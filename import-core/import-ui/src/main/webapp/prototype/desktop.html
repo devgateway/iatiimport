@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>IATI Import - Template</title>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+    <!-- Latest compiled and minified JavaScript -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <nav class="navbar navbar-default">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">IATI Import Tool</a>
+        </div>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav">
+            <!-- Single button -->
+            <li class="active"><a href="#"><div class="glyphicon glyphicon-home"></div> Home</a></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><div class="glyphicon glyphicon-import"></div> Import Process <span class="caret"></span></a>
+              <ul class="dropdown-menu" role="menu">
+                <li><a href="wizard.html">IATI Version 1.05</a></li>
+                <li><a href="wizard.html"">IATI Version 2.01</a></li>
+                <li class="divider"></li>
+                <li><a href="wizard.html"">Other Sources</a></li>
+              </ul>
+            </li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><div class="glyphicon glyphicon-list"></div> Reports <span class="caret"></span></a>
+              <ul class="dropdown-menu" role="menu">
+                <li><a href="previous.html">Previous Imports</a></li>
+                <li><a href="previous.html">Logs</a></li>
+              </ul>
+            </li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><div class="glyphicon glyphicon-cog"></div> Administration <span class="caret"></span></a>
+              <ul class="dropdown-menu" role="menu">
+                <li><a href="#">Users</a></li>
+                <li><a href="#">Groups</a></li>
+                <li class="divider">Metadata</li>
+                <li><a href="#">Field Mappings</a></li>
+                <li><a href="#">Value Mappings</a></li>
+              </ul>
+            </li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><div class="glyphicon glyphicon-user"></div> User <span class="caret"></span></a>
+              <ul class="dropdown-menu" role="menu">
+                <li><a href="#">Settings</a></li>
+                <li><a href="#">Log Out</a></li>
+              </ul>
+            </li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><div class="glyphicon glyphicon-book"></div> Language <span class="caret"></span></a>
+                <ul class="dropdown-menu" role="menu">
+                    <li><a href="#">English</a></li>
+                    <li><a href="#">Spanish</a></li>
+                    <li><a href="#">Portuguese</a></li>
+                </ul>
+            </li>
+          </ul>
+        </div><!-- /.navbar-collapse -->
+    </nav>
+    <div class="container">
+        <br/>
+        <div class="panel panel-danger">
+            <!-- Default panel contents -->
+            <div class="panel-heading">Latest Imports</div>
+            <div class="panel-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>
+                                Import Type
+                            </th>
+                            <th>
+                                Date and Time
+                            </th>
+                            <th>
+                                Author
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                IATI 1.05
+                            </td>
+                            <td>
+                                Moments ago
+                            </td>
+                            <td>
+                                Gregor Samsa
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <br/>
+        <div class="panel panel-success">
+            <!-- Default panel contents -->
+            <div class="panel-heading">Latest Errors</div>
+            <div class="panel-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>
+                                Import Type
+                            </th>
+                            <th>
+                                Date and Time
+                            </th>
+                            <th>
+                                Author
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                IATI 2.01
+                            </td>
+                            <td>
+                                2 days ago
+                            </td>
+                            <td>
+                                Luke Skywalker
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                IATI 1.05
+                            </td>
+                            <td>
+                                October 23rd, 2014
+                            </td>
+                            <td>
+                                Admin
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <footer class="footer">
+            <p>Developed by Development Gateway, Inc - 2015 </p>
+        </footer>
+    </div>
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>

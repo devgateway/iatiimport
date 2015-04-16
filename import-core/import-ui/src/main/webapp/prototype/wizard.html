@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>IATI Import - Template</title>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+    <!-- Latest compiled and minified JavaScript -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/fileinput.min.css">
+</head>
+<body>
+    <nav class="navbar navbar-default navbar-iati">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">IATI Import Tool</a>
+        </div>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav">
+            <!-- Single button -->
+            <li class="active"><a href="#"><div class="glyphicon glyphicon-home"></div> Home</a></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><div class="glyphicon glyphicon-import"></div> Import Process <span class="caret"></span></a>
+              <ul class="dropdown-menu" role="menu">
+                <li><a href="wizard.html">IATI Version 1.05</a></li>
+                <li><a href="wizard.html"">IATI Version 2.01</a></li>
+                <li class="divider"></li>
+                <li><a href="wizard.html"">Other Sources</a></li>
+              </ul>
+            </li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><div class="glyphicon glyphicon-list"></div> Reports <span class="caret"></span></a>
+              <ul class="dropdown-menu" role="menu">
+                <li><a href="previous.html">Previous Imports</a></li>
+                <li><a href="previous.html">Logs</a></li>
+              </ul>
+            </li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><div class="glyphicon glyphicon-cog"></div> Administration <span class="caret"></span></a>
+              <ul class="dropdown-menu" role="menu">
+                <li><a href="#">Users</a></li>
+                <li><a href="#">Groups</a></li>
+                <li class="divider">Metadata</li>
+                <li><a href="#">Field Mappings</a></li>
+                <li><a href="#">Value Mappings</a></li>
+              </ul>
+            </li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><div class="glyphicon glyphicon-user"></div> User <span class="caret"></span></a>
+              <ul class="dropdown-menu" role="menu">
+                <li><a href="#">Settings</a></li>
+                <li><a href="#">Log Out</a></li>
+              </ul>
+            </li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><div class="glyphicon glyphicon-book"></div> Language <span class="caret"></span></a>
+                <ul class="dropdown-menu" role="menu">
+                    <li><a href="#">English</a></li>
+                    <li><a href="#">Spanish</a></li>
+                    <li><a href="#">Portuguese</a></li>
+                </ul>
+            </li>
+          </ul>
+        </div><!-- /.navbar-collapse -->
+    </nav>
+    <div class="container">
+      <h2>Import Process <small>IATI 1.05</small></h2>
+      <div class="row">
+        <div class="col-sm-3 col-md-3">
+          <ul class="nav nav-pills nav-stacked" role="tablist">
+            <li role="presentation" class="active"><a href="#file" aria-controls="file" role="tab" data-toggle="tab"><div class="glyphicon glyphicon-file"></div> Upload File(s) <span class="sr-only">(current)</span><span class="badge">Done</span></a></li>
+            <li role="presentation"><a href="#filter" aria-controls="filter" role="tab" data-toggle="tab"><div class="glyphicon glyphicon-filter"></div> Filter Data <span class="badge">Done</span></a></li>
+            <li role="presentation"><a href="#projects" aria-controls="projects" role="tab" data-toggle="tab"><div class="glyphicon glyphicon-list-alt"></div> Choose Projects</a></li>
+            <li role="presentation"><a href="#fields" aria-controls="fields" role="tab" data-toggle="tab"><div class="glyphicon glyphicon-tasks"></div> Choose Fields</a></li>
+            <li role="presentation"><a href="#mapvalues" aria-controls="mapvalues" role="tab" data-toggle="tab"><div class="glyphicon glyphicon-tasks"></div> Map Values</a></li>
+            <li role="presentation"><a href="#review" aria-controls="review" role="tab" data-toggle="tab"><div class="glyphicon glyphicon-save"></div> Review and Import</a></li>
+          </ul>
+        </div>
+        <div class="col-sm-9 col-md-9 main">
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane" id="file">
+                    <div class="panel panel-default">
+                    <div class="panel-heading"><strong>Upload file(s)</strong></div>
+                        <div class="panel-body">
+                            Select files to upload
+                            <input id="input-1" type="file" class="file">
+                        </div>
+                        <div class="progress" style="margin:0px 20px 0px 20px">
+                          <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%">
+                            <span class="sr-only">40% Complete (success)</span>
+                          </div>
+                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Filename
+                                    </th>
+                                    <th>
+                                        Date and Time
+                                    </th>
+                                    <th>
+                                        Action
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        project_raw_data.xml
+                                    </td>
+                                    <td>
+                                        2 days ago
+                                    </td>
+                                    <td>
+                                        <span class="label label-success">View</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        project_raw_data_2.xml
+                                    </td>
+                                    <td>
+                                        October 23rd, 2014
+                                    </td>
+                                    <td>
+                                        <span class="label label-success">View</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <br /><br /><br />
+                        <div style="text-align:right;padding:10px;">
+                            <button type="button" class="btn btn-warning navbar-btn" style="width:200px;">Process</button>&nbsp;
+                            <button type="button" class="btn btn-disabled navbar-btn" style="width:200px;">Next >></button>
+                        </div>
+                    </div>
+                </div>
+                <div role="tabpanel" class="tab-pane " id="filter">
+                    <div class="panel panel-default">
+                        <div class="panel-heading"><strong>Filter Information</strong></div>
+                        <div class="panel-body">
+                            Select for each field, which values you would like to include as part of the import process
+                            <br /><br />
+                            <div class="panel panel-warning">
+                                <div class="panel-heading">Recipient Country</div>
+                                <div class="panel-body">
+                                    <div class="input-group">
+                                      <span class="input-group-addon">
+                                        <input type="checkbox" aria-label="Field1">
+                                      </span>
+                                      <input type="text" class="form-control" aria-label="Field1" value="Honduras" readonly></inputy>
+                                    </div>
+                                    <div class="input-group">
+                                      <span class="input-group-addon">
+                                        <input type="checkbox" aria-label="Field1">
+                                      </span>
+                                      <input type="text" class="form-control" aria-label="Field1" value="Nicaragua" readonly></inputy>
+                                    </div>
+                                    <div class="input-group">
+                                      <span class="input-group-addon">
+                                        <input type="checkbox" aria-label="Field1">
+                                      </span>
+                                      <input type="text" class="form-control" aria-label="Field1" value="Belize" readonly></inputy>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel panel-warning">
+                                <div class="panel-heading">Language</div>
+                                <div class="panel-body">
+                                    <div class="input-group">
+                                      <span class="input-group-addon">
+                                        <input type="checkbox" aria-label="Field1">
+                                      </span>
+                                      <input type="text" class="form-control" aria-label="Field1" value="English" readonly></inputy>
+                                    </div>
+                                    <div class="input-group">
+                                      <span class="input-group-addon">
+                                        <input type="checkbox" aria-label="Field1">
+                                      </span>
+                                      <input type="text" class="form-control" aria-label="Field1" value="Spanish" readonly></inputy>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="text-align:right;padding:10px;">
+                            <button type="button" class="btn btn-success navbar-btn" style="width:200px;">Next >></button>
+                        </div>
+                    </div>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="projects">
+                    <div class="panel panel-default">
+                        <div class="panel-heading"><strong>Choose Projects</strong></div>
+                        <div class="panel-body">
+                            <div class="panel panel-success">
+                                <div class="panel-heading">New Projects</div>
+                                <div class="panel-body">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    Import
+                                                </th>
+                                                <th>
+                                                    Source Project
+                                                </th>
+                                                <th>
+                                                    Destination Project
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                        <input type="checkbox" aria-label="Field1">
+                                                </td>
+                                                <td>
+                                                    Source Project Name 1
+                                                </td>
+                                                <td>
+                                                    <div class="autocomplete">
+                                                      <input class="typeahead" type="text" placeholder="Destination Project Name 1">
+                                                    </div>                                                
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                        <input type="checkbox" aria-label="Field1">
+                                                </td>
+                                                <td>
+                                                    Source Project Name 2
+                                                </td>
+                                                <td>
+                                                    <div class="autocomplete">
+                                                      <input class="typeahead" type="text" placeholder="Destination Project Name 2">
+                                                    </div>                                                
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="panel panel-danger">
+                                <div class="panel-heading">Existing Projects</div>
+                                <div class="panel-body">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    Update
+                                                </th>
+                                                <th>
+                                                    Source Project
+                                                </th>
+                                                <th>
+                                                    Destination Project
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <input type="checkbox" aria-label="Field1">
+                                                </td>
+                                                <td>
+                                                    Source Project Name 1
+                                                </td>
+                                                <td>
+                                                    <div class="autocomplete">
+                                                      <input class="typeahead" type="text" placeholder="Destination Project Name 1">
+                                                    </div>                                                
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <input type="checkbox" aria-label="Field1">
+                                                </td>
+                                                <td>
+                                                    Source Project Name 2
+                                                </td>
+                                                <td>
+                                                    <div class="autocomplete">
+                                                      <input class="typeahead" type="text" placeholder="Destination Project Name 2">
+                                                    </div>                                                
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="text-align:right;padding:10px;">
+                            <button type="button" class="btn btn-success navbar-btn" style="width:200px;">Next >></button>
+                        </div>
+                    </div>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="fields">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <strong>Choose and Map Fields</strong>
+                        </div>
+                            <div class="panel-body">
+                                <ul class="nav nav-pills navbar-right">
+                                    <li role="presentation" class="dropdown">
+                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-expanded="false">
+                                            Load Existing Template
+                                            <span class="caret"></span>
+                                        </a>
+                                        <ul class="dropdown-menu" role="menu">
+                                            <li role="presentation"><a href="#template1" aria-controls="template1">Template 1 IATI 1.05</a></li>
+                                            <li role="presentation"><a href="#template2" aria-controls="template2">Template 2 IATI 2.01</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                Import/Update
+                                            </th>
+                                            <th>
+                                                Source Field
+                                            </th>
+                                            <th>
+                                                Destination Field
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <input type="checkbox" aria-label="Field1">
+                                            </td>
+                                            <td>
+                                                <div class="table_cell">
+                                                Activity Status
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <ul class="nav nav-pills navbar-left">
+                                                    <li role="presentation" class="dropdown">
+                                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-expanded="false">
+                                                            Project Status
+                                                            <span class="caret"></span>
+                                                        </a>
+                                                        <ul class="dropdown-menu" role="menu">
+                                                            <li role="presentation"><a href="#template1" aria-controls="template1">Project Status</a></li>
+                                                            <li role="presentation"><a href="#template2" aria-controls="template2">Project Title</a></li>
+                                                            <li role="presentation"><a href="#template2" aria-controls="template2">Description</a></li>
+                                                            <li role="presentation"><a href="#template2" aria-controls="template2">Sectors</a></li>
+                                                            <li role="presentation"><a href="#template2" aria-controls="template2">Contacts</a></li>
+                                                            <li role="presentation"><a href="#template2" aria-controls="template2">Location</a></li>
+                                                            <li role="presentation"><a href="#template2" aria-controls="template2">Disbursements</a></li>
+                                                            <li role="presentation"><a href="#template2" aria-controls="template2">Commitments</a></li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="checkbox" aria-label="Field1">
+                                            </td>
+                                            <td>
+                                                <div class="table_cell">
+                                                Project Name
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <ul class="nav nav-pills navbar-left">
+                                                    <li role="presentation" class="dropdown">
+                                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-expanded="false">
+                                                            Project Title
+                                                            <span class="caret"></span>
+                                                        </a>
+                                                        <ul class="dropdown-menu" role="menu">
+                                                            <li role="presentation"><a href="#template1" aria-controls="template1">Project Status</a></li>
+                                                            <li role="presentation"><a href="#template2" aria-controls="template2">Project Title</a></li>
+                                                            <li role="presentation"><a href="#template2" aria-controls="template2">Description</a></li>
+                                                            <li role="presentation"><a href="#template2" aria-controls="template2">Sectors</a></li>
+                                                            <li role="presentation"><a href="#template2" aria-controls="template2">Contacts</a></li>
+                                                            <li role="presentation"><a href="#template2" aria-controls="template2">Location</a></li>
+                                                            <li role="presentation"><a href="#template2" aria-controls="template2">Disbursements</a></li>
+                                                            <li role="presentation"><a href="#template2" aria-controls="template2">Commitments</a></li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="checkbox" aria-label="Field1">
+                                            </td>
+                                            <td>
+                                                <div class="table_cell">
+                                                Description
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <ul class="nav nav-pills navbar-left">
+                                                    <li role="presentation" class="dropdown">
+                                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-expanded="false">
+                                                            Description
+                                                            <span class="caret"></span>
+                                                        </a>
+                                                        <ul class="dropdown-menu" role="menu">
+                                                            <li role="presentation"><a href="#template1" aria-controls="template1">Project Status</a></li>
+                                                            <li role="presentation"><a href="#template2" aria-controls="template2">Project Title</a></li>
+                                                            <li role="presentation"><a href="#template2" aria-controls="template2">Description</a></li>
+                                                            <li role="presentation"><a href="#template2" aria-controls="template2">Sectors</a></li>
+                                                            <li role="presentation"><a href="#template2" aria-controls="template2">Contacts</a></li>
+                                                            <li role="presentation"><a href="#template2" aria-controls="template2">Location</a></li>
+                                                            <li role="presentation"><a href="#template2" aria-controls="template2">Disbursements</a></li>
+                                                            <li role="presentation"><a href="#template2" aria-controls="template2">Commitments</a></li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="checkbox" aria-label="Field1">
+                                            </td>
+                                            <td>
+                                                <div class="table_cell">
+                                                Contacts
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <ul class="nav nav-pills navbar-left">
+                                                    <li role="presentation" class="dropdown">
+                                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-expanded="false">
+                                                            Contacts
+                                                            <span class="caret"></span>
+                                                        </a>
+                                                        <ul class="dropdown-menu" role="menu">
+                                                            <li role="presentation"><a href="#template1" aria-controls="template1">Project Status</a></li>
+                                                            <li role="presentation"><a href="#template2" aria-controls="template2">Project Title</a></li>
+                                                            <li role="presentation"><a href="#template2" aria-controls="template2">Description</a></li>
+                                                            <li role="presentation"><a href="#template2" aria-controls="template2">Sectors</a></li>
+                                                            <li role="presentation"><a href="#template2" aria-controls="template2">Contacts</a></li>
+                                                            <li role="presentation"><a href="#template2" aria-controls="template2">Location</a></li>
+                                                            <li role="presentation"><a href="#template2" aria-controls="template2">Disbursements</a></li>
+                                                            <li role="presentation"><a href="#template2" aria-controls="template2">Commitments</a></li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div style="text-align:right;padding:10px;">
+                                <button type="button" class="btn btn-warning navbar-btn" style="width:200px;">Save</button>&nbsp;
+                                <button type="button" class="btn btn-success navbar-btn" style="width:200px;">Next >></button>
+                            </div>
+                    </div>
+                </div>
+                <div role="tabpanel" class="tab-pane active" id="mapvalues">
+                    <div class="panel panel-default">
+                            <div class="panel-heading"><strong>Map Fields Values</strong></div>
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-sm-12 col-md-12">
+                                        <ul class="nav nav-pills navbar-right">
+                                            <li role="presentation" class="dropdown">
+                                                <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-expanded="false">
+                                                    Load Existing Mapping
+                                                    <span class="caret"></span>
+                                                </a>
+                                                <ul class="dropdown-menu" role="menu">
+                                                    <li role="presentation"><a href="#template1" aria-controls="template1">Value Mapping 1</a></li>
+                                                    <li role="presentation"><a href="#template2" aria-controls="template2">Value Mapping 2</a></li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3 col-md-3">
+                                        <ul class="nav nav-pills nav-stacked" role="tablist">
+                                            <li role="presentation" class="active"><a href="#field_one" aria-controls="field_one" role="tab" data-toggle="tab">Activity Status</a></li>
+                                            <li role="presentation"><a href="#field_two" aria-controls="field_two" role="tab" data-toggle="tab">Financing Instrument</a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-sm-9 col-md-9 main">
+                                        <div class="tab-content">
+                                            <div role="tabpanel" class="tab-pane active" id="field_one">
+                                                <div class="panel panel-default">
+                                                    <div class="panel-body">
+                                                        <table class="table">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>
+                                                                        Source Values
+                                                                    </th>
+                                                                    <th>
+                                                                        Destination Value
+                                                                    </th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td>
+                                                                        <div class="table_cell">
+                                                                            Completed
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <ul class="nav nav-pills navbar-left">
+                                                                            <li role="presentation" class="dropdown">
+                                                                                <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-expanded="false">
+                                                                                    Completed
+                                                                                    <span class="caret"></span>
+                                                                                </a>
+                                                                                <ul class="dropdown-menu" role="menu">
+                                                                                    <li role="presentation"><a href="#template1" aria-controls="template1">Completed</a></li>
+                                                                                    <li role="presentation"><a href="#template1" aria-controls="template1">Ongoing</a></li>
+                                                                                    <li role="presentation"><a href="#template2" aria-controls="template2">Pipeline</a></li>
+                                                                                </ul>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>
+                                                                        <div class="table_cell">
+                                                                            Ongoing
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <ul class="nav nav-pills navbar-left">
+                                                                            <li role="presentation" class="dropdown">
+                                                                                <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-expanded="false">
+                                                                                    Ongoing
+                                                                                    <span class="caret"></span>
+                                                                                </a>
+                                                                                <ul class="dropdown-menu" role="menu">
+                                                                                    <li role="presentation"><a href="#template1" aria-controls="template1">Completed</a></li>
+                                                                                    <li role="presentation"><a href="#template1" aria-controls="template1">Ongoing</a></li>
+                                                                                    <li role="presentation"><a href="#template2" aria-controls="template2">Pipeline</a></li>
+                                                                                </ul>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>
+                                                                        <div class="table_cell">
+                                                                            Pipeline
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <ul class="nav nav-pills navbar-left">
+                                                                            <li role="presentation" class="dropdown">
+                                                                                <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-expanded="false">
+                                                                                    Pipeline
+                                                                                    <span class="caret"></span>
+                                                                                </a>
+                                                                                <ul class="dropdown-menu" role="menu">
+                                                                                    <li role="presentation"><a href="#template1" aria-controls="template1">Completed</a></li>
+                                                                                    <li role="presentation"><a href="#template1" aria-controls="template1">Ongoing</a></li>
+                                                                                    <li role="presentation"><a href="#template2" aria-controls="template2">Pipeline</a></li>
+                                                                                </ul>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div role="tabpanel" class="tab-pane" id="field_two">
+                                                <div class="panel panel-default">
+                                                    <div class="panel-body">
+                                                        <table class="table">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>
+                                                                        Source Values
+                                                                    </th>
+                                                                    <th>
+                                                                        Destination Value
+                                                                    </th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td>
+                                                                        <div class="table_cell">
+                                                                            Grant
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <ul class="nav nav-pills navbar-left">
+                                                                            <li role="presentation" class="dropdown">
+                                                                                <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-expanded="false">
+                                                                                    Grant
+                                                                                    <span class="caret"></span>
+                                                                                </a>
+                                                                                <ul class="dropdown-menu" role="menu">
+                                                                                    <li role="presentation"><a href="#template1" aria-controls="template1">Grant</a></li>
+                                                                                    <li role="presentation"><a href="#template1" aria-controls="template1">Loan</a></li>
+                                                                                </ul>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>
+                                                                        <div class="table_cell">
+                                                                            Loan
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <ul class="nav nav-pills navbar-left">
+                                                                            <li role="presentation" class="dropdown">
+                                                                                <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-expanded="false">
+                                                                                    Loan
+                                                                                    <span class="caret"></span>
+                                                                                </a>
+                                                                                <ul class="dropdown-menu" role="menu">
+                                                                                    <li role="presentation"><a href="#template1" aria-controls="template1">Grant</a></li>
+                                                                                    <li role="presentation"><a href="#template1" aria-controls="template1">Loan</a></li>
+                                                                                </ul>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="text-align:right;padding:10px;">
+                                    <button type="button" class="btn btn-warning navbar-btn" style="width:200px;">Save</button>&nbsp;
+                                    <button type="button" class="btn btn-success navbar-btn" style="width:200px;">Next >></button>
+                                </div>
+
+                            </div>
+                    </div>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="review">
+                    <div class="panel panel-default">
+                        <div class="panel-heading"><strong>Review and Import</strong></div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-sm-3 col-md-3">
+                                </div>
+                                <div class="col-sm-6 col-md-6">
+                                    <div class="form-group has-success has-feedback">
+                                        <input type="text" class="form-control" id="inputSuccess2" aria-describedby="inputSuccess2Status" value="Files Uploaded" READONLY>
+                                        <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
+                                    </div>
+                                    <div class="form-group has-success has-feedback">
+                                        <input type="text" class="form-control" id="inputSuccess2" aria-describedby="inputSuccess2Status" value="Data Filtered" READONLY>
+                                        <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
+                                    </div>
+                                    <div class="form-group has-success has-feedback">
+                                        <input type="text" class="form-control" id="inputSuccess2" aria-describedby="inputSuccess2Status" value="Projects Selected" READONLY>
+                                        <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
+                                    </div>
+                                    <div class="form-group has-success has-feedback">
+                                        <input type="text" class="form-control" id="inputSuccess2" aria-describedby="inputSuccess2Status" value="Fields Selected" READONLY>
+                                        <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
+                                    </div>
+                                    <div class="form-group has-success has-feedback">
+                                        <input type="text" class="form-control" id="inputSuccess2" aria-describedby="inputSuccess2Status" value="Values Mapped" READONLY>
+                                        <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3 col-md-3">
+                                </div>
+                            </div>
+                            <div style="text-align:right;padding:10px;">
+                                <button type="button" class="btn btn-warning navbar-btn" style="width:200px;">Cancel</button>&nbsp;
+                                <button type="button" class="btn btn-success navbar-btn" style="width:200px;">Proceed with Import</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="container">
+        <br/>
+        <footer class="footer">
+            <p>Developed by Development Gateway, Inc - 2015 </p>
+        </footer>
+    </div>
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+<script src="js/fileinput.min.js"></script>
+<script src="js/typeahead.bundle.min.js"></script>
+<script src="js/typeaheadimpl.js"></script>
+</body>
+</html>
