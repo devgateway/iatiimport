@@ -18,6 +18,10 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @ComponentScan
 @EnableConfigurationProperties
 public class RestApplication {
+	public static void main(String[] args) {
+	//    SpringApplication.run(Application.class);
+	}
+	
     @Bean
     MultipartConfigElement multipartConfigElement() {
         return new MultipartConfigElement("");
