@@ -2,6 +2,7 @@ package org.devgateway.importtool.rest;
 
 import javax.servlet.MultipartConfigElement;
 
+import org.devgateway.importtool.services.Application;
 import org.devgateway.importtool.services.ServiceConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -18,7 +19,11 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @ComponentScan
 @EnableConfigurationProperties
 public class RestApplication {
-    @Bean
+	public static void main(String[] args) {
+	//    SpringApplication.run(Application.class);
+	}
+	
+	@Bean
     MultipartConfigElement multipartConfigElement() {
         return new MultipartConfigElement("");
     }
