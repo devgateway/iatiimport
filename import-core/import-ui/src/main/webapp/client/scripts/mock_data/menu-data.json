@@ -4,7 +4,8 @@
         "label": " Home",
         "enabled": true,
         "position": "navbar-left",
-        "iconClass":"glyphicon-home"
+        "iconClass":"glyphicon-home",
+         "url": "#/home"
     },
     {
         "name": "import_process",
@@ -17,13 +18,15 @@
                 "name": "iati1",
                 "label": "IATI Version 1.05",
                 "enabled": true,
-                "type":"menu-item"
+                "type":"menu-item",
+                 "url": "#/wizard/iati1"
             },
             {
                 "name": "iati2",
                 "label": "IATI Version 2.01",
                 "enabled": true,
-                "type":"menu-item"
+                "type":"menu-item",
+                "url": "#/wizard/iati2"
             },
             {
                 "name": "divider1",
@@ -35,7 +38,8 @@
                 "name": "other_sources",
                 "label": "Other Sources",
                 "enabled": true,
-                "type":"menu-item"
+                "type":"menu-item",
+                "url": "#/wizard/other"
             }
         ]
     },
@@ -50,13 +54,15 @@
                 "name": "previous_imports",
                 "label": "Previous Imports",
                 "enabled": true,
-                "type":"menu-item"
+                "type":"menu-item",
+                 "url": "#/reports/previousimports"
             },
             {
                 "name": "logs",
                 "label": "Logs",
                 "enabled": true,
-                "type": "menu-item"
+                "type": "menu-item",
+                "url": "#/reports/logs"
             }
         ]
     },
@@ -71,13 +77,15 @@
                 "name": "users",
                 "label": "Users",
                 "enabled": true,
-                "type":"menu-item"
+                "type":"menu-item",
+                "url": "#/admin/users"
             },
             {
                 "name": "groups",
                 "label": "Groups",
                 "enabled": true,
-                "type":"menu-item"
+                "type":"menu-item",
+                "url": "#/admin/groups"
             },
             {
                 "name": "divider2",
@@ -89,13 +97,15 @@
                 "name": "field_mappings",
                 "label": "Field Mappings",
                 "enabled": true,
-                "type":"menu-item"
+                "type":"menu-item",
+                "url": "#/admin/fieldmappings"
             },
             {
                 "name": "value_mappings",
                 "label": "Value Mappings",
                 "enabled": true,
-                "type":"menu-item"
+                "type":"menu-item",
+                "url": "#/admin/valuemappings"
             }
         ]
     },
@@ -110,13 +120,15 @@
                 "name": "settings",
                 "label": "Settings",
                 "enabled": true,
-                "type":"menu-item"
+                "type":"menu-item",
+                "url": "#/user/settings"
             },
             {
                 "name": "log_out",
                 "label": "Log Out",
                 "enabled": true,
-                "type":"menu-item"                
+                "type":"menu-item",
+                "url": "#/user/logout"               
             }
         ]
     },
@@ -131,19 +143,22 @@
                 "name": "english",
                 "label": "English",
                 "enabled": true,
-                "type":"menu-item"
+                "type":"menu-item",
+                 "url": "#/language/en" 
             },
             {
                 "name": "spanish",
                 "label": "Spanish",
                 "enabled": true,
-                "type":"menu-item"
+                "type":"menu-item",
+                "url": "#/language/es"
             },
             {
                 "name": "french",
                 "label": "French",
                 "enabled": true,
-                "type":"menu-item"
+                "type":"menu-item",
+                "url": "#/language/fr"
             }
         ]
     }

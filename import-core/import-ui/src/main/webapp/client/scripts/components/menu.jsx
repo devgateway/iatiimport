@@ -41,7 +41,7 @@ var Menu = React.createClass({
                 if(item.position == NAVBAR_LEFT){                                                
                    menusLeft.push(
                     <li className="dropdown" key={item.label}>
-                     <a href="#" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="true"><div className={iconClass}></div>{item.label} <span className={caret}></span></a>
+                     <a href={item.url} className="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="true"><div className={iconClass}></div>{item.label} <span className={caret}></span></a>
                      {subMenu}
                    </li>
                    );
