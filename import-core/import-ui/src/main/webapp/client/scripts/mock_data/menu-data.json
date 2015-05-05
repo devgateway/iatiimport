@@ -1,0 +1,150 @@
+[
+    {
+        "name": "home",
+        "label": " Home",
+        "enabled": true,
+        "position": "navbar-left",
+        "iconClass":"glyphicon-home"
+    },
+    {
+        "name": "import_process",
+        "label": " Import Process",
+        "enabled": true,
+        "position": "navbar-left",
+        "iconClass":"glyphicon-import",
+        "children": [
+            {
+                "name": "iati1",
+                "label": "IATI Version 1.05",
+                "enabled": true,
+                "type":"menu-item"
+            },
+            {
+                "name": "iati2",
+                "label": "IATI Version 2.01",
+                "enabled": true,
+                "type":"menu-item"
+            },
+            {
+                "name": "divider1",
+                "label": "divider1",
+                "enabled": true,
+                "type":"divider"
+            },
+            {
+                "name": "other_sources",
+                "label": "Other Sources",
+                "enabled": true,
+                "type":"menu-item"
+            }
+        ]
+    },
+    {
+        "name": "reports",
+        "label": " Reports",
+        "enabled": true,
+        "position": "navbar-left",
+        "iconClass":"glyphicon-list",
+        "children": [
+            {
+                "name": "previous_imports",
+                "label": "Previous Imports",
+                "enabled": true,
+                "type":"menu-item"
+            },
+            {
+                "name": "logs",
+                "label": "Logs",
+                "enabled": true,
+                "type": "menu-item"
+            }
+        ]
+    },
+    {
+        "name": "administration",
+        "label": " Administration",
+        "enabled": true,
+        "position": "navbar-left",
+        "iconClass":"glyphicon-cog",
+        "children": [
+            {
+                "name": "users",
+                "label": "Users",
+                "enabled": true,
+                "type":"menu-item"
+            },
+            {
+                "name": "groups",
+                "label": "Groups",
+                "enabled": true,
+                "type":"menu-item"
+            },
+            {
+                "name": "divider2",
+                "label": "divider2",
+                "enabled": true,
+                "type":"divider"
+            },
+            {
+                "name": "field_mappings",
+                "label": "Field Mappings",
+                "enabled": true,
+                "type":"menu-item"
+            },
+            {
+                "name": "value_mappings",
+                "label": "Value Mappings",
+                "enabled": true,
+                "type":"menu-item"
+            }
+        ]
+    },
+    {
+        "name": "user",
+        "label": " User",
+        "enabled": true,
+        "position": "navbar-right",
+        "iconClass":"glyphicon-user",
+        "children": [
+            {
+                "name": "settings",
+                "label": "Settings",
+                "enabled": true,
+                "type":"menu-item"
+            },
+            {
+                "name": "log_out",
+                "label": "Log Out",
+                "enabled": true,
+                "type":"menu-item"                
+            }
+        ]
+    },
+    {
+        "name": "language",
+        "label": " Language",
+        "enabled": true,
+        "position": "navbar-right",
+        "iconClass":"glyphicon-book",
+        "children": [
+            {
+                "name": "english",
+                "label": "English",
+                "enabled": true,
+                "type":"menu-item"
+            },
+            {
+                "name": "spanish",
+                "label": "Spanish",
+                "enabled": true,
+                "type":"menu-item"
+            },
+            {
+                "name": "french",
+                "label": "French",
+                "enabled": true,
+                "type":"menu-item"
+            }
+        ]
+    }
+]
