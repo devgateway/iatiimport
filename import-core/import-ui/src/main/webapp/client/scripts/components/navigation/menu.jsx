@@ -1,9 +1,9 @@
 var React = require('react');
-var menuStore = require('../stores/MenuStore');
+var menuStore = require('./../../stores/MenuStore');
 var reactAsync = require('react-async');
 var Reflux = require('reflux');
 var NAVBAR_LEFT = 'navbar-left';
-var appActions = require('./../actions');
+var appActions = require('./../../actions');
 var SubMenu = require('./sub-menu');
 var Menu = React.createClass({
   mixins: [reactAsync.Mixin, Reflux.ListenerMixin],

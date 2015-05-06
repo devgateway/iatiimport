@@ -1,5 +1,5 @@
 var React = require('react');
-var Menu = require('./menu');
+var Menu = require('./../navigation/menu');
 var Header = React.createClass({
   render: function() {
     return (

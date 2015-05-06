@@ -1,7 +1,7 @@
 var React = require('react');
-var Header = require('./header');
-var Footer = require('./footer');
-var Content = require('./content');
+var Header = require('./../layout/header');
+var Footer = require('./../layout/footer');
+var WizardSteps = require('./wizard-steps');
 var Wizard = React.createClass({
   componentDidMount: function () {
       // from the path '/wizard/:id'
@@ -12,8 +12,11 @@ var Wizard = React.createClass({
      <div>     
        <Header />
        <div className="container">
-       <h1>Wizard {this.props.params.id}</h1>
-       </div>
+         <h2>Import Process <small>IATI 1.05</small></h2>
+          <div className="row">
+           <WizardSteps/>         
+         </div>
+        </div>
        <Footer/>
       </div>
     );
