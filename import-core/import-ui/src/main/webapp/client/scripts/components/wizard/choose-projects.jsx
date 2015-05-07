@@ -4,7 +4,7 @@ var UploadFile = React.createClass({
     return (
     
         <div className="panel panel-default">
-                <div className="panel-heading"><strong>Upload file(s)</strong></div>
+                <div className="panel-heading"><strong>Choose Projects</strong></div>
         </div>
         
     );

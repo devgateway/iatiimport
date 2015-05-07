@@ -172,3 +172,61 @@
 .table_cell {
     padding-top:10px;
 }
+
+
+
+.wizard-steps > li > a.active,
+.wizard-steps > li > a:focus {
+  color: #FFF;
+  background-color: #337AB7;	
+  text-decoration: none;
+}
+
+.wizard-steps {
+  padding-left: 0;
+  margin-bottom: 0;
+  list-style: none;
+}
+.wizard-steps > li {
+  position: relative;
+  display: block;
+}
+.wizard-steps > li > a {
+  position: relative;
+  display: block;
+  padding: 10px 15px;
+}
+.wizard-steps > li > a:hover{
+  text-decoration: none;
+  background-color: #eee;
+  color: #337AB7
+}
+
+.wizard-steps > li.disabled > a {
+  color: #337AB7
+}
+.wizard-steps > li.disabled > a:hover,
+.wizard-steps > li.disabled > a:focus {
+  color: #337AB7
+  text-decoration: none;
+  cursor: not-allowed;
+  background-color: transparent;
+}
+.wizard-steps .open > a,
+.wizard-steps .open > a:hover,
+.wizard-steps .open > a:focus {
+  background-color: #eee;
+  border-color: #337ab7;
+  color: #337AB7
+}
+.wizard-steps .wizard-steps-divider {
+  height: 1px;
+  margin: 9px 0;
+  overflow: hidden;
+  background-color: #e5e5e5;
+  color: #337AB7
+}
+.wizard-steps > li > a > img {
+  max-width: none;
+}
+
