@@ -11,4 +11,6 @@ public interface ISourceProcessor {
 	public List<InternalDocument> getDocuments();
 
 	public String getIdField();
+	
+	//public Boolean isFormatValid();
 }

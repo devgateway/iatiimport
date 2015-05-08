@@ -1,0 +1,37 @@
+<codelist date-last-modified="2015-03-25T12:12:02.001138+00:00" version="" name="FlowType" xml:lang="en">
+  <FlowType>
+    <code>10</code>
+    <name>ODA</name>
+    <language>en</language>
+    <description>Aide Publique au D&#233;veloppement</description>
+  </FlowType>
+  <FlowType>
+    <code>20</code>
+    <name>OOF</name>
+    <language>en</language>
+    <description>Other Official Flows</description>
+  </FlowType>
+  <FlowType>
+    <code>30</code>
+    <name>Private NGO and other private sources</name>
+    <language>en</language>
+    <description>ONG et autres sources</description>
+  </FlowType>
+  <FlowType>
+    <code>35</code>
+    <name>Private Market</name>
+    <language>en</language>
+  </FlowType>
+  <FlowType>
+    <code>40</code>
+    <name>Non flow</name>
+    <language>en</language>
+    <description>e.g. GNI</description>
+  </FlowType>
+  <FlowType>
+    <code>50</code>
+    <name>Other flows</name>
+    <language>en</language>
+    <description>e.g. non-ODA component of peacebuilding operations</description>
+  </FlowType>
+</codelist>

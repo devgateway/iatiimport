@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--This is example XML for the IATI activity standard.  No reference to actual data, real organisations or development cooperation models is intended.-->
+<!--iati-activities starts-->
+<iati-activities generated-datetime="2014-09-10T07:15:37Z" version="2.01" linked-data-default="http://data.example.org/">
+ <iati-activity xml:lang="en" default-currency="USD" last-updated-datetime="2014-09-10T07:15:37Z" linked-data-uri="http://data.example.org/123456789" hierarchy="1">
+  <iati-identifier>AA-AAA-123456789-ABC123</iati-identifier>
+  <title>
+   <narrative>Activity title</narrative>
+   <narrative xml:lang="fr">Titre de l'activité</narrative>
+   <narrative xml:lang="es">Título de la actividad</narrative>
+  </title>
+  <activity-scope code="3" />
+ </iati-activity>
+ <iati-activity xml:lang="en" default-currency="USD" last-updated-datetime="2014-09-10T07:15:37Z" linked-data-uri="http://data.example.org/123456789" hierarchy="1">
+  <iati-identifier>AA-AAA-123456789-ABC123</iati-identifier>
+  <title>
+   <narrative>Activity title</narrative>
+   <narrative xml:lang="fr">Titre de l'activité</narrative>
+   <narrative xml:lang="es">Título de la actividad</narrative>
+  </title>
+  <activity-status code="2" />
+ </iati-activity>
+</iati-activities>

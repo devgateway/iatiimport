@@ -1,0 +1,87 @@
+<codelist date-last-modified="2015-03-25T12:12:02.432941+00:00" version="" name="Region" xml:lang="en">
+  <Region>
+    <code>88</code>
+    <name>States Ex-Yugoslavia unspecified</name>
+    <language>en</language>
+  </Region>
+  <Region>
+    <code>89</code>
+    <name>Europe, regional</name>
+    <language>en</language>
+  </Region>
+  <Region>
+    <code>189</code>
+    <name>North of Sahara, regional</name>
+    <language>en</language>
+  </Region>
+  <Region>
+    <code>289</code>
+    <name>South of Sahara, regional</name>
+    <language>en</language>
+  </Region>
+  <Region>
+    <code>298</code>
+    <name>Africa, regional</name>
+    <language>en</language>
+  </Region>
+  <Region>
+    <code>380</code>
+    <name>West Indies, regional</name>
+    <language>en</language>
+  </Region>
+  <Region>
+    <code>389</code>
+    <name>North and Central America, regional</name>
+    <language>en</language>
+  </Region>
+  <Region>
+    <code>489</code>
+    <name>South America, regional</name>
+    <language>en</language>
+  </Region>
+  <Region>
+    <code>498</code>
+    <name>America, regional</name>
+    <language>en</language>
+  </Region>
+  <Region>
+    <code>589</code>
+    <name>Middle East, regional</name>
+    <language>en</language>
+  </Region>
+  <Region>
+    <code>619</code>
+    <name>Central Asia, regional</name>
+    <language>en</language>
+  </Region>
+  <Region>
+    <code>679</code>
+    <name>South Asia, regional</name>
+    <language>en</language>
+  </Region>
+  <Region>
+    <code>689</code>
+    <name>South and Central Asia, regional</name>
+    <language>en</language>
+  </Region>
+  <Region>
+    <code>789</code>
+    <name>Far East Asia, regional</name>
+    <language>en</language>
+  </Region>
+  <Region>
+    <code>798</code>
+    <name>Asia, regional</name>
+    <language>en</language>
+  </Region>
+  <Region>
+    <code>889</code>
+    <name>Oceania, regional</name>
+    <language>en</language>
+  </Region>
+  <Region>
+    <code>998</code>
+    <name>Developing countries, unspecified</name>
+    <language>en</language>
+  </Region>
+</codelist>
