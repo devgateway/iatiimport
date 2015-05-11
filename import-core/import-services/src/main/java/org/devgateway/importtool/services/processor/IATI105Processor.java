@@ -25,9 +25,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-@Component("IATI201")
+@Component("IATI105")
 @Scope("session")
-public class IATI201Processor implements ISourceProcessor {
+public class IATI105Processor implements ISourceProcessor {
 
 	private String DEFAULT_ID_FIELD = "iati-identifier";
 	private InputStream input;
@@ -179,6 +179,8 @@ public class IATI201Processor implements ISourceProcessor {
 			for (int j = 0; j < element.getChildNodes().getLength(); j++) {
 				if (element.getChildNodes().item(j).getNodeType() == Node.ELEMENT_NODE) {
 					Element currentNode = (Element) element.getChildNodes().item(j);
+					log.error(currentNode.getNodeType());
+					log.error(currentNode.getNodeName());
 					if(currentNode.getChildNodes().getLength() == 1) {
 						document.addStringField(currentNode.getNodeName(), currentNode.getChildNodes().item(0).getNodeValue());
 					}
@@ -193,6 +195,15 @@ public class IATI201Processor implements ISourceProcessor {
 						
 					}
 				}
+				
+//				
+//				
+//				Element nameElement = (Element) element.getElementsByTagName(
+//						"iati-identifier").item(0);
+//				String name = nameElement.getChildNodes().item(0)
+//						.getNodeValue(); element.getChildNodes().item(j).getChildNodes().getLength()
+//				document.addStringField(name, element.getChildNodes().item(j)
+//						.getNodeValue());
 			}
 
 			list.add(document);

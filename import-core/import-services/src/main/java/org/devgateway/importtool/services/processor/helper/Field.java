@@ -2,11 +2,14 @@ package org.devgateway.importtool.services.processor.helper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class Field {
 	private FieldType type;
 	private String fieldName;
-	private List<String> possibleValues;
+	private Map<String, String> attributes;
+	private List<Field> childFields;
+	private Map<String, String> possibleValues;
 	private List<String> filters;
 	
 	public String getFieldName() {
@@ -25,12 +28,12 @@ public class Field {
 		this.type = type;
 	}
 
-	public List<String> getPossibleValues() {
+	public Map<String, String> getPossibleValues() {
 		return possibleValues;
 	}
 
 	//Setter left only for unit tests. See if still needed
-	public void setPossibleValues(List<String> possibleValues) {
+	public void setPossibleValues(Map<String, String> possibleValues) {
 		this.possibleValues = possibleValues;
 	}
 
@@ -53,7 +56,35 @@ public class Field {
 		}  
 		this.filters.add(string);
 	}
-	
-	
 
+	public Map<String, String> getAttributes() {
+		return attributes;
+	}
+
+	public void setAttributes(Map<String, String> attributes) {
+		this.attributes = attributes;
+	}
+
+	public List<Field> getChildFields() {
+		return childFields;
+	}
+
+	public void setChildFields(List<Field> childFields) {
+		this.childFields = childFields;
+	}
+	
+	public boolean equals(Field f) {
+		return f.getFieldName() == this.getFieldName();
+	}
+
+	public void appendPossibleValue(String code, String name) {
+		if(!this.possibleValues.containsKey(code) && !this.possibleValues.containsValue(name) ) {
+			this.possibleValues.put(code, name);
+		}
+	}
+	
+	public String toString() {
+		return fieldName;
+	}
 }
+

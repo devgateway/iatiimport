@@ -13,6 +13,7 @@ var taskConfig = function(grunt) {
         src: [
           'styles/fonts/**/*.{woff,otf,ttf,eot,svg}',
           'images/**/*.{webp}',
+          'mockup/**/*.json',
           '!*.js',
           '*.{ico,png,txt}',
           '*.html'

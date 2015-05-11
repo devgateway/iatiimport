@@ -1,0 +1,26 @@
+<codelist date-last-modified="2015-03-25T12:12:01.998933+00:00" version="" name="DisbursementChannel" xml:lang="en">
+  <DisbursementChannel>
+    <code>1</code>
+    <name>Money is disbursed through central Ministry of Finance or Treasury</name>
+    <language>en</language>
+    <description>Money is disbursed through central Ministry of Finance or Treasury</description>
+  </DisbursementChannel>
+  <DisbursementChannel>
+    <code>2</code>
+    <name>Money is disbursed directly to the implementing institution and managed through a separate bank account</name>
+    <language>en</language>
+    <description>Money is disbursed directly to the implementing institution and managed through a separate bank account</description>
+  </DisbursementChannel>
+  <DisbursementChannel>
+    <code>3</code>
+    <name>Aid in kind: Donors utilise third party agencies, e.g. NGOs or management companies</name>
+    <language>en</language>
+    <description>Aid in kind: Donors utilise third party agencies, e.g. NGOs or management companies</description>
+  </DisbursementChannel>
+  <DisbursementChannel>
+    <code>4</code>
+    <name>Aid in kind: Donors manage funds themselves</name>
+    <language>en</language>
+    <description>Aid in kind: Donors manage funds themselves</description>
+  </DisbursementChannel>
+</codelist>

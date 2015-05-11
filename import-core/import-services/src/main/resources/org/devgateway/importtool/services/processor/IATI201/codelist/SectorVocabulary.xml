@@ -1,0 +1,50 @@
+<codelist date-last-modified="2015-03-25T12:12:02.563220+00:00" version="" name="SectorVocabulary" xml:lang="en">
+  <SectorVocabulary>
+    <code>1</code>
+    <name>OECD DAC CRS Purpose Codes (5 digit)</name>
+    <language>en</language>
+    <description>The sector reported corresponds to an OECD DAC CRS 5-digit purpose code</description>
+  </SectorVocabulary>
+  <SectorVocabulary>
+    <code>2</code>
+    <name>OECD DAC CRS Purpose Codes (3 digit)</name>
+    <language>en</language>
+    <description>The sector reported corresponds to an OECD DAC CRS 3-digit purpose code</description>
+  </SectorVocabulary>
+  <SectorVocabulary>
+    <code>3</code>
+    <name>Classification of the Functions of Government (UN)</name>
+    <language>en</language>
+    <description>The sector reported corresponds to the UN Classification of the Functions of Government (CoFoG)</description>
+  </SectorVocabulary>
+  <SectorVocabulary>
+    <code>4</code>
+    <name>Statistical classification of economic activities in the European Community</name>
+    <language>en</language>
+    <description>The sector reported corresponds to the statistical classifications of economic activities in the European Community</description>
+  </SectorVocabulary>
+  <SectorVocabulary>
+    <code>5</code>
+    <name>National Taxonomy for Exempt Entities (USA)</name>
+    <language>en</language>
+    <description>The sector reported corresponds to the National Taxonomy for Exempt Entities (NTEE) - USA</description>
+  </SectorVocabulary>
+  <SectorVocabulary>
+    <code>6</code>
+    <name>AidData</name>
+    <language>en</language>
+    <description>The sector reported corresponds to AidData classifications</description>
+  </SectorVocabulary>
+  <SectorVocabulary>
+    <code>99</code>
+    <name>Reporting Organisation</name>
+    <language>en</language>
+    <description>The sector reported corresponds to a sector vocabulary maintained by the reporting organisation for this activity</description>
+  </SectorVocabulary>
+  <SectorVocabulary>
+    <code>98</code>
+    <name>Reporting Organisation 2</name>
+    <language>en</language>
+    <description>The sector reported corresponds to a sector vocabulary maintained by the reporting organisation for this activity (if they are referencing more than one)</description>
+  </SectorVocabulary>
+</codelist>
