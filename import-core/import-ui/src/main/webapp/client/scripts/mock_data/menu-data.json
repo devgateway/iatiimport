@@ -5,7 +5,7 @@
         "enabled": true,
         "position": "navbar-left",
         "iconClass":"glyphicon-home",
-         "url": "#/home"
+         "url": "/"
     },
     {
         "name": "import_process",
@@ -13,6 +13,7 @@
         "enabled": true,
         "position": "navbar-left",
         "iconClass":"glyphicon-import",
+        "url": "/",
         "children": [
             {
                 "name": "iati1",
@@ -49,6 +50,7 @@
         "enabled": true,
         "position": "navbar-left",
         "iconClass":"glyphicon-list",
+        "url": "/",
         "children": [
             {
                 "name": "previous_imports",
@@ -72,6 +74,7 @@
         "enabled": true,
         "position": "navbar-left",
         "iconClass":"glyphicon-cog",
+        "url": "/",
         "children": [
             {
                 "name": "users",
@@ -115,6 +118,7 @@
         "enabled": true,
         "position": "navbar-right",
         "iconClass":"glyphicon-user",
+        "url": "/",
         "children": [
             {
                 "name": "settings",
@@ -138,6 +142,7 @@
         "enabled": true,
         "position": "navbar-right",
         "iconClass":"glyphicon-book",
+        "url": "/",
         "children": [
             {
                 "name": "english",

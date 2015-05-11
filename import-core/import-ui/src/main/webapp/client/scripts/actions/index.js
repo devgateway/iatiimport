@@ -2,7 +2,8 @@
 
 var Reflux = require('reflux');
 var appActions = Reflux.createActions([
-  'loadMenuData'  
+  'loadMenuData',
+  'loadFileData'
 ]);
 
 module.exports = appActions;

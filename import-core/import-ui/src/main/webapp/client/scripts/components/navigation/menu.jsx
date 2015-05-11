@@ -5,6 +5,8 @@ var Reflux = require('reflux');
 var NAVBAR_LEFT = 'navbar-left';
 var appActions = require('./../../actions');
 var SubMenu = require('./sub-menu');
+var Router = require('react-router');
+var Link = Router.Link;
 var Menu = React.createClass({
   mixins: [reactAsync.Mixin, Reflux.ListenerMixin],
   componentDidMount: function() {
@@ -41,7 +43,7 @@ var Menu = React.createClass({
                 if(item.position == NAVBAR_LEFT){                                                
                    menusLeft.push(
                     <li className="dropdown" key={item.label}>
-                     <a href={item.url} className="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="true"><div className={iconClass}></div>{item.label} <span className={caret}></span></a>
+                     <Link to={item.url} className="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="true"><div className={iconClass}></div>{item.label} <span className={caret}></span></Link>
                      {subMenu}
                    </li>
                    );
