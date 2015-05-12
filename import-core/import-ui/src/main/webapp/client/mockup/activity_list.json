@@ -3,18 +3,21 @@
 		"amp_activity_id": 1,
 		"amp_id": "8822220000",
 		"title": "Project Title 1",
-		"created_date": "2001-01-01 12:00:00"
+		"created_date": "2001-01-01 12:00:00",
+		"status": "NEW"
 	},
 	{
 		"amp_activity_id": 2,
 		"amp_id": "8822220001",
 		"title": "Project Title 2",
-		"created_date": "2001-01-01 12:00:00"
+		"created_date": "2001-01-01 12:00:00",
+		"status": "NEW"
 	},
 	{
 		"amp_activity_id": 3,
 		"amp_id": "8822220002",
 		"title": "Project Title 3",
-		"created_date": "2001-01-01 12:00:00"
+		"created_date": "2001-01-01 12:00:00",
+		"status": "EXISTS"
 	}
 ]

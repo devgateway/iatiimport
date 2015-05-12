@@ -1,5 +1,5 @@
 var React = require('react');
-var UploadFile = React.createClass({  
+var FilterData = React.createClass({  
   render: function() {  
     return (
     
@@ -11,4 +11,4 @@ var UploadFile = React.createClass({
   }
 });
 
-module.exports = UploadFile;
+module.exports = FilterData;

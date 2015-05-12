@@ -16,8 +16,7 @@ var MenuStore = Reflux.createStore({
     var self = this;    
     $.ajax({
         url: '/mockup/menu_items.json',        
-        error: function() {
-        	console.log('error');
+        error: function() {        	
         	self.trigger({            
                 menuData: []
               });
