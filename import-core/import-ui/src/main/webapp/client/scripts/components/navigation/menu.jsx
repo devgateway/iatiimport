@@ -8,9 +8,10 @@ var SubMenu = require('./sub-menu');
 var Router = require('react-router');
 var Link = Router.Link;
 var Menu = React.createClass({
-    mixins: [reactAsync.Mixin, Reflux.ListenerMixin
+    mixins              : [
+        reactAsync.Mixin, Reflux.ListenerMixin
     ],
-    componentDidMount: function () {
+    componentDidMount   : function () {
         this.listenTo(menuStore, this.updateMenu);
     },
     getInitialStateAsync: function () {
@@ -23,12 +24,12 @@ var Menu = React.createClass({
             } catch (err) {}
         });
     },
-    updateMenu: function (data) {
+    updateMenu          : function (data) {
         this.setState({
             menuData: data.menuData
         });
     },
-    render: function () {
+    render              : function () {
         var menusLeft = [];
         var menusRight = [];
         if (this.state.menuData) {
