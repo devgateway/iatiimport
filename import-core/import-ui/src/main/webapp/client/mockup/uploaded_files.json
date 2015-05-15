@@ -1,10 +1,10 @@
 [
     {
-        "fileName": "project_raw_data.xml",
-        "uploadDate": "April 23rd, 2015"
+        "file_name": "project_raw_data.xml",
+        "upload_date": "April 23rd, 2015"
     },
     {
-        "fileName": "project_raw_data_2.xml",
-        "uploadDate": "October 23rd, 2014"
+        "file_name": "project_raw_data_2.xml",
+        "upload_date": "October 23rd, 2014"
     }
 ]

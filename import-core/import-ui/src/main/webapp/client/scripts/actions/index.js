@@ -6,7 +6,10 @@ var appActions = Reflux.createActions([
   'loadFileData',
   'loadProjectData',
   'loadDestinationFieldsData',
-  'loadSourceFieldsData'
+  'loadSourceFieldsData',
+  'loadRecipientData',
+  'loadLanguageData'
+  
 ]);
 
 module.exports = appActions;

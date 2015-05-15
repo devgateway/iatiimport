@@ -1,5 +1,5 @@
 var React = require('react');
-var UploadFile = React.createClass({  
+var MapValues = React.createClass({  
   render: function() {  
     return (
     
@@ -195,4 +195,4 @@ var UploadFile = React.createClass({
   }
 });
 
-module.exports = UploadFile;
+module.exports = MapValues;

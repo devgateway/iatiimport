@@ -1,0 +1,14 @@
+[
+    {
+        "name": "World Bank",
+        "id":1
+    },
+    {
+        "name": "AfDB",
+        "id":2
+    },
+    {
+        "name": "Australia",
+        "id":3
+    }
+]
