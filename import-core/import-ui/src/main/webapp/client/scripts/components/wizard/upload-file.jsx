@@ -77,7 +77,7 @@ var UploadFile = React.createClass({
                 </table>
                 <br /><br /><br />
                 <div className="buttons">
-                    <button className="btn btn-warning navbar-btn btn-custom" type="button">
+                    <button className="btn btn-warning navbar-btn btn-custom" type="button" onClick={this.props.processHandler}>
                         Process</button>&nbsp;
                     <button className="btn btn-disabled navbar-btn btn-custom" type="button">Next >></button>
                 </div>

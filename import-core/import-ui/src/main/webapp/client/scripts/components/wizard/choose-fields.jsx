@@ -4,7 +4,7 @@ var Reflux = require('reflux');
 var appActions = require('./../../actions');
 var Router = require('react-router');
 var Link = Router.Link;
-
+var CustomSelect = require('./custom-select');
 var destinationFieldsStore = require('./../../stores/DestinationFieldsStore');
 var sourceFieldsStore = require('./../../stores/SourceFieldsStore');
 
@@ -34,6 +34,7 @@ var ChooseFields = React.createClass({
             } catch (err) {}
         });
     },
+    
     updateSourceFields: function(data) {
         this.setState({
             sourceFieldsData: data.sourceFieldsData
@@ -44,31 +45,31 @@ var ChooseFields = React.createClass({
             destinationFieldsData: data.destinationFieldsData
         });
     },   
-    createFieldsDropdown: function(sourceField){
-    var destinationFields = $.map(this.state.destinationFieldsData, function(item, i) {
-            if(sourceField.field_type == item.field_type){
-               return <option key={item.field_name} value={item.field_name} >{item.field_name}</option>
+    getOptions: function(sourceField){    
+    var options = [];
+    $.map(this.state.destinationFieldsData, function(item, i) {
+            if(sourceField.field_type == item.field_type){              
+               options.push({value:item.field_name, label:item.field_name})
             }              
-           });
-     return destinationFields
+         });
+     return options
     }, 
     render: function() {
         var rows = [];
         if (this.state.destinationFieldsData && this.state.sourceFieldsData) {                    
            $.map(this.state.sourceFieldsData, function(item, i) {
+                var options = this.getOptions(item);                
                 rows.push(<tr key={item.field_name}>
                     <td>
-                        <input aria-label="Field1" type="checkbox"/>
+                        <input value={item.field_name} aria-label="Field1" type="checkbox" onChange = {this.props.eventHandlers.selectFieldMapping}/>
                     </td>
                     <td>
                         <div className="table_cell">
                             {item.field_name}
                         </div>
                     </td>
-                    <td>
-                    <select className="form-control">
-                      {this.createFieldsDropdown(item)}
-                    </select>
+                    <td>                   
+                    <CustomSelect options={options} value="value" label="label" data={{sourceField:item.field_name}} handleChange = {this.props.eventHandlers.updateFieldMappings}/>
                     </td>
                 </tr>);
             }.bind(this));

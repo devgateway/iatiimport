@@ -13,6 +13,7 @@ var FilterData = require('./components/wizard/filter-data');
 var ChooseProjects = require('./components/wizard/choose-projects');
 var ChooseFields = require('./components/wizard/choose-fields');
 var MapValues = require('./components/wizard/map-values');
+var MapValuesTab = require('./components/wizard/map-values-table');
 var Import = require('./components/wizard/review-import');
 
 var routes = (
@@ -23,9 +24,11 @@ var routes = (
 			<Route name="filter" path="filter" handler={FilterData}/>
 			<Route name="projects" path="projects" handler={ChooseProjects}/>
 			<Route name="fields" path="fields" handler={ChooseFields}/>
-			<Route name="mapvalues" path="values" handler={MapValues}/>
+			<Route name="mapvalues" path="values" handler={MapValues}>			  
+			</Route>			
 			<Route name="import" path="import" handler={Import}/>		  
 		</Route>
+		
 	</Route>
 );
 

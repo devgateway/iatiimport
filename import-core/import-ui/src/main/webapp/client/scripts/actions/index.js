@@ -8,7 +8,9 @@ var appActions = Reflux.createActions([
   'loadDestinationFieldsData',
   'loadSourceFieldsData',
   'loadRecipientData',
-  'loadLanguageData'
+  'loadLanguageData',
+  'loadSourceValuesData',
+  'loadDestinationValuesData'
   
 ]);
 
