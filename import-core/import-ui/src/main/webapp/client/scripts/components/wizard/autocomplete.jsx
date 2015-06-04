@@ -22,7 +22,7 @@ var AutoComplete = React.createClass({
         var self = this;
         
         $el.bind('typeahead:selected', function (obj, datum, name) {           
-            self.props.onSelect(datum);
+            self.props.onSelect(self.props.data,datum);
         });
     },
     render: function () {

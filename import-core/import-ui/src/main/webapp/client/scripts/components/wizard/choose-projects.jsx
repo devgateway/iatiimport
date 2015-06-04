@@ -26,14 +26,11 @@ var ChooseProjects = React.createClass({
             } catch (err) {}
         });
     },
-    projectSelected: function(selected){
-      console.log(selected);
-    },
     updateProject: function (data) {
         this.setState({
             projectData: data.projectData
         });
-    },
+    },   
     render: function () {
         var newProjects = [];
         var existingProjects = [];        
@@ -42,25 +39,25 @@ var ChooseProjects = React.createClass({
                 if (item.status == 'NEW') {
                     newProjects.push(<tr key={i}>
                         <td>
-                            <input aria-label="Field1" type="checkbox"/>
+                            <input aria-label="Field1" value={item.amp_id} type="checkbox" onChange={this.props.eventHandlers.selectProject} />
                         </td>
                         <td>
                             {item.title}
                         </td>
                         <td>                            
-                            <AutoComplete url="/mockup/activity_list.json" display="title" placeholder="Destination Project Name 1" refId="destSearch" onSelect={this.projectSelected} /> 
+                            <AutoComplete url="/mockup/activity_list.json" display="title" data={{sourceProjectId:item.amp_id}} placeholder="Destination Project Name 1" refId="destSearch" onSelect={this.props.eventHandlers.updateProjects} /> 
                         </td>
                     </tr>);
                 } else {
                     existingProjects.push(<tr key={i}>
                         <td>
-                            <input aria-label="Field1" type="checkbox"/>
+                            <input aria-label="Field1"  type="checkbox" value={item.amp_id} onChange={this.props.eventHandlers.selectProject}/>
                         </td>
                         <td>
                             {item.title}
                         </td>
                         <td>
-                           <AutoComplete url="/mockup/activity_list.json" display="title" placeholder="Destination Project Name 1" refId="destSearch" onSelect={this.projectSelected} />                            
+                           <AutoComplete url="/mockup/activity_list.json" display="title" placeholder="Destination Project Name 1" value={item.amp_id} refId="destSearch" data={{sourceProjectId:item.amp_id}} onSelect={this.props.eventHandlers.updateProjects} />                            
                         </td>
                     </tr>);
                 }

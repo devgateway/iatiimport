@@ -7,9 +7,9 @@ var UploadFile = require('./upload-file');
 var Router = require('react-router');
 var RouteHandler = Router.RouteHandler;
 var Wizard = React.createClass({
-  getInitialState    : function() {
+  getInitialState: function() {
     return {
-      projects     : [],
+      projects: [],
       fieldMappings: [],
       valueMappings: []
     };
@@ -79,12 +79,54 @@ var Wizard = React.createClass({
       });
     }
   },
+  updateProjects: function(data,selectedProject){  
+    if (data.sourceProjectId) {
+      var projects = this.state.projects;
+      var match = _.findWhere(projects, {
+        'sourceProjectId': data.sourceProjectId        
+      });
+      if (match) {
+        match.destinationProject = selectedProject;
+      } else {
+        projects.push({
+          sourceProjectId: data.sourceProjectId,          
+          destinationProject: selectedProject
+        });
+      }
+      this.setState({
+        projects: projects
+      });
+    }  
+    
+  },  
+  selectProject: function(event) {
+    if (event) {
+      var projects = this.state.projects;
+      var match = _.findWhere(projects, {
+        'sourceProjectId': event.target.value
+      });
+      if (match) {
+        match.selected = event.target.checked;
+      } else {
+        projects.push({
+          sourceProjectId: event.target.value,
+          selected       : event.target.checked
+        });
+      }
+      this.setState({
+        projects: projects
+      });
+      console.log(projects);
+    }
+  },
   render: function() {
     var eventHandlers = {};
     eventHandlers.processHandler      = this.processUpload;
     eventHandlers.updateFieldMappings = this.updateFieldMappings;
     eventHandlers.selectFieldMapping  = this.selectFieldMapping;
     eventHandlers.updateValueMappings = this.updateValueMappings;
+    eventHandlers.updateProjects = this.updateProjects;
+    eventHandlers.selectProject = this.selectProject;
 
     var wizardData = {};
     wizardData.fieldMappings = this.state.fieldMappings;
