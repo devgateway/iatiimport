@@ -29,6 +29,7 @@ var taskConfig = function(grunt) {
     }
 
     grunt.task.run([
+      'prism',
       'connect:server'
     ]);
 

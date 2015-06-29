@@ -9,14 +9,15 @@ var taskConfig = function(grunt) {
     options: {
       port: 9010,
       livereload: 35729,
-      hostname: '127.0.0.1'
+      hostname: 'localhost'
     },
     server: {
       options: {
-        open: 'http://127.0.0.1:9010/',
+        open: 'http://localhost:9010/',
         base: '<%= yeogurt.client %>/.serve',
         middleware: function(connect) {
           return [
+            require('grunt-connect-prism/middleware'),
             connect.static('.tmp'),
             connect().use('/bower_components', connect.static('./client/bower_components')),
             connect.static('client')
