@@ -1,13 +1,16 @@
 package org.devgateway.importtool.rest;
 
+import static org.devgateway.importtool.services.processor.helper.Constants.DESTINATION_PROCESSOR;
+import static org.devgateway.importtool.services.processor.helper.Constants.SOURCE_PROCESSOR;
+
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.devgateway.importtool.services.processor.helper.Field;
+import org.devgateway.importtool.services.processor.helper.FieldValue;
 import org.devgateway.importtool.services.processor.helper.IDestinationProcessor;
 import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
 import org.devgateway.importtool.services.processor.helper.InternalDocument;
@@ -18,11 +21,35 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import static org.devgateway.importtool.services.processor.helper.Constants.*;
-
 @RestController
-@RequestMapping(value = "/data")
+@RequestMapping(value = "/importer/data")
 class DataController {
+
+	@RequestMapping(method = RequestMethod.GET, value = "/source/filters")
+	ResponseEntity<List<Field>> getFilterFields(HttpServletRequest request) {
+		ISourceProcessor processor = (ISourceProcessor) request.getSession()
+				.getAttribute(SOURCE_PROCESSOR);
+		if (processor == null) {
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		return new ResponseEntity<>(processor.getFilterFields(), HttpStatus.OK);
+	}
+
+	@RequestMapping(method = RequestMethod.GET, value = "/source/languages")
+	ResponseEntity<List<Language>> getLanguages(HttpServletRequest request) {
+		ISourceProcessor processor = (ISourceProcessor) request.getSession()
+				.getAttribute(SOURCE_PROCESSOR);
+		if (processor == null) {
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		List<Language> listLanguages = new ArrayList<Language>();
+		
+		processor.getLanguages().stream().forEach(lang -> {
+				Locale tmp = new Locale(lang);
+				listLanguages.add(new Language(tmp.getLanguage(), tmp.getDisplayLanguage()));
+			});
+		return new ResponseEntity<>(listLanguages, HttpStatus.OK);
+	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/source/field")
 	ResponseEntity<List<Field>> getSourceFields(HttpServletRequest request) {
@@ -35,7 +62,7 @@ class DataController {
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/source/field/{fieldName}")
-	ResponseEntity<Map<String, String>> getSourceFieldValues(
+	ResponseEntity<List<FieldValue>> getSourceFieldValues(
 			@PathVariable String fieldName, HttpServletRequest request) {
 		ISourceProcessor processor = (ISourceProcessor) request.getSession()
 				.getAttribute(SOURCE_PROCESSOR);
@@ -47,7 +74,7 @@ class DataController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
-		Map<String, String> possibleValues = field.getPossibleValues();
+		List<FieldValue> possibleValues = field.getPossibleValues();
 		return new ResponseEntity<>(possibleValues, HttpStatus.OK);
 	}
 
@@ -61,7 +88,7 @@ class DataController {
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/destination/field/{fieldName}")
-	ResponseEntity<Map<String, String>> getDestinationFieldValues(
+	ResponseEntity<List<FieldValue>> getDestinationFieldValues(
 			@PathVariable String fieldName, HttpServletRequest request) {
 		IDestinationProcessor processor = (IDestinationProcessor) request
 				.getSession().getAttribute(DESTINATION_PROCESSOR);
@@ -73,7 +100,7 @@ class DataController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
-		Map<String, String> possibleValues = field.getPossibleValues();
+		List<FieldValue> possibleValues = field.getPossibleValues();
 		return new ResponseEntity<>(possibleValues, HttpStatus.OK);
 	}
 

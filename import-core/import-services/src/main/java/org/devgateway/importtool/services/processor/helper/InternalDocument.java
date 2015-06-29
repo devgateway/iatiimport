@@ -4,8 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class InternalDocument {
+	private String identifier = "";
+	private String title = "";
 	private Map<String, Object> fields = new HashMap<String, Object>();
-	private OperationType operation = OperationType.NOOP;
 
 	public Map<String, Object> getFields() {
 		return fields;
@@ -19,12 +20,24 @@ public class InternalDocument {
 		fields.put(fieldName, value);
 	}
 
-	public OperationType getOperation() {
-		return operation;
+	public Object getField(String fieldName) {
+		return fields.get(fieldName);
 	}
 
-	public void setOperation(OperationType operation) {
-		this.operation = operation;
+	public String getIdentifier() {
+		return identifier;
+	}
+
+	public void setIdentifier(String identifier) {
+		this.identifier = identifier;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
 }

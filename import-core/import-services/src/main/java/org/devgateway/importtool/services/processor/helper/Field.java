@@ -7,10 +7,11 @@ import java.util.Map;
 public class Field {
 	private FieldType type;
 	private String fieldName;
+	private String displayName;
 	private Map<String, String> attributes;
 	private List<Field> childFields;
-	private Map<String, String> possibleValues;
-	private List<String> filters;
+	private List<FieldValue> possibleValues;
+	private List<String> filters = new ArrayList<String>();
 	
 	public String getFieldName() {
 		return fieldName;
@@ -28,18 +29,13 @@ public class Field {
 		this.type = type;
 	}
 
-	public Map<String, String> getPossibleValues() {
+	public List<FieldValue> getPossibleValues() {
 		return possibleValues;
 	}
 
 	//Setter left only for unit tests. See if still needed
-	public void setPossibleValues(Map<String, String> possibleValues) {
+	public void setPossibleValues(List<FieldValue> possibleValues) {
 		this.possibleValues = possibleValues;
-	}
-
-	public void setFilter(String string) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	public List<String> getFilters() {
@@ -50,11 +46,8 @@ public class Field {
 		this.filters = filters;
 	}
 
-	public void addFilter(String string) {
-		if(this.filters == null) {
-			this.filters = new ArrayList<String>();
-		}  
-		this.filters.add(string);
+	public void addFilter(String value) {
+		this.filters.add(value);
 	}
 
 	public Map<String, String> getAttributes() {
@@ -77,14 +70,22 @@ public class Field {
 		return f.getFieldName() == this.getFieldName();
 	}
 
-	public void appendPossibleValue(String code, String name) {
-		if(!this.possibleValues.containsKey(code) && !this.possibleValues.containsValue(name) ) {
-			this.possibleValues.put(code, name);
-		}
-	}
+//	public void appendPossibleValue(String code, String name) {
+//		if(!this.possibleValues.containsKey(code) && !this.possibleValues.containsValue(name) ) {
+//			this.possibleValues.put(code, name);
+//		}
+//	}
 	
 	public String toString() {
 		return fieldName;
+	}
+
+	public String getDisplayName() {
+		return displayName;
+	}
+
+	public void setDisplayName(String displayName) {
+		this.displayName = displayName;
 	}
 }
 
