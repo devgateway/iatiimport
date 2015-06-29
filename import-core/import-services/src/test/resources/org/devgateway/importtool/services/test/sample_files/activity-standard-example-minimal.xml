@@ -5,10 +5,28 @@
  <iati-activity xml:lang="en" default-currency="USD" last-updated-datetime="2014-09-10T07:15:37Z" linked-data-uri="http://data.example.org/123456789" hierarchy="1">
   <iati-identifier>AA-AAA-123456789-ABC123</iati-identifier>
   <title>
-   <narrative>Activity title</narrative>
-   <narrative xml:lang="fr">Titre de l'activité</narrative>
-   <narrative xml:lang="es">Título de la actividad</narrative>
+   <narrative>Activity title 1</narrative>
+   <narrative xml:lang="fr">Titre de l'activité 1</narrative>
+   <narrative xml:lang="es">Título de la actividad 1</narrative>
   </title>
   <activity-status code="2" />
+ </iati-activity>
+ <iati-activity xml:lang="en" default-currency="USD" last-updated-datetime="2014-09-10T07:15:37Z" linked-data-uri="http://data.example.org/123456789" hierarchy="1">
+  <iati-identifier>AA-AAA-123456789-ABC1234</iati-identifier>
+  <title>
+   <narrative>Activity title 2</narrative>
+   <narrative xml:lang="fr">Titre de l'activité 2</narrative>
+   <narrative xml:lang="es">Título de la actividad 2</narrative>
+  </title>
+  <activity-status code="2" />
+ </iati-activity>
+ <iati-activity xml:lang="en" default-currency="USD" last-updated-datetime="2014-09-10T07:15:37Z" linked-data-uri="http://data.example.org/123456789" hierarchy="1">
+  <iati-identifier>AA-AAA-123456789-ABC12345</iati-identifier>
+  <title>
+   <narrative>Activity title 3</narrative>
+   <narrative xml:lang="fr">Titre de l'activité 3</narrative>
+   <narrative xml:lang="es">Título de la actividad 3</narrative>
+  </title>
+  <activity-status code="3" />
  </iati-activity>
 </iati-activities>

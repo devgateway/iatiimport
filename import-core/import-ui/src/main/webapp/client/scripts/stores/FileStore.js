@@ -15,7 +15,7 @@ var FileStore = Reflux.createStore({
   handleLoadFileData: function() {
     var self = this;    
     $.ajax({
-        url: '/mockup/uploaded_files.json',        
+        url: '/importer/import/uploaded',        
         error: function() {        	
         	self.trigger({            
                 fileData: []

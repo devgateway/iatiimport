@@ -1,10 +1,8 @@
 [
-    {
-        "file_name": "project_raw_data.xml",
-        "upload_date": "April 23rd, 2015"
-    },
-    {
-        "file_name": "project_raw_data_2.xml",
-        "upload_date": "October 23rd, 2014"
-    }
+{
+"id": null,
+"fileName": "activity-standard-example-minimal.xml",
+"data": null,
+"createdDate": 1434993620274
+}
 ]

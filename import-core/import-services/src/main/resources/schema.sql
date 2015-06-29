@@ -15,18 +15,16 @@ CREATE TABLE user_account
 )
 ;
 
+CREATE TABLE uploaded_file (
+  id bigint NOT NULL,
+  file_name varchar (255),
+  file_data blob,
+  author varchar(255),
+  created_date timestamp,
+  PRIMARY KEY (`id`)
+)
+;
 INSERT INTO user_account (id, first_name, last_name, pass_word, created_date, user_name, enabled, is_admin) VALUES (NEXTVAL('hibernate_sequence'), 'Regular', 'User', 'abc', '2015-03-24 12:00:00', 'user', true, false);
 INSERT INTO user_account (id, first_name, last_name, pass_word, created_date, user_name, enabled, is_admin) VALUES (NEXTVAL('hibernate_sequence'), 'Admin', 'User', 'abc', '2015-03-24 12:00:00', 'admin', true, true);
 
--- insert into oauth_access_token (token_id, token, authentication_id, user_name, client_id, authentication, refresh_token) values (?, ?, ?, ?, ?, ?, ?)
-create table oauth_access_token (
-  token_id varchar ,
-  token bytea ,
-  authentication_id varchar ,
-  user_name varchar ,
-  client_id varchar ,
-  authentication varchar ,
-  refresh_token varchar  ,
-  CONSTRAINT pk PRIMARY KEY (token_id )
-) ;
 
