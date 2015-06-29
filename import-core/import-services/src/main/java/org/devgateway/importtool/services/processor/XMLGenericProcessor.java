@@ -29,6 +29,7 @@ public class XMLGenericProcessor implements ISourceProcessor {
 	private String DEFAULT_ID_FIELD = "xml-identifier";
 	private InputStream input;
 	private Log log = LogFactory.getLog(getClass());
+	private String descriptiveName = "XML Generic";
 	
 
 	@Override
@@ -75,7 +76,7 @@ public class XMLGenericProcessor implements ISourceProcessor {
 
 			Field field = new Field();
 			field.setFieldName(node.getNodeName());
-			field.appendPossibleValue(node.getNodeName(), node.getNodeValue());
+			//field.appendPossibleValue(node.getNodeName(), node.getNodeValue());
 			field.setAttributes(extractAttributes(node));
 			if (node.getChildNodes().getLength() > 0) {
 				field.setChildFields(extractFields(node.getChildNodes()));
@@ -124,6 +125,28 @@ public class XMLGenericProcessor implements ISourceProcessor {
 	@Override
 	public String getIdField() {
 		return DEFAULT_ID_FIELD;
+	}
+
+	@Override
+	public List<String> getLanguages() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Field> getFilterFields() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public String getDescriptiveName() {
+		return this.descriptiveName ;
+	}
+
+	@Override
+	public String getTitleField() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

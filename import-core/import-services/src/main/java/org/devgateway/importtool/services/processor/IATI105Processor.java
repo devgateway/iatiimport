@@ -14,6 +14,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.services.processor.helper.Field;
+import org.devgateway.importtool.services.processor.helper.FieldValue;
 import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
 import org.devgateway.importtool.services.processor.helper.InternalDocument;
 import org.springframework.context.annotation.Scope;
@@ -30,9 +31,11 @@ import org.xml.sax.SAXException;
 public class IATI105Processor implements ISourceProcessor {
 
 	private String DEFAULT_ID_FIELD = "iati-identifier";
-	private InputStream input;
+	@SuppressWarnings("unused")
+	private InputStream input = null;
 	private Log log = LogFactory.getLog(getClass());
 	private Document doc;
+	private String descriptiveName = "IATI 1.05";
 	private static Map<String, String> mappingNameFile = new HashMap<String, String>();
 	static {
 		mappingNameFile.put("activity-status", "ActivityStatus");
@@ -74,7 +77,7 @@ public class IATI105Processor implements ISourceProcessor {
 
 	private void processPossibleValues(List<Field> fieldList) {
 		for (Field field : fieldList) {
-			Map<String, String> possibleValues = new HashMap<String, String>();
+			List<FieldValue> possibleValues = new ArrayList<FieldValue>();
 			String fieldName = field.getFieldName();
 			String standardFieldName = mappingNameFile.get(fieldName);
 			InputStream is = this.getClass().getResourceAsStream(
@@ -102,7 +105,11 @@ public class IATI105Processor implements ISourceProcessor {
 									.getElementsByTagName("name").item(0);
 							String name = nameElement.getChildNodes().item(0)
 									.getNodeValue();
-							possibleValues.put(code, name);
+							FieldValue fv = new FieldValue();
+							fv.setCode(code);
+							fv.setValue(name);
+							
+							possibleValues.add(fv);
 						}
 					}
 				} catch (ParserConfigurationException | SAXException
@@ -215,6 +222,29 @@ public class IATI105Processor implements ISourceProcessor {
 	@Override
 	public String getIdField() {
 		return DEFAULT_ID_FIELD;
+	}
+
+	@Override
+	public List<String> getLanguages() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Field> getFilterFields() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getDescriptiveName() {
+		return this.descriptiveName ;
+	}
+
+	@Override
+	public String getTitleField() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

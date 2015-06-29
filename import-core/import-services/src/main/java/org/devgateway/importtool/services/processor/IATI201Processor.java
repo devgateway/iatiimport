@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -14,6 +16,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.services.processor.helper.Field;
+import org.devgateway.importtool.services.processor.helper.FieldValue;
 import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
 import org.devgateway.importtool.services.processor.helper.InternalDocument;
 import org.springframework.context.annotation.Scope;
@@ -30,10 +33,10 @@ import org.xml.sax.SAXException;
 public class IATI201Processor implements ISourceProcessor {
 
 	private String DEFAULT_ID_FIELD = "iati-identifier";
-	private InputStream input;
 	private Log log = LogFactory.getLog(getClass());
 	private Document doc;
 	private static Map<String, String> mappingNameFile = new HashMap<String, String>();
+	private String descriptiveName = "IATI 2.01";
 	static {
 		mappingNameFile.put("activity-status", "ActivityStatus");
 		mappingNameFile.put("activity-scope", "ActivityScope");
@@ -47,7 +50,6 @@ public class IATI201Processor implements ISourceProcessor {
 
 	@Override
 	public void setInput(InputStream input) {
-		this.input = input;
 		if (this.doc == null) {
 			DocumentBuilderFactory factory = DocumentBuilderFactory
 					.newInstance();
@@ -74,7 +76,7 @@ public class IATI201Processor implements ISourceProcessor {
 
 	private void processPossibleValues(List<Field> fieldList) {
 		for (Field field : fieldList) {
-			Map<String, String> possibleValues = new HashMap<String, String>();
+			List<FieldValue> possibleValues = new ArrayList<FieldValue>();
 			String fieldName = field.getFieldName();
 			String standardFieldName = mappingNameFile.get(fieldName);
 			InputStream is = this.getClass().getResourceAsStream(
@@ -102,7 +104,11 @@ public class IATI201Processor implements ISourceProcessor {
 									.getElementsByTagName("name").item(0);
 							String name = nameElement.getChildNodes().item(0)
 									.getNodeValue();
-							possibleValues.put(code, name);
+							FieldValue fv = new FieldValue();
+							fv.setCode(code);
+							fv.setValue(name);
+
+							possibleValues.add(fv);
 						}
 					}
 				} catch (ParserConfigurationException | SAXException
@@ -178,19 +184,25 @@ public class IATI201Processor implements ISourceProcessor {
 			Element element = (Element) node;
 			for (int j = 0; j < element.getChildNodes().getLength(); j++) {
 				if (element.getChildNodes().item(j).getNodeType() == Node.ELEMENT_NODE) {
-					Element currentNode = (Element) element.getChildNodes().item(j);
-					if(currentNode.getChildNodes().getLength() == 1) {
-						document.addStringField(currentNode.getNodeName(), currentNode.getChildNodes().item(0).getNodeValue());
-					}
-					else if(currentNode.getChildNodes().getLength() > 1)
-					{
-						NodeList narratives = currentNode.getElementsByTagName("narrative");
-						for(int k = 0; k < narratives.getLength(); k++) {
+					Element currentNode = (Element) element.getChildNodes()
+							.item(j);
+					if (currentNode.getChildNodes().getLength() == 1) {
+						document.addStringField(currentNode.getNodeName(),
+								currentNode.getChildNodes().item(0)
+										.getNodeValue());
+					} else if (currentNode.getChildNodes().getLength() > 1) {
+						NodeList narratives = currentNode
+								.getElementsByTagName("narrative");
+						for (int k = 0; k < narratives.getLength(); k++) {
 							Element narrative = (Element) narratives.item(k);
-							String suffix = "".equals(narrative.getAttribute("xml:lang")) ? "" : "_" + narrative.getAttribute("xml:lang");
-							document.addStringField(currentNode.getNodeName() + suffix, narrative.getChildNodes().item(0).getNodeValue());
+							String suffix = "".equals(narrative
+									.getAttribute("xml:lang")) ? "" : "_"
+									+ narrative.getAttribute("xml:lang");
+							document.addStringField(currentNode.getNodeName()
+									+ suffix, narrative.getChildNodes().item(0)
+									.getNodeValue());
 						}
-						
+
 					}
 				}
 			}
@@ -204,6 +216,58 @@ public class IATI201Processor implements ISourceProcessor {
 	@Override
 	public String getIdField() {
 		return DEFAULT_ID_FIELD;
+	}
+
+	@Override
+	public List<String> getLanguages() {
+		// The strategy for getting the languages included in the file is to
+		// parse the file, from the xml:lang attribute
+		Document doc = this.doc;
+		List<String> list = new ArrayList<String>();
+
+		// Get root language
+		List<String> activityLanguageList = extractLanguage(doc
+				.getElementsByTagName("iati-activity"));
+		List<String> narrativeLanguageList = extractLanguage(doc
+				.getElementsByTagName("narrative"));
+
+		Set<String> set = new HashSet<String>();
+		set.addAll(activityLanguageList);
+		set.addAll(narrativeLanguageList);
+		list.addAll(set);
+		return list;
+	}
+
+	private List<String> extractLanguage(NodeList elementsByTagName) {
+		List<String> list = new ArrayList<String>();
+		for (int i = 0; i < elementsByTagName.getLength(); i++) {
+			Node langAttr = elementsByTagName.item(i).getAttributes()
+					.getNamedItem("xml:lang");
+			if (langAttr == null)
+				continue;
+			String lang = langAttr.getNodeValue();
+			if (!list.contains(lang)) {
+				list.add(lang);
+			}
+		}
+		return list;
+	}
+
+	@Override
+	public List<Field> getFilterFields() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getDescriptiveName() {
+		return this.descriptiveName;
+	}
+
+	@Override
+	public String getTitleField() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
