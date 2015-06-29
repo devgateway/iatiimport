@@ -59,3 +59,37 @@
   color: #000;
   padding: 0.5em 0;
 }
+
+.scrollablebody {
+    width: 100%;
+}
+
+thead.scrollablebody, tbody.scrollablebody, tr.scrollablebody, td.scrollablebody, th.scrollablebody { display: block; }
+
+tr.scrollablebody:after {
+    content: ' ';
+    display: block;
+    visibility: hidden;
+    clear: both;
+}
+
+thead.scrollablebody th {
+    height: 30px;
+
+    /*text-align: left;*/
+}
+
+tbody.scrollablebody {
+    height: 120px;
+    overflow-y: auto;
+}
+
+thead.scrollablebody {
+    /* fallback */
+}
+
+
+tbody.scrollablebody td, thead.scrollablebody th {
+    width: 19.2%;
+    float: left;
+}      

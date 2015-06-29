@@ -36,28 +36,28 @@ var ChooseProjects = React.createClass({
         var existingProjects = [];        
         if (this.state.projectData) {
            $.map(this.state.projectData, function (item, i) {
-                if (item.status == 'NEW') {
+                if (item.operation == 'INSERT') {
                     newProjects.push(<tr key={i}>
                         <td>
-                            <input aria-label="Field1" value={item.amp_id} type="checkbox" onChange={this.props.eventHandlers.selectProject} />
+                            <input aria-label="Source" value={item.sourceDocument.identifier} type="checkbox" onChange={this.props.eventHandlers.selectProject} />
                         </td>
                         <td>
-                            {item.title}
+                            {item.sourceDocument.title}
                         </td>
                         <td>                            
-                            <AutoComplete url="/mockup/activity_list.json" display="title" data={{sourceProjectId:item.amp_id}} placeholder="Destination Project Name 1" refId="destSearch" onSelect={this.props.eventHandlers.updateProjects} /> 
+                            <AutoComplete url="/importer/data/destination/project" display="title" placeholder="Destination Project Name 1" refId="destSearch" onSelect={this.props.eventHandlers.updateProjects} /> 
                         </td>
                     </tr>);
                 } else {
                     existingProjects.push(<tr key={i}>
                         <td>
-                            <input aria-label="Field1"  type="checkbox" value={item.amp_id} onChange={this.props.eventHandlers.selectProject}/>
+                            <input aria-label="Field1"  type="checkbox" value={item.sourceDocument.identifier} onChange={this.props.eventHandlers.selectProject}/>
                         </td>
                         <td>
-                            {item.title}
+                            {item.sourceDocument.title}
                         </td>
                         <td>
-                           <AutoComplete url="/mockup/activity_list.json" display="title" placeholder="Destination Project Name 1" value={item.amp_id} refId="destSearch" data={{sourceProjectId:item.amp_id}} onSelect={this.props.eventHandlers.updateProjects} />                            
+                            {item.destinationDocument.title}
                         </td>
                     </tr>);
                 }
@@ -116,7 +116,7 @@ var ChooseProjects = React.createClass({
                     </div>
                 </div>
                 <div className="buttons">
-                    <button className="btn btn-success navbar-btn btn-custom" type="button">Next >></button>
+                    <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.props.eventHandlers.chooseProjects}>Next >></button>
                 </div>
                 </div>
             ); } }); 

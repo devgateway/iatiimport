@@ -6,7 +6,7 @@ var Router = require('react-router');
 var Link = Router.Link;
 
 var languageStore = require('./../../stores/LanguageStore');
-var recipientStore = require('./../../stores/RecipientStore');
+var filterStore = require('./../../stores/FilterStore');
 
 var FilterData = React.createClass({
     mixins: [
@@ -14,7 +14,7 @@ var FilterData = React.createClass({
     ],
     componentDidMount: function() {
         this.listenTo(languageStore, this.updateLanguages);
-        this.listenTo(recipientStore, this.updateRecipients);
+        this.listenTo(filterStore, this.updateFilters);
     },
     getInitialStateAsync: function() {
         appActions.loadLanguageData();
@@ -25,18 +25,19 @@ var FilterData = React.createClass({
                 });
             } catch (err) {}
         });
-        appActions.loadRecipientData();
-        recipientStore.listen(function(data) {
+
+        appActions.loadFilterData();
+        filterStore.listen(function(data) {
             try {
                 return cb(null, {
-                    recipientData: data.recipientData
+                    filterData: data.filterData
                 });
             } catch (err) {}
         });
     },
-    updateRecipients: function(data) {
+    updateFilters: function(data) {
         this.setState({
-            recipientData: data.recipientData
+            filterData: data.filterData
         });
     },
     updateLanguages: function(data) {
@@ -45,16 +46,30 @@ var FilterData = React.createClass({
         });
     },
     render: function() {
-        var recipients = [];
+        var filters = [];
 
-        if (this.state.recipientData) {
-            $.map(this.state.recipientData, function(recipient, i) {
-                recipients.push(<div className="input-group">
-                    <span className="input-group-addon">
-                        <input aria-label="Recipient" type="checkbox" value={recipient.id}/>
-                    </span>
-                    <input aria-label="Field1" className="form-control" readOnly type="text" value={recipient.name}/>
-                </div>);
+        if (this.state.filterData) {
+            $.map(this.state.filterData, function(filter, i) {
+                var filterValues = [];
+                $.map(filter.possibleValues, function(values, i) {
+                    filterValues.push(
+                            <div className="input-group">
+                            <span className="input-group-addon">
+                                <input aria-label={values.value} type="checkbox" value={values.code}/>
+                            </span>
+                            <input aria-label="Field1" className="form-control" readOnly type="text" value={values.value}/>
+                            </div>
+                        )
+                });
+//                debugger;
+                filters.push(
+                    <div className="panel panel-warning">
+                        <div className="panel-heading">{filter.displayName}</div>
+                        <div className="panel-body">
+                            {filterValues}
+                        </div>
+                    </div>
+                );
             }.bind(this));
         }
 
@@ -63,9 +78,9 @@ var FilterData = React.createClass({
             $.map(this.state.languageData, function(language, i) {
                 languages.push(<div className="input-group">
                     <span className="input-group-addon">
-                        <input aria-label="language" type="checkbox" value={language.name}/>
+                        <input aria-label="language" type="checkbox" value={language.code}/>
                     </span>
-                    <input aria-label="Field1" className="form-control" readOnly type="text" value={language.name}/>
+                    <input aria-label="Field1" className="form-control" readOnly type="text" value={language.description}/>
                 </div>);
             }.bind(this));
         }
@@ -76,12 +91,7 @@ var FilterData = React.createClass({
                 <div className="panel-body">
                     Select for each field, which values you would like to include as part of the import process
                     <br /><br />
-                    <div className="panel panel-warning">
-                        <div className="panel-heading">Recipient Country</div>
-                        <div className="panel-body">
-                            {recipients}
-                        </div>
-                    </div>
+                    {filters}
                     <div className="panel panel-warning">
                         <div className="panel-heading">Language</div>
                         <div className="panel-body">
@@ -90,7 +100,10 @@ var FilterData = React.createClass({
                     </div>
                 </div>
                 <div className="buttons">
-                    <button className="btn btn-success navbar-btn btn-custom" type="button">Next >></button>
+                    <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.props.eventHandlers.filterData}>Next >></button>
                 </div>
                 </div>
-            ); } }); module.exports = FilterData;
+            ); } 
+});
+
+module.exports = FilterData;

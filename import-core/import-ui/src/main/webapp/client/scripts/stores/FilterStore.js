@@ -6,25 +6,25 @@ var appConfig = require('./../conf');
 var appActions = require('./../actions');
 
 
-var RecipientStore = Reflux.createStore({
+var FilterStore = Reflux.createStore({
 
   init: function() {
-    this.listenTo(appActions.loadRecipientData, this.handleLoadRecipientData);
+    this.listenTo(appActions.loadFilterData, this.handleLoadFilterData);
   },
 
-  handleLoadRecipientData: function() {
+  handleLoadFilterData: function() {
     var self = this;    
     $.ajax({
-        url: '/mockup/recipients.json',        
+        url: '/importer/data/source/filters',        
         error: function() {        	
         	self.trigger({            
-                recipientData: []
+                filterData: []
               });
         },
         dataType: 'json',
         success: function(data) {        	
         	self.trigger({            
-                recipientData: data
+                filterData: data
               });
         },
         type: 'GET'
@@ -33,4 +33,4 @@ var RecipientStore = Reflux.createStore({
 
 });
 
-module.exports = RecipientStore;
+module.exports = FilterStore;

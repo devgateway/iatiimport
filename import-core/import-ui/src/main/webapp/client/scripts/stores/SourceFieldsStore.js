@@ -15,7 +15,7 @@ var SourceFieldsStore = Reflux.createStore({
   handleLoadSourceFieldsData: function() {
     var self = this;    
     $.ajax({
-        url: '/mockup/source_fields.json',        
+        url: '/importer/data/source/field',        
         error: function() {        	
         	self.trigger({            
                 sourceFieldsData: []

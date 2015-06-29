@@ -20,14 +20,14 @@
                 "label": "IATI Version 1.05",
                 "enabled": true,
                 "type":"menu-item",
-                 "url": "#/wizard/iati1"
+                "url": "#/wizard/IATI105/AMP"
             },
             {
                 "name": "iati2",
                 "label": "IATI Version 2.01",
                 "enabled": true,
                 "type":"menu-item",
-                "url": "#/wizard/iati2"
+                "url": "#/wizard/IATI201/AMP"
             },
             {
                 "name": "divider1",

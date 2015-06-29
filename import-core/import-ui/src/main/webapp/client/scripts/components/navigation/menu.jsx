@@ -16,13 +16,6 @@ var Menu = React.createClass({
     },
     getInitialStateAsync: function () {
         appActions.loadMenuData();
-        menuStore.listen(function (data) {
-            try {
-                return cb(null, {
-                    menuData: data.menuData
-                });
-            } catch (err) {}
-        });
     },
     updateMenu          : function (data) {
         this.setState({

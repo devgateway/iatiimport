@@ -12,7 +12,7 @@ var Header = React.createClass({
             <span className="icon-bar"></span>
             <span className="icon-bar"></span>
            </button>
-           <a className="navbar-brand" href="#">IATI Import Tool</a>
+           <a className="navbar-brand" href="#">Import Tool</a>
           </div>         
           <Menu/>         
         </div>        

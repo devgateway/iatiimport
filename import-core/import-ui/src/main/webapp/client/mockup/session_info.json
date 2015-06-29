@@ -1,0 +1,9 @@
+[
+    {
+        "username": "user",
+        "authentication_token": "XXXXXXXX",
+        "additional_properties": {
+            "workspace_id": 1
+        }
+    }
+]

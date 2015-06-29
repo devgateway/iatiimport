@@ -1,0 +1,66 @@
+[
+    {
+        "name": "home",
+        "label": " Home",
+        "enabled": true,
+        "position": "navbar-left",
+        "iconClass":"glyphicon-home",
+         "url": "/"
+    },
+    {
+        "name": "import_process",
+        "label": " Import Process",
+        "enabled": true,
+        "position": "navbar-left",
+        "iconClass":"glyphicon-import",
+        "url": "/",
+        "children": [
+            {
+                "name": "iati1",
+                "label": "IATI 1.05 to AMP",
+                "enabled": true,
+                "type":"menu-item",
+                "url": "#/wizard/IATI105/AMP"
+            },
+            {
+                "name": "iati2",
+                "label": "IATI 2.01 to AMP",
+                "enabled": true,
+                "type":"menu-item",
+                "url": "#/wizard/IATI201/AMP"
+            }
+        ]
+    },
+    {
+        "name": "reports",
+        "label": " Reports",
+        "enabled": true,
+        "position": "navbar-left",
+        "iconClass":"glyphicon-list",
+        "url": "/",
+        "children": [
+            {
+                "name": "previous_imports",
+                "label": "Previous Imports",
+                "enabled": true,
+                "type":"menu-item",
+                 "url": "#/reports/previousimports"
+            },
+            {
+                "name": "logs",
+                "label": "Logs",
+                "enabled": true,
+                "type": "menu-item",
+                "url": "#/reports/logs"
+            }
+        ]
+    },
+    {
+        "name": "close",
+        "label": " Close",
+        "enabled": true,
+        "position": "navbar-right",
+        "iconClass":"glyphicon-stop",
+        "url": "#/close"
+    }
+]

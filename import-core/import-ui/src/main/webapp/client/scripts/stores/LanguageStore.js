@@ -15,7 +15,7 @@ var LanguageStore = Reflux.createStore({
   handleLoadLanguageData: function() {
     var self = this;    
     $.ajax({
-        url: '/mockup/languages.json',        
+        url: '/importer/data/source/languages',        
         error: function() {        	
         	self.trigger({            
                 languageData: []

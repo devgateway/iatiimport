@@ -32,8 +32,8 @@ var ReviewImport = React.createClass({
                         <div className="col-sm-3 col-md-3"></div>
                     </div>
                     <div className="buttons">
-                        <button className="btn btn-warning navbar-btn btn-custom" type="button">Cancel</button>&nbsp;
-                        <button className="btn btn-success navbar-btn btn-custom" type="button">Proceed with Import</button>
+                        <button className="btn btn-warning navbar-btn btn-custom" type="button">Close</button>&nbsp;
+                        <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.props.eventHandlers.reviewImport}>Proceed with Import</button>
                     </div>
                 </div>
             </div>

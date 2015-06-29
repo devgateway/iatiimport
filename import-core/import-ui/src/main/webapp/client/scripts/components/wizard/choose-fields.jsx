@@ -48,8 +48,8 @@ var ChooseFields = React.createClass({
     getOptions: function(sourceField){    
     var options = [];
     $.map(this.state.destinationFieldsData, function(item, i) {
-            if(sourceField.field_type == item.field_type){              
-               options.push({value:item.field_name, label:item.field_name})
+            if(sourceField.type == item.type){              
+               options.push({value:item.fieldName, label:item.displayName || item.fieldName})
             }              
          });
      return options
@@ -59,17 +59,17 @@ var ChooseFields = React.createClass({
         if (this.state.destinationFieldsData && this.state.sourceFieldsData) {                    
            $.map(this.state.sourceFieldsData, function(item, i) {
                 var options = this.getOptions(item);                
-                rows.push(<tr key={item.field_name}>
+                rows.push(<tr key={item.fieldName}>
                     <td>
-                        <input value={item.field_name} aria-label="Field1" type="checkbox" onChange = {this.props.eventHandlers.selectFieldMapping}/>
+                        <input value={item.fieldName} aria-label="Field1" type="checkbox" onChange = {this.props.eventHandlers.selectFieldMapping}/>
                     </td>
                     <td>
                         <div className="table_cell">
-                            {item.field_name}
+                            {item.displayName}
                         </div>
                     </td>
                     <td>                   
-                    <CustomSelect options={options} value="value" label="label" data={{sourceField:item.field_name}} handleChange = {this.props.eventHandlers.updateFieldMappings}/>
+                    <CustomSelect options={options} value="value" label="label" data={{sourceField:item.fieldName}} handleChange = {this.props.eventHandlers.updateFieldMappings}/>
                     </td>
                 </tr>);
             }.bind(this));
@@ -86,8 +86,8 @@ var ChooseFields = React.createClass({
                                 <span className="caret"></span>
                             </a>
                             <ul className="dropdown-menu" role="menu">
-                                <li role="presentation"><a aria-controls="template1" href="#template1">Template 1 IATI 1.05</a></li>
-                                <li role="presentation"><a aria-controls="template2" href="#template2">Template 2 IATI 2.01</a></li>
+                                <li role="presentation"><a aria-controls="template1" href="#template1">Usual Field Mapping</a></li>
+                                <li role="presentation"><a aria-controls="template2" href="#template2">Other Field mapping</a></li>
                             </ul>
                         </li>
                     </ul>
@@ -112,7 +112,7 @@ var ChooseFields = React.createClass({
                 </div>
                 <div className="buttons">
                     <button className="btn btn-warning navbar-btn btn-custom" type="button">Save</button>&nbsp;
-                    <button className="btn btn-success navbar-btn btn-custom" type="button">Next >></button>
+                    <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.props.eventHandlers.chooseFields}>Next >></button>
                 </div>
                 </div>
             ); } }); 

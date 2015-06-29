@@ -15,7 +15,7 @@ var DestinationFieldsStore = Reflux.createStore({
   handleLoadDestinationFieldsData: function() {
     var self = this;    
     $.ajax({
-        url: '/mockup/destination_fields.json',        
+        url: '/importer/data/destination/field',        
         error: function() {        	
         	self.trigger({            
                 destinationFieldsData: []

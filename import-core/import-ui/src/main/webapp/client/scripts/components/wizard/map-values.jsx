@@ -36,7 +36,7 @@ var MapValues = React.createClass({
         </div>
         <div className="buttons">
           <button className="btn btn-warning navbar-btn btn-custom" type="button">Save</button>&nbsp;
-          <button className="btn btn-success navbar-btn btn-custom" type="button">Next >></button>
+          <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.props.eventHandlers.mapValues}>Next >></button>
         </div>
         </div>
       ); } }); 

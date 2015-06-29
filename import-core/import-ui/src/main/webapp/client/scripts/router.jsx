@@ -19,7 +19,7 @@ var Import = require('./components/wizard/review-import');
 var routes = (
 	<Route name="layout" path="/" handler={Home}>
 		<DefaultRoute handler={Content} />		
-		<Route path="wizard/:id" handler={Wizard}>	
+		<Route path="wizard/:src/:dst" handler={Wizard}>	
 			<DefaultRoute name="upload" handler={UploadFile}/>
 			<Route name="filter" path="filter" handler={FilterData}/>
 			<Route name="projects" path="projects" handler={ChooseProjects}/>

@@ -15,7 +15,7 @@ var ProjectStore = Reflux.createStore({
   handleLoadProjectData: function() {
     var self = this;    
     $.ajax({
-        url: '/mockup/activity_list.json',        
+        url: '/importer/import/projects',        
         error: function() {        	
         	self.trigger({            
                 projectData: []
