@@ -1,7 +1,6 @@
+CREATE SEQUENCE IF NOT EXISTS hibernate_sequence ;
 
-create sequence  hibernate_sequence ;
-
-CREATE TABLE user_account
+CREATE TABLE IF NOT EXISTS user_account
 (
   id bigint NOT NULL,
   first_name varchar (255),
@@ -15,7 +14,7 @@ CREATE TABLE user_account
 )
 ;
 
-CREATE TABLE uploaded_file (
+CREATE TABLE IF NOT EXISTS uploaded_file (
   id bigint NOT NULL,
   file_name varchar (255),
   file_data blob,
