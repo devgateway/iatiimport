@@ -30,13 +30,13 @@ var MapValues = React.createClass({
 
     return (
       <div className="panel panel-default">
-        <div className="panel-heading"><strong>Map Fields Values</strong></div>
+        <div className="panel-heading"><strong>{this.props.i18nLib.t('wizard.map_values.map_field_values')}</strong></div>
         <div className="panel-body">
           <TabbedArea activeTab={this.state.activeTab} paneModels={sourceFields} switchTab={this.switchTab}/>
         </div>
         <div className="buttons">
-          <button className="btn btn-warning navbar-btn btn-custom" type="button">Save</button>&nbsp;
-          <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.props.eventHandlers.mapValues}>Next >></button>
+          <button className="btn btn-warning navbar-btn btn-custom" type="button">{this.props.i18nLib.t('wizard.map_values.save')}</button>&nbsp;
+          <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.props.eventHandlers.mapValues}>{this.props.i18nLib.t('wizard.map_values.next')}</button>
         </div>
         </div>
       ); } }); 

@@ -1,13 +1,15 @@
 [
     {
+        "i18n-key":"header.nav.menu.home",
         "name": "home",
         "label": " Home",
         "enabled": true,
         "position": "navbar-left",
         "iconClass":"glyphicon-home",
          "url": "/"
+         
     },
-    {
+    {   "i18n-key":"header.nav.menu.import_process",
         "name": "import_process",
         "label": " Import Process",
         "enabled": true,
@@ -15,7 +17,8 @@
         "iconClass":"glyphicon-import",
         "url": "/",
         "children": [
-            {
+            {    
+                "i18n-key":"header.nav.menu.submenu.iati1",
                 "name": "iati1",
                 "label": "IATI 1.05 to AMP",
                 "enabled": true,
@@ -23,6 +26,7 @@
                 "url": "#/wizard/IATI105/AMP"
             },
             {
+                "i18n-key":"header.nav.menu.submenu.iati2",
                 "name": "iati2",
                 "label": "IATI 2.01 to AMP",
                 "enabled": true,
@@ -31,7 +35,8 @@
             }
         ]
     },
-    {
+    {   
+        "i18n-key":"header.nav.menu.reports",
         "name": "reports",
         "label": " Reports",
         "enabled": true,
@@ -40,6 +45,7 @@
         "url": "/",
         "children": [
             {
+                "i18n-key":"header.nav.menu.submenu.previous_imports",
                 "name": "previous_imports",
                 "label": "Previous Imports",
                 "enabled": true,
@@ -47,6 +53,7 @@
                  "url": "#/reports/previousimports"
             },
             {
+                "i18n-key":"header.nav.menu.submenu.logs",
                 "name": "logs",
                 "label": "Logs",
                 "enabled": true,
@@ -56,6 +63,7 @@
         ]
     },
     {
+        "i18n-key":"header.nav.menu.close",
         "name": "close",
         "label": " Close",
         "enabled": true,

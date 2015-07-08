@@ -242,9 +242,17 @@
 	text-align:right;
 	padding:10px;
 }
-
+.top-bar{
+	height:40px;
+}
 .btn-custom{
 	width:200px;
 }
 
-
+#language-selector{
+	float:right;
+	margin:5px;
+}
+.clear{
+	clear:both;
+}

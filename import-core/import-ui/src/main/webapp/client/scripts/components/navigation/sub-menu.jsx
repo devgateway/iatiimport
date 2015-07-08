@@ -7,7 +7,7 @@ var SubMenu = React.createClass({
     if(this.props.items){
     $.map(this.props.items, function (item, i) {	    
 	        if(item.type === TYPE_MENU){
-	          subMenus.push(<li key={item.name}><a href={item.url} >{item.label}</a></li>);
+	          subMenus.push(<li key={item.name}><a href={item.url} >{this.props.i18nLib.t(item["i18n-key"])}</a></li>);
 	        }else if(item.type === TYPE_DIVIDER){
 	          subMenus.push(<li className="divider" key={item.name}></li>);
 	        }		     

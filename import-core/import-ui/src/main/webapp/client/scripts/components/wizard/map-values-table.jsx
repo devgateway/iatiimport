@@ -71,10 +71,10 @@ var MappingTable = React.createClass({
 			            <thead>
 			                <tr>
 			                    <th>
-			                        Source Values
+			                        {this.props.i18nLib.t('wizard.map_values.source_value')}
 			                    </th>
 			                    <th>
-			                        Destination Value
+			                        {this.props.i18nLib.t('wizard.map_values.destination_value')}			                        
 			                    </th>
 			                </tr>
 			            </thead>

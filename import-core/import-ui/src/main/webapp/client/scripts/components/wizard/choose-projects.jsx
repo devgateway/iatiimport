@@ -65,23 +65,23 @@ var ChooseProjects = React.createClass({
         };
         return (
             <div className="panel panel-default">
-                <div className="panel-heading"><strong>Choose Projects</strong></div>
+                <div className="panel-heading"><strong>{this.props.i18nLib.t('wizard.choose_projects.choose_projects')}</strong></div>
                 <div className="panel-body">
                 
                     <div className="panel panel-success">
-                        <div className="panel-heading">New Projects</div>
+                        <div className="panel-heading">{this.props.i18nLib.t('wizard.choose_projects.new_projects')}</div>
                         <div className="panel-body">
                             <table className="table">
                                 <thead>
                                     <tr>
                                         <th>
-                                            Import
+                                            {this.props.i18nLib.t('wizard.choose_projects.import')}
                                         </th>
                                         <th>
-                                            Source Project
+                                            {this.props.i18nLib.t('wizard.choose_projects.source_project')}
                                         </th>
                                         <th>
-                                            Destination Project
+                                            {this.props.i18nLib.t('wizard.choose_projects.destination_project')}
                                         </th>
                                     </tr>
                                 </thead>
@@ -92,19 +92,19 @@ var ChooseProjects = React.createClass({
                         </div>
                     </div>
                     <div className="panel panel-danger">
-                        <div className="panel-heading">Existing Projects</div>
+                        <div className="panel-heading">{this.props.i18nLib.t('wizard.choose_projects.existing_projects')}</div>
                         <div className="panel-body">
                             <table className="table">
                                 <thead>
                                     <tr>
                                         <th>
-                                            Update
+                                            {this.props.i18nLib.t('wizard.choose_projects.update')}
                                         </th>
                                         <th>
-                                            Source Project
+                                            {this.props.i18nLib.t('wizard.choose_projects.source_project')}
                                         </th>
                                         <th>
-                                            Destination Project
+                                            {this.props.i18nLib.t('wizard.choose_projects.destination_project')}
                                         </th>
                                     </tr>
                                 </thead>
@@ -116,7 +116,7 @@ var ChooseProjects = React.createClass({
                     </div>
                 </div>
                 <div className="buttons">
-                    <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.props.eventHandlers.chooseProjects}>Next >></button>
+                    <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.props.eventHandlers.chooseProjects}>{this.props.i18nLib.t('wizard.choose_projects.next')}</button>
                 </div>
                 </div>
             ); } }); 

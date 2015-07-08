@@ -1,9 +1,9 @@
 var React = require('react');
 var Menu = require('./../navigation/menu');
 var Header = React.createClass({
-  render: function() {
+  render: function() {  
     return (
-      <nav className="navbar navbar-default navbar-iati">
+      <nav className="navbar navbar-default navbar-iati">     
       <div className="container">
          <div className="navbar-header">
            <button type="button" className="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
@@ -12,9 +12,9 @@ var Header = React.createClass({
             <span className="icon-bar"></span>
             <span className="icon-bar"></span>
            </button>
-           <a className="navbar-brand" href="#">Import Tool</a>
+           <a className="navbar-brand" href="#">{this.props.i18nLib.t("header.import_tool")}</a>
           </div>         
-          <Menu/>         
+          <Menu {...this.props} />         
         </div>        
       </nav>
     );

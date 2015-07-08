@@ -87,20 +87,20 @@ var FilterData = React.createClass({
 
         return (
             <div className="panel panel-default">
-                <div className="panel-heading"><strong>Filter Information</strong></div>
-                <div className="panel-body">
-                    Select for each field, which values you would like to include as part of the import process
+                <div className="panel-heading"><strong>{this.props.i18nLib.t('wizard.filter_data.filter_information')}</strong></div>
+                <div className="panel-body">                   
+                    {this.props.i18nLib.t('wizard.filter_data.select_filters')}
                     <br /><br />
                     {filters}
                     <div className="panel panel-warning">
-                        <div className="panel-heading">Language</div>
+                        <div className="panel-heading">{this.props.i18nLib.t('wizard.filter_data.language')}</div>
                         <div className="panel-body">
                             {languages}
                         </div>
                     </div>
                 </div>
                 <div className="buttons">
-                    <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.props.eventHandlers.filterData}>Next >></button>
+                    <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.props.eventHandlers.filterData}>{this.props.i18nLib.t('wizard.filter_data.next')}</button>
                 </div>
                 </div>
             ); } 

@@ -204,7 +204,7 @@ var Wizard = React.createClass({
     return (
       <div>
       <div className="container">
-      <h2>Import Process &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <h2>{this.props.i18nLib.t('wizard.import_process')}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       <small>{this.state.info.sourceProcessorName} to {this.state.info.destinationProcessorName} </small></h2>
       <div className="row">
       <WizardSteps {...this.props}/>

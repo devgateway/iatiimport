@@ -66,22 +66,22 @@ var UploadFile = React.createClass({
         }
         return (
             <div className="panel panel-default">
-                <div className="panel-heading"><strong>Upload file(s)</strong></div>
+                <div className="panel-heading"><strong>{this.props.i18nLib.t('wizard.steps.upload_files')}</strong></div>
                 <div className="panel-body">
-                    Select files to upload
+                    {this.props.i18nLib.t('wizard.upload_file.select_file')}
                     <input className="file" ref="iatiFileInput" type="file"/>
                 </div>
                 <table className="table">
                     <thead>
                         <tr>
                             <th>
-                                Filename
+                                 {this.props.i18nLib.t('wizard.upload_file.filename')}
                             </th>
                             <th>
-                                Date and Time
+                                {this.props.i18nLib.t('wizard.upload_file.upload_date')}
                             </th>
                             <th>
-                                Action
+                                 {this.props.i18nLib.t('wizard.upload_file.action')}
                             </th>
                         </tr>
                     </thead>
@@ -91,7 +91,7 @@ var UploadFile = React.createClass({
                 </table>
                 <br /><br /><br />
                 <div className="buttons">
-                    <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.props.eventHandlers.uploadFile}>Next >></button>
+                    <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.props.eventHandlers.uploadFile}>{this.props.i18nLib.t('wizard.upload_file.next')}</button>
                 </div>
             </div>
             );

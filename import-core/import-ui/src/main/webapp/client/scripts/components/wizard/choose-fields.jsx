@@ -77,17 +77,17 @@ var ChooseFields = React.createClass({
 
         return (
             <div className="panel panel-default">
-                <div className="panel-heading"><strong>Choose and Map Fields</strong></div>
+                <div className="panel-heading"><strong>{this.props.i18nLib.t('wizard.map_fields.choose_map_fields')}</strong></div>
                 <div className="panel-body">
                     <ul className="nav nav-pills navbar-right">
                         <li className="dropdown" role="presentation">
                             <a aria-expanded="false" className="dropdown-toggle" data-toggle="dropdown" href="#" role="button">
-                                Load Existing Template
+                                {this.props.i18nLib.t('wizard.map_fields.load_existing_template')}
                                 <span className="caret"></span>
                             </a>
                             <ul className="dropdown-menu" role="menu">
-                                <li role="presentation"><a aria-controls="template1" href="#template1">Usual Field Mapping</a></li>
-                                <li role="presentation"><a aria-controls="template2" href="#template2">Other Field mapping</a></li>
+                                <li role="presentation"><a aria-controls="template1" href="#template1">{this.props.i18nLib.t('wizard.map_fields.usual_field_mapping')}</a></li>
+                                <li role="presentation"><a aria-controls="template2" href="#template2">{this.props.i18nLib.t('wizard.map_fields.other_field_mapping')}</a></li>
                             </ul>
                         </li>
                     </ul>
@@ -95,13 +95,13 @@ var ChooseFields = React.createClass({
                         <thead>
                             <tr>
                                 <th>
-                                    Import/Update
+                                     {this.props.i18nLib.t('wizard.map_fields.import_update')}
                                 </th>
                                 <th>
-                                    Source Field
+                                     {this.props.i18nLib.t('wizard.map_fields.source_field')}
                                 </th>
                                 <th>
-                                    Destination Field
+                                     {this.props.i18nLib.t('wizard.map_fields.destination_field')}
                                 </th>
                             </tr>
                         </thead>
@@ -111,8 +111,8 @@ var ChooseFields = React.createClass({
                     </table>
                 </div>
                 <div className="buttons">
-                    <button className="btn btn-warning navbar-btn btn-custom" type="button">Save</button>&nbsp;
-                    <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.props.eventHandlers.chooseFields}>Next >></button>
+                    <button className="btn btn-warning navbar-btn btn-custom" type="button">{this.props.i18nLib.t('wizard.map_fields.save')}</button>&nbsp;
+                    <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.props.eventHandlers.chooseFields}>{this.props.i18nLib.t('wizard.map_fields.next')}</button>
                 </div>
                 </div>
             ); } }); 
