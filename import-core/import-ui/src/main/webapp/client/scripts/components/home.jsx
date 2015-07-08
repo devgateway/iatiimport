@@ -4,10 +4,11 @@ var Footer = require('./layout/footer');
 var Content = require('./content');
 var Router = require('react-router');
 var RouteHandler = Router.RouteHandler;
-var translations = require('./../utils/translations');
+var translations = require('/i18n/translations');
+var Cookies = require('js-cookie');
 var Home = React.createClass({
-   getInitialState: function() {             
-         i18n.init({lng: window.navigator.userLanguage || window.navigator.language || 'en', resStore:translations.resources ,lng: 'en',fallbackLng: 'en',debug: true});
+   getInitialState: function() {                    
+         i18n.init({ resStore:translations.resources ,fallbackLng: 'en',load: 'unspecific'});
          return {
              i18nLib: i18n
          }
@@ -15,18 +16,18 @@ var Home = React.createClass({
   componentDidMount: function() { 
     
   }, 
-  onLanguageChange: function(event){  
+  onLanguageChange: function(event){      
     var i18nLib = this.state.i18nLib;   
     i18nLib.setLng(event.target.value); 
-    this.setState ({i18nLib: i18nLib} );         	
+    this.setState ({i18nLib: i18nLib} );           	
   },
   render: function() {  
     return (
      <div id="container">    
      <div >
      <select id="language-selector" onChange ={this.onLanguageChange} >
-       <option value="en">English	</option>
-       <option value="fr">French</option>
+       <option value="en" selected={Cookies.get('i18next') === 'en' ? 'selected' : ''}>English	</option>
+       <option value="fr" selected={Cookies.get('i18next') === 'fr' ? 'selected' : ''}>French</option>
       </select>
      </div >  
      <div className="clear">          

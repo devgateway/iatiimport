@@ -5,6 +5,7 @@
     "object-assign": "~1.0.0",
     "superagent": "~0.21.0",
     "cookie": "~0.1.2",
+    "js-cookie": "~2.0.2",
     "keymirror": "~0.1.0",
     "director": "~1.2.7",
     "form-serialize": "~0.4.0",
