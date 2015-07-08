@@ -31,6 +31,9 @@ var ChooseProjects = React.createClass({
             projectData: data.projectData
         });
     },   
+    selectAll: function(){
+
+    },
     render: function () {
         var newProjects = [];
         var existingProjects = [];        
@@ -76,6 +79,7 @@ var ChooseProjects = React.createClass({
                                     <tr>
                                         <th>
                                             {this.props.i18nLib.t('wizard.choose_projects.import')}
+                                            
                                         </th>
                                         <th>
                                             {this.props.i18nLib.t('wizard.choose_projects.source_project')}

@@ -24,6 +24,7 @@ import org.devgateway.importtool.services.processor.helper.IDestinationProcessor
 import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -74,7 +75,7 @@ class ImportController {
 		List<File> fileList = new ArrayList<File>();
 		AuthenticationToken authToken = (AuthenticationToken) request
 				.getSession().getAttribute(AUTH_TOKEN);
-		if(repository == null || authToken == null) return new ResponseEntity<>(fileList, HttpStatus.SERVICE_UNAVAILABLE);
+		if(repository == null || authToken == null) return new ResponseEntity<>(fileList, HttpStatus.OK);
 		Iterable<File> list = repository.findByAuthor(authToken.getAuthenticationToken());
 		list.forEach(n -> {
 			fileList.add(n);
@@ -82,15 +83,20 @@ class ImportController {
 		return new ResponseEntity<>(fileList, HttpStatus.OK);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/wipeall")
+	@RequestMapping(method = RequestMethod.GET, value = "/wipeall", produces={MediaType.APPLICATION_JSON_VALUE})
 	public ResponseEntity<String> wipe(HttpServletRequest request) {
-		AuthenticationToken authToken = (AuthenticationToken) request
-				.getSession().getAttribute(AUTH_TOKEN);
-		if(authToken != null) {
-			Iterable<File> list = repository.findByAuthor(authToken.getAuthenticationToken());
+		request.getSession().removeAttribute(SOURCE_PROCESSOR);
+		request.getSession().removeAttribute(DESTINATION_PROCESSOR);
+		request.getSession().removeAttribute(AUTH_TOKEN);
+		try {
+			Iterable<File> list = repository.findAll();
 			repository.delete(list);
 		}
-		return new ResponseEntity<>("{}", HttpStatus.OK);
+		catch(Exception e) {
+//			e.printStackTrace();
+			return new ResponseEntity<>("{ 'error': ' " + e.getMessage() + "'}", HttpStatus.SERVICE_UNAVAILABLE);
+		}
+		return new ResponseEntity<>("{'error': ''}", HttpStatus.OK);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/upload")

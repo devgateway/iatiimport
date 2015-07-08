@@ -4,7 +4,7 @@ var Footer = require('./layout/footer');
 var Content = require('./content');
 var Router = require('react-router');
 var RouteHandler = Router.RouteHandler;
-var translations = require('/i18n/translations');
+var translations = require('../../i18n/translations');
 var Cookies = require('js-cookie');
 var Home = React.createClass({
    getInitialState: function() {                    

@@ -297,4 +297,10 @@ public class IATI105StaticProcessor implements ISourceProcessor {
 		return list;
 	}
 
+	@Override
+	public void setFilterFields(List<Field> fields) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

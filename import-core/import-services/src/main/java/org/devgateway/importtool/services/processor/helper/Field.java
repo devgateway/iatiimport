@@ -13,6 +13,21 @@ public class Field {
 	private List<FieldValue> possibleValues;
 	private List<String> filters = new ArrayList<String>();
 	
+	public Field() {
+	}
+
+	public Field(String displayName, String fieldName, FieldType type) {
+		this.displayName = displayName;
+		this.fieldName = fieldName;
+		this.type = type;
+	}
+
+	public Field(String displayName, String fieldName, FieldType type,
+			List<FieldValue> codeListValues) {
+		this(displayName, fieldName, type);
+		this.possibleValues = codeListValues;
+	}
+
 	public String getFieldName() {
 		return fieldName;
 	}

@@ -4,6 +4,7 @@ public class DocumentMapping {
 	private InternalDocument sourceDocument;
 	private InternalDocument destinationDocument;
 	private OperationType operation = OperationType.NOOP;
+	private Boolean selected = false;
 
 	public InternalDocument getSourceDocument() {
 		return sourceDocument;
@@ -32,6 +33,16 @@ public class DocumentMapping {
 
 	public void setOperation(OperationType operation) {
 		this.operation = operation;
+	}
+
+
+	public Boolean getSelected() {
+		return selected;
+	}
+
+
+	public void setSelected(Boolean selected) {
+		this.selected = selected;
 	}
 
 

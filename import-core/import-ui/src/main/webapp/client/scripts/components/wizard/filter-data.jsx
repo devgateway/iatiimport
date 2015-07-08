@@ -4,6 +4,7 @@ var Reflux = require('reflux');
 var appActions = require('./../../actions');
 var Router = require('react-router');
 var Link = Router.Link;
+var _ = require('lodash/dist/lodash.underscore');
 
 var languageStore = require('./../../stores/LanguageStore');
 var filterStore = require('./../../stores/FilterStore');
@@ -18,22 +19,7 @@ var FilterData = React.createClass({
     },
     getInitialStateAsync: function() {
         appActions.loadLanguageData();
-        languageStore.listen(function(data) {
-            try {                
-                return cb(null, {
-                    languageData: data.languageData
-                });
-            } catch (err) {}
-        });
-
         appActions.loadFilterData();
-        filterStore.listen(function(data) {
-            try {
-                return cb(null, {
-                    filterData: data.filterData
-                });
-            } catch (err) {}
-        });
     },
     updateFilters: function(data) {
         this.setState({
@@ -45,6 +31,35 @@ var FilterData = React.createClass({
             languageData: data.languageData
         });
     },
+    handleToggle: function(field, value, event) {
+        var currentField = _.find(this.state.filterData, { 'fieldName': field.fieldName });
+        var filterExists = _.some(currentField.filters, function(a) { return a == value.code});
+        if(!filterExists && event.target.checked) {
+            currentField.filters.push(value.code);
+        }
+        else
+        {
+            currentField.filters = _.without(currentField.filters, value.code);
+        }
+        var currentFilterData = this.state.filterData;
+
+        this.setState( { filterData: this.state.filterData });
+    },
+    handleNext: function() {
+        this.props.eventHandlers.filterData(this.state.filterData);
+    },
+    selectAll: function(field, event) {
+        if(event.target.checked) {
+            field.filters = _.pluck(field.possibleValues, 'code');
+        } 
+        else
+        {
+            field.filters = [];
+        }
+        this.setState({
+            filterData: this.state.filterData
+        });
+    },
     render: function() {
         var filters = [];
 
@@ -52,24 +67,27 @@ var FilterData = React.createClass({
             $.map(this.state.filterData, function(filter, i) {
                 var filterValues = [];
                 $.map(filter.possibleValues, function(values, i) {
+                    var checkedValue = _.some(filter.filters, function(v){ return v == values.code});
                     filterValues.push(
                             <div className="input-group">
                             <span className="input-group-addon">
-                                <input aria-label={values.value} type="checkbox" value={values.code}/>
+                                <input aria-label={values.value} type="checkbox" checked={checkedValue} onChange={this.handleToggle.bind(this, filter, values)} />
                             </span>
                             <input aria-label="Field1" className="form-control" readOnly type="text" value={values.value}/>
                             </div>
                         )
-                });
-//                debugger;
-                filters.push(
-                    <div className="panel panel-warning">
-                        <div className="panel-heading">{filter.displayName}</div>
-                        <div className="panel-body">
-                            {filterValues}
+                }.bind(this));
+
+                if(filterValues.length > 0 ) {
+                    filters.push(
+                        <div className="panel panel-warning">
+                            <div className="panel-heading">{filter.displayName} <input type="checkbox" onChange={this.selectAll.bind(this, filter)} /></div>
+                            <div className="panel-body">
+                                {filterValues}
+                            </div>
                         </div>
-                    </div>
-                );
+                    );
+                }
             }.bind(this));
         }
 
@@ -100,10 +118,11 @@ var FilterData = React.createClass({
                     </div>
                 </div>
                 <div className="buttons">
-                    <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.props.eventHandlers.filterData}>{this.props.i18nLib.t('wizard.filter_data.next')}</button>
+                    <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.handleNext}>{this.props.i18nLib.t('wizard.filter_data.next')}</button>
                 </div>
                 </div>
-            ); } 
+            ); 
+    } 
 });
 
 module.exports = FilterData;

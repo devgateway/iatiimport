@@ -20,5 +20,7 @@ public interface ISourceProcessor {
 
 	public String getTitleField();
 
+	public void setFilterFields(List<Field> fields);
+
 	//public Boolean isFormatValid();
 }

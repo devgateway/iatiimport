@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -46,37 +47,70 @@ public class IATI201StaticProcessor implements ISourceProcessor {
 	static {
 		mappingNameFile.put("activity-status", "ActivityStatus");
 		mappingNameFile.put("activity-scope", "ActivityScope");
+		mappingNameFile.put("collaboration-type", "CollaborationType");
+		mappingNameFile.put("recipient-country", "Country");
+		mappingNameFile.put("recipient-region", "Region");
+		mappingNameFile.put("default-aid-type", "AidType");
+		mappingNameFile.put("default-finance-type", "FinanceType");
+		mappingNameFile.put("default-flow-type", "FlowType");
+		mappingNameFile.put("default-tied-status", "TiedStatus");
+		mappingNameFile.put("policy-marker", "PolicyMarker");
+		mappingNameFile.put("sector", "Sector");
 	}
 
 	public IATI201StaticProcessor() {
-		Field IATIIdentifier = new Field();
-		IATIIdentifier.setDisplayName("IATI Identifier");
-		IATIIdentifier.setFieldName("iati-identifier");
-		IATIIdentifier.setType(FieldType.STRING);
-		fieldList.add(IATIIdentifier);
+		instantiateStaticFields();
+	}
 
-		Field title = new Field();
-		title.setDisplayName("Title");
-		title.setFieldName("title");
-		title.setType(FieldType.MULTILANG_STRING);
-		fieldList.add(title);
+	private void instantiateStaticFields() {
+		fieldList.add(new Field("IATI Identifier", "iati-identifier", FieldType.STRING));
+		fieldList.add(new Field("Title", "title", FieldType.MULTILANG_STRING));
 
-		Field activityStatus = new Field();
-		activityStatus.setDisplayName("Activity Status");
-		activityStatus.setFieldName("activity-status");
-		activityStatus.setType(FieldType.LIST);
-		activityStatus.setPossibleValues(getCodeListValues("activity-status"));
+		Field activityStatus = new Field("Activity Status", "activity-status", FieldType.LIST, getCodeListValues("activity-status"));
 		fieldList.add(activityStatus);
 		filterFieldList.add(activityStatus);
 
-		Field activityScope = new Field();
-		activityScope.setDisplayName("Activity Scope");
-		activityScope.setFieldName("activity-scope");
-		activityScope.setType(FieldType.LIST);
-		activityScope.setPossibleValues(getCodeListValues("activity-scope"));
+		Field activityScope = new Field("Activity Scope", "activity-scope", FieldType.LIST, getCodeListValues("activity-scope"));
 		fieldList.add(activityScope);
 		filterFieldList.add(activityScope);
-}
+
+		Field collaborationType = new Field("Collaboration Type", "collaboration-type", FieldType.LIST, getCodeListValues("collaboration-type"));
+		fieldList.add(collaborationType);
+		filterFieldList.add(collaborationType);
+
+		Field recipientCountry = new Field("Recipient Country", "recipient-country", FieldType.LIST, getCodeListValues("recipient-country"));
+		fieldList.add(recipientCountry);
+		filterFieldList.add(recipientCountry);
+
+		Field recipientRegion = new Field("Recipient Region", "recipient-region", FieldType.LIST, getCodeListValues("recipient-region"));
+		fieldList.add(recipientRegion);
+		filterFieldList.add(recipientRegion);
+
+		Field aidType = new Field("Aid Type", "default-aid-type", FieldType.LIST, getCodeListValues("default-aid-type"));
+		fieldList.add(aidType);
+		filterFieldList.add(aidType);
+
+		Field financeType = new Field("Finance Type", "default-finance-type", FieldType.LIST, getCodeListValues("default-finance-type"));
+		fieldList.add(financeType);
+		filterFieldList.add(financeType);
+
+		Field flowType = new Field("Flow Type", "default-flow-type", FieldType.LIST, getCodeListValues("default-flow-type"));
+		fieldList.add(flowType);
+		filterFieldList.add(flowType);
+
+		Field tiedStatus = new Field("Tied Status", "default-tied-status", FieldType.LIST, getCodeListValues("default-tied-status"));
+		fieldList.add(tiedStatus);
+		filterFieldList.add(tiedStatus);
+
+		Field policyMarker = new Field("PolicyMarker", "policy-marker", FieldType.LIST, getCodeListValues("policy-marker"));
+		fieldList.add(policyMarker);
+		filterFieldList.add(policyMarker);
+	
+		Field sector = new Field("Sector", "sector", FieldType.LIST, getCodeListValues("sector"));
+		fieldList.add(sector);
+		filterFieldList.add(sector);
+
+	}
 
 	private List<FieldValue> getCodeListValues(String codeListName) {
 		String standardFieldName = mappingNameFile.get(codeListName);
@@ -152,7 +186,7 @@ public class IATI201StaticProcessor implements ISourceProcessor {
 	public String getIdField() {
 		return DEFAULT_ID_FIELD;
 	}
-	
+
 	@Override
 	public String getTitleField() {
 		return DEFAULT_TITLE_FIELD;
@@ -164,7 +198,8 @@ public class IATI201StaticProcessor implements ISourceProcessor {
 		// parse the file, from the xml:lang attribute
 		Document doc = this.doc;
 		List<String> list = new ArrayList<String>();
-		if(doc == null) return list;
+		if (doc == null)
+			return list;
 		// Get root language
 		List<String> activityLanguageList = extractLanguage(doc
 				.getElementsByTagName("iati-activity"));
@@ -180,7 +215,42 @@ public class IATI201StaticProcessor implements ISourceProcessor {
 
 	@Override
 	public List<Field> getFilterFields() {
+		Document doc = this.doc;
+		if (doc == null)
+			return filterFieldList;
 
+		// List<Field> filterFieldListReduced = new ArrayList<Field>();
+		for (Field field : filterFieldList) {
+			NodeList nodeList = doc.getElementsByTagName(field.getFieldName());
+			List<FieldValue> reducedPossibleValues = new ArrayList<FieldValue>();
+			switch (field.getType()) {
+			case LIST:
+				if (nodeList.getLength() > 0) {
+					for (int i = 0; i < nodeList.getLength(); i++) {
+						Element fieldElement = (Element) nodeList.item(i);
+						final String codeValue = fieldElement
+								.getAttribute("code");
+						Optional<FieldValue> fieldValue = field
+								.getPossibleValues().stream().filter(n -> {
+									return n.getCode().equals(codeValue);
+								}).findFirst();
+						if (fieldValue.isPresent()
+								&& !reducedPossibleValues
+										.stream()
+										.filter(n -> {
+											return n.getCode().equals(
+													fieldValue.get().getCode());
+										}).findFirst().isPresent()) {
+							reducedPossibleValues.add(fieldValue.get());
+						}
+					}
+				}
+				break;
+			default:
+				break;
+			}
+			field.setPossibleValues(reducedPossibleValues);
+		}
 		return filterFieldList;
 	}
 
@@ -191,11 +261,8 @@ public class IATI201StaticProcessor implements ISourceProcessor {
 		for (int i = 0; i < nodeList.getLength(); i++) {
 			// Creo el nuevo documento.
 			InternalDocument document = new InternalDocument();
-
 			Element element = (Element) nodeList.item(i);
-
 			Boolean filterIncluded = false;
-			// Busco campos segun lista de campos y tipo
 			NodeList fieldNodeList;
 			for (Field field : getFields()) {
 				switch (field.getType()) {
@@ -238,12 +305,14 @@ public class IATI201StaticProcessor implements ISourceProcessor {
 					if (fieldNodeList.getLength() > 0
 							&& fieldNodeList.getLength() == 1) {
 						Element fieldElement = (Element) fieldNodeList.item(0);
-						
-						narrativeNodeList = fieldElement.getElementsByTagName("narrative");
-						Element narrativeElement = (Element) narrativeNodeList.item(0);
+
+						narrativeNodeList = fieldElement
+								.getElementsByTagName("narrative");
+						Element narrativeElement = (Element) narrativeNodeList
+								.item(0);
 						if (narrativeElement.getChildNodes().getLength() == 1) {
-							mlStringValue = narrativeElement.getChildNodes().item(0)
-									.getNodeValue();
+							mlStringValue = narrativeElement.getChildNodes()
+									.item(0).getNodeValue();
 						} else {
 							mlStringValue = "";
 						}
@@ -294,6 +363,11 @@ public class IATI201StaticProcessor implements ISourceProcessor {
 			}
 		}
 		return list;
+	}
+
+	@Override
+	public void setFilterFields(List<Field> fields) {
+		filterFieldList = fields;
 	}
 
 }

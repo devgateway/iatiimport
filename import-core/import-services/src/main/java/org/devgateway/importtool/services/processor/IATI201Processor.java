@@ -270,4 +270,10 @@ public class IATI201Processor implements ISourceProcessor {
 		return null;
 	}
 
+	@Override
+	public void setFilterFields(List<Field> fields) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

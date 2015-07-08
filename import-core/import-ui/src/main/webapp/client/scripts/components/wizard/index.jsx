@@ -11,6 +11,8 @@ var Router = require('react-router');
 var RouteHandler = Router.RouteHandler;
 var Navigation = Router.Navigation;
 
+var formActions = require('./../../actions/form');
+
 var Wizard = React.createClass({
   mixins: [Navigation],
   getInitialState: function() {
@@ -22,11 +24,9 @@ var Wizard = React.createClass({
     };
   },
   componentWillReceiveProps: function(nextProps) {
-    // Remove if not needed
-    var sourceProcessor = nextProps.params.src;
-    var destinationProcessor = nextProps.params.dst;
-
-    this.initImportSession(sourceProcessor, destinationProcessor);
+    if(this.props.params.src !== nextProps.params.src || this.props.params.dst !== nextProps.params.dst) {
+      this.initImportSession(nextProps.params.src, nextProps.params.dst);
+    }
   },
   componentDidMount  : function() {
     var sourceProcessor = this.props.params.src;
@@ -38,7 +38,8 @@ var Wizard = React.createClass({
   uploadFile: function() {
     this.transitionTo('filter', this.props.params);
   },
-  filterData: function() {
+  filterData: function(data) {
+    formActions.updateFilters(data);
     this.transitionTo('projects', this.props.params);
   },
   chooseProjects: function() {
@@ -161,11 +162,14 @@ var Wizard = React.createClass({
   },
   initImportSession: function(sourceProcessor, destinationProcessor) {
     var compiledURL = _.template(appConfig.TOOL_START_ENDPOINT);
-    $.get(compiledURL({
-      'sourceProcessor': sourceProcessor,
-      'destinationProcessor': destinationProcessor,
-      'authenticationToken': appConfig.DESTINATION_AUTH_TOKEN
-    }), function(result) {
+    var token = appConfig.DESTINATION_AUTH_TOKEN || "default_token";
+    var url = compiledURL({
+        'sourceProcessor': sourceProcessor,
+        'destinationProcessor': destinationProcessor,
+        'authenticationToken': appConfig.DESTINATION_AUTH_TOKEN
+      });
+
+    $.get(url, function(result) {
       this.setState({
                       info: {
                         authenticationToken: result.authenticationToken,
