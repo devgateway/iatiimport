@@ -13,7 +13,9 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
       'test/helpers/phantomjs-shims.js',
-      'test/scripts/bundle.js'
+      'test/scripts/bundle.js',
+      'client/bower_components/jquery/dist/jquery.js',
+      'client/bower_components/bootstrap-fileinput/js/fileinput.min.js'
     ],
 
     // list of files to exclude
