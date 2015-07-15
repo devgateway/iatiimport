@@ -6,15 +6,19 @@ module.exports = {
 					'import_tool' : 'Import Tool',
 					'nav' : {
 						'menu' : {
-							'home' : 'Home ',
-							'import_process' : 'Import Process ',
-							'reports' : 'Reports ',
-							'close' : 'Close ',
+							'home' : ' Home ',
+							'import_process' : ' Import Process ',
+							'reports' : ' Reports ',
+							'close' : ' Close ',
+							'language_selector':' Language',
 							'submenu' : {
 								'iati1' : 'IATI 1.05 to AMP',
 								'iati2' : 'IATI 2.01 to AMP',
 								'logs' : 'Logs',
-								'previous_imports' : 'Previous Imports'
+								'previous_imports' : 'Previous Imports',
+								'en':'English ',
+								'fr':'French '
+								 
 							}
 						}
 					}
@@ -95,11 +99,14 @@ module.exports = {
 							'import_process' : ' Processus D\'importation ',
 							'reports' : ' Rapports ',
 							'close' : ' Fermer ',
+							'language_selector':' Language',
 							'submenu' : {
 								'iati1' : 'IATI 1.05 à AMP',
 								'iati2' : 'IATI 2.01 à AMP',
 								'logs' : 'Logs',
-								'previous_imports' : 'Importations Précédent'
+								'previous_imports' : 'Importations Précédent',
+								'en':'English ',
+								'fr':'French '
 							}
 						}
 					}
@@ -155,7 +162,7 @@ module.exports = {
 						'update' : 'Mise À Jour',
 						'next' : 'Suivant >>',
 						'source_value':'Valeur Source',
-						 'destination_value':'Destinations Valeur'
+						'destination_value':'Destinations Valeur'
 					},
 					'review_import' : {
 						'review_import' : 'Examen et à l\'importation',

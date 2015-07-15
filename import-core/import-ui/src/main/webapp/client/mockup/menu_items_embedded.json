@@ -70,5 +70,31 @@
         "position": "navbar-right",
         "iconClass":"glyphicon-stop",
         "url": "#/close"
+    },
+    {   "i18n-key":"header.nav.menu.language_selector",
+        "name": "language_selector",
+        "label": " Language",
+        "enabled": true,
+        "position": "navbar-left",
+        "iconClass":"glyphicon-globe",
+        "url": "/",
+        "children": [
+            {    
+                "i18n-key":"header.nav.menu.submenu.en",
+                "name": "en",
+                "label": "en",
+                "enabled": true,
+                "type":"language-selector-item",
+                "url": "#/wizard/IATI105/AMP"
+            },
+            {
+                "i18n-key":"header.nav.menu.submenu.fr",
+                "name": "fr",
+                "label": "fr",
+                "enabled": true,
+                "type":"language-selector-item",
+                "url": "#/wizard/IATI201/AMP"
+            }
+        ]
     }
 ]

@@ -253,6 +253,9 @@
 	float:right;
 	margin:5px;
 }
+.selected-language{
+	width:10px;
+}
 .clear{
 	clear:both;
 }
