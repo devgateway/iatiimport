@@ -5,7 +5,7 @@
 
 var UploadFile = require('../../../client/scripts/components/wizard/upload-file');
 var React = require("react/addons");
-var stubFiles = require("../../../client/mockup/uploaded_files.json");
+var stubFiles = require("../../stubs/uploaded_files.json");
 
 describe('Upload File ', function() {
   var TestUtils = React.addons.TestUtils;

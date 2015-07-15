@@ -32,6 +32,7 @@ var FilterData = React.createClass({
         });
     },
     handleToggle: function(field, value, event) {
+        console.log('handleToggle')
         var currentField = _.find(this.state.filterData, { 'fieldName': field.fieldName });
         var filterExists = _.some(currentField.filters, function(a) { return a == value.code});
         if(!filterExists && event.target.checked) {
@@ -71,7 +72,7 @@ var FilterData = React.createClass({
                     filterValues.push(
                             <div className="input-group">
                             <span className="input-group-addon">
-                                <input aria-label={values.value} type="checkbox" checked={checkedValue} onChange={this.handleToggle.bind(this, filter, values)} />
+                                <input aria-label={values.value} className="value-select" type="checkbox" checked={checkedValue} onChange={this.handleToggle.bind(this, filter, values)} />
                             </span>
                             <input aria-label="Field1" className="form-control" readOnly type="text" value={values.value}/>
                             </div>
@@ -80,8 +81,8 @@ var FilterData = React.createClass({
 
                 if(filterValues.length > 0 ) {
                     filters.push(
-                        <div className="panel panel-warning">
-                            <div className="panel-heading">{filter.displayName} <input type="checkbox" onChange={this.selectAll.bind(this, filter)} /></div>
+                        <div className="panel panel-warning filter-group">
+                            <div className="panel-heading filter-group-header"><span className="filter-group-title">{filter.displayName}</span> <input type="checkbox" className="group-select" onChange={this.selectAll.bind(this, filter)} /></div>
                             <div className="panel-body">
                                 {filterValues}
                             </div>
@@ -118,7 +119,7 @@ var FilterData = React.createClass({
                     </div>
                 </div>
                 <div className="buttons">
-                    <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.handleNext}>{this.props.i18nLib.t('wizard.filter_data.next')}</button>
+                    <button className="btn btn-success navbar-btn btn-custom btn-next" type="button" onClick={this.handleNext}>{this.props.i18nLib.t('wizard.filter_data.next')}</button>
                 </div>
                 </div>
             ); 
