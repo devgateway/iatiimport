@@ -15,7 +15,8 @@ module.exports = function(config) {
       'test/helpers/phantomjs-shims.js',
       'test/scripts/bundle.js',
       'client/bower_components/jquery/dist/jquery.js',
-      'client/bower_components/bootstrap-fileinput/js/fileinput.min.js'
+      'client/bower_components/bootstrap-fileinput/js/fileinput.min.js',
+      'client/bower_components/typeahead.js/dist/typeahead.bundle.js'
     ],
 
     // list of files to exclude

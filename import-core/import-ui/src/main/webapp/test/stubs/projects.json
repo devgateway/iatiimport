@@ -1,0 +1,44 @@
+[
+    {
+        "sourceDocument": {
+            "identifier": "AA-AAA-123456789-ABC123",
+            "title": "Activity title 1",
+            "fields": {
+                "activity-scope": "",
+                "activity-status": "2",
+                "iati-identifier": "AA-AAA-123456789-ABC123",
+                "title": "Activity title 1"
+            }
+        },
+        "destinationDocument": null,
+        "operation": "INSERT"
+    },
+    {
+        "sourceDocument": {
+            "identifier": "AA-AAA-123456789-ABC1234",
+            "title": "Activity title 2",
+            "fields": {
+                "activity-scope": "",
+                "activity-status": "2",
+                "iati-identifier": "AA-AAA-123456789-ABC1234",
+                "title": "Activity title 2"
+            }
+        },
+        "destinationDocument": null,
+        "operation": "INSERT"
+    },
+    {
+        "sourceDocument": {
+            "identifier": "AA-AAA-123456789-ABC12345",
+            "title": "Activity title 3",
+            "fields": {
+                "activity-scope": "",
+                "activity-status": "3",
+                "iati-identifier": "AA-AAA-123456789-ABC12345",
+                "title": "Activity title 3"
+            }
+        },
+        "destinationDocument": null,
+        "operation": "INSERT"
+    }
+]

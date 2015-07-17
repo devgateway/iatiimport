@@ -31,8 +31,10 @@ var ChooseProjects = React.createClass({
             projectData: data.projectData
         });
     },   
-    selectAll: function(){
-
+    selectAll: function(){ 
+    },
+    selectProject: function(event) {       
+       this.props.eventHandlers.selectProject(event);
     },
     render: function () {
         var newProjects = [];
@@ -42,7 +44,7 @@ var ChooseProjects = React.createClass({
                 if (item.operation == 'INSERT') {
                     newProjects.push(<tr key={i}>
                         <td>
-                            <input aria-label="Source" value={item.sourceDocument.identifier} type="checkbox" onChange={this.props.eventHandlers.selectProject} />
+                            <input aria-label="Source" className="source" value={item.sourceDocument.identifier} type="checkbox" onChange={this.selectProject} />
                         </td>
                         <td>
                             {item.sourceDocument.title}
@@ -54,7 +56,7 @@ var ChooseProjects = React.createClass({
                 } else {
                     existingProjects.push(<tr key={i}>
                         <td>
-                            <input aria-label="Field1"  type="checkbox" value={item.sourceDocument.identifier} onChange={this.props.eventHandlers.selectProject}/>
+                            <input aria-label="Field1"  className="source" type="checkbox" value={item.sourceDocument.identifier} onChange={this.selectProject}/>
                         </td>
                         <td>
                             {item.sourceDocument.title}

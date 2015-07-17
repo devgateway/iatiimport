@@ -156,8 +156,7 @@ var Wizard = React.createClass({
       }
       this.setState({
         projects: projects
-      });
-      console.log(projects);
+      });      
     }
   },
   initImportSession: function(sourceProcessor, destinationProcessor) {
