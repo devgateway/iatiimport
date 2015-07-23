@@ -1,0 +1,14 @@
+[
+	{
+		"fieldName": "activity_status",
+		"type": "STRING"
+	},
+	{
+		"fieldName": "title",
+		"type": "STRING"
+	},
+	{
+		"fieldName": "sectors",
+		"type": "LIST"
+	}
+]
