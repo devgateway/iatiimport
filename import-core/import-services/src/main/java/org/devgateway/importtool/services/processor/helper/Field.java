@@ -11,8 +11,14 @@ public class Field {
 	private Map<String, String> attributes;
 	private List<Field> childFields;
 	private List<FieldValue> possibleValues;
+	private boolean isMappable;
 	private List<String> filters = new ArrayList<String>();
-	
+
+	// These types are silly but needed for now.
+	// Refactor to something more reasonable and generic (Make Field an
+	// interface and get types to be implementations of it)
+	private String subType = "";
+
 	public Field() {
 	}
 
@@ -22,14 +28,20 @@ public class Field {
 		this.type = type;
 	}
 
-	public Field(String displayName, String fieldName, FieldType type,
-			List<FieldValue> codeListValues) {
+	public Field(String displayName, String fieldName, FieldType type, boolean isMappable) {
 		this(displayName, fieldName, type);
-		this.possibleValues = codeListValues;
+		this.isMappable = isMappable;
 	}
 
 	public String getFieldName() {
 		return fieldName;
+	}
+
+	public String getUniqueFieldName() {
+		if("".equals(subType))
+			return fieldName;
+		else
+			return fieldName + "_" + subType;
 	}
 
 	public void setFieldName(String fieldName) {
@@ -48,7 +60,7 @@ public class Field {
 		return possibleValues;
 	}
 
-	//Setter left only for unit tests. See if still needed
+	// Setter left only for unit tests. See if still needed
 	public void setPossibleValues(List<FieldValue> possibleValues) {
 		this.possibleValues = possibleValues;
 	}
@@ -80,17 +92,11 @@ public class Field {
 	public void setChildFields(List<Field> childFields) {
 		this.childFields = childFields;
 	}
-	
+
 	public boolean equals(Field f) {
 		return f.getFieldName() == this.getFieldName();
 	}
 
-//	public void appendPossibleValue(String code, String name) {
-//		if(!this.possibleValues.containsKey(code) && !this.possibleValues.containsValue(name) ) {
-//			this.possibleValues.put(code, name);
-//		}
-//	}
-	
 	public String toString() {
 		return fieldName;
 	}
@@ -102,5 +108,20 @@ public class Field {
 	public void setDisplayName(String displayName) {
 		this.displayName = displayName;
 	}
-}
 
+	public boolean isMappable() {
+		return isMappable;
+	}
+
+	public void setIsMappable(boolean isMappable) {
+		this.isMappable = isMappable;
+	}
+
+	public String getSubType() {
+		return subType;
+	}
+
+	public void setSubType(String subType) {
+		this.subType = subType;
+	}
+}

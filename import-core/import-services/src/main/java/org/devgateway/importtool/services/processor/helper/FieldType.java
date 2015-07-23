@@ -1,9 +1,5 @@
 package org.devgateway.importtool.services.processor.helper;
 
 public enum FieldType {
-	STRING,
-	INTEGER,
-	ARRAY,
-	LIST,
-	MULTILANG_STRING
+	BOOLEAN, STRING, INTEGER, LIST, MULTILANG_STRING, DATE, TRANSACTION, ORGANIZATION
 }

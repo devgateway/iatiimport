@@ -9,7 +9,7 @@ public interface IDestinationProcessor {
 
 	public List<Field> getFields();
 
-	public List<InternalDocument> getDocuments();
+	public List<InternalDocument> getDocuments(Boolean summary);
 
 	public String getIdField();
 
@@ -17,10 +17,9 @@ public interface IDestinationProcessor {
 
 	public void setTestMode(Boolean testMode);
 
-	public ActionResult insert(InternalDocument source);
+	public ActionResult insert(InternalDocument source, List<FieldMapping> fieldMapping, List<FieldValueMapping> valueMapping);
 
-	public ActionResult update(InternalDocument source,
-			InternalDocument destination);
+	public ActionResult update(InternalDocument source, InternalDocument destination, List<FieldMapping> fieldMapping, List<FieldValueMapping> valueMapping);
 
 	public String getTitleField();
 

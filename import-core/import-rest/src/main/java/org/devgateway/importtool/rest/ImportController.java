@@ -3,6 +3,7 @@ package org.devgateway.importtool.rest;
 import static org.devgateway.importtool.services.processor.helper.Constants.DESTINATION_PROCESSOR;
 import static org.devgateway.importtool.services.processor.helper.Constants.SOURCE_PROCESSOR;
 import static org.devgateway.importtool.services.processor.helper.Constants.AUTH_TOKEN;
+import static org.devgateway.importtool.services.processor.helper.Constants.DOCUMENT_MAPPER;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -12,15 +13,20 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.services.File;
 import org.devgateway.importtool.services.FileRepository;
-import org.devgateway.importtool.services.processor.AMPProcessor;
-import org.devgateway.importtool.services.processor.IATI105StaticProcessor;
-import org.devgateway.importtool.services.processor.IATI201StaticProcessor;
+import org.devgateway.importtool.services.processor.AMPStaticProcessor;
+import org.devgateway.importtool.services.processor.IATI104Processor;
+import org.devgateway.importtool.services.processor.IATI105Processor;
+import org.devgateway.importtool.services.processor.IATI201Processor;
 import org.devgateway.importtool.services.processor.XMLGenericProcessor;
+import org.devgateway.importtool.services.processor.helper.ActionResult;
 import org.devgateway.importtool.services.processor.helper.DocumentMapper;
 import org.devgateway.importtool.services.processor.helper.DocumentMapping;
 import org.devgateway.importtool.services.processor.helper.IDestinationProcessor;
+import org.devgateway.importtool.services.processor.helper.IDocumentMapper;
 import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,12 +43,10 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping(value = "/importer/import")
 class ImportController {
 
-	private final FileRepository repository;
-
 	@Autowired
-	ImportController(FileRepository repository) {
-		this.repository = repository;
-	}
+	private FileRepository repository;
+	
+	private Log log = LogFactory.getLog(getClass());
 
 	@RequestMapping(method = RequestMethod.GET, value = "/new/{sourceProcessorName}/{destinationProcessorName}/{authenticationToken}")
 	ResponseEntity<AuthenticationToken> initiateImport(
@@ -50,15 +54,22 @@ class ImportController {
 			@PathVariable String destinationProcessorName,
 			@PathVariable String authenticationToken, HttpServletRequest request) {
 		ISourceProcessor srcProcessor;
-		if(request.getSession().getAttribute(SOURCE_PROCESSOR) == null) {
+		log.debug("Initializing srcProcessor.");
+		if (request.getSession().getAttribute(SOURCE_PROCESSOR) == null) {
+			log.debug("Creating new processor and putting it in session.");
 			srcProcessor = getSourceProcessor(sourceProcessorName);
 			request.getSession().setAttribute(SOURCE_PROCESSOR, srcProcessor);
+		} else {
+			log.debug("Already in session.");
+			srcProcessor = (ISourceProcessor) request.getSession()
+					.getAttribute(SOURCE_PROCESSOR);
 		}
-		else {
-			srcProcessor = (ISourceProcessor)request.getSession().getAttribute(SOURCE_PROCESSOR);
-		}
+		log.debug(srcProcessor);
 
-		IDestinationProcessor destProcessor = getDestinationProcessor(destinationProcessorName);
+		log.debug("Initializing destProcessor:");
+		IDestinationProcessor destProcessor = getDestinationProcessor(destinationProcessorName, authenticationToken);
+		log.debug(destProcessor);
+		
 		request.getSession().setAttribute(DESTINATION_PROCESSOR, destProcessor);
 
 		AuthenticationToken authObject = new AuthenticationToken(
@@ -70,31 +81,42 @@ class ImportController {
 		return new ResponseEntity<>(authObject, HttpStatus.OK);
 	}
 
+	@RequestMapping(method = RequestMethod.GET, value = "/new/{sourceProcessorName}/{destinationProcessorName}")
+	ResponseEntity<String> initiateImport() {
+
+		return new ResponseEntity<>("{}", HttpStatus.OK);
+	}
+
 	@RequestMapping(method = RequestMethod.GET, value = "/uploaded")
 	public ResponseEntity<List<File>> listFiles(HttpServletRequest request) {
 		List<File> fileList = new ArrayList<File>();
 		AuthenticationToken authToken = (AuthenticationToken) request
 				.getSession().getAttribute(AUTH_TOKEN);
-		if(repository == null || authToken == null) return new ResponseEntity<>(fileList, HttpStatus.OK);
-		Iterable<File> list = repository.findByAuthor(authToken.getAuthenticationToken());
+		if (repository == null || authToken == null)
+			return new ResponseEntity<>(fileList, HttpStatus.OK);
+		Iterable<File> list = repository.findByAuthor(authToken
+				.getAuthenticationToken());
 		list.forEach(n -> {
 			fileList.add(n);
 		});
 		return new ResponseEntity<>(fileList, HttpStatus.OK);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/wipeall", produces={MediaType.APPLICATION_JSON_VALUE})
+	@RequestMapping(method = RequestMethod.GET, value = "/wipeall", produces = { MediaType.APPLICATION_JSON_VALUE })
 	public ResponseEntity<String> wipe(HttpServletRequest request) {
 		request.getSession().removeAttribute(SOURCE_PROCESSOR);
 		request.getSession().removeAttribute(DESTINATION_PROCESSOR);
 		request.getSession().removeAttribute(AUTH_TOKEN);
+		request.getSession().removeAttribute(DOCUMENT_MAPPER);
 		try {
-			Iterable<File> list = repository.findAll();
-			repository.delete(list);
-		}
-		catch(Exception e) {
-//			e.printStackTrace();
-			return new ResponseEntity<>("{ 'error': ' " + e.getMessage() + "'}", HttpStatus.SERVICE_UNAVAILABLE);
+			repository.deleteAll();
+			// Iterable<File> list = repository.findAll();
+			// repository.delete(list);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(
+					"{ 'error': ' " + e.getMessage() + "'}",
+					HttpStatus.SERVICE_UNAVAILABLE);
 		}
 		return new ResponseEntity<>("{'error': ''}", HttpStatus.OK);
 	}
@@ -143,63 +165,56 @@ class ImportController {
 	@RequestMapping(method = RequestMethod.GET, value = "/projects")
 	ResponseEntity<List<DocumentMapping>> processedProjects(
 			HttpServletRequest request) {
-		ISourceProcessor srcProcessor = (ISourceProcessor)request.getSession().getAttribute(SOURCE_PROCESSOR);
-		IDestinationProcessor destProcessor = (IDestinationProcessor)request.getSession().getAttribute(DESTINATION_PROCESSOR);
-		
-		DocumentMapper documentMapper = new DocumentMapper();
-		// Assign Source and Destination Processor to the document mapper
+		ISourceProcessor srcProcessor = (ISourceProcessor) request.getSession()
+				.getAttribute(SOURCE_PROCESSOR);
+		IDestinationProcessor destProcessor = (IDestinationProcessor) request
+				.getSession().getAttribute(DESTINATION_PROCESSOR);
+		IDocumentMapper documentMapper = (IDocumentMapper) request.getSession()
+				.getAttribute(DOCUMENT_MAPPER);
+		if (documentMapper == null) {
+			documentMapper = new DocumentMapper();
+			request.getSession().setAttribute(DOCUMENT_MAPPER, documentMapper);
+		}
+
 		documentMapper.setSourceProcessor(srcProcessor);
 		documentMapper.setDestinationProcessor(destProcessor);
-		try {
-			documentMapper.initialize();
+		if (!documentMapper.isInitialized()) {
+			try {
+				documentMapper.initialize();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
-		catch(Exception e) {
-			e.printStackTrace();
+
+		return new ResponseEntity<>(documentMapper.getDocumentMappings(),
+				HttpStatus.OK);
+	}
+
+	@RequestMapping(method = RequestMethod.GET, value = "/execute")
+	ResponseEntity<List<ActionResult>> execute(HttpServletRequest request) {
+		IDocumentMapper documentMapper = (IDocumentMapper) request.getSession()
+				.getAttribute(DOCUMENT_MAPPER);
+		if (documentMapper == null) {
+			documentMapper = new DocumentMapper();
+			request.getSession().setAttribute(DOCUMENT_MAPPER, documentMapper);
 		}
-
-		return new ResponseEntity<>(documentMapper.getDocumentMappings(), HttpStatus.OK);
+		List<ActionResult> results = documentMapper.execute();
+		
+//		List<ActionResult> results = new ArrayList<ActionResult>();
+//		results.add(new ActionResult("1", "INSERT", "ok", "project 1"));
+//		results.add(new ActionResult("2", "INSERT", "ok", "project 2"));
+//		results.add(new ActionResult("3", "INSERT", "ok", "project 3"));
+//		results.add(new ActionResult("4", "INSERT", "ok", "project 4"));
+//		
+		return new ResponseEntity<>(results, HttpStatus.OK);
 	}
 
-	@RequestMapping(method = RequestMethod.POST, value = "/projects")
-	ResponseEntity<AuthenticationToken> selectProjects(
-			@PathVariable String authenticationToken) {
-		AuthenticationToken authObject = new AuthenticationToken(
-				authenticationToken, new Date(), "", null);
-		return new ResponseEntity<>(authObject, HttpStatus.OK);
-	}
-
-	@RequestMapping(method = RequestMethod.POST, value = "/fields/mapping")
-	ResponseEntity<AuthenticationToken> mapFields(
-			@PathVariable String authenticationToken) {
-		AuthenticationToken authObject = new AuthenticationToken(
-				authenticationToken, new Date(), "", null);
-		return new ResponseEntity<>(authObject, HttpStatus.OK);
-	}
-
-	@RequestMapping(method = RequestMethod.GET, value = "/validate")
-	ResponseEntity<AuthenticationToken> validate(
-			@PathVariable String authenticationToken) {
-		AuthenticationToken authObject = new AuthenticationToken(
-				authenticationToken, new Date(), "", null);
-		return new ResponseEntity<>(authObject, HttpStatus.OK);
-	}
-
-	@RequestMapping(method = RequestMethod.POST, value = "/execute")
-	ResponseEntity<AuthenticationToken> execute(
-			@PathVariable String authenticationToken) {
-		AuthenticationToken authObject = new AuthenticationToken(
-				authenticationToken, new Date(), "", null);
-		return new ResponseEntity<>(authObject, HttpStatus.OK);
-	}
-
-	private IDestinationProcessor getDestinationProcessor(String processorName) {
+	private IDestinationProcessor getDestinationProcessor(String processorName, String authenticationToken) {
 		IDestinationProcessor processor;
 		switch (processorName) {
 		case "AMP":
-			processor = new AMPProcessor();
-			break;
 		default:
-			processor = new AMPProcessor();
+			processor = new AMPStaticProcessor(authenticationToken);
 			break;
 		}
 		return processor;
@@ -209,11 +224,13 @@ class ImportController {
 		ISourceProcessor processor;
 		switch (processorName) {
 		case "IATI201":
-			processor = new IATI201StaticProcessor();
+			processor = new IATI201Processor();
 			break;
 		case "IATI105":
-			//TODO: Update to 105 PRocessor when done
-			processor = new IATI105StaticProcessor();
+			processor = new IATI105Processor();
+			break;
+		case "IATI104":
+			processor = new IATI104Processor();
 			break;
 		case "XMLGeneric":
 			processor = new XMLGenericProcessor();

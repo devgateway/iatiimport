@@ -1,6 +1,7 @@
 package org.devgateway.importtool.services.processor.helper;
 
 public class FieldValue {
+	private int index;
 	private String code;
 	private String value;
 	public String getCode() {
@@ -16,5 +17,13 @@ public class FieldValue {
 		this.value = value;
 	}
 	
-
+	public String toString() {
+		return this.code;
+	}
+	public int getIndex() {
+		return index;
+	}
+	public void setIndex(int index) {
+		this.index = index;
+	}
 }
