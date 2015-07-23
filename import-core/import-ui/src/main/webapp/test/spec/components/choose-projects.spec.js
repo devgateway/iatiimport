@@ -2,9 +2,7 @@
 *   Upload File Spec Test
 */
 'use strict';
-
 var ChooseProjects = require('../../../client/scripts/components/wizard/choose-projects');
-var AutoComplete = require('../../../client/scripts/components/wizard/autocomplete');
 var React = require("react/addons");
 var jasmineReact = require("jasmine-react-helpers");
 var projects = require("../../stubs/projects.json");
@@ -24,9 +22,9 @@ describe('Choose Projects ', function() {
     });
   it('should display project data', function() {	
 	  var projects = TestUtils.scryRenderedDOMComponentsWithClass(instance, "table");
-	   var columns = TestUtils.scryRenderedDOMComponentsWithTag(projects[0], "td");	
-	    expect(columns[0].props.children.type).toBe("input");
-	    expect(columns[1].props.children).toBe("Activity title 1");	    
+	  var columns = TestUtils.scryRenderedDOMComponentsWithTag(projects[0], "td");	
+	  expect(columns[0].props.children.type).toBe("input");
+	  expect(columns[1].props.children).toBe("Activity title 1");	    
   });
   
   it('should call selectProject on project checkbox change', function() {	  
