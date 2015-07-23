@@ -2,7 +2,7 @@ var React = require('react');
 var CustomSelect = React.createClass({
      getInitialState: function() {
          return {
-             value: ''
+             value: this.props.initialOption
          }
      },
      change: function(event){
