@@ -2,9 +2,12 @@
 
 var Reflux = require('reflux');
 var formActions = Reflux.createActions([
-    'updateFilters'
+    'updateFilters',
+    'updateSelectedProjects',
+    'updateSelectedValues'
 ]);
 
+formActions.updateSelectedFields = Reflux.createAction({ asyncResult: true });
 module.exports = formActions;
 
 

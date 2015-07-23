@@ -18,15 +18,23 @@
         "url": "/",
         "children": [
             {    
-                "i18n-key":"header.nav.menu.submenu.iati1",
-                "name": "iati1",
+                "i18n-key":"header.nav.menu.submenu.iati104",
+                "name": "iati104",
+                "label": "IATI 1.04 to AMP",
+                "enabled": true,
+                "type":"menu-item",
+                "url": "#/wizard/IATI104/AMP"
+            },
+            {    
+                "i18n-key":"header.nav.menu.submenu.iati105",
+                "name": "iati105",
                 "label": "IATI 1.05 to AMP",
                 "enabled": true,
                 "type":"menu-item",
                 "url": "#/wizard/IATI105/AMP"
             },
             {
-                "i18n-key":"header.nav.menu.submenu.iati2",
+                "i18n-key":"header.nav.menu.submenu.iati201",
                 "name": "iati2",
                 "label": "IATI 2.01 to AMP",
                 "enabled": true,

@@ -21,10 +21,10 @@ var Content = React.createClass({
 //    this.listenTo(sessionStore, this.updateSession);
   },
   updateDestinationSession : function (data) {
-      this.setState({
-          destinationSessionData: data.sessionData
-      });
-      appConfig.DESTINATION_AUTH_TOKEN = this.state.destinationSessionData[0].authentication_token
+    this.setState({
+        destinationSessionData: data.sessionData
+    });
+    appConfig.DESTINATION_AUTH_TOKEN = this.state.destinationSessionData.token
   },
   updateSession : function (data) {
       this.setState({
@@ -32,20 +32,44 @@ var Content = React.createClass({
       });
   },
   render: function() {
-    var userInfo = <h3>Session not initialized</h3>;
     var token = <h3>N/A</h3>;
+    var url = <h3>N/A</h3>;
+    var username = <h3>N/A</h3>;
+    var team = <h3>N/A</h3>;
+    if(this.state.destinationSessionData && !this.state.destinationSessionData.token) {
+      return (
+        <div className="container">
+          <br/>
+            <div className="jumbotron">
+            Session information for the destination system could not be retrieved. Verify if backend services are working correctly.
+            
+            </div>
+        </div>
+      );
+    }
+
     if (this.state.destinationSessionData) {
-       userInfo = <div> User: {this.state.destinationSessionData[0].username} </div>;
-       token = <div>Destination System Token: {this.state.destinationSessionData[0].authentication_token} </div>
+       token = <div>Destination System Token: {this.state.destinationSessionData.token} </div>
+       url = <div>Destination System URL: {this.state.destinationSessionData.url} </div>
+       username = <div> User: {this.state.destinationSessionData['user-name']} </div>;
+       team = <div> User: {this.state.destinationSessionData.team} </div>;
     };
+    var debugInfo = <div className="jumbotron"> </div>;
+    if(appConfig.DEBUG) {
+      var debugInfo = (
+          <div className="jumbotron">
+            Debug session information:
+            {token}     
+            {url}     
+            {username}
+            {team}
+          </div>
+      );
+    }
     return (
       <div className="container">
         <br/>
-        <div className="jumbotron">
-          Debug session information:
-          {userInfo}
-          {token}     
-        </div>
+          {debugInfo}
       </div>
     );
   }
