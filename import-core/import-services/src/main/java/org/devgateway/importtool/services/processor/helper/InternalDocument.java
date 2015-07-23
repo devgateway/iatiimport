@@ -8,7 +8,7 @@ public class InternalDocument {
 	private String identifier = "";
 	private Map<String, String> stringFields = new HashMap<String, String>();
 	private Map<String, Map<String, String>> multilangFields = new HashMap<String, Map<String, String>>();
-	private Map<String, FinancialTransaction> transactionFields = new HashMap<String, FinancialTransaction>();
+	private Map<String, Map<String, String>> transactionFields = new HashMap<String, Map<String, String>>();
 	private Map<String, Date> dateFields = new HashMap<String, Date>();
 
 	public void addStringField(String fieldName, String value) {
@@ -19,7 +19,7 @@ public class InternalDocument {
 		getMultilangFields().put(fieldName, multiLangvalue);
 	}
 
-	public void addTransactionField(String fieldName, FinancialTransaction transaction) {
+	public void addTransactionField(String fieldName, Map<String, String> transaction) {
 		getTransactionFields().put(fieldName, transaction);
 	}
 
@@ -51,11 +51,11 @@ public class InternalDocument {
 		this.multilangFields = multilangFields;
 	}
 
-	public Map<String, FinancialTransaction> getTransactionFields() {
+	public Map<String, Map<String, String>> getTransactionFields() {
 		return transactionFields;
 	}
 
-	public void setTransactionFields(Map<String, FinancialTransaction> transactionFields) {
+	public void setTransactionFields(Map<String, Map<String, String>> transactionFields) {
 		this.transactionFields = transactionFields;
 	}
 

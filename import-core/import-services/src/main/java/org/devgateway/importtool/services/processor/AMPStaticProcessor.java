@@ -87,6 +87,25 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		fieldList.add(new Field("Actual Start Date", "actual_start_date", FieldType.DATE, true));
 		fieldList.add(new Field("Original Completion Date", "original_completion_date", FieldType.DATE, true));
 		fieldList.add(new Field("Actual Completion Date", "actual_completion_date", FieldType.DATE, true));
+		
+		// Transactions
+		// Transaction Fields
+		Field actualCommitments = new Field("Actual Commitments", "transaction", FieldType.TRANSACTION, true);
+		actualCommitments.setSubType("AC");
+		fieldList.add(actualCommitments);
+
+		Field actualDisbursements = new Field("Actual Disbursements", "transaction", FieldType.TRANSACTION, true);
+		actualDisbursements.setSubType("AD");
+		fieldList.add(actualDisbursements);
+
+		Field plannedCommitments = new Field("Planned Commitments", "transaction", FieldType.TRANSACTION, true);
+		plannedCommitments.setSubType("PC");
+		fieldList.add(plannedCommitments);
+
+		Field plannedDisbursements = new Field("Planned Disbursements", "transaction", FieldType.TRANSACTION, true);
+		plannedDisbursements.setSubType("PD");
+		fieldList.add(plannedDisbursements);
+		
 	}
 
 	private List<FieldValue> getToA() {

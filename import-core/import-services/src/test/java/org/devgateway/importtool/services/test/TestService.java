@@ -64,8 +64,7 @@ public class TestService {
 	// @Test
 	public void testImportFieldsMinimal() throws Throwable {
 		ISourceProcessor transformer = new IATI201Processor();
-		InputStream is = this.getClass().getResourceAsStream(
-				"sample_files/activity-standard-example-minimal.xml");
+		InputStream is = this.getClass().getResourceAsStream("sample_files/activity-standard-example-minimal.xml");
 		transformer.setInput(is);
 		List<Field> fields = transformer.getFields();
 		List<String> expectedFields = new ArrayList<String>();
@@ -73,11 +72,9 @@ public class TestService {
 		expectedFields.add("activity-status");
 		expectedFields.add("title");
 
-		Boolean matched = fields.stream().anyMatch(
-				n -> {
-					return expectedFields.stream().anyMatch(
-							m -> m == n.getFieldName());
-				});
+		Boolean matched = fields.stream().anyMatch(n -> {
+			return expectedFields.stream().anyMatch(m -> m == n.getFieldName());
+		});
 		Assert.assertEquals(matched, true);
 	}
 
@@ -90,19 +87,18 @@ public class TestService {
 		destinationProcessor.setAuthenticationToken("27368298-48e3-48ef-9f75-13a58f2f5cb6");
 
 		// Upload Source
-		InputStream is = this.getClass().getResourceAsStream(
-				"sample_files/Kosovo_Test_File.xml");
+		InputStream is = this.getClass().getResourceAsStream("sample_files/Kosovo_Test_File.xml");
 		sourceProcessor.setInput(is);
 
 		// Filter Source Data
 		// Get the "activity-status" field from the list of available filters
 		// for the processor
 		// Set a value for filtering
-//		List<Field> filterFields = sourceProcessor.getFilterFields();
-//		Field testFilterField = filterFields.stream().filter(n -> {
-//			return n.getFieldName().equals("activity-status");
-//		}).findFirst().get();
-//		testFilterField.addFilter("2");
+		// List<Field> filterFields = sourceProcessor.getFilterFields();
+		// Field testFilterField = filterFields.stream().filter(n -> {
+		// return n.getFieldName().equals("activity-status");
+		// }).findFirst().get();
+		// testFilterField.addFilter("2");
 
 		// Choose Projects to be updated
 		// Get List of Source Projects that match the filter
@@ -116,17 +112,15 @@ public class TestService {
 		documentMapper.setDestinationProcessor(destinationProcessor);
 		documentMapper.initialize();
 
-		long insertCount = documentMapper
-		.getDocumentMappings().stream().filter(n -> {
+		long insertCount = documentMapper.getDocumentMappings().stream().filter(n -> {
 			return n.getOperation() == OperationType.INSERT;
 		}).count();
-		
-//		Assert.assertThat("One document to be inserted ", , is(2L));
-		long updateCount = documentMapper
-				.getDocumentMappings().stream().filter(n -> {
-					return n.getOperation() == OperationType.UPDATE;
-				}).count();
-//		Assert.assertThat("One document to be updated", , is(1L));
+
+		// Assert.assertThat("One document to be inserted ", , is(2L));
+		long updateCount = documentMapper.getDocumentMappings().stream().filter(n -> {
+			return n.getOperation() == OperationType.UPDATE;
+		}).count();
+		// Assert.assertThat("One document to be updated", , is(1L));
 		log.debug("to insert:" + insertCount);
 		log.debug("to update:" + updateCount);
 
@@ -134,7 +128,6 @@ public class TestService {
 		List<Field> sourceFields = sourceProcessor.getFields();
 		List<Field> destinationFields = destinationProcessor.getFields();
 
-		// System.out.println(sourceFields.size());
 		// Find source field activity status
 		Optional<Field> optSrcField = sourceFields.stream().filter(n -> {
 			return n.getFieldName().equals("activity-status");
@@ -146,44 +139,40 @@ public class TestService {
 
 		if (optSrcField.isPresent() && optDstField.isPresent()) {
 			// Assign the field mapping
-//			documentMapper
-//					.addFieldMapping(optSrcField.get(), optDstField.get());
+			// documentMapper
+			// .addFieldMapping(optSrcField.get(), optDstField.get());
 			FieldMapping fm = new FieldMapping();
 			fm.setSourceField(optSrcField.get());
 			fm.setDestinationField(optDstField.get());
-			
+
 			// Assign Value mapping of the chosen fields
 			// Find value for Activity Status SRC: 2, Implementation ,DST: 2,
 			// Ongoing
 			Field sourceField = optSrcField.get();
-			
-			FieldValue sourceFieldValue = sourceField.getPossibleValues()
-					.stream().filter(n -> {
-						return n.getCode().equals("2");
-					}).findFirst().get();
+
+			FieldValue sourceFieldValue = sourceField.getPossibleValues().stream().filter(n -> {
+				return n.getCode().equals("2");
+			}).findFirst().get();
 			Field destinationField = optSrcField.get();
-			FieldValue destinationFieldValue = destinationField
-					.getPossibleValues().stream().filter(n -> {
-						return n.getCode().equals("2");
-					}).findFirst().get();
+			FieldValue destinationFieldValue = destinationField.getPossibleValues().stream().filter(n -> {
+				return n.getCode().equals("2");
+			}).findFirst().get();
 			FieldValueMapping fvm = new FieldValueMapping();
 			fvm.setSourceField(sourceField);
-			//fvm.setSourceFieldValue(sourceFieldValue);
-			//fvm.setDestinationFieldValue(destinationFieldValue);
-//			documentMapper.addValueMapping(sourceField, sourceFieldValue,
-//					destinationFieldValue);
+			// fvm.setSourceFieldValue(sourceFieldValue);
+			// fvm.setDestinationFieldValue(destinationFieldValue);
+			// documentMapper.addValueMapping(sourceField, sourceFieldValue,
+			// destinationFieldValue);
 		}
 		// Execute Import
 		List<ActionResult> result = documentMapper.execute();
 		result.stream().forEach(n -> {
-			System.out.println("Result Status: " + n.getStatus());
-			System.out.println("Result Message: " + n.getMessage());
+//			System.out.println("Result Status: " + n.getStatus());
+//			System.out.println("Result Message: " + n.getMessage());
 		});
 	}
 
-	
-	
-//	@Test
+	// @Test
 	public void testActivityStatusImport() throws Throwable {
 		// Select type of Source -> Destination process
 		ISourceProcessor sourceProcessor = new IATI201Processor();
@@ -191,8 +180,7 @@ public class TestService {
 		destinationProcessor.setTestMode(true);
 
 		// Upload Source
-		InputStream is = this.getClass().getResourceAsStream(
-				"sample_files/activity-standard-example-minimal.xml");
+		InputStream is = this.getClass().getResourceAsStream("sample_files/activity-standard-example-minimal.xml");
 		sourceProcessor.setInput(is);
 
 		// Filter Source Data
@@ -217,15 +205,13 @@ public class TestService {
 		documentMapper.setDestinationProcessor(destinationProcessor);
 		documentMapper.initialize();
 
-		Assert.assertThat("One document to be inserted ", documentMapper
-				.getDocumentMappings().stream().filter(n -> {
-					return n.getOperation() == OperationType.INSERT;
-				}).count(), is(2L));
+		Assert.assertThat("One document to be inserted ", documentMapper.getDocumentMappings().stream().filter(n -> {
+			return n.getOperation() == OperationType.INSERT;
+		}).count(), is(2L));
 
-		Assert.assertThat("One document to be updated", documentMapper
-				.getDocumentMappings().stream().filter(n -> {
-					return n.getOperation() == OperationType.UPDATE;
-				}).count(), is(1L));
+		Assert.assertThat("One document to be updated", documentMapper.getDocumentMappings().stream().filter(n -> {
+			return n.getOperation() == OperationType.UPDATE;
+		}).count(), is(1L));
 
 		// Choose Fields
 		List<Field> sourceFields = sourceProcessor.getFields();
@@ -243,38 +229,36 @@ public class TestService {
 
 		if (optSrcField.isPresent() && optDstField.isPresent()) {
 			// Assign the field mapping
-//			documentMapper
-//					.addFieldMapping(optSrcField.get(), optDstField.get());
+			// documentMapper
+			// .addFieldMapping(optSrcField.get(), optDstField.get());
 			FieldMapping fm = new FieldMapping();
 			fm.setSourceField(optSrcField.get());
 			fm.setDestinationField(optDstField.get());
-			
+
 			// Assign Value mapping of the chosen fields
 			// Find value for Activity Status SRC: 2, Implementation ,DST: 2,
 			// Ongoing
 			Field sourceField = optSrcField.get();
-			
-			FieldValue sourceFieldValue = sourceField.getPossibleValues()
-					.stream().filter(n -> {
-						return n.getCode().equals("2");
-					}).findFirst().get();
+
+			FieldValue sourceFieldValue = sourceField.getPossibleValues().stream().filter(n -> {
+				return n.getCode().equals("2");
+			}).findFirst().get();
 			Field destinationField = optSrcField.get();
-			FieldValue destinationFieldValue = destinationField
-					.getPossibleValues().stream().filter(n -> {
-						return n.getCode().equals("2");
-					}).findFirst().get();
+			FieldValue destinationFieldValue = destinationField.getPossibleValues().stream().filter(n -> {
+				return n.getCode().equals("2");
+			}).findFirst().get();
 			FieldValueMapping fvm = new FieldValueMapping();
 			fvm.setSourceField(sourceField);
-			//fvm.setSourceFieldValue(sourceFieldValue);
-			//fvm.setDestinationFieldValue(destinationFieldValue);
-//			documentMapper.addValueMapping(sourceField, sourceFieldValue,
-//					destinationFieldValue);
+			// fvm.setSourceFieldValue(sourceFieldValue);
+			// fvm.setDestinationFieldValue(destinationFieldValue);
+			// documentMapper.addValueMapping(sourceField, sourceFieldValue,
+			// destinationFieldValue);
 		}
 		// Execute Import
 		List<ActionResult> result = documentMapper.execute();
 		result.stream().forEach(n -> {
-			System.out.println("Result Status: " + n.getStatus());
-			System.out.println("Result Message: " + n.getMessage());
+//			System.out.println("Result Status: " + n.getStatus());
+//			System.out.println("Result Message: " + n.getMessage());
 		});
 	}
 

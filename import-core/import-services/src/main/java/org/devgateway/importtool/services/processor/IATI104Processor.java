@@ -2,11 +2,9 @@ package org.devgateway.importtool.services.processor;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -27,7 +25,6 @@ import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.services.processor.helper.Field;
 import org.devgateway.importtool.services.processor.helper.FieldType;
 import org.devgateway.importtool.services.processor.helper.FieldValue;
-import org.devgateway.importtool.services.processor.helper.FinancialTransaction;
 import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
 import org.devgateway.importtool.services.processor.helper.InternalDocument;
 import org.springframework.context.annotation.Scope;
@@ -375,8 +372,8 @@ public class IATI104Processor implements ISourceProcessor {
 						nodes = (NodeList) xPath.evaluate("//transaction-type[@code='" + field.getSubType() + "']/parent::*", element, XPathConstants.NODESET);
 						for (int j = 0; j < nodes.getLength(); ++j) {
 							String reference = "";
-							BigDecimal value;
-							Date date;
+//							BigDecimal value;
+//							Date date;
 							String receivingOrganization = "";
 
 							Element e = (Element) nodes.item(j);
@@ -386,28 +383,28 @@ public class IATI104Processor implements ISourceProcessor {
 
 							// Amount
 							String localValue = e.getElementsByTagName("value").item(0).getChildNodes().item(0).getNodeValue();
-							value = new BigDecimal(localValue);
+//							value = new BigDecimal(localValue);
 
 							// Date
 							String localDate = e.getElementsByTagName("transaction-date").item(0).getChildNodes().item(0).getNodeValue();
-							String format = "yyyy-MM-dd";
-							SimpleDateFormat sdf = new SimpleDateFormat(format);
-							date = sdf.parse(localDate);
+//							String format = "yyyy-MM-dd";
+//							SimpleDateFormat sdf = new SimpleDateFormat(format);
+//							date = sdf.parse(localDate);
 
 							// Receiving Org
 							receivingOrganization = e.getElementsByTagName("receiver-org").item(0).getChildNodes().getLength() > 0 ? e.getElementsByTagName("receiver-org").item(0).getChildNodes().item(0).getNodeValue() : null;
 
-							FinancialTransaction ft = new FinancialTransaction();
-							ft.setDate(date);
-							ft.setReceivingOrganization(receivingOrganization);
-							ft.setReference(reference);
-							ft.setValue(value);
-							ft.setType(field.getSubType());
+							Map<String, String> transactionFields = new HashMap<String, String>();
+							transactionFields.put("date", localDate);
+							transactionFields.put("receiving-org", receivingOrganization);
+							transactionFields.put("reference", reference);
+							transactionFields.put("value", localValue);
+							transactionFields.put("subtype", field.getSubType());
 
-							document.addTransactionField("transaction", ft);
+							document.addTransactionField("transaction", transactionFields);
 						}
 
-					} catch (XPathExpressionException | ParseException e1) {
+					} catch (XPathExpressionException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
