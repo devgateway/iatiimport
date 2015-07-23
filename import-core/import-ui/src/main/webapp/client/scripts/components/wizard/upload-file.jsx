@@ -1,6 +1,7 @@
 var React = require('react');
 var _ = require('lodash/dist/lodash.underscore');
 var fileStore = require('./../../stores/FileStore');
+var moment = require('moment');
 var reactAsync = require('react-async');
 var Reflux = require('reflux');
 var appActions = require('./../../actions');
@@ -50,16 +51,14 @@ var UploadFile = React.createClass({
     render: function() {
         var files = [];
         if (this.state.fileData && this.state.fileData.length > 0) {        
-        $.map(this.state.fileData, function (item, i) {            
-                files.push(<tr key={item.id}>
+        $.map(this.state.fileData, function (item, i) {    
+            var createdDate = moment(item.createdDate).fromNow();
+            files.push(<tr key={item.id}>
                     <td>
                         {item.fileName}
                     </td>
                     <td>
-                        {item.createdDate}
-                    </td>
-                    <td>
-                        <span className="label label-success sr-only">View</span>
+                        {createdDate}
                     </td>
                 </tr>);
             });
@@ -79,9 +78,6 @@ var UploadFile = React.createClass({
                             </th>
                             <th>
                                 {this.props.i18nLib.t('wizard.upload_file.upload_date')}
-                            </th>
-                            <th>
-                                 {this.props.i18nLib.t('wizard.upload_file.action')}
                             </th>
                         </tr>
                     </thead>
