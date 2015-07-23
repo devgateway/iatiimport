@@ -71,7 +71,7 @@ var UploadFile = React.createClass({
                     {this.props.i18nLib.t('wizard.upload_file.select_file')}
                     <input className="file" ref="iatiFileInput" type="file"/>
                 </div>
-                <table className="table">
+                <table className="table file-list">
                     <thead>
                         <tr>
                             <th>
