@@ -11,8 +11,9 @@ module.exports = {
 							'reports' : 'Reports ',
 							'close' : 'Close ',
 							'submenu' : {
-								'iati1' : 'IATI 1.05 to AMP',
-								'iati2' : 'IATI 2.01 to AMP',
+								'iati104' : 'IATI 1.04 to AMP',
+								'iati105' : 'IATI 1.05 to AMP',
+								'iati201' : 'IATI 2.01 to AMP',
 								'logs' : 'Logs',
 								'previous_imports' : 'Previous Imports'
 							}
@@ -96,8 +97,9 @@ module.exports = {
 							'reports' : ' Rapports ',
 							'close' : ' Fermer ',
 							'submenu' : {
-								'iati1' : 'IATI 1.05 à AMP',
-								'iati2' : 'IATI 2.01 à AMP',
+								'iati104' : 'IATI 1.04 to AMP',
+								'iati105' : 'IATI 1.05 à AMP',
+								'iati201' : 'IATI 2.01 à AMP',
 								'logs' : 'Logs',
 								'previous_imports' : 'Importations Précédent'
 							}
