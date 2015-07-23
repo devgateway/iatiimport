@@ -322,7 +322,6 @@ public class IATI104Processor implements ISourceProcessor {
 			XPath xPath = XPathFactory.newInstance().newXPath();
 
 			for (Field field : getFields()) {
-				System.out.println(field.getType());
 				switch (field.getType()) {
 				case LIST:
 					String codeValue = "";
