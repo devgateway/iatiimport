@@ -80,7 +80,10 @@ module.exports = function(grunt) {
   invokeConfigFn(serverConfig);
   invokeConfigFn(testConfig);
   invokeConfigFn(registerDefinitions);
-  grunt.config.set('prism',
+
+  grunt.loadNpmTasks('grunt-connect-proxy');
+
+/*  grunt.config.set('prism',
   {
     options: {
       mode: 'proxy',
@@ -90,5 +93,5 @@ module.exports = function(grunt) {
     }
   });
 
-  grunt.loadNpmTasks('grunt-connect-prism');
+  grunt.loadNpmTasks('grunt-connect-prism');*/
 };

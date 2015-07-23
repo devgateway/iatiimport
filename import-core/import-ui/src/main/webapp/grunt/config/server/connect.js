@@ -12,12 +12,25 @@ var taskConfig = function(grunt) {
       hostname: 'localhost'
     },
     server: {
+      proxies: [
+        {
+          context: '/importer',
+          host: 'localhost',
+          port: 8080
+        },
+        {
+          context: ['/aim', '/TEMPLATE', '/repository', '/rest', '/index.do', '/showDesktop.do', '/wicket'],
+          host: 'localhost',
+          port: 8081
+        }
+
+      ],
       options: {
         open: 'http://localhost:9010/',
         base: '<%= yeogurt.client %>/.serve',
         middleware: function(connect) {
           return [
-            require('grunt-connect-prism/middleware'),
+            require('grunt-connect-proxy/lib/utils').proxyRequest,
             connect.static('.tmp'),
             connect().use('/bower_components', connect.static('./client/bower_components')),
             connect.static('client')
