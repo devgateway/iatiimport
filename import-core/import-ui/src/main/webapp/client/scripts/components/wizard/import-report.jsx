@@ -1,15 +1,36 @@
 var React = require('react');
 var Router = require('react-router');
 var Link = Router.Link;
+var _ = require('lodash/dist/lodash.underscore');
+
 var ImportReport = React.createClass({
   componentDidMount: function () {
   },
   
   render: function() {
-    var results = [];
+    var results = this.props.results;
+    var rows = [];
+    _.each(results, function(result) {
+        rows.push(
+                <tr>
+                    <td>
+                        {result.id}
+                    </td>
+                    <td>
+                        {result.operation}
+                    </td>
+                    <td>
+                        {result.status}
+                    </td>
+                    <td>
+                        {result.message}
+                    </td>
+                </tr>
+                );
+            });
 
     return (
-<div className="modal fade" id="myModal" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div className="modal fade" id="modalResults" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div className="modal-dialog">
     <div className="modal-content">
       <div className="modal-header">
@@ -24,7 +45,10 @@ var ImportReport = React.createClass({
                         Project Id
                     </th>
                     <th>
-                        Result
+                        Operation
+                    </th>
+                    <th>
+                        Status
                     </th>
                     <th>
                         Message
@@ -32,39 +56,7 @@ var ImportReport = React.createClass({
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>
-                        Project Name 1
-                    </td>
-                    <td>
-                        <span className="label label-success">Imported</span>
-                    </td>
-                    <td>
-                        OK
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        Project Name 2
-                    </td>
-                    <td>
-                        <span className="label label-success">Imported</span>
-                    </td>
-                    <td>
-                        OK
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        Project Name 3
-                    </td>
-                    <td>
-                        <span className="label label-danger">Rejected</span>
-                    </td>
-                    <td>
-                        Rejected with message: "No permissions"
-                    </td>
-                </tr>
+                {rows}
             </tbody>
         </table>
         
