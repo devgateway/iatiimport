@@ -13,22 +13,29 @@ var AutoComplete = React.createClass({
             }
         });
         searchEngine.initialize();
+        var language = this.props.language;
         $el.typeahead(null, {
             name      : this.props.name,
-            displayKey: this.props.display,
+            display: function(v){ return v.fields.title[language];},
             source    : searchEngine.ttAdapter()
         });
         
         var self = this;
         
         $el.bind('typeahead:selected', function (obj, datum, name) {           
-            self.props.onSelect(self.props.data,datum);
+            self.props.onSelect(datum);
         });
+
+        if(this.props.value) {
+            $el.val(this.props.value.title);
+        }
     },
     render: function () {
+        var language = this.props.language;
+        var value = this.props.value ? this.props.value.fields.title[language] : undefined;
         return (
             <div className="autocomplete">
-                <input className="typeahead" placeholder={this.props.placeholder} ref={this.props.refId} type="text"/>
+                <input className="typeahead" placeholder={this.props.placeholder} ref={this.props.refId} type="text" />
             </div>
         );
     }
