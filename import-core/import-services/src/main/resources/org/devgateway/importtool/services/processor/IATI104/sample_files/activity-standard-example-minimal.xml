@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--This is example XML for the IATI activity standard.  No reference to actual data, real organisations or development cooperation models is intended.-->
+<!--iati-activities starts-->
+<iati-activities generated-datetime="2014-05-06T10:15:37" version="1.04" linked-data-default="http://data.example.org/">
+ <!--iati-activity starts-->	
+ <iati-activity xml:lang="en" default-currency="EUR" last-updated-datetime="2014-05-06T10:15:37" hierarchy="1" version="1.04" linked-data-uri="http://data.example.org/123456789">
+  <reporting-org ref="AA-AAA-123456789" type="21">Organisation Name</reporting-org>
+  <iati-identifier>AA-AAA-123456789-ABC123</iati-identifier>
+  <other-identifier owner-name="Agency A" owner-ref="AA-AAA-123456789">ABC123-XYZ</other-identifier>
+  <title>Activity title</title>
+  <description type="1">General activity description text.  Long description of the activity with no particular structure.</description>
+  <description type="2">Objectives for the activity, for example from a logical framework.</description>
+  <description type="3">Statement of groups targeted to benefit from the activity.</description>
+  <activity-status code="2" />
+  <activity-scope code="3" />
+  <activity-date iso-date="2012-04-15" type="start-planned" />
+  <activity-date iso-date="2012-04-28" type="start-actual" />
+  <activity-date iso-date="2015-12-31" type="end-planned" />
+ </iati-activity>
+  <!--iati-activity ends-->	
+</iati-activities>
+<!--iati-activities ends-->
