@@ -45,6 +45,9 @@ var ChooseFields = React.createClass({
             destinationFieldsData: data.destinationFieldsData
         });
     },   
+    selectFieldMapping: function(event){
+      this.props.eventHandlers.selectFieldMapping(event);
+    },
     getOptions: function(sourceField){    
     var options = [];
     $.map(this.state.destinationFieldsData, function(item, i) {
@@ -61,7 +64,7 @@ var ChooseFields = React.createClass({
                 var options = this.getOptions(item);                
                 rows.push(<tr key={item.fieldName}>
                     <td>
-                        <input value={item.fieldName} aria-label="Field1" type="checkbox" onChange = {this.props.eventHandlers.selectFieldMapping}/>
+                        <input value={item.fieldName} aria-label="Field1" type="checkbox" onChange = {this.selectFieldMapping} className="source-selector"/>
                     </td>
                     <td>
                         <div className="table_cell">
