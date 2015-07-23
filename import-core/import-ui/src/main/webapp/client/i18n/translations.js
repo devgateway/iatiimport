@@ -12,8 +12,9 @@ module.exports = {
 							'close' : ' Close ',
 							'language_selector':' Language',
 							'submenu' : {
-								'iati1' : 'IATI 1.05 to AMP',
-								'iati2' : 'IATI 2.01 to AMP',
+								'iati104' : 'IATI 1.04 to AMP',
+								'iati105' : 'IATI 1.05 to AMP',
+								'iati201' : 'IATI 2.01 to AMP',
 								'logs' : 'Logs',
 								'previous_imports' : 'Previous Imports',
 								'en':'English ',
@@ -101,8 +102,9 @@ module.exports = {
 							'close' : ' Fermer ',
 							'language_selector':' Language',
 							'submenu' : {
-								'iati1' : 'IATI 1.05 à AMP',
-								'iati2' : 'IATI 2.01 à AMP',
+								'iati104' : 'IATI 1.04 to AMP',
+								'iati105' : 'IATI 1.05 à AMP',
+								'iati201' : 'IATI 2.01 à AMP',
 								'logs' : 'Logs',
 								'previous_imports' : 'Importations Précédent',
 								'en':'English ',

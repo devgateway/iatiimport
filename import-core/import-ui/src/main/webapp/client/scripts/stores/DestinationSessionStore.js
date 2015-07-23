@@ -17,7 +17,7 @@ var DestinationSessionStore = Reflux.createStore({
     $.get('/importer/import/wipeall', function(){});    
  
     $.ajax({
-        url: appConfig.DESTINATION_AUTH_TOKEN_ENDPOINT,        
+        url: appConfig.DESTINATION_API_HOST + appConfig.DESTINATION_AUTH_TOKEN_ENDPOINT,        
         error: function() {
           self.trigger({            
                 sessionData: []

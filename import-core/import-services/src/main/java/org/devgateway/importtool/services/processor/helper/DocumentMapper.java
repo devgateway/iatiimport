@@ -1,9 +1,7 @@
 package org.devgateway.importtool.services.processor.helper;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 public class DocumentMapper implements IDocumentMapper {
@@ -12,9 +10,10 @@ public class DocumentMapper implements IDocumentMapper {
 
 	private ISourceProcessor sourceProcessor;
 	private IDestinationProcessor destinationProcessor;
-	private Map<Field, Field> fieldMapping = new HashMap<Field, Field>();
-	private Map<Field, Map<FieldValue, FieldValue>> valueMapping = new HashMap<Field, Map<FieldValue, FieldValue>>();
+	private List<FieldMapping> fieldMappingObject = new ArrayList<FieldMapping>();
+	private List<FieldValueMapping> valueMappingObject = new ArrayList<FieldValueMapping>();
 	private List<DocumentMapping> documentMappings = new ArrayList<DocumentMapping>();
+	private boolean isInitialized = false;
 
 	public ISourceProcessor getSourceProcessor() {
 		return sourceProcessor;
@@ -28,46 +27,18 @@ public class DocumentMapper implements IDocumentMapper {
 		return destinationProcessor;
 	}
 
-	public void setDestinationProcessor(
-			IDestinationProcessor destinationProcessor) {
+	public void setDestinationProcessor(IDestinationProcessor destinationProcessor) {
 		this.destinationProcessor = destinationProcessor;
 	}
 
-	public void addFieldMapping(Field sourceField, Field destinationField) {
-		fieldMapping.put(sourceField, destinationField);
-	}
-
-	public void addValueMapping(Field srcField, FieldValue sourceValue,
-			FieldValue destinationValue) {
-		Map<FieldValue, FieldValue> mapping = new HashMap<FieldValue, FieldValue>();
-		mapping.put(sourceValue, destinationValue);
-		valueMapping.put(srcField, mapping);
-	}
-
-	public Map<Field, Map<FieldValue, FieldValue>> getValueMapping() {
-		return valueMapping;
-	}
-
-	public void setValueMapping(
-			Map<Field, Map<FieldValue, FieldValue>> valueMapping) {
-		this.valueMapping = valueMapping;
-	}
-
-	public Map<Field, Field> getFieldMapping() {
-		return fieldMapping;
-	}
-
-	public void setFieldMapping(Map<Field, Field> fieldMapping) {
-		this.fieldMapping = fieldMapping;
-	}
-
 	// Mapping and transformation operations go here
+	@Override
 	public List<ActionResult> execute() {
 		List<ActionResult> results = new ArrayList<ActionResult>();
-		// // Key: Source Document
-		// // Value: Dest Document
+
 		for (DocumentMapping doc : documentMappings) {
-			results.add(processDocumentMapping(doc));
+			if (doc.getSelected())
+				results.add(processDocumentMapping(doc));
 		}
 		return results;
 	}
@@ -78,10 +49,11 @@ public class DocumentMapper implements IDocumentMapper {
 		ActionResult result = null;
 		switch (doc.getOperation()) {
 		case INSERT:
-			result = this.destinationProcessor.insert(source);
+			// For now, we pass the mapping. Find a better more efficient way.
+			result = this.destinationProcessor.insert(source, this.getFieldMappingObject(), this.getValueMappingObject());
 			break;
 		case UPDATE:
-			result = this.destinationProcessor.update(source, destination);
+			result = this.destinationProcessor.update(source, destination, this.getFieldMappingObject(), this.getValueMappingObject());
 			break;
 		case NOOP:
 			break;
@@ -92,60 +64,47 @@ public class DocumentMapper implements IDocumentMapper {
 		return result;
 	}
 
-	public void setValueMapping(Field firstFieldSource, String valueSrc,
-			String valueDest) {
+	public void setValueMapping(Field firstFieldSource, String valueSrc, String valueDest) {
 
 	}
 
 	public void initialize() throws Exception {
 		if (sourceProcessor == null || destinationProcessor == null) {
-			throw new Exception(
-					"Missing prerequirements to initialize this mapping");
+			throw new Exception("Missing prerequirements to initialize this mapping");
 		}
 
 		// Get the document lists and field that will be used for matching and
 		// prepare the list of documents to be updated
 		List<InternalDocument> sourceDocuments = sourceProcessor.getDocuments();
-		List<InternalDocument> destinationDocuments = destinationProcessor
-				.getDocuments();
+		List<InternalDocument> destinationDocuments = destinationProcessor.getDocuments(false);
 
 		for (InternalDocument srcDoc : sourceDocuments) {
 			String sourceIdField = sourceProcessor.getIdField();
-			String sourceTitleField = sourceProcessor.getTitleField();
 			String destinationIdField = destinationProcessor.getIdField();
 
-			String sourceIdValue = (String) srcDoc.getField(sourceIdField);
-			String sourceTitleValue = (String) srcDoc
-					.getField(sourceTitleField);
+			String sourceIdValue = srcDoc.getStringFields().get(sourceIdField);
 			srcDoc.setIdentifier(sourceIdValue);
-			srcDoc.setTitle(sourceTitleValue);
-			Optional<InternalDocument> optionalDestDoc = destinationDocuments
-					.stream()
-					.filter(n -> {
-						return sourceIdValue.equals(n
-								.getField(destinationIdField));
-					}).findFirst();
+			Optional<InternalDocument> optionalDestDoc = destinationDocuments.stream().filter(n -> {
+				return sourceIdValue.equals(n.getStringFields().get(destinationIdField));
+			}).findFirst();
 			if (optionalDestDoc.isPresent()) {
 				InternalDocument destDoc = optionalDestDoc.get();
-				String destinationTitleField = destinationProcessor.getTitleField();
-				String destinationIdValue = (String) destDoc.getField(destinationIdField);
-				String destinationTitleValue = (String) destDoc.getField(destinationTitleField);
+				String destinationIdValue = (String) destDoc.getStringFields().get(destinationIdField);
 				destDoc.setIdentifier(destinationIdValue);
-				destDoc.setTitle(destinationTitleValue);
 				addDocumentMapping(srcDoc, destDoc, OperationType.UPDATE);
 			} else {
 				addDocumentMapping(srcDoc, null, OperationType.INSERT);
 			}
 		}
+
+		this.setInitialized(true);
 	}
 
-	private void addDocumentMapping(InternalDocument srcDoc,
-			InternalDocument destDoc, OperationType operation) {
+	private void addDocumentMapping(InternalDocument srcDoc, InternalDocument destDoc, OperationType operation) {
 		// Look for an existing src mapping
-		Optional<DocumentMapping> mapping = this.getDocumentMappings().stream()
-				.filter(n -> {
-					return n.getSourceDocument() == srcDoc;
-				}).findFirst();
+		Optional<DocumentMapping> mapping = this.getDocumentMappings().stream().filter(n -> {
+			return n.getSourceDocument() == srcDoc;
+		}).findFirst();
 		if (!mapping.isPresent()) {
 			DocumentMapping newMapping = new DocumentMapping();
 			newMapping.setSourceDocument(srcDoc);
@@ -162,6 +121,36 @@ public class DocumentMapper implements IDocumentMapper {
 
 	public void setDocumentMappings(List<DocumentMapping> documentMappings) {
 		this.documentMappings = documentMappings;
+	}
+
+	@Override
+	public boolean isInitialized() {
+		return isInitialized;
+	}
+
+	@Override
+	public void setInitialized(boolean isInitialized) {
+		this.isInitialized = isInitialized;
+	}
+
+	@Override
+	public List<FieldMapping> getFieldMappingObject() {
+		return fieldMappingObject;
+	}
+
+	@Override
+	public void setFieldMappingObject(List<FieldMapping> fieldMappingObject) {
+		this.fieldMappingObject = fieldMappingObject;
+	}
+
+	@Override
+	public List<FieldValueMapping> getValueMappingObject() {
+		return valueMappingObject;
+	}
+
+	@Override
+	public void setValueMappingObject(List<FieldValueMapping> valueMappingObject) {
+		this.valueMappingObject = valueMappingObject;
 	}
 
 }

@@ -7,13 +7,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.services.ServiceConfiguration;
 import org.devgateway.importtool.services.processor.AMPProcessor;
+import org.devgateway.importtool.services.processor.IATI104Processor;
 import org.devgateway.importtool.services.processor.IATI201Processor;
-import org.devgateway.importtool.services.processor.IATI201StaticProcessor;
 import org.devgateway.importtool.services.processor.helper.DocumentMapper;
 import org.devgateway.importtool.services.processor.helper.Field;
+import org.devgateway.importtool.services.processor.helper.FieldMapping;
 import org.devgateway.importtool.services.processor.helper.FieldValue;
+import org.devgateway.importtool.services.processor.helper.FieldValueMapping;
 import org.devgateway.importtool.services.processor.helper.IDestinationProcessor;
 import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
 import org.devgateway.importtool.services.processor.helper.ActionResult;
@@ -40,7 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
  *
  */
 public class TestService {
-	// private Log log = LogFactory.getLog(getClass());
+	private Log log = LogFactory.getLog(getClass());
 
 	@Configuration
 	@EnableAutoConfiguration
@@ -60,8 +64,7 @@ public class TestService {
 	// @Test
 	public void testImportFieldsMinimal() throws Throwable {
 		ISourceProcessor transformer = new IATI201Processor();
-		InputStream is = this.getClass().getResourceAsStream(
-				"sample_files/activity-standard-example-minimal.xml");
+		InputStream is = this.getClass().getResourceAsStream("sample_files/activity-standard-example-minimal.xml");
 		transformer.setInput(is);
 		List<Field> fields = transformer.getFields();
 		List<String> expectedFields = new ArrayList<String>();
@@ -69,122 +72,115 @@ public class TestService {
 		expectedFields.add("activity-status");
 		expectedFields.add("title");
 
-		Boolean matched = fields.stream().anyMatch(
-				n -> {
-					return expectedFields.stream().anyMatch(
-							m -> m == n.getFieldName());
-				});
+		Boolean matched = fields.stream().anyMatch(n -> {
+			return expectedFields.stream().anyMatch(m -> m == n.getFieldName());
+		});
 		Assert.assertEquals(matched, true);
 	}
 
-	// @Test
-	// public void testImportFieldsCompleteCycle() throws Throwable {
-	// // Data Source
-	// InputStream is = this.getClass().getResourceAsStream(
-	// "sample_files/activity-standard-example-minimal.xml");
-	//
-	// // Processor Class that will process the source
-	// ISourceProcessor sourceProcessor = new IATI201Processor();
-	//
-	// // Set the datasource to the transformer
-	// sourceProcessor.setInput(is);
-	//
-	// // Extract available field from the datasource
-	// List<Field> sourceFields = sourceProcessor.getFields();
-	// for (Field field : sourceFields) {
-	// // Assert that the possible values exist for each field extracted
-	// Map<String, String> fieldValues = field.getPossibleValues();
-	//
-	// if (field.getFieldName().equals("activity-status")) {
-	// field.addFilter("2");
-	// }
-	// Assert.assertThat("There are values for the field.",
-	// fieldValues.size(), is(not(0)));
-	// Assert.assertThat("There are filters for the field.", field
-	// .getFilters().size(), is(not(0)));
-	// }
-	//
-	// List<InternalDocument> sourceDocuments = sourceProcessor.getDocuments();
-	// Assert.assertThat("There are three source documents.",
-	// sourceDocuments.size(), is(3));
-	//
-	// List<String> languages = sourceProcessor.getLanguages();
-	//
-	// Assert.assertThat("There are three source languages.",
-	// languages.size(), is(3));
-	// // Mark one document as operation INSERT
-	//
-	// // Processor Class that will process the destination calls
-	// IDestinationProcessor destinationProcessor = new AMPProcessor();
-	// destinationProcessor.setTestMode(true);
-	//
-	// List<InternalDocument> destinationDocuments = destinationProcessor
-	// .getDocuments();
-	// Assert.assertThat("There are three destination documents.",
-	// destinationDocuments.size(), is(3));
-	//
-	// // Extract available fields from the destination
-	// List<Field> destinationFields = destinationProcessor.getFields();
-	//
-	// // Instantiate document mapper that will connect documents from the
-	// // source to the destination
-	// DocumentMapper documentMapper = new DocumentMapper();
-	//
-	// // Set involved processors
-	// documentMapper.setSourceProcessor(sourceProcessor);
-	// documentMapper.setDestinationProcessor(destinationProcessor);
-	//
-	// Field firstFieldSource = sourceFields.stream().findFirst().get();
-	// Field firstFieldDest = destinationFields.stream().findFirst().get();
-	// // Map first field from source with first field of destination
-	// documentMapper.addFieldMapping(firstFieldSource, firstFieldDest);
-	//
-	// // Map first field value from source with first field value of
-	// // destination
-	// Map<String, String> sourcePossibleValues = firstFieldSource
-	// .getPossibleValues();
-	// Map<String, String> destinationPossibleValues = firstFieldDest
-	// .getPossibleValues();
-	//
-	// // From the field selected to be mapped, map the first value
-	//
-	// documentMapper.setValueMapping(
-	// firstFieldSource,
-	// sourcePossibleValues.get(sourcePossibleValues.keySet().stream()
-	// .findFirst().get()),
-	// destinationPossibleValues.get(destinationPossibleValues
-	// .keySet().stream().findFirst().get()));
-	//
-	// // Map documents
-	// // but first mark first document as operation INSERT
-	// //
-	// sourceDocuments.stream().findFirst().get().setOperation(OperationType.INSERT);
-	//
-	// // Map only document with operation INSERT with the first destination
-	// // object
-	// // documentMapper.addDocumentMapping(
-	// // sourceDocuments.stream().filter(n -> {
-	// // return n.getOperation() == OperationType.INSERT;
-	// // }).findFirst().get(), destinationDocuments.stream().findFirst()
-	// // .get());
-	// //
-	// // Initiate transfer to destination system
-	// List<MappingResult> results = documentMapper.execute();
-	//
-	// Assert.assertThat("One document was transferred.", results.size(),
-	// is(1));
-	// }
-
 	@Test
+	public void testKosovoImport() throws Throwable {
+		// Select type of Source -> Destination process
+		ISourceProcessor sourceProcessor = new IATI104Processor();
+		IDestinationProcessor destinationProcessor = new AMPProcessor();
+		destinationProcessor.setTestMode(false);
+		destinationProcessor.setAuthenticationToken("27368298-48e3-48ef-9f75-13a58f2f5cb6");
+
+		// Upload Source
+		InputStream is = this.getClass().getResourceAsStream("sample_files/Kosovo_Test_File.xml");
+		sourceProcessor.setInput(is);
+
+		// Filter Source Data
+		// Get the "activity-status" field from the list of available filters
+		// for the processor
+		// Set a value for filtering
+		// List<Field> filterFields = sourceProcessor.getFilterFields();
+		// Field testFilterField = filterFields.stream().filter(n -> {
+		// return n.getFieldName().equals("activity-status");
+		// }).findFirst().get();
+		// testFilterField.addFilter("2");
+
+		// Choose Projects to be updated
+		// Get List of Source Projects that match the filter
+		// Get List of Destination Projects and match them to create a list of
+		// new and existing projects
+		// Set Operations
+
+		DocumentMapper documentMapper = new DocumentMapper();
+		// Assign Source and Destination Processor to the document mapper
+		documentMapper.setSourceProcessor(sourceProcessor);
+		documentMapper.setDestinationProcessor(destinationProcessor);
+		documentMapper.initialize();
+
+		long insertCount = documentMapper.getDocumentMappings().stream().filter(n -> {
+			return n.getOperation() == OperationType.INSERT;
+		}).count();
+
+		// Assert.assertThat("One document to be inserted ", , is(2L));
+		long updateCount = documentMapper.getDocumentMappings().stream().filter(n -> {
+			return n.getOperation() == OperationType.UPDATE;
+		}).count();
+		// Assert.assertThat("One document to be updated", , is(1L));
+		log.debug("to insert:" + insertCount);
+		log.debug("to update:" + updateCount);
+
+		// Choose Fields
+		List<Field> sourceFields = sourceProcessor.getFields();
+		List<Field> destinationFields = destinationProcessor.getFields();
+
+		// Find source field activity status
+		Optional<Field> optSrcField = sourceFields.stream().filter(n -> {
+			return n.getFieldName().equals("activity-status");
+		}).findFirst();
+
+		Optional<Field> optDstField = destinationFields.stream().filter(n -> {
+			return n.getFieldName().equals("activity_status");
+		}).findFirst();
+
+		if (optSrcField.isPresent() && optDstField.isPresent()) {
+			// Assign the field mapping
+			// documentMapper
+			// .addFieldMapping(optSrcField.get(), optDstField.get());
+			FieldMapping fm = new FieldMapping();
+			fm.setSourceField(optSrcField.get());
+			fm.setDestinationField(optDstField.get());
+
+			// Assign Value mapping of the chosen fields
+			// Find value for Activity Status SRC: 2, Implementation ,DST: 2,
+			// Ongoing
+			Field sourceField = optSrcField.get();
+
+			FieldValue sourceFieldValue = sourceField.getPossibleValues().stream().filter(n -> {
+				return n.getCode().equals("2");
+			}).findFirst().get();
+			Field destinationField = optSrcField.get();
+			FieldValue destinationFieldValue = destinationField.getPossibleValues().stream().filter(n -> {
+				return n.getCode().equals("2");
+			}).findFirst().get();
+			FieldValueMapping fvm = new FieldValueMapping();
+			fvm.setSourceField(sourceField);
+			// fvm.setSourceFieldValue(sourceFieldValue);
+			// fvm.setDestinationFieldValue(destinationFieldValue);
+			// documentMapper.addValueMapping(sourceField, sourceFieldValue,
+			// destinationFieldValue);
+		}
+		// Execute Import
+		List<ActionResult> result = documentMapper.execute();
+		result.stream().forEach(n -> {
+//			System.out.println("Result Status: " + n.getStatus());
+//			System.out.println("Result Message: " + n.getMessage());
+		});
+	}
+
+	// @Test
 	public void testActivityStatusImport() throws Throwable {
 		// Select type of Source -> Destination process
-		ISourceProcessor sourceProcessor = new IATI201StaticProcessor();
+		ISourceProcessor sourceProcessor = new IATI201Processor();
 		IDestinationProcessor destinationProcessor = new AMPProcessor();
 		destinationProcessor.setTestMode(true);
 
 		// Upload Source
-		InputStream is = this.getClass().getResourceAsStream(
-				"sample_files/activity-standard-example-minimal.xml");
+		InputStream is = this.getClass().getResourceAsStream("sample_files/activity-standard-example-minimal.xml");
 		sourceProcessor.setInput(is);
 
 		// Filter Source Data
@@ -209,15 +205,13 @@ public class TestService {
 		documentMapper.setDestinationProcessor(destinationProcessor);
 		documentMapper.initialize();
 
-		Assert.assertThat("One document to be inserted ", documentMapper
-				.getDocumentMappings().stream().filter(n -> {
-					return n.getOperation() == OperationType.INSERT;
-				}).count(), is(2L));
+		Assert.assertThat("One document to be inserted ", documentMapper.getDocumentMappings().stream().filter(n -> {
+			return n.getOperation() == OperationType.INSERT;
+		}).count(), is(2L));
 
-		Assert.assertThat("One document to be updated", documentMapper
-				.getDocumentMappings().stream().filter(n -> {
-					return n.getOperation() == OperationType.UPDATE;
-				}).count(), is(1L));
+		Assert.assertThat("One document to be updated", documentMapper.getDocumentMappings().stream().filter(n -> {
+			return n.getOperation() == OperationType.UPDATE;
+		}).count(), is(1L));
 
 		// Choose Fields
 		List<Field> sourceFields = sourceProcessor.getFields();
@@ -235,29 +229,36 @@ public class TestService {
 
 		if (optSrcField.isPresent() && optDstField.isPresent()) {
 			// Assign the field mapping
-			documentMapper
-					.addFieldMapping(optSrcField.get(), optDstField.get());
+			// documentMapper
+			// .addFieldMapping(optSrcField.get(), optDstField.get());
+			FieldMapping fm = new FieldMapping();
+			fm.setSourceField(optSrcField.get());
+			fm.setDestinationField(optDstField.get());
+
 			// Assign Value mapping of the chosen fields
 			// Find value for Activity Status SRC: 2, Implementation ,DST: 2,
 			// Ongoing
 			Field sourceField = optSrcField.get();
-			FieldValue sourceFieldValue = sourceField.getPossibleValues()
-					.stream().filter(n -> {
-						return n.getCode().equals("2");
-					}).findFirst().get();
+
+			FieldValue sourceFieldValue = sourceField.getPossibleValues().stream().filter(n -> {
+				return n.getCode().equals("2");
+			}).findFirst().get();
 			Field destinationField = optSrcField.get();
-			FieldValue destinationFieldValue = destinationField
-					.getPossibleValues().stream().filter(n -> {
-						return n.getCode().equals("2");
-					}).findFirst().get();
-			documentMapper.addValueMapping(sourceField, sourceFieldValue,
-					destinationFieldValue);
+			FieldValue destinationFieldValue = destinationField.getPossibleValues().stream().filter(n -> {
+				return n.getCode().equals("2");
+			}).findFirst().get();
+			FieldValueMapping fvm = new FieldValueMapping();
+			fvm.setSourceField(sourceField);
+			// fvm.setSourceFieldValue(sourceFieldValue);
+			// fvm.setDestinationFieldValue(destinationFieldValue);
+			// documentMapper.addValueMapping(sourceField, sourceFieldValue,
+			// destinationFieldValue);
 		}
 		// Execute Import
 		List<ActionResult> result = documentMapper.execute();
 		result.stream().forEach(n -> {
-			System.out.println("Result Status: " + n.getStatus());
-			System.out.println("Result Message: " + n.getMessage());
+//			System.out.println("Result Status: " + n.getStatus());
+//			System.out.println("Result Message: " + n.getMessage());
 		});
 	}
 

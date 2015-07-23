@@ -34,7 +34,7 @@ var ReviewImport = React.createClass({
                     </div>
                     <div className="buttons">
                         <button className="btn btn-warning navbar-btn btn-custom" type="button">{this.props.i18nLib.t('wizard.review_import.close')}</button>&nbsp;
-                        <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.props.eventHandlers.reviewImport}>{this.props.i18nLib.t('wizard.review_import.proceed_import')}</button>
+                        <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.props.eventHandlers.launchImport}>{this.props.i18nLib.t('wizard.review_import.proceed_import')}</button>
                     </div>
                 </div>
             </div>

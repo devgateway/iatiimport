@@ -18,16 +18,16 @@ var Wizard = React.createClass({
   getInitialState: function() {
     return {
       info: {},
-      projects: [],
-      fieldMappings: [],
-      valueMappings: []
+      results: []
     };
   },
+
   componentWillReceiveProps: function(nextProps) {
     if(this.props.params.src !== nextProps.params.src || this.props.params.dst !== nextProps.params.dst) {
       this.initImportSession(nextProps.params.src, nextProps.params.dst);
     }
   },
+
   componentDidMount  : function() {
     var sourceProcessor = this.props.params.src;
     var destinationProcessor = this.props.params.dst;
@@ -38,126 +38,38 @@ var Wizard = React.createClass({
   uploadFile: function() {
     this.transitionTo('filter', this.props.params);
   },
+
   filterData: function(data) {
-    formActions.updateFilters(data);
-    this.transitionTo('projects', this.props.params);
+    formActions.updateFilters(data).then(function() { 
+      this.transitionTo('projects', this.props.params);
+    }.bind(this));
   },
-  chooseProjects: function() {
-    this.transitionTo('fields', this.props.params);
-  },
-  chooseFields: function() {
-    this.transitionTo('mapvalues', this.props.params);
-  },
-  mapValues: function() {
-    this.transitionTo('import', this.props.params);
-  },
-  reviewImport: function() {
-    console.log("Call the modal");
-    //Ugly ugly call.
-    $("#myModal").modal("show");
-  },
-  // Callbacks from the steps
-  updateFieldMappings: function(data, selectedDestinationField) {
-    if (data.sourceField) {
-      var fieldMappings = this.state.fieldMappings;
-      var match = _.findWhere(fieldMappings, {
-        'sourceFieldName': data.sourceField
-      });
-      if (match) {
-        match.destinationFieldName = selectedDestinationField;
-      } else {
-        fieldMappings.push({
-          sourceFieldName     : data.sourceField,
-          destinationFieldName: selectedDestinationField
-        });
-      }
-      this.setState({
-        fieldMappings: fieldMappings
-      });
-    }
-  },
-  selectFieldMapping: function(event) {
-    if (event) {
-      var fieldMappings = this.state.fieldMappings;
-      var match = _.findWhere(fieldMappings, {
-        'sourceFieldName': event.target.value
-      });
-      if (match) {
-        match.selected = event.target.checked;
-      } else {
-        fieldMappings.push({
-          sourceFieldName: event.target.value,
-          selected       : event.target.checked
-        });
-      }
 
-      this.setState({
-        fieldMappings: fieldMappings
-      });
-    }
+  chooseProjects: function(data) {
+    formActions.updateSelectedProjects(data).then(function() { 
+      this.transitionTo('fields', this.props.params);
+    }.bind(this));
   },
-  updateValueMappings: function(data, selectedDestinationValue) {
-    if (data.sourceValue) {
-      var valueMappings = this.state.valueMappings;
-      var match = _.findWhere(valueMappings, {
-        'sourceFieldName': data.sourceFieldName,
-        'sourceValueName': data.sourceValue
-      });
-      if (match) {
-        match.destinationValueName = selectedDestinationValue;
-      } else {
-        valueMappings.push({
-          sourceFieldName     : data.sourceFieldName,
-          sourceValueName     : data.sourceValue,
-          destinationValueName: selectedDestinationValue
-        });
-      }
-      this.setState({
-        valueMappings: valueMappings
-      });
-    }
+
+  chooseFields: function(data) {
+    formActions.updateSelectedFields.triggerPromise(data).then(function() { 
+      this.transitionTo('mapvalues', this.props.params);
+    }.bind(this)).catch(function(err) {
+      console.log("Error retrieving values");
+    })
   },
-  updateProjects: function(data,selectedProject){  
 
-    //TODO: Remove this logic from here. Push it to the store or the backend.
+  mapValues: function(data) {
+    formActions.updateSelectedValues(data).then(function() { 
+      this.transitionTo('import', this.props.params);
+    }.bind(this));
+  },
 
-    if (data.sourceProjectId) {
-      var projects = this.state.projects;
-      var match = _.findWhere(projects, {
-        'sourceProjectId': data.sourceProjectId        
-      });
-      if (match) {
-        match.destinationProject = selectedProject;
-      } else {
-        projects.push({
-          sourceProjectId: data.sourceProjectId,          
-          destinationProject: selectedProject
-        });
-      }
-      this.setState({
-        projects: projects
-      });
-    }  
-    
-  },  
-  selectProject: function(event) {
-    if (event) {
-      var projects = this.state.projects;
-      var match = _.findWhere(projects, {
-        'sourceProjectId': event.target.value
-      });
-      if (match) {
-        match.selected = event.target.checked;
-      } else {
-        projects.push({
-          sourceProjectId: event.target.value,
-          selected       : event.target.checked
-        });
-      }
-      this.setState({
-        projects: projects
-      });      
-    }
+  launchImport: function() {
+    $.get('/importer/import/execute', function(result) {
+      this.setState({results: result});
+      $("#modalResults").modal("show");
+    }.bind(this));
   },
   initImportSession: function(sourceProcessor, destinationProcessor) {
     var compiledURL = _.template(appConfig.TOOL_START_ENDPOINT);
@@ -165,7 +77,8 @@ var Wizard = React.createClass({
     var url = compiledURL({
         'sourceProcessor': sourceProcessor,
         'destinationProcessor': destinationProcessor,
-        'authenticationToken': appConfig.DESTINATION_AUTH_TOKEN
+        'authenticationToken': appConfig.DESTINATION_AUTH_TOKEN,
+        'host': appConfig.DESTINATION_API_HOST
       });
 
     $.get(url, function(result) {
@@ -190,19 +103,7 @@ var Wizard = React.createClass({
     eventHandlers.chooseProjects      = this.chooseProjects;
     eventHandlers.chooseFields        = this.chooseFields;
     eventHandlers.mapValues           = this.mapValues;
-    eventHandlers.reviewImport        = this.reviewImport;
-
-    eventHandlers.updateFieldMappings = this.updateFieldMappings;
-    eventHandlers.selectFieldMapping  = this.selectFieldMapping;
-    eventHandlers.updateValueMappings = this.updateValueMappings;
-    eventHandlers.updateProjects      = this.updateProjects;
-    eventHandlers.selectProject       = this.selectProject;
-
-
-    var wizardData = {};
-    wizardData.fieldMappings = this.state.fieldMappings;
-    wizardData.valueMappings = this.state.valueMappings;
-    wizardData.projects      = this.state.projects;
+    eventHandlers.launchImport        = this.launchImport;
 
     return (
       <div>
@@ -212,11 +113,11 @@ var Wizard = React.createClass({
       <div className="row">
       <WizardSteps {...this.props}/>
       <div className="col-sm-9 col-md-9 main">
-      <RouteHandler eventHandlers={eventHandlers} wizardData={wizardData} {...this.props}/>
+      <RouteHandler eventHandlers={eventHandlers} {...this.props}/>
       </div>
       </div>
       </div>
-      <ImportReport {...this.props} />
+      <ImportReport results={this.state.results} />
       </div>
       );
   }

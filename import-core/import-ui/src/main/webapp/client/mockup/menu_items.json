@@ -17,6 +17,13 @@
         "children": [
             {
                 "name": "iati1",
+                "label": "IATI Version 1.04",
+                "enabled": true,
+                "type":"menu-item",
+                "url": "#/wizard/IATI104/AMP"
+            },
+            {
+                "name": "iati1",
                 "label": "IATI Version 1.05",
                 "enabled": true,
                 "type":"menu-item",

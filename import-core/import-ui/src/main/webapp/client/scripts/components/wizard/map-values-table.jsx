@@ -13,23 +13,9 @@ var MappingTable = React.createClass({
         this.listenTo(destinationValuesStore, this.updateDestinationValues);
         this.listenTo(sourceValuesStore, this.updateSourceValues);
     },
-    getInitialStateAsync: function() {         
-        appActions.loadDestinationValuesData(this.props.destinationFieldName);
-        destinationValuesStore.listen(function(data) {
-            try {
-                return cb(null, {
-                    destinationValuesData: data.destinationValuesData
-                });
-            } catch (err) {}
-        });        
-        appActions.loadSourceValuesData(this.props.sourceFieldName);
-        sourceValuesStore.listen(function(data) {
-            try {
-                return cb(null, {
-                    sourceValuesData: data.sourceValuesData
-                });
-            } catch (err) {}
-        });
+    getInitialStateAsync: function() {    
+        appActions.loadDestinationValuesData(this.props.mapping.destinationField.fieldName);
+        appActions.loadSourceValuesData(this.props.mapping.sourceField.fieldName);
     },
     
     updateSourceValues: function(data) {    

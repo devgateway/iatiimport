@@ -2,18 +2,19 @@
   "name": "import-ui",
   "version": "0.0.1",
   "dependencies": {
-    "object-assign": "~1.0.0",
-    "superagent": "~0.21.0",
     "cookie": "~0.1.2",
-    "js-cookie": "~2.0.2",
-    "keymirror": "~0.1.0",
     "director": "~1.2.7",
     "form-serialize": "~0.4.0",
+    "js-cookie": "~2.0.2",
+    "keymirror": "~0.1.0",
+    "moment": "^2.10.3",
     "node-jsx": "~0.13.3",
+    "object-assign": "~1.0.0",
     "react": "~0.13.0",
-    "react-router": "~0.13.2",
     "react-async": "~2.1.0",
-    "reflux": "~0.2.7"
+    "react-router": "~0.13.2",
+    "reflux": "~0.2.7",
+    "superagent": "~0.21.0"
   },
   "devDependencies": {
     "bower": "~1.3.3",
@@ -23,6 +24,7 @@
     "grunt-browserify": "~3.2.0",
     "grunt-concurrent": "~1.0.0",
     "grunt-connect-prism": "^1.0.3",
+    "grunt-connect-proxy": "^0.2.0",
     "grunt-contrib-clean": "0.5.0",
     "grunt-contrib-concat": "~0.5.0",
     "grunt-contrib-connect": "~0.9.0",

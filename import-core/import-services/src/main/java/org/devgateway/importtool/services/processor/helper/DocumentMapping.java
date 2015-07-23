@@ -1,6 +1,9 @@
 package org.devgateway.importtool.services.processor.helper;
 
+import java.util.UUID;
+
 public class DocumentMapping {
+	private UUID id = UUID.randomUUID();
 	private InternalDocument sourceDocument;
 	private InternalDocument destinationDocument;
 	private OperationType operation = OperationType.NOOP;
@@ -43,6 +46,16 @@ public class DocumentMapping {
 
 	public void setSelected(Boolean selected) {
 		this.selected = selected;
+	}
+
+
+	public UUID getId() {
+		return id;
+	}
+
+
+	public void setId(UUID id) {
+		this.id = id;
 	}
 
 

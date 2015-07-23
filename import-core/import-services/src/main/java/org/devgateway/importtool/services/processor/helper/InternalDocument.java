@@ -1,27 +1,30 @@
 package org.devgateway.importtool.services.processor.helper;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 public class InternalDocument {
 	private String identifier = "";
-	private String title = "";
-	private Map<String, Object> fields = new HashMap<String, Object>();
-
-	public Map<String, Object> getFields() {
-		return fields;
-	}
-
-	public void setField(Map<String, Object> field) {
-		this.fields = field;
-	}
+	private Map<String, String> stringFields = new HashMap<String, String>();
+	private Map<String, Map<String, String>> multilangFields = new HashMap<String, Map<String, String>>();
+	private Map<String, Map<String, String>> transactionFields = new HashMap<String, Map<String, String>>();
+	private Map<String, Date> dateFields = new HashMap<String, Date>();
 
 	public void addStringField(String fieldName, String value) {
-		fields.put(fieldName, value);
+		getStringFields().put(fieldName, value);
 	}
 
-	public Object getField(String fieldName) {
-		return fields.get(fieldName);
+	public void addMultilangStringField(String fieldName, Map<String, String> multiLangvalue) {
+		getMultilangFields().put(fieldName, multiLangvalue);
+	}
+
+	public void addTransactionField(String fieldName, Map<String, String> transaction) {
+		getTransactionFields().put(fieldName, transaction);
+	}
+
+	public void addDateField(String fieldName, Date activityDate) {
+		getDateFields().put(fieldName, activityDate);
 	}
 
 	public String getIdentifier() {
@@ -32,12 +35,36 @@ public class InternalDocument {
 		this.identifier = identifier;
 	}
 
-	public String getTitle() {
-		return title;
+	public Map<String, String> getStringFields() {
+		return stringFields;
 	}
 
-	public void setTitle(String title) {
-		this.title = title;
+	public void setStringFields(Map<String, String> stringFields) {
+		this.stringFields = stringFields;
+	}
+
+	public Map<String, Map<String, String>> getMultilangFields() {
+		return multilangFields;
+	}
+
+	public void setMultilangFields(Map<String, Map<String, String>> multilangFields) {
+		this.multilangFields = multilangFields;
+	}
+
+	public Map<String, Map<String, String>> getTransactionFields() {
+		return transactionFields;
+	}
+
+	public void setTransactionFields(Map<String, Map<String, String>> transactionFields) {
+		this.transactionFields = transactionFields;
+	}
+
+	public Map<String, Date> getDateFields() {
+		return dateFields;
+	}
+
+	public void setDateFields(Map<String, Date> dateFields) {
+		this.dateFields = dateFields;
 	}
 
 }

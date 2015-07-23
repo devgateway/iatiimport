@@ -21,7 +21,6 @@ var FilterStore = Reflux.createStore({
   },
   handleUpdateFilters: function(data) {
     var self = this;
-    debugger;
     $.ajax({
       headers: { 
         'Accept': 'application/json',

@@ -2,10 +2,14 @@ package org.devgateway.importtool.services.processor.helper;
 
 
 public class ActionResult {
+	private String operation = "";
 	private String status = "";
 	private String message = "";
+	private String id = "";
 	
-	public ActionResult(String status, String message) {
+	public ActionResult(String id, String operation, String status, String message) {
+		this.id = id;
+		this.operation = operation;
 		this.status = status;
 		this.message = message;
 	}
@@ -24,6 +28,22 @@ public class ActionResult {
 
 	public void setMessage(String message) {
 		this.message = message;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getOperation() {
+		return operation;
+	}
+
+	public void setOperation(String operation) {
+		this.operation = operation;
 	}
 
 }

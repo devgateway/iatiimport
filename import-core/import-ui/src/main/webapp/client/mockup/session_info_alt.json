@@ -1,9 +1,8 @@
-[
-    {
-        "username": "atl@amp.org",
-        "authentication_token": "0e631eec-e69b-45cf-bcf9-f66745e70204",
-        "additional_properties": {
-            "workspace_id": 1
-        }
-    }
-]
+{
+    "token": "1c92507c-1039-4cd1-8c30-5ac955455926",
+    "url": "http://local.amp.org:8080/showLayout.do?layout=login",
+    "team": "Austria",
+    "user-name": "AMP User",
+    "add-activity": false,
+    "view-activity": true
+}

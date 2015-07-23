@@ -1,0 +1,834 @@
+<?xml version="1.0"?>
+<iati-activities version="1.04" generated-datetime="2015-07-03T15:45:05">
+  <iati-activity xml:lang="en" default-currency="EUR" last-updated-datetime="2015-07-03T15:41:59">
+    <reporting-org ref="EC-ELARG" type="15">DG Neighbourhood and Enlargement Negotiations</reporting-org>
+    <iati-identifier>EC-ELARG-2010/22203/61</iati-identifier>
+    <other-identifier owner-ref="EC-ELARG" owner-name="DG Neighbourhood and Enlargement Negotiations">2010/22203/61</other-identifier>
+    <title>Support to ICO 
+</title>
+    <description>Support for the continuing functioning of the International Civilian Office (ICO) in Kosovo (under UNSCR 1244/99)  under the Multi-Beneficiary IPA assistance for 2010.
+Support to ICO </description>
+    <activity-status code="2">Implementation</activity-status>
+    <activity-date type="start-planned" iso-date="2010-06-21">2010-06-21</activity-date>
+    <activity-date type="end-planned" iso-date="2012-12-31">2012-12-31</activity-date>
+    <activity-date type="start-actual" iso-date="2010-07-01">2010-07-01</activity-date>
+    <activity-date type="end-actual" iso-date="2011-01-01">2011-01-01</activity-date>
+    <contact-info>
+      <organisation/>
+      <telephone/>
+      <email/>
+      <website/>
+    </contact-info>
+    <participating-org role="Funding" ref="EC-ELARG" type="15">DG Neighbourhood and Enlargement Negotiations</participating-org>
+    <participating-org role="Extending" ref="EC-ELARG" type="15">DG Neighbourhood and Enlargement Negotiations</participating-org>
+    <participating-org role="Accountable" ref="47000">Other multilateral institution</participating-org>
+    <recipient-country code="XK">Kosovo</recipient-country>
+    <sector vocabulary="DAC" code="15110">Public sector policy and administrative management</sector>
+    <policy-marker vocabulary="DAC" significance="0" code="01">Gender Equality</policy-marker>
+    <policy-marker vocabulary="DAC" significance="0" code="02">Aid to Environment</policy-marker>
+    <policy-marker vocabulary="DAC" significance="2" code="03">Participatory Development/Good</policy-marker>
+    <policy-marker vocabulary="DAC" significance="0" code="04">Trade Development</policy-marker>
+    <policy-marker vocabulary="DAC" significance="0" code="05">Aid Targeting the Objectives of the Convention on Biological Diversity</policy-marker>
+    <policy-marker vocabulary="DAC" significance="0" code="06">Aid Targeting the Objectives of the Framework Convention on Climate Change - Mitigation</policy-marker>
+    <policy-marker vocabulary="DAC" significance="0" code="07">Aid Targeting the Objectives of the Framework Convention on Climate Change - Adaptation</policy-marker>
+    <policy-marker vocabulary="DAC" significance="0" code="08">Aid Targeting the Objectives of the Convention to Combat Desertification</policy-marker>
+    <collaboration-type code="1">Bilateral</collaboration-type>
+    <default-flow-type code="10">ODA (Official development Assistance</default-flow-type>
+    <default-finance-type code="110">Grant</default-finance-type>
+    <default-aid-type code="C01">Project-type interventions</default-aid-type>
+    <default-tied-status code="5">Untied</default-tied-status>
+    <transaction ref="EC-ELARG-2010/22203/61/0">
+      <transaction-type code="C">Commitment</transaction-type>
+      <value value-date="2010-06-21">3500000</value>
+      <transaction-date iso-date="2010-06-21">2010-06-21</transaction-date>
+      <receiver-org/>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22203/61/IPA/2010/021-613">
+      <transaction-type code="D">Disbursement</transaction-type>
+      <value value-date="2010-07-14">3325000</value>
+      <transaction-date iso-date="2010-07-14">2010-07-14</transaction-date>
+      <receiver-org>International Civilian Office For Kosovo</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22203/61/IPA/2011/020-223">
+      <transaction-type code="D">Disbursement</transaction-type>
+      <value value-date="2011-07-12">175000</value>
+      <transaction-date iso-date="2011-07-12">2011-07-12</transaction-date>
+      <receiver-org>International Civilian Office For Kosovo</receiver-org>
+    </transaction>
+  </iati-activity>
+  <iati-activity xml:lang="en" default-currency="EUR" last-updated-datetime="2015-07-03T15:41:59">
+    <reporting-org ref="EC-ELARG" type="15">DG Neighbourhood and Enlargement Negotiations</reporting-org>
+    <iati-identifier>EC-ELARG-2010/22452/1</iati-identifier>
+    <other-identifier owner-ref="EC-ELARG" owner-name="DG Neighbourhood and Enlargement Negotiations">2010/22452/1</other-identifier>
+    <title>Strengthening the Rule of Law </title>
+    <description>2010 Annual Programme for Kosovo* under the IPA Transition Assistance and Institution Building Component.
+Strengthening the Rule of Law </description>
+    <activity-status code="2">Implementation</activity-status>
+    <activity-date type="start-planned" iso-date="2011-01-12">2011-01-12</activity-date>
+    <activity-date type="end-planned" iso-date="2019-07-12">2019-07-12</activity-date>
+    <activity-date type="start-actual" iso-date="2011-06-10">2011-06-10</activity-date>
+    <activity-date type="end-actual" iso-date="2016-04-12">2016-04-12</activity-date>
+    <contact-info>
+      <organisation/>
+      <telephone/>
+      <email/>
+      <website/>
+    </contact-info>
+    <participating-org role="Funding" ref="EC-ELARG" type="15">DG Neighbourhood and Enlargement Negotiations</participating-org>
+    <participating-org role="Extending" ref="EC-ELARG" type="15">DG Neighbourhood and Enlargement Negotiations</participating-org>
+    <participating-org role="Accountable" ref="41000">United Nations agency, fund or commission (UN)</participating-org>
+    <recipient-country code="XK">Kosovo</recipient-country>
+    <sector vocabulary="DAC" code="15130">Legal and judicial development</sector>
+    <policy-marker vocabulary="DAC" significance="0" code="01">Gender Equality</policy-marker>
+    <policy-marker vocabulary="DAC" significance="0" code="02">Aid to Environment</policy-marker>
+    <policy-marker vocabulary="DAC" significance="2" code="03">Participatory Development/Good</policy-marker>
+    <policy-marker vocabulary="DAC" significance="0" code="04">Trade Development</policy-marker>
+    <policy-marker vocabulary="DAC" significance="0" code="05">Aid Targeting the Objectives of the Convention on Biological Diversity</policy-marker>
+    <policy-marker vocabulary="DAC" significance="0" code="06">Aid Targeting the Objectives of the Framework Convention on Climate Change - Mitigation</policy-marker>
+    <policy-marker vocabulary="DAC" significance="0" code="07">Aid Targeting the Objectives of the Framework Convention on Climate Change - Adaptation</policy-marker>
+    <policy-marker vocabulary="DAC" significance="0" code="08">Aid Targeting the Objectives of the Convention to Combat Desertification</policy-marker>
+    <collaboration-type code="1">Bilateral</collaboration-type>
+    <default-flow-type code="10">ODA (Official development Assistance</default-flow-type>
+    <default-finance-type code="110">Grant</default-finance-type>
+    <default-aid-type code="C01">Project-type interventions</default-aid-type>
+    <default-tied-status code="5">Untied</default-tied-status>
+    <transaction ref="EC-ELARG-2010/22452/1/0">
+      <transaction-type code="C">Commitment</transaction-type>
+      <value value-date="2010-12-20">12300000</value>
+      <transaction-date iso-date="2010-12-20">2010-12-20</transaction-date>
+      <receiver-org/>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/0">
+      <transaction-type code="C">Commitment</transaction-type>
+      <value value-date="2010-12-20">6100000</value>
+      <transaction-date iso-date="2010-12-20">2010-12-20</transaction-date>
+      <receiver-org/>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/10/0">
+      <transaction-type code="C">Commitment</transaction-type>
+      <value value-date="2010-12-20">8500000</value>
+      <transaction-date iso-date="2010-12-20">2010-12-20</transaction-date>
+      <receiver-org/>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2011/016-840">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2011-06-16">45043</value>
+      <transaction-date iso-date="2011-06-16">2011-06-16</transaction-date>
+      <receiver-org>Particip Gmbh Consultants Fur Entwicklung Und Umwelt</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/1/IPA/2011/020-701">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2011-07-14">57234</value>
+      <transaction-date iso-date="2011-07-14">2011-07-14</transaction-date>
+      <receiver-org>Astec Global Consultancy Limited</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/10/IPA/2011/021-063">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2011-07-21">274147</value>
+      <transaction-date iso-date="2011-07-21">2011-07-21</transaction-date>
+      <receiver-org>Flamur Isufi</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2011/024-551">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2011-09-30">467</value>
+      <transaction-date iso-date="2011-09-30">2011-09-30</transaction-date>
+      <receiver-org>Salbatring Int Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2011/028-841">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2011-10-05">749</value>
+      <transaction-date iso-date="2011-10-05">2011-10-05</transaction-date>
+      <receiver-org>Salbatring Int Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/1/IPA/2011/029-477">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2011-10-07">379640</value>
+      <transaction-date iso-date="2011-10-07">2011-10-07</transaction-date>
+      <receiver-org>Hulla &amp; Co Human Dynamics Kg</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2011/030-540">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2011-10-25">643</value>
+      <transaction-date iso-date="2011-10-25">2011-10-25</transaction-date>
+      <receiver-org>Salbatring Int Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/10/IPA/2011/031-581">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2011-10-26">7052</value>
+      <transaction-date iso-date="2011-10-26">2011-10-26</transaction-date>
+      <receiver-org>Lirex Bg Ltd</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2011/033-798">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2011-12-13">809</value>
+      <transaction-date iso-date="2011-12-13">2011-12-13</transaction-date>
+      <receiver-org>Salbatring Int Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/10/IPA/2011/038-186">
+      <transaction-type code="D">Disbursement</transaction-type>
+      <value value-date="2011-12-14">800000</value>
+      <transaction-date iso-date="2011-12-14">2011-12-14</transaction-date>
+      <receiver-org>Agenzia Regionale Per La Prevenzione E Protezione Ambientale Del Veneto</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2011/037-428">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2011-12-19">417</value>
+      <transaction-date iso-date="2011-12-19">2011-12-19</transaction-date>
+      <receiver-org>Salbatring Int Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2011/036-647">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2012-01-18">30029</value>
+      <transaction-date iso-date="2012-01-18">2012-01-18</transaction-date>
+      <receiver-org>Particip Gmbh Consultants Fur Entwicklung Und Umwelt</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2012/000-744">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2012-01-20">411</value>
+      <transaction-date iso-date="2012-01-20">2012-01-20</transaction-date>
+      <receiver-org>Salbatring Int Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/10/IPA/2011/041-046">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2012-02-08">4701</value>
+      <transaction-date iso-date="2012-02-08">2012-02-08</transaction-date>
+      <receiver-org>Lirex Bg Ltd</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2012/003-229">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2012-02-15">300</value>
+      <transaction-date iso-date="2012-02-15">2012-02-15</transaction-date>
+      <receiver-org>Salbatring Int Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2012/005-481">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2012-03-14">118515</value>
+      <transaction-date iso-date="2012-03-14">2012-03-14</transaction-date>
+      <receiver-org>Cowi Belgium Sprl</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/10/IPA/2012/005-713">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2012-03-23">182765</value>
+      <transaction-date iso-date="2012-03-23">2012-03-23</transaction-date>
+      <receiver-org>Flamur Isufi</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2012/006-905">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2012-03-26">62242</value>
+      <transaction-date iso-date="2012-03-26">2012-03-26</transaction-date>
+      <receiver-org>Astec Global Consultancy Limited</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2012/006-991">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2012-04-11">1111</value>
+      <transaction-date iso-date="2012-04-11">2012-04-11</transaction-date>
+      <receiver-org>Salbatring Int Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2012/009-636">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2012-04-24">566</value>
+      <transaction-date iso-date="2012-04-24">2012-04-24</transaction-date>
+      <receiver-org>Salbatring Int Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/1/IPA/2012/012-560">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2012-05-14">119730</value>
+      <transaction-date iso-date="2012-05-14">2012-05-14</transaction-date>
+      <receiver-org>Terveyden Ja Hyvinvoinnin Laitos</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/1/IPA/2012/013-625">
+      <transaction-type code="D">Disbursement</transaction-type>
+      <value value-date="2012-05-25">2807511</value>
+      <transaction-date iso-date="2012-05-25">2012-05-25</transaction-date>
+      <receiver-org>United Nations Office For Project Services</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2012/012-349">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2012-05-31">489</value>
+      <transaction-date iso-date="2012-05-31">2012-05-31</transaction-date>
+      <receiver-org>Salbatring Int Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/1/IPA/2012/014-776">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2012-06-04">119750</value>
+      <transaction-date iso-date="2012-06-04">2012-06-04</transaction-date>
+      <receiver-org>Kentro Merimnas Oikogeneias Kai Paidiou</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/1/IPA/2012/015-147">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2012-06-06">133800</value>
+      <transaction-date iso-date="2012-06-06">2012-06-06</transaction-date>
+      <receiver-org>Hulla &amp; Co Human Dynamics Kg</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/1/IPA/2012/016-237">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2012-06-20">68931</value>
+      <transaction-date iso-date="2012-06-20">2012-06-20</transaction-date>
+      <receiver-org>Al Trade Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2012/016-660">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2012-06-27">60866</value>
+      <transaction-date iso-date="2012-06-27">2012-06-27</transaction-date>
+      <receiver-org>Dfc Sa</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2012/016-107">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2012-07-05">291</value>
+      <transaction-date iso-date="2012-07-05">2012-07-05</transaction-date>
+      <receiver-org>Salbatring Int Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2012/019-222">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2012-07-26">252</value>
+      <transaction-date iso-date="2012-07-26">2012-07-26</transaction-date>
+      <receiver-org>Salbatring Int Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/1/IPA/2012/020-741">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2012-07-27">103397</value>
+      <transaction-date iso-date="2012-07-27">2012-07-27</transaction-date>
+      <receiver-org>Al Trade Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2012/021-154">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2012-07-31">16735</value>
+      <transaction-date iso-date="2012-07-31">2012-07-31</transaction-date>
+      <receiver-org>Ibf International Consulting Sa</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2012/022-103">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2012-08-13">26138</value>
+      <transaction-date iso-date="2012-08-13">2012-08-13</transaction-date>
+      <receiver-org>Ibf International Consulting Sa</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/10/IPA/2012/021-831">
+      <transaction-type code="D">Disbursement</transaction-type>
+      <value value-date="2012-08-14">733000</value>
+      <transaction-date iso-date="2012-08-14">2012-08-14</transaction-date>
+      <receiver-org>Kreditanstalt Fur Wiederaufbau</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2012/021-829">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2012-08-16">563</value>
+      <transaction-date iso-date="2012-08-16">2012-08-16</transaction-date>
+      <receiver-org>Salbatring Int Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/10/IPA/2012/026-698">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2012-09-26">238000</value>
+      <transaction-date iso-date="2012-09-26">2012-09-26</transaction-date>
+      <receiver-org>Eptisa Servicios De Ingenieria Sl</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/1/IPA/2012/026-928">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2012-10-05">123857</value>
+      <transaction-date iso-date="2012-10-05">2012-10-05</transaction-date>
+      <receiver-org>Al Trade Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2012/030-731">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2012-11-09">939</value>
+      <transaction-date iso-date="2012-11-09">2012-11-09</transaction-date>
+      <receiver-org>Salbatring Int Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2012/030-732">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2012-11-09">1309</value>
+      <transaction-date iso-date="2012-11-09">2012-11-09</transaction-date>
+      <receiver-org>Salbatring Int Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/10/6">
+      <transaction-type code="C">Commitment</transaction-type>
+      <value value-date="2012-11-20">2000000</value>
+      <transaction-date iso-date="2012-11-20">2012-11-20</transaction-date>
+      <receiver-org/>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2012/032-939">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2012-11-30">111990</value>
+      <transaction-date iso-date="2012-11-30">2012-11-30</transaction-date>
+      <receiver-org>Ars Progetti Spa - Ambiente Risorse E Sviluppo</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2012/034-660">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2012-12-06">17426</value>
+      <transaction-date iso-date="2012-12-06">2012-12-06</transaction-date>
+      <receiver-org>Ibf International Consulting Sa</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/1/IPA/2012/035-145">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2012-12-11">144456</value>
+      <transaction-date iso-date="2012-12-11">2012-12-11</transaction-date>
+      <receiver-org>Al Trade Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2012/031-442">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2012-12-11">487</value>
+      <transaction-date iso-date="2012-12-11">2012-12-11</transaction-date>
+      <receiver-org>Salbatring Int Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/10/IPA/2012/035-490">
+      <transaction-type code="D">Disbursement</transaction-type>
+      <value value-date="2012-12-12">338178</value>
+      <transaction-date iso-date="2012-12-12">2012-12-12</transaction-date>
+      <receiver-org>Agenzia Regionale Per La Prevenzione E Protezione Ambientale Del Veneto</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/10/IPA/2012/035-487">
+      <transaction-type code="D">Disbursement</transaction-type>
+      <value value-date="2012-12-12">481822</value>
+      <transaction-date iso-date="2012-12-12">2012-12-12</transaction-date>
+      <receiver-org>Agenzia Regionale Per La Prevenzione E Protezione Ambientale Del Veneto</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/1/IPA/2012/037-043">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2012-12-20">99976</value>
+      <transaction-date iso-date="2012-12-20">2012-12-20</transaction-date>
+      <receiver-org>Al Trade Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/1/IPA/2012/037-309">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2012-12-20">12004</value>
+      <transaction-date iso-date="2012-12-20">2012-12-20</transaction-date>
+      <receiver-org>Terveyden Ja Hyvinvoinnin Laitos</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/1/IPA/2012/037-317">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2012-12-20">60290</value>
+      <transaction-date iso-date="2012-12-20">2012-12-20</transaction-date>
+      <receiver-org>Terveyden Ja Hyvinvoinnin Laitos</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/1/IPA/2012/037-443">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2012-12-20">175965</value>
+      <transaction-date iso-date="2012-12-20">2012-12-20</transaction-date>
+      <receiver-org>Ndermarrja Ndertimore Engeniering Nartel Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2012/036-605">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2012-12-25">817</value>
+      <transaction-date iso-date="2012-12-25">2012-12-25</transaction-date>
+      <receiver-org>Salbatring Int Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/1/IPA/2013/000-644">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2013-01-17">206647</value>
+      <transaction-date iso-date="2013-01-17">2013-01-17</transaction-date>
+      <receiver-org>Kentro Merimnas Oikogeneias Kai Paidiou</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2012/036-371">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2013-01-17">41494</value>
+      <transaction-date iso-date="2013-01-17">2013-01-17</transaction-date>
+      <receiver-org>Astec Global Consultancy Limited</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/1/IPA/2012/034-591">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2013-01-18">383584</value>
+      <transaction-date iso-date="2013-01-18">2013-01-18</transaction-date>
+      <receiver-org>Hulla &amp; Co Human Dynamics Kg</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2012/038-345">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2013-01-23">33362</value>
+      <transaction-date iso-date="2013-01-23">2013-01-23</transaction-date>
+      <receiver-org>Ibf International Consulting Sa</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2013/001-883">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2013-01-29">5880</value>
+      <transaction-date iso-date="2013-01-29">2013-01-29</transaction-date>
+      <receiver-org/>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2013/001-074">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2013-02-07">5388</value>
+      <transaction-date iso-date="2013-02-07">2013-02-07</transaction-date>
+      <receiver-org>Theunisz Petrus</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2013/000-680">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2013-02-12">31034</value>
+      <transaction-date iso-date="2013-02-12">2013-02-12</transaction-date>
+      <receiver-org>N.p.n. Hidroterm Ok</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/10/IPA/2013/000-680">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2013-02-12">41334</value>
+      <transaction-date iso-date="2013-02-12">2013-02-12</transaction-date>
+      <receiver-org>N.p.n. Hidroterm Ok</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2013/003-775">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2013-02-20">15888</value>
+      <transaction-date iso-date="2013-02-20">2013-02-20</transaction-date>
+      <receiver-org>Alatec Ingenieros Consultores Y Arquitectos Sa</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2013/002-567">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2013-02-26">1000</value>
+      <transaction-date iso-date="2013-02-26">2013-02-26</transaction-date>
+      <receiver-org>Salbatring Int Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2013/003-183">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2013-02-28">468</value>
+      <transaction-date iso-date="2013-02-28">2013-02-28</transaction-date>
+      <receiver-org>Salbatring Int Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2013/003-297">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2013-03-14">34378</value>
+      <transaction-date iso-date="2013-03-14">2013-03-14</transaction-date>
+      <receiver-org>Dfc Sa</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/1/IPA/2013/006-216">
+      <transaction-type code="D">Disbursement</transaction-type>
+      <value value-date="2013-03-15">2192489</value>
+      <transaction-date iso-date="2013-03-15">2013-03-15</transaction-date>
+      <receiver-org>United Nations Office For Project Services</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2013/007-272">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2013-03-27">67535</value>
+      <transaction-date iso-date="2013-03-27">2013-03-27</transaction-date>
+      <receiver-org>Cowi Belgium Sprl</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2013/005-762">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2013-04-11">871</value>
+      <transaction-date iso-date="2013-04-11">2013-04-11</transaction-date>
+      <receiver-org>Salbatring Int Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2013/007-497">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2013-04-16">3920</value>
+      <transaction-date iso-date="2013-04-16">2013-04-16</transaction-date>
+      <receiver-org/>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2013/011-629">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2013-05-15">440</value>
+      <transaction-date iso-date="2013-05-15">2013-05-15</transaction-date>
+      <receiver-org>Salbatring Int Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2013/009-092">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2013-05-15">690</value>
+      <transaction-date iso-date="2013-05-15">2013-05-15</transaction-date>
+      <receiver-org>Salbatring Int Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/1/IPA/2013/011-834">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2013-05-21">117269</value>
+      <transaction-date iso-date="2013-05-21">2013-05-21</transaction-date>
+      <receiver-org>Al Trade Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2013/012-472">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2013-05-27">3592</value>
+      <transaction-date iso-date="2013-05-27">2013-05-27</transaction-date>
+      <receiver-org>Theunisz Petrus</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/1/IPA/2013/013-766">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2013-06-14">80432</value>
+      <transaction-date iso-date="2013-06-14">2013-06-14</transaction-date>
+      <receiver-org>Terveyden Ja Hyvinvoinnin Laitos</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/1/IPA/2013/015-262">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2013-06-20">399316</value>
+      <transaction-date iso-date="2013-06-20">2013-06-20</transaction-date>
+      <receiver-org>Hulla &amp; Co Human Dynamics Kg</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2013/014-133">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2013-06-27">577</value>
+      <transaction-date iso-date="2013-06-27">2013-06-27</transaction-date>
+      <receiver-org>Salbatring Int Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/1/IPA/2013/013-925">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2013-07-09">158461</value>
+      <transaction-date iso-date="2013-07-09">2013-07-09</transaction-date>
+      <receiver-org>Ndermarrja Ndertimore Engeniering Nartel Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/1/IPA/2013/017-037">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2013-07-09">713382</value>
+      <transaction-date iso-date="2013-07-09">2013-07-09</transaction-date>
+      <receiver-org>Teched Savjetodavne Usluge Doo Za Poslovno Savjetovanje I Razvoj Informacijskog Drustva</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/1/IPA/2013/016-115">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2013-07-16">222653</value>
+      <transaction-date iso-date="2013-07-16">2013-07-16</transaction-date>
+      <receiver-org>Kentro Merimnas Oikogeneias Kai Paidiou</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2013/016-822">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2013-07-16">410</value>
+      <transaction-date iso-date="2013-07-16">2013-07-16</transaction-date>
+      <receiver-org>Salbatring Int Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/1/IPA/2013/018-083">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2013-07-18">158462</value>
+      <transaction-date iso-date="2013-07-18">2013-07-18</transaction-date>
+      <receiver-org>Ndermarrja Ndertimore Engeniering Nartel Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/10/IPA/2013/018-705">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2013-07-24">1131000</value>
+      <transaction-date iso-date="2013-07-24">2013-07-24</transaction-date>
+      <receiver-org>Deutsche Gesellschaft Fur Internationale Zusammenarbeit (Giz) Gmbh</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2013/018-897">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2013-07-30">10592</value>
+      <transaction-date iso-date="2013-07-30">2013-07-30</transaction-date>
+      <receiver-org>Alatec Ingenieros Consultores Y Arquitectos Sa</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2013/019-204">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2013-08-01">18684</value>
+      <transaction-date iso-date="2013-08-01">2013-08-01</transaction-date>
+      <receiver-org>N.p.n. Hidroterm Ok</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2013/020-419">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2013-08-21">289</value>
+      <transaction-date iso-date="2013-08-21">2013-08-21</transaction-date>
+      <receiver-org>Salbatring Int Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2013/021-052">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2013-08-21">5515</value>
+      <transaction-date iso-date="2013-08-21">2013-08-21</transaction-date>
+      <receiver-org>Cacttus Sha</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2013/021-925">
+      <transaction-type code="D">Disbursement</transaction-type>
+      <value value-date="2013-09-06">200000</value>
+      <transaction-date iso-date="2013-09-06">2013-09-06</transaction-date>
+      <receiver-org>Bundesrepublik Deutschland</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/1/IPA/2013/022-146">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2013-09-09">161566</value>
+      <transaction-date iso-date="2013-09-09">2013-09-09</transaction-date>
+      <receiver-org>Ndermarrja Ndertimore Engeniering Nartel Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/10/IPA/2013/017-261">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2013-09-12">208523</value>
+      <transaction-date iso-date="2013-09-12">2013-09-12</transaction-date>
+      <receiver-org>Eptisa Servicios De Ingenieria Sl</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2013/023-072">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2013-09-18">463</value>
+      <transaction-date iso-date="2013-09-18">2013-09-18</transaction-date>
+      <receiver-org>Salbatring Int Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/10/IPA/2013/019-351">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2013-09-27">12055</value>
+      <transaction-date iso-date="2013-09-27">2013-09-27</transaction-date>
+      <receiver-org>Louis Berger Sas</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2013/026-683">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2013-10-22">3928</value>
+      <transaction-date iso-date="2013-10-22">2013-10-22</transaction-date>
+      <receiver-org>Markus Miessen</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/1/IPA/2013/027-179">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2013-10-25">111000</value>
+      <transaction-date iso-date="2013-10-25">2013-10-25</transaction-date>
+      <receiver-org>Terveyden Ja Hyvinvoinnin Laitos</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2013/021-426">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2013-11-07">58657</value>
+      <transaction-date iso-date="2013-11-07">2013-11-07</transaction-date>
+      <receiver-org>Stichting Spark</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2013/025-475">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2013-11-08">261</value>
+      <transaction-date iso-date="2013-11-08">2013-11-08</transaction-date>
+      <receiver-org>Salbatring Int Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2013/024-774">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2013-11-28">66286</value>
+      <transaction-date iso-date="2013-11-28">2013-11-28</transaction-date>
+      <receiver-org>Ars Progetti Spa - Ambiente Risorse E Sviluppo</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2013/028-756">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2013-11-28">351</value>
+      <transaction-date iso-date="2013-11-28">2013-11-28</transaction-date>
+      <receiver-org>Salbatring Int Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/1/IPA/2013/032-939">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2013-12-12">224373</value>
+      <transaction-date iso-date="2013-12-12">2013-12-12</transaction-date>
+      <receiver-org>Ndermarrja Ndertimore Engeniering Nartel Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/1/IPA/2014/001-053">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2014-02-04">251343</value>
+      <transaction-date iso-date="2014-02-04">2014-02-04</transaction-date>
+      <receiver-org>Kentro Merimnas Oikogeneias Kai Paidiou</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/1/IPA/2013/035-378">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2014-02-27">203238</value>
+      <transaction-date iso-date="2014-02-27">2014-02-27</transaction-date>
+      <receiver-org>Hulla &amp; Co Human Dynamics Kg</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/10/IPA/2013/035-487">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2014-03-05">134580</value>
+      <transaction-date iso-date="2014-03-05">2014-03-05</transaction-date>
+      <receiver-org>Eptisa Servicios De Ingenieria Sl</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/1/IPA/2014/003-523">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2014-03-10">168486</value>
+      <transaction-date iso-date="2014-03-10">2014-03-10</transaction-date>
+      <receiver-org>Ndermarrja Ndertimore Engeniering Nartel Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/1/IPA/2014/009-503">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2014-04-24">238393</value>
+      <transaction-date iso-date="2014-04-24">2014-04-24</transaction-date>
+      <receiver-org>Ndermarrja Ndertimore Engeniering Nartel Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/10/IPA/2014/009-794">
+      <transaction-type code="D">Disbursement</transaction-type>
+      <value value-date="2014-04-24">176298</value>
+      <transaction-date iso-date="2014-04-24">2014-04-24</transaction-date>
+      <receiver-org>Agenzia Regionale Per La Prevenzione E Protezione Ambientale Del Veneto</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/1/IPA/2013/030-262">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2014-04-24">100355</value>
+      <transaction-date iso-date="2014-04-24">2014-04-24</transaction-date>
+      <receiver-org>Al Trade Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/1/IPA/2014/012-292">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2014-05-13">308579</value>
+      <transaction-date iso-date="2014-05-13">2014-05-13</transaction-date>
+      <receiver-org>Ndermarrja Ndertimore Engeniering Nartel Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/10/IPA/2014/009-315">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2014-05-23">97945</value>
+      <transaction-date iso-date="2014-05-23">2014-05-23</transaction-date>
+      <receiver-org>Louis Berger Sas</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2014/009-334">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2014-05-26">54855</value>
+      <transaction-date iso-date="2014-05-26">2014-05-26</transaction-date>
+      <receiver-org>Louis Berger Sas</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/10/IPA/2014/012-520">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2014-06-10">361519</value>
+      <transaction-date iso-date="2014-06-10">2014-06-10</transaction-date>
+      <receiver-org>Eptisa Servicios De Ingenieria Sl</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/1/IPA/2014/015-034">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2014-06-30">129993</value>
+      <transaction-date iso-date="2014-06-30">2014-06-30</transaction-date>
+      <receiver-org>Ndermarrja Ndertimore Engeniering Nartel Shpk</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/1/IPA/2014/014-745">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2014-07-01">475588</value>
+      <transaction-date iso-date="2014-07-01">2014-07-01</transaction-date>
+      <receiver-org>Teched Savjetodavne Usluge Doo Za Poslovno Savjetovanje I Razvoj Informacijskog Drustva</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/1/IPA/2014/013-662">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2014-07-16">1406</value>
+      <transaction-date iso-date="2014-07-16">2014-07-16</transaction-date>
+      <receiver-org>Astec Global Consultancy Limited</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/1/IPA/2014/021-381">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2014-08-26">194351</value>
+      <transaction-date iso-date="2014-08-26">2014-08-26</transaction-date>
+      <receiver-org>Hulla &amp; Co Human Dynamics Kg</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/10/IPA/2014/023-321">
+      <transaction-type code="D">Disbursement</transaction-type>
+      <value value-date="2014-09-23">3280000</value>
+      <transaction-date iso-date="2014-09-23">2014-09-23</transaction-date>
+      <receiver-org>Kreditanstalt Fur Wiederaufbau</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2014/022-606">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2014-10-27">75496</value>
+      <transaction-date iso-date="2014-10-27">2014-10-27</transaction-date>
+      <receiver-org>Stichting Spark</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2014/028-968">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2014-11-24">35015</value>
+      <transaction-date iso-date="2014-11-24">2014-11-24</transaction-date>
+      <receiver-org>Louis Berger Sas</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/10/IPA/2014/031-337">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2014-12-12">8189</value>
+      <transaction-date iso-date="2014-12-12">2014-12-12</transaction-date>
+      <receiver-org>Eptisa Servicios De Ingenieria Sl</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/10/IPA/2015/007-117">
+      <transaction-type code="D">Disbursement</transaction-type>
+      <value value-date="2015-03-20">981000</value>
+      <transaction-date iso-date="2015-03-20">2015-03-20</transaction-date>
+      <receiver-org>Kreditanstalt Fur Wiederaufbau</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/1/IPA/2015/003-439">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2015-03-25">160864</value>
+      <transaction-date iso-date="2015-03-25">2015-03-25</transaction-date>
+      <receiver-org>Hulla &amp; Co Human Dynamics Kg</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/11/IPA/2015/004-708">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2015-04-23">5892</value>
+      <transaction-date iso-date="2015-04-23">2015-04-23</transaction-date>
+      <receiver-org>Markus Miessen</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/10/IPA/2015/006-634">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2015-04-27">185097</value>
+      <transaction-date iso-date="2015-04-27">2015-04-27</transaction-date>
+      <receiver-org>Eptisa Servicios De Ingenieria Sl</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/10/IPA/2015/011-438">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2015-04-29">759000</value>
+      <transaction-date iso-date="2015-04-29">2015-04-29</transaction-date>
+      <receiver-org>Deutsche Gesellschaft Fur Internationale Zusammenarbeit (Giz) Gmbh</receiver-org>
+    </transaction>
+    <transaction ref="EC-ELARG-2010/22452/1/IPA/2014/040-229">
+      <transaction-type code="E">Expenditure</transaction-type>
+      <value value-date="2015-04-30">15910</value>
+      <transaction-date iso-date="2015-04-30">2015-04-30</transaction-date>
+      <receiver-org>Ndermarrja Ndertimore Engeniering Nartel Shpk</receiver-org>
+    </transaction>
+  </iati-activity>
+</iati-activities>

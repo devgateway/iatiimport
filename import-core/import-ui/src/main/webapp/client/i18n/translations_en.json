@@ -1,0 +1,86 @@
+'en' : {
+    translation : {
+        'header' : {
+            'import_tool' : 'Import Tool',
+            'nav' : {
+                'menu' : {
+                    'home' : 'Home ',
+                    'import_process' : 'Import Process ',
+                    'reports' : 'Reports ',
+                    'close' : 'Close ',
+                    'submenu' : {
+                        'iati104' : 'IATI 1.04 to AMP',
+                        'iati105' : 'IATI 1.05 to AMP',
+                        'iati201' : 'IATI 2.01 to AMP',
+                        'logs' : 'Logs',
+                        'previous_imports' : 'Previous Imports'
+                    }
+                }
+            }
+        },
+        'wizard' : {
+            'import_process' : 'Import Process',
+            'steps' : {
+                'upload_files' : ' Upload File(s)',
+                'filter_data' : ' Filter Data',
+                'choose_projects' : ' Choose Projects',
+                'choose_fields' : ' Choose Fields',
+                'map_values' : ' Map Values',
+                'review_import' : ' Review and Import'
+            },
+            'upload_file' : {
+                'select_file' : 'Select files to upload',
+                'filename' : 'Filename',
+                'upload_date' : 'Date and Time',
+                 'action':'Action',
+                'view' : 'View',
+                'next' : 'Next >>'
+            },
+            'filter_data' : {
+                'filter_information': 'Filter Information',
+                'select_filters' : 'Select for each field, which values you would like to include as part of the import process',
+                'language' : 'Language',
+                'next' : 'Next >>'
+            },
+            'choose_projects' : {
+                'choose_projects' : 'Choose Projects',
+                'new_projects' : 'New Projects',
+                'existing_projects' : 'Existing Projects',                      
+                'import' : 'Import',
+                'source_project' : 'Source Project',
+                'destination_project' : 'Destination Project',
+                'update' : 'Update',
+                'next' : 'Next >>'
+            },
+            'map_fields' : {
+                'choose_map_fields' : 'Choose and Map Fields',
+                'import_update' : 'Import/Update',
+                'source_field' : 'Source Field',
+                'destination_field' : 'Destination Field',
+                'next' : 'Next >>',
+                'save' : 'Save',
+                'load_existing_template' : 'Load Existing Template',
+                'usual_field_mapping' : 'Usual Field Mapping',
+                'other_field_mapping' : 'Other Field Mapping'
+            },
+            'map_values' : {
+                'map_field_values' : 'Map Fields Values',
+                'save' : 'Save',
+                'update' : 'Update',
+                'next' : 'Next >>',
+                 'source_value':'Source Value',
+                 'destination_value':'Destination Value'
+            },
+            'review_import' : {
+                'review_import' : 'Review and Import',
+                'files_uploaded' : 'Files Uploaded',
+                'data_filtered' : 'Data Filtered',
+                'projects_selected' : 'Projects Selected',
+                'fields_selected' : 'Fields Selected',
+                'values_mapped' : 'Values Mapped',
+                'proceed_import' : 'Proceed with Import',
+                'close' : 'Close '
+            }
+        }
+    }
+}

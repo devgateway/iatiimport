@@ -3,17 +3,25 @@ package org.devgateway.importtool.services.processor;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.services.processor.helper.Field;
+import org.devgateway.importtool.services.processor.helper.FieldMapping;
 import org.devgateway.importtool.services.processor.helper.FieldType;
 import org.devgateway.importtool.services.processor.helper.FieldValue;
+import org.devgateway.importtool.services.processor.helper.FieldValueMapping;
 import org.devgateway.importtool.services.processor.helper.IDestinationProcessor;
 import org.devgateway.importtool.services.processor.helper.InternalDocument;
 import org.devgateway.importtool.services.processor.helper.ActionResult;
+import org.devgateway.importtool.services.processor.helper.TokenHeaderInterceptor;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -28,19 +36,27 @@ public class AMPProcessor implements IDestinationProcessor {
 	private String DEFAULT_ID_FIELD = "amp-identifier";
 	private String DEFAULT_TITLE_FIELD = "title";
 	private String baseURL;
+
 	private String fieldsEndpoint;
+	private String fieldsTestEndpoint;
+
 	private String possibleValuesEndpoint;
 	private String documentsEndpoint;
-	@SuppressWarnings("unused")
+	private String documentsTestEndpoint;
 	private String authenticationToken;
 	private Boolean testMode = false;
 	private String descriptiveName = "AMP 2.11";
 
+	private List<ClientHttpRequestInterceptor> interceptors = new ArrayList<ClientHttpRequestInterceptor>();
+	private RestTemplate template;
+
 	public AMPProcessor() {
-		this.baseURL = "http://localhost:8080/mockup";
-		this.setFieldsEndpoint("destination_fields.json");
+		this.baseURL = "http://localhost:8081";
+		this.setFieldsEndpoint("/rest/activity/fields");
+		this.setFieldsTestEndpoint("destination_fields.json");
+		this.setDocumentsEndpoint("/rest/activity/projects");
+		this.setDocumentsTestEndpoint("activity_list.json");
 		this.setPossibleValuesEndpoint("_possiblevalues.json");
-		this.setDocumentsEndpoint("activity_list.json");
 	}
 
 	@Override
@@ -49,8 +65,7 @@ public class AMPProcessor implements IDestinationProcessor {
 		String result = "";
 
 		if (testMode) {
-			InputStream input = this.getClass().getResourceAsStream(
-					"AMP/sample_files/" + this.getFieldsEndpoint());
+			InputStream input = this.getClass().getResourceAsStream("AMP/sample_files/" + this.getFieldsTestEndpoint());
 
 			try {
 				result = IOUtils.toString(input, "UTF-8");
@@ -59,9 +74,8 @@ public class AMPProcessor implements IDestinationProcessor {
 			}
 
 		} else {
-			RestTemplate restTemplate = new RestTemplate();
-			result = restTemplate.getForObject(
-					baseURL + "/" + this.getFieldsEndpoint(), String.class);
+			RestTemplate restTemplate = getRestTemplate();
+			result = restTemplate.getForObject(baseURL + this.getFieldsEndpoint(), String.class);
 		}
 
 		try {
@@ -73,15 +87,22 @@ public class AMPProcessor implements IDestinationProcessor {
 					Field field = new Field();
 					String fieldName = node.get("field_name").asText();
 					field.setFieldName(fieldName);
-					String displayName = node.get("display_name").asText();
-					field.setDisplayName(displayName);
-					List<FieldValue> possibleValues = getPossibleValues(fieldName);
-					field.setPossibleValues(possibleValues);
+					String fieldLabel = node.get("field_label").asText();
+					field.setDisplayName(fieldLabel);
+					// List<FieldValue> possibleValues =
+					// getPossibleValues(fieldName);
+					// field.setPossibleValues(possibleValues);
 					FieldType fieldType = FieldType.STRING;
 
 					switch (node.get("field_type").asText()) {
+					case "boolean":
+						fieldType = FieldType.BOOLEAN;
+						break;
 					case "string":
-						fieldType = FieldType.STRING;
+						if (node.get("translatable").asBoolean())
+							fieldType = FieldType.MULTILANG_STRING;
+						else
+							fieldType = FieldType.STRING;
 						break;
 					case "list":
 						fieldType = FieldType.LIST;
@@ -89,19 +110,15 @@ public class AMPProcessor implements IDestinationProcessor {
 					case "integer":
 						fieldType = FieldType.INTEGER;
 						break;
-					case "multilang_string":
-						fieldType = FieldType.MULTILANG_STRING;
-						break;
-						
 					}
 					field.setType(fieldType);
 					list.add(field);
 				});
 			}
 
-		} catch (IOException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			//e.printStackTrace();
+			e.printStackTrace();
 		}
 
 		return list;
@@ -112,9 +129,7 @@ public class AMPProcessor implements IDestinationProcessor {
 		String result = null;
 		try {
 			if (testMode) {
-				InputStream input = this.getClass().getResourceAsStream(
-						"AMP/sample_files/" + fieldName
-								+ this.getPossibleValuesEndpoint());
+				InputStream input = this.getClass().getResourceAsStream("AMP/sample_files/" + fieldName + this.getPossibleValuesEndpoint());
 
 				try {
 					result = IOUtils.toString(input, "UTF-8");
@@ -124,9 +139,8 @@ public class AMPProcessor implements IDestinationProcessor {
 				}
 
 			} else {
-				RestTemplate restTemplate = new RestTemplate();
-				result = restTemplate.getForObject(baseURL + "/" + fieldName
-						+ this.getPossibleValuesEndpoint(), String.class);
+				RestTemplate restTemplate = getRestTemplate();
+				result = restTemplate.getForObject(baseURL + "/" + fieldName + this.getPossibleValuesEndpoint(), String.class);
 			}
 
 			ObjectMapper mapper = new ObjectMapper();
@@ -151,43 +165,47 @@ public class AMPProcessor implements IDestinationProcessor {
 	}
 
 	@Override
-	public List<InternalDocument> getDocuments() {
+	// Updated!
+	public List<InternalDocument> getDocuments(Boolean onlyEditable) {
 		List<InternalDocument> list = new ArrayList<InternalDocument>();
 		String result = "";
 
 		try {
 			if (testMode) {
-				InputStream input = this.getClass().getResourceAsStream(
-						"AMP/sample_files/" + this.getDocumentsEndpoint());
+				InputStream input = this.getClass().getResourceAsStream("AMP/sample_files/" + this.getDocumentsTestEndpoint());
 				result = IOUtils.toString(input, "UTF-8");
 			} else {
-				RestTemplate restTemplate = new RestTemplate();
-				result = restTemplate.getForObject(
-						baseURL + "/" + this.getDocumentsEndpoint(),
-						String.class);
+				RestTemplate restTemplate = getRestTemplate();
+				log.debug(this.authenticationToken);
+				result = restTemplate.getForObject(baseURL + this.getDocumentsEndpoint(), String.class);
 			}
 			ObjectMapper mapper = new ObjectMapper();
 			JsonNode jsonNode;
 			jsonNode = mapper.readTree(result);
 			if (jsonNode.isArray()) {
 				jsonNode.forEach((JsonNode node) -> {
-					String id = node.get("amp_activity_id").asText();
+					Boolean edit = node.get("edit").asBoolean();
+
+					String id = node.get("internal_id").asText();
 					String internalId = node.get("amp_id").asText();
-					String identifier = node.get("amp_identifier").asText();
-					String title = node.get("title").asText();
-					String dateString = node.get("created_date").asText();
-					String status = node.get("activity_status").asText();
+					String identifier = node.get("project_code").asText();
+					Map<String, String> title = extractMultilanguageText(node.get("project_title"));
+					String dateString = node.get("creation_date").asText();
 
 					InternalDocument document = new InternalDocument();
 					document.setIdentifier(identifier);
-					document.setTitle(title);
 					document.addStringField("id", id);
 					document.addStringField("internalId", internalId);
 					document.addStringField("amp-identifier", identifier);
-					document.addStringField("title", title);
+					document.addMultilangStringField("title", title);
 					document.addStringField("dateString", dateString);
-					document.addStringField("activity_status", status);
-					list.add(document);
+
+					if (onlyEditable) {
+						if (edit)
+							list.add(document);
+					} else {
+						list.add(document);
+					}
 				});
 			}
 		} catch (Exception e) {
@@ -195,6 +213,23 @@ public class AMPProcessor implements IDestinationProcessor {
 		}
 
 		return list;
+	}
+
+	private Map<String, String> extractMultilanguageText(JsonNode jsonNode) {
+		Iterator<Entry<String, JsonNode>> it = jsonNode.fields();
+		Map<String, String> languages = new HashMap<String, String>();
+		while (it.hasNext()) {
+			Entry<String, JsonNode> entry = it.next();
+			languages.put(entry.getKey(), entry.getValue().asText());
+		}
+		return languages;
+	}
+
+	private RestTemplate getRestTemplate() {
+		if (template == null)
+			template = new RestTemplate();
+		template.setInterceptors(this.interceptors);
+		return template;
 	}
 
 	@Override
@@ -225,6 +260,7 @@ public class AMPProcessor implements IDestinationProcessor {
 
 	@Override
 	public void setAuthenticationToken(String authToken) {
+		this.interceptors.add(new TokenHeaderInterceptor(authToken));
 		this.authenticationToken = authToken;
 	}
 
@@ -245,18 +281,15 @@ public class AMPProcessor implements IDestinationProcessor {
 	}
 
 	@Override
-	public ActionResult insert(InternalDocument source) {
-		ActionResult result = new ActionResult("INSERT",
-				"Project has been inserted");
+	public ActionResult insert(InternalDocument source, List<FieldMapping> fieldMapping, List<FieldValueMapping> valueMapping) {
+		ActionResult result = new ActionResult("1", "INSERT", "OK", "Project has been inserted");
 		log.debug("Update new document in destination system");
 		return result;
 	}
 
 	@Override
-	public ActionResult update(InternalDocument source,
-			InternalDocument destination) {
-		ActionResult result = new ActionResult("UPDATE",
-				"Project has been updated");
+	public ActionResult update(InternalDocument source, InternalDocument destination, List<FieldMapping> fieldMapping, List<FieldValueMapping> valueMapping) {
+		ActionResult result = new ActionResult("1", "UPDATE", "OK", "Project has been updated");
 		log.debug("Update new document in destination system");
 		return result;
 	}
@@ -265,6 +298,22 @@ public class AMPProcessor implements IDestinationProcessor {
 	public String getDescriptiveName() {
 
 		return this.descriptiveName;
+	}
+
+	private String getFieldsTestEndpoint() {
+		return fieldsTestEndpoint;
+	}
+
+	private void setFieldsTestEndpoint(String fieldsTestEndpoint) {
+		this.fieldsTestEndpoint = fieldsTestEndpoint;
+	}
+
+	private String getDocumentsTestEndpoint() {
+		return documentsTestEndpoint;
+	}
+
+	private void setDocumentsTestEndpoint(String documentsTestEndpoint) {
+		this.documentsTestEndpoint = documentsTestEndpoint;
 	}
 
 }
