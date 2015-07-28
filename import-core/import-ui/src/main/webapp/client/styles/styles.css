@@ -259,3 +259,11 @@
 .clear{
 	clear:both;
 }
+
+.loading-icon {
+    background: url('/images/ajax-loader.gif') no-repeat center center;
+    height: 100%;
+    min-height: 50px;
+    color: #FFF;
+	display: block;
+}

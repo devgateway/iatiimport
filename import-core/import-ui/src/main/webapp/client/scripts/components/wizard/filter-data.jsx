@@ -10,29 +10,41 @@ var languageStore = require('./../../stores/LanguageStore');
 var filterStore = require('./../../stores/FilterStore');
 
 var FilterData = React.createClass({
-    mixins: [
-        reactAsync.Mixin, Reflux.ListenerMixin
-    ],
+    mixins: [Reflux.ListenerMixin],
+     getInitialState: function() {
+       return {filterData: [], languageData:[]};
+    },
     componentDidMount: function() {
         this.listenTo(languageStore, this.updateLanguages);
         this.listenTo(filterStore, this.updateFilters);
-    },
-    getInitialStateAsync: function() {
-        appActions.loadLanguageData();
-        appActions.loadFilterData();
-    },
+        this.loadData();
+    },    
     updateFilters: function(data) {
         this.setState({
-            filterData: data.filterData
+            filterData: data
         });
     },
     updateLanguages: function(data) {
         this.setState({
-            languageData: data.languageData
+            languageData: data
         });
     },
-    handleToggle: function(field, value, event) {
-        console.log('handleToggle')
+    loadData: function(){    
+      appActions.loadLanguageData.triggerPromise().then(function(data) {      
+        this.props.eventHandlers.hideLoadingIcon();                       
+        this.updateLanguages(data); 
+      }.bind(this)).catch(function(err) {
+        console.log("Error retrieving languages");
+      }); 
+      
+      appActions.loadFilterData.triggerPromise().then(function(data) {      
+        this.props.eventHandlers.hideLoadingIcon();                       
+        this.updateFilters(data); 
+      }.bind(this)).catch(function(err) {
+        console.log("Error retrieving filters");        
+      });
+    },
+    handleToggle: function(field, value, event) {        
         var currentField = _.find(this.state.filterData, { 'fieldName': field.fieldName });
         var filterExists = _.some(currentField.filters, function(a) { return a == value.code});
         if(!filterExists && event.target.checked) {

@@ -33,9 +33,15 @@ var Wizard = React.createClass({
     var destinationProcessor = this.props.params.dst;
     this.initImportSession(sourceProcessor, destinationProcessor);
   },
-
+  hideLoadingIcon: function(){
+     $(this.refs.loadingIcon.getDOMNode()).hide();
+  },
+  showLoadingIcon:  function(){
+    $(this.refs.loadingIcon.getDOMNode()).show();
+  },
   // Steps and transitions
   uploadFile: function() {
+    $(this.refs.loadingIcon.getDOMNode()).show(); 
     this.transitionTo('filter', this.props.params);
   },
 
@@ -53,6 +59,7 @@ var Wizard = React.createClass({
 
   chooseFields: function(data) {
     formActions.updateSelectedFields.triggerPromise(data).then(function() { 
+    
       this.transitionTo('mapvalues', this.props.params);
     }.bind(this)).catch(function(err) {
       console.log("Error retrieving values");
@@ -61,6 +68,7 @@ var Wizard = React.createClass({
 
   mapValues: function(data) {
     formActions.updateSelectedValues(data).then(function() { 
+        
       this.transitionTo('import', this.props.params);
     }.bind(this));
   },
@@ -104,15 +112,18 @@ var Wizard = React.createClass({
     eventHandlers.chooseFields        = this.chooseFields;
     eventHandlers.mapValues           = this.mapValues;
     eventHandlers.launchImport        = this.launchImport;
+    eventHandlers.hideLoadingIcon     = this.hideLoadingIcon;
 
     return (
       <div>
-      <div className="container">
+      <div className="container " >      
+      
       <h2>{this.props.i18nLib.t('wizard.import_process')}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       <small>{this.state.info.sourceProcessorName} to {this.state.info.destinationProcessorName} </small></h2>
       <div className="row">
       <WizardSteps {...this.props}/>
-      <div className="col-sm-9 col-md-9 main">
+      <div className="col-sm-9 col-md-9 main " >
+      <div className="loading-icon" ref="loadingIcon">Loading ...</div>      
       <RouteHandler eventHandlers={eventHandlers} {...this.props}/>
       </div>
       </div>

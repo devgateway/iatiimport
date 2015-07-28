@@ -17,15 +17,11 @@ var FileStore = Reflux.createStore({
     $.ajax({
         url: '/importer/import/uploaded',        
         error: function() {        	
-        	self.trigger({            
-                fileData: []
-              });
+        	appActions.loadFileData.failed();
         },
         dataType: 'json',
         success: function(data) {        	
-        	self.trigger({            
-        		fileData: data
-              });
+        	appActions.loadFileData.completed(data);
         },
         type: 'GET'
      }); 

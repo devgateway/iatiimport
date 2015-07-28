@@ -5,16 +5,16 @@ var appActions = Reflux.createActions([
   'initSession',
   'initDestinationSession',
   'loadMenuData',
-  'loadFileData',
-  'loadProjectData',
   'loadDestinationFieldsData',
   'loadSourceFieldsData',
-  'loadMappingFieldsData',
-  'loadFilterData',
-  'loadLanguageData',
+  'loadMappingFieldsData', 
   'loadSourceValuesData',
   'loadDestinationValuesData',
   'loadValueMappingData'
 ]);
 
+appActions.loadProjectData = Reflux.createAction({ asyncResult: true });
+appActions.loadFileData = Reflux.createAction({ asyncResult: true });
+appActions.loadFilterData = Reflux.createAction({ asyncResult: true });
+appActions.loadLanguageData = Reflux.createAction({ asyncResult: true });
 module.exports = appActions;
