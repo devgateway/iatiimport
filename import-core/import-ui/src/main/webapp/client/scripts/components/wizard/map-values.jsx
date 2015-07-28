@@ -13,9 +13,7 @@ var _ = require('lodash/dist/lodash.underscore');
 
 
 var MapValues = React.createClass({
-    mixins: [
-        reactAsync.Mixin, Reflux.ListenerMixin
-    ],
+    mixins: [Reflux.ListenerMixin],
   getInitialState: function() {
     return {
       activeTab: 0,
@@ -24,15 +22,22 @@ var MapValues = React.createClass({
   },
   componentDidMount: function() {
       this.listenTo(valueMappingStore, this.updateValueMappingStore);
+      this.loadData();
   },
   updateValueMappingStore: function(data) {
       this.setState({
-          mappings: data.mappingValuesData
+          mappings: data
       });
-  },   
-  getInitialStateAsync: function() {
-    appActions.loadValueMappingData();
   },
+  loadData: function(){      
+      appActions.loadValueMappingData.triggerPromise().then(function(data) {      
+        this.props.eventHandlers.hideLoadingIcon();                       
+        this.updateValueMappingStore(data); 
+      }.bind(this)).catch(function(err) {
+        console.log("Error retrieving value mappings");
+      }); 
+   
+  },  
   switchTab: function(idx) {
     this.setState({
       activeTab: idx

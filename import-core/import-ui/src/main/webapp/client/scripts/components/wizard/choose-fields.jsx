@@ -11,53 +11,56 @@ var fieldMappingStore = require('./../../stores/FieldMappingStore');
 var _ = require('lodash/dist/lodash.underscore');
 
 var ChooseFields = React.createClass({
-    mixins: [
-        reactAsync.Mixin, Reflux.ListenerMixin
-    ],
+    mixins: [Reflux.ListenerMixin],
+    getInitialState: function() {
+       return {sourceFieldsData:[], destinationFieldsData:[], mappingFieldsData:[]};
+    },
     componentDidMount: function() {
         this.listenTo(destinationFieldsStore, this.updateDestinationFields);
         this.listenTo(sourceFieldsStore, this.updateSourceFields);
         this.listenTo(fieldMappingStore, this.updateFieldMappingStore);
-    },
-    getInitialStateAsync: function() {
-        appActions.loadDestinationFieldsData();
-        destinationFieldsStore.listen(function(data) {
-            try {
-                return cb(null, {
-                    destinationFieldsData: data.destinationFieldsData
-                });
-            } catch (err) {}
-        });
-        appActions.loadSourceFieldsData();
-        sourceFieldsStore.listen(function(data) {
-            try {
-                return cb(null, {
-                    sourceFieldsData: data.sourceFieldsData
-                });
-            } catch (err) {}
-        });
-        appActions.loadMappingFieldsData();
-    },
-    
+        this.loadData();
+    },    
     updateSourceFields: function(data) {
         this.setState({
-            sourceFieldsData: data.sourceFieldsData
+            sourceFieldsData: data
         });
     },
     updateDestinationFields: function(data) {
         this.setState({
-            destinationFieldsData: data.destinationFieldsData
+            destinationFieldsData: data
         });
-    },   
+    }, 
+    updateFieldMappingStore: function(data) {
+        this.setState({
+            mappingFieldsData: data
+        });
+    }, 
+     loadData: function(){      
+      appActions.loadDestinationFieldsData.triggerPromise().then(function(data) {      
+        this.props.eventHandlers.hideLoadingIcon();                       
+        this.updateDestinationFields(data); 
+      }.bind(this)).catch(function(err) {
+        console.log("Error retrieving destination fields");
+      }); 
+      
+      appActions.loadSourceFieldsData.triggerPromise().then(function(data) {      
+        this.props.eventHandlers.hideLoadingIcon();                       
+        this.updateSourceFields(data); 
+      }.bind(this)).catch(function(err) {
+        console.log("Error retrieving source fields");        
+      });
+      
+      appActions.loadMappingFieldsData.triggerPromise().then(function(data) {      
+        this.props.eventHandlers.hideLoadingIcon();                       
+        this.updateFieldMappingStore(data); 
+      }.bind(this)).catch(function(err) {
+        console.log("Error retrieving field mappings");        
+      });
+    },  
     selectFieldMapping: function(event){
       this.props.eventHandlers.selectFieldMapping(event);
     },
-    updateFieldMappingStore: function(data) {
-        this.setState({
-            mappingFieldsData: data.mappingFieldsData
-        });
-    },   
-
     getOptions: function(sourceField){    
     var options = [];
     $.map(this.state.destinationFieldsData, function(item, i) {
