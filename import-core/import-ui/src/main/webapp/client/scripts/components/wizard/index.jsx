@@ -43,7 +43,7 @@ var Wizard = React.createClass({
      $(this.refs.message.getDOMNode()).html(msg);     
      var box = $(this.refs.messageBox.getDOMNode());
      box.show();
-     box.fadeOut({duration:3000});     
+     box.fadeOut({duration:10000});     
   },
   // Steps and transitions
   uploadFile: function() {
@@ -133,7 +133,7 @@ var Wizard = React.createClass({
       <div className="alert alert-danger message-box" role="alert" ref="messageBox">
        <span className="glyphicon glyphicon-exclamation-sign error-box" aria-hidden="true"></span>
        <span className="sr-only">Error:</span>
-         <span ref="message">Enter a valid email address</span>
+         <span ref="message"></span>
        </div>
       <div className="loading-icon" ref="loadingIcon">Loading ...</div>      
       <RouteHandler eventHandlers={eventHandlers} {...this.props}/>

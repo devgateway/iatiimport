@@ -15,7 +15,8 @@ var FilterData = React.createClass({
        return {filterData: [], languageData:[]};
     },
     languageDataLoaded: false,
-    filterDataLoaded: false,    
+    filterDataLoaded: false,
+    errorMsg:"",
     componentDidMount: function() {
         this.listenTo(languageStore, this.updateLanguages);
         this.listenTo(filterStore, this.updateFilters);
@@ -32,6 +33,8 @@ var FilterData = React.createClass({
         });
     },
     loadData: function(){      
+      this.clearFlags();
+      this.errorMsg = "";
       this.props.eventHandlers.showLoadingIcon();
       appActions.loadLanguageData.triggerPromise().then(function(data) {                            
          this.updateLanguages(data); 
@@ -40,7 +43,8 @@ var FilterData = React.createClass({
       }.bind(this)).catch(function(err) {       
         this.languageDataLoaded = true;
         this.hideLoadingIcon(); 
-        this.props.eventHandlers.displayError("Error retrieving languages");
+        this.errorMsg += " Error retrieving languages.";
+        this.displayError();        
       }.bind(this));
       
       appActions.loadFilterData.triggerPromise().then(function(data) {                              
@@ -50,7 +54,8 @@ var FilterData = React.createClass({
       }.bind(this)).catch(function(err) {
          this.filterDataLoaded = true; 
          this.hideLoadingIcon(); 
-         this.props.eventHandlers.displayError("Error retrieving filters");                 
+         this.errorMsg += " Error retrieving filters.";
+         this.displayError();                          
       }.bind(this));
     },
     clearFlags: function(){     
@@ -62,6 +67,11 @@ var FilterData = React.createClass({
            this.props.eventHandlers.hideLoadingIcon();
         }
     }, 
+    displayError: function(){
+        if(this.languageDataLoaded && this.filterDataLoaded){
+           this.props.eventHandlers.displayError(this.errorMsg); 
+        }
+    },
     handleToggle: function(field, value, event) {        
         var currentField = _.find(this.state.filterData, { 'fieldName': field.fieldName });
         var filterExists = _.some(currentField.filters, function(a) { return a == value.code});

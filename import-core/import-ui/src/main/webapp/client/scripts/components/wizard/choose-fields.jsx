@@ -18,6 +18,7 @@ var ChooseFields = React.createClass({
     destDataLoaded:false,
     sourceDataLoaded:false,
     mappingDataLoaded:false,
+    errorMsg: "",
     componentDidMount: function() {
         this.listenTo(destinationFieldsStore, this.updateDestinationFields);
         this.listenTo(sourceFieldsStore, this.updateSourceFields);
@@ -44,6 +45,11 @@ var ChooseFields = React.createClass({
         this.sourceDataLoaded = false;
         this.mappingDataLoaded = false;
     }, 
+    displayError: function(){
+        if(this.destDataLoaded && this.sourceDataLoaded && this.mappingDataLoaded){
+           this.props.eventHandlers.displayError(this.errorMsg); 
+        }
+    },
     hideLoadingIcon: function(){
         if(this.destDataLoaded && this.sourceDataLoaded && this.mappingDataLoaded){
            this.props.eventHandlers.hideLoadingIcon();
@@ -51,6 +57,7 @@ var ChooseFields = React.createClass({
     },   
     loadData: function(){
         this.clearFlags(); 
+        this.errorMsg = "";
         this.props.eventHandlers.showLoadingIcon();
       appActions.loadDestinationFieldsData.triggerPromise().then(function(data) {                             
 	    this.updateDestinationFields(data);
@@ -59,7 +66,8 @@ var ChooseFields = React.createClass({
       }.bind(this)).catch(function(err) {
         this.destDataLoaded = true; 
         this.hideLoadingIcon();        
-        this.props.eventHandlers.displayError("Error retrieving destination fields");
+        this.errorMsg += " Error retrieving destination fields.";
+         this.displayError(); 
       }.bind(this)); 
       
       appActions.loadSourceFieldsData.triggerPromise().then(function(data) {                              
@@ -69,7 +77,8 @@ var ChooseFields = React.createClass({
       }.bind(this)).catch(function(err) {
         this.sourceDataLoaded = true;
         this.hideLoadingIcon();        
-        this.props.eventHandlers.displayError("Error retrieving source fields");        
+        this.errorMsg += " Error retrieving source fields.";  
+        this.displayError();      
       }.bind(this));
       
       appActions.loadMappingFieldsData.triggerPromise().then(function(data) {                              
@@ -78,8 +87,9 @@ var ChooseFields = React.createClass({
         this.hideLoadingIcon();
       }.bind(this)).catch(function(err) {
         this.mappingDataLoaded = true;
-        this.hideLoadingIcon();         
-        this.props.eventHandlers.displayError("Error retrieving field mappings");       
+        this.hideLoadingIcon();       
+        this.errorMsg += " Error retrieving field mappings.";  
+        this.displayError();       
       }.bind(this));
     },  
     selectFieldMapping: function(event){
