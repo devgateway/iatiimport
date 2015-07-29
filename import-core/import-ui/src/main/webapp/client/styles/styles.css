@@ -262,8 +262,15 @@
 
 .loading-icon {
     background: url('/images/ajax-loader.gif') no-repeat center center;
-    height: 100%;
     min-height: 50px;
     color: #FFF;
-	display: block;
+	position: absolute;
+    top: 30%;
+    left: 45%;
+    z-index: 100;
+    display:none;
+}
+
+.message-box{
+	display:none;
 }
