@@ -155,7 +155,7 @@ var ChooseFields = React.createClass({
                         </div>
                     </td>
                     <td>                   
-                    <CustomSelect options={options} value="value" label="label" data={{sourceField:item.fieldName}} handleChange = {this.props.eventHandlers.updateFieldMappings}/>
+                    <CustomSelect initialOption={value} options={options} value="value" label="label" data={item} handleChange={this.handleSelectToggle}/>
                     </td>
                 </tr>);
                 var options = this.getOptions(item);
