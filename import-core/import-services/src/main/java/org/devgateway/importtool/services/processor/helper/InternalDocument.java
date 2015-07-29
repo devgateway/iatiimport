@@ -7,12 +7,17 @@ import java.util.Map;
 public class InternalDocument {
 	private String identifier = "";
 	private Map<String, String> stringFields = new HashMap<String, String>();
+	private Map<String, String[]> stringMultiFields = new HashMap<String, String[]>();
 	private Map<String, Map<String, String>> multilangFields = new HashMap<String, Map<String, String>>();
 	private Map<String, Map<String, String>> transactionFields = new HashMap<String, Map<String, String>>();
 	private Map<String, Date> dateFields = new HashMap<String, Date>();
 
 	public void addStringField(String fieldName, String value) {
 		getStringFields().put(fieldName, value);
+	}
+	
+	public void addStringMultiField(String fieldName, String[] value) {
+		getStringMultiFields().put(fieldName, value);
 	}
 
 	public void addMultilangStringField(String fieldName, Map<String, String> multiLangvalue) {
@@ -65,6 +70,12 @@ public class InternalDocument {
 
 	public void setDateFields(Map<String, Date> dateFields) {
 		this.dateFields = dateFields;
+	}
+	public Map<String, String[]> getStringMultiFields() {
+		return stringMultiFields;
+	}
+	public void setStringMultiFields(Map<String, String[]> stringMultiFields) {
+		this.stringMultiFields = stringMultiFields;
 	}
 
 }

@@ -12,6 +12,8 @@ public class Field {
 	private List<Field> childFields;
 	private List<FieldValue> possibleValues;
 	private boolean isMappable;
+	private boolean isMultiple;
+	private boolean isPercentage;
 	private List<String> filters = new ArrayList<String>();
 
 	// These types are silly but needed for now.
@@ -123,5 +125,21 @@ public class Field {
 
 	public void setSubType(String subType) {
 		this.subType = subType;
+	}
+
+	public boolean isMultiple() {
+		return isMultiple;
+	}
+
+	public void setMultiple(boolean isMultiple) {
+		this.isMultiple = isMultiple;
+	}
+
+	public boolean isPercentage() {
+		return isPercentage;
+	}
+
+	public void setPercentage(boolean isPercentage) {
+		this.isPercentage = isPercentage;
 	}
 }

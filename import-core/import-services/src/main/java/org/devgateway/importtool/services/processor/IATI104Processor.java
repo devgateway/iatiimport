@@ -119,7 +119,10 @@ public class IATI104Processor implements ISourceProcessor {
 
 		Field sector = new Field("Sector", "sector", FieldType.LIST, true);
 		sector.setPossibleValues(getCodeListValues("sector"));
+		sector.setMultiple(true);
+		sector.setPercentage(true);
 		fieldList.add(sector);
+
 		filterFieldList.add(sector);
 
 		// Dates
@@ -168,6 +171,7 @@ public class IATI104Processor implements ISourceProcessor {
 	private List<FieldValue> getCodeListValues(String codeListName) {
 		return getCodeListValues(codeListName, false);
 	}
+
 	private List<FieldValue> getCodeListValues(String codeListName, Boolean concatenate) {
 		String standardFieldName = mappingNameFile.get(codeListName);
 		List<FieldValue> possibleValues = new ArrayList<FieldValue>();
@@ -194,11 +198,9 @@ public class IATI104Processor implements ISourceProcessor {
 						FieldValue fv = new FieldValue();
 						fv.setIndex(index++);
 						fv.setCode(code);
-						if(concatenate) {
+						if (concatenate) {
 							fv.setValue(code + " - " + name);
-						}
-						else
-						{
+						} else {
 							fv.setValue(name);
 						}
 
@@ -321,14 +323,25 @@ public class IATI104Processor implements ISourceProcessor {
 			for (Field field : getFields()) {
 				switch (field.getType()) {
 				case LIST:
-					String codeValue = "";
-					fieldNodeList = element.getElementsByTagName(field.getFieldName());
-					if (fieldNodeList.getLength() > 0 && fieldNodeList.getLength() == 1) {
-						Element fieldElement = (Element) fieldNodeList.item(0);
-						codeValue = fieldElement.getAttribute("code");
+					if (field.isMultiple()) {
+						fieldNodeList = element.getElementsByTagName(field.getFieldName());
+						String[] codeValues = new String[fieldNodeList.getLength()];
+						for (int j = 0; j < fieldNodeList.getLength(); j++) {
+							System.out.println(fieldNodeList.getLength());
+							Element fieldElement = (Element) fieldNodeList.item(j);
+							codeValues[j] = fieldElement.getAttribute("code");
+						}
+						document.addStringMultiField(field.getFieldName(), codeValues);
+					} else {
+						String codeValue = "";
+						fieldNodeList = element.getElementsByTagName(field.getFieldName());
+						if (fieldNodeList.getLength() > 0 && fieldNodeList.getLength() == 1) {
+							Element fieldElement = (Element) fieldNodeList.item(0);
+							codeValue = fieldElement.getAttribute("code");
+						}
+						filterIncluded = includedByFilter(field.getFilters(), codeValue);
+						document.addStringField(field.getFieldName(), codeValue);
 					}
-					filterIncluded = includedByFilter(field.getFilters(), codeValue);
-					document.addStringField(field.getFieldName(), codeValue);
 					break;
 				case STRING:
 					String stringValue = "";
@@ -341,8 +354,6 @@ public class IATI104Processor implements ISourceProcessor {
 							stringValue = "";
 						}
 					}
-					// filterIncluded = includedByFilter(field.getFilters(),
-					// stringValue);
 					document.addStringField(field.getFieldName(), stringValue);
 					break;
 				case MULTILANG_STRING:
@@ -372,8 +383,6 @@ public class IATI104Processor implements ISourceProcessor {
 						nodes = (NodeList) xPath.evaluate("//transaction-type[@code='" + field.getSubType() + "']/parent::*", element, XPathConstants.NODESET);
 						for (int j = 0; j < nodes.getLength(); ++j) {
 							String reference = "";
-//							BigDecimal value;
-//							Date date;
 							String receivingOrganization = "";
 
 							Element e = (Element) nodes.item(j);
@@ -383,13 +392,9 @@ public class IATI104Processor implements ISourceProcessor {
 
 							// Amount
 							String localValue = e.getElementsByTagName("value").item(0).getChildNodes().item(0).getNodeValue();
-//							value = new BigDecimal(localValue);
 
 							// Date
 							String localDate = e.getElementsByTagName("transaction-date").item(0).getChildNodes().item(0).getNodeValue();
-//							String format = "yyyy-MM-dd";
-//							SimpleDateFormat sdf = new SimpleDateFormat(format);
-//							date = sdf.parse(localDate);
 
 							// Receiving Org
 							receivingOrganization = e.getElementsByTagName("receiver-org").item(0).getChildNodes().getLength() > 0 ? e.getElementsByTagName("receiver-org").item(0).getChildNodes().item(0).getNodeValue() : null;
@@ -401,7 +406,7 @@ public class IATI104Processor implements ISourceProcessor {
 							transactionFields.put("value", localValue);
 							transactionFields.put("subtype", field.getSubType());
 
-							document.addTransactionField("transaction", transactionFields);
+							document.addTransactionField("transaction_" + field.getSubType() + "_" + j, transactionFields);
 						}
 
 					} catch (XPathExpressionException e1) {
