@@ -17,15 +17,11 @@ var SourceFieldsStore = Reflux.createStore({
     $.ajax({
         url: '/importer/data/source/field',        
         error: function() {        	
-        	self.trigger({            
-                sourceFieldsData: []
-              });
+        	appActions.loadSourceFieldsData.failed();
         },
         dataType: 'json',
         success: function(data) {        	
-        	self.trigger({            
-                sourceFieldsData: data
-              });
+        	appActions.loadSourceFieldsData.completed(data);
         },
         type: 'GET'
      }); 

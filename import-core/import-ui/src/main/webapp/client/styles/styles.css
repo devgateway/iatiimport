@@ -253,6 +253,24 @@
 	float:right;
 	margin:5px;
 }
+.selected-language{
+	width:10px;
+}
 .clear{
 	clear:both;
+}
+
+.loading-icon {
+    background: url('/images/ajax-loader.gif') no-repeat center center;
+    min-height: 50px;
+    color: #FFF;
+	position: absolute;
+    top: 30%;
+    left: 45%;
+    z-index: 100;
+    display:none;
+}
+
+.message-box{
+	display:none;
 }

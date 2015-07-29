@@ -42,20 +42,15 @@ var ValueMappingStore = Reflux.createStore({
     $.ajax({
         url: '/importer/data/source/field/valuemapping',        
         error: function() {        	
-        	self.trigger({            
-                mappingValuesData: []
-              });
+        	appActions.loadValueMappingData.failed();
         },
         dataType: 'json',
         success: function(data) {        	
-        	self.trigger({            
-                mappingValuesData: data
-              });
+        	appActions.loadValueMappingData.completed(data);
         },
         type: 'GET'
      }); 
   }
-
 });
 
 module.exports = ValueMappingStore;

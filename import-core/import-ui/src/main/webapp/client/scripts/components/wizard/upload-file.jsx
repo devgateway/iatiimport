@@ -8,11 +8,14 @@ var appActions = require('./../../actions');
 var appConfig = require('./../../conf');
 
 var UploadFile = React.createClass({
-    mixins: [
-        reactAsync.Mixin, Reflux.ListenerMixin
+    mixins: [Reflux.ListenerMixin
     ],
+    getInitialState: function() {
+       return {fileData: []};
+    },
     componentDidMount: function() {     
         this.listenTo(fileStore, this.updateFileData);
+        this.loadData();     
         var $el = $(this.refs.iatiFileInput.getDOMNode());
         var self = this;    
         $el.fileinput(
@@ -36,16 +39,23 @@ var UploadFile = React.createClass({
                 }
          });
         $el.on("fileuploaded",function(event, data, previewId, index) {
-           appActions.loadFileData();
+           self.loadData();
            $el.fileinput('clear');
         })
-    },
-    getInitialStateAsync: function() {
-        appActions.loadFileData();
+    },    
+    loadData: function(){  
+      this.props.eventHandlers.showLoadingIcon();  
+      appActions.loadFileData.triggerPromise().then(function(data) {      
+        this.props.eventHandlers.hideLoadingIcon();                       
+        this.updateFileData(data); 
+      }.bind(this)).catch(function(err) {       
+        this.props.eventHandlers.hideLoadingIcon(); 
+        this.props.eventHandlers.displayError("Error retrieving uploaded files");
+      }.bind(this)); 
     },
     updateFileData: function(data) {
         this.setState({
-            fileData: data.fileData
+            fileData: data
         });
     },
     render: function() {
@@ -70,7 +80,7 @@ var UploadFile = React.createClass({
                     {this.props.i18nLib.t('wizard.upload_file.select_file')}
                     <input className="file" ref="iatiFileInput" type="file"/>
                 </div>
-                <table className="table">
+                <table className="table file-list">
                     <thead>
                         <tr>
                             <th>

@@ -47,15 +47,11 @@ var FilterStore = Reflux.createStore({
     $.ajax({
       url: '/importer/data/source/filters',
       error: function() {
-        self.trigger({
-          filterData: []
-        });
+    	appActions.loadFilterData.failed();        
       },
       dataType: 'json',
       success: function(data) {
-        self.trigger({
-          filterData: data
-        });
+        appActions.loadFilterData.completed(data);        
       },
       type: 'GET'
     });

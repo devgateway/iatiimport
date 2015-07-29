@@ -11,27 +11,34 @@ var _ = require('lodash/dist/lodash.underscore');
 
 var ChooseProjects = React.createClass({
     mixins: [
-        reactAsync.Mixin, Reflux.ListenerMixin
+        Reflux.ListenerMixin
     ],
-    componentDidMount: function () {
-        this.listenTo(projectStore, this.updateProject);
+    getInitialState: function() {
+       return {projectData: []};
     },
-    getInitialStateAsync: function () {
-        appActions.loadProjectData();
-
-        projectStore.listen(function (data) {
-            try {
-                return cb(null, {
-                    projectData: data.projectData
-                });
-            } catch (err) {}
-        });
+    componentWillMount: function () {
+     this.listenTo(projectStore, this.updateProject);             
+     this.loadData();
     },
-    updateProject: function (data) {
+    updateProject: function (data) {        
         this.setState({
-            projectData: data.projectData
+            projectData: data
         });
-    },   
+    }, 
+    loadData: function(){
+     appActions.loadProjectData.triggerPromise().then(function(data) { 
+        this.props.eventHandlers.hideLoadingIcon();                       
+        this.updateProject(data);                
+      }.bind(this)).catch(function(err) {
+        this.props.eventHandlers.hideLoadingIcon();        
+        this.props.eventHandlers.displayError("Error retrieving project data");
+     }.bind(this)); 
+    },  
+    selectAll: function(){ 
+    },
+    selectProject: function(event) {       
+       this.props.eventHandlers.selectProject(event);
+    },
     selectAllNew: function(event){
         this.selectAll(event.target.checked, 'INSERT');
     },
@@ -78,7 +85,7 @@ var ChooseProjects = React.createClass({
                 if (item.operation == 'INSERT') {
                     newProjects.push(<tr key={i}>
                         <td>
-                            <input aria-label="Source" type="checkbox" checked={item.selected} onChange={this.handleToggle.bind(this, item)} />
+                           <input aria-label="Source" className="source"  type="checkbox" checked={item.selected} onChange={this.handleToggle.bind(this, item)} />
                         </td>
                         <td>
                             {item.sourceDocument.multilangFields.title[language]} 
@@ -91,7 +98,7 @@ var ChooseProjects = React.createClass({
                 } else {
                     existingProjects.push(<tr key={i}>
                         <td>
-                            <input aria-label="Source"  type="checkbox" checked={item.selected} onChange={this.handleToggle.bind(this, item)} />
+                          <input aria-label="Source"  type="checkbox" checked={item.selected} onChange={this.handleToggle.bind(this, item)} />
                         </td>
                         <td>
                             {item.sourceDocument.multilangFields.title[language]}

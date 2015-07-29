@@ -43,15 +43,11 @@ var ProjectStore = Reflux.createStore({
     $.ajax({
         url: '/importer/import/projects',        
         error: function() {        	
-        	self.trigger({            
-                projectData: []
-              });
+        	appActions.loadProjectData.failed();
         },
         dataType: 'json',
-        success: function(data) {        	
-        	self.trigger({            
-                projectData: data
-              });
+        success: function(data) {  
+        	appActions.loadProjectData.completed(data);        	
         },
         type: 'GET'
      }); 

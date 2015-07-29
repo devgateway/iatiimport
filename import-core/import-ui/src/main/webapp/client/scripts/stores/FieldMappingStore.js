@@ -37,15 +37,11 @@ var FieldMappingStore = Reflux.createStore({
     $.ajax({
         url: '/importer/data/source/field/mapping',        
         error: function() {        	
-        	self.trigger({            
-                mappingFieldsData: []
-              });
+        	appActions.loadMappingFieldsData.failed();
         },
         dataType: 'json',
         success: function(data) {        	
-        	self.trigger({            
-                mappingFieldsData: data
-              });
+        	appActions.loadMappingFieldsData.completed(data);
         },
         type: 'GET'
      }); 

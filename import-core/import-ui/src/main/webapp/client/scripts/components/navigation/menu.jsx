@@ -33,7 +33,7 @@ var Menu = React.createClass({
                     if (item.iconClass) {
                         iconClass += item.iconClass;
                     }
-                    var subMenu = (item.children && item.children.length > 0) ? <SubMenu items={item.children} i18nLib = {self.props.i18nLib} /> : '';
+                    var subMenu = (item.children && item.children.length > 0) ? <SubMenu items={item.children} {...self.props} /> : '';
                     var caret = (item.children && item.children.length > 0) ? 'caret' : '';
                     if (item.position == NAVBAR_LEFT) {
                         menusLeft.push(<li className="dropdown" key={item.label}>

@@ -4,17 +4,19 @@ var Reflux = require('reflux');
 var appActions = Reflux.createActions([
   'initSession',
   'initDestinationSession',
-  'loadMenuData',
-  'loadFileData',
-  'loadProjectData',
-  'loadDestinationFieldsData',
-  'loadSourceFieldsData',
-  'loadMappingFieldsData',
-  'loadFilterData',
-  'loadLanguageData',
+  'loadMenuData',   
   'loadSourceValuesData',
-  'loadDestinationValuesData',
-  'loadValueMappingData'
+  'loadDestinationValuesData'
 ]);
 
+appActions.loadProjectData = Reflux.createAction({ asyncResult: true });
+appActions.loadFileData = Reflux.createAction({ asyncResult: true });
+appActions.loadFilterData = Reflux.createAction({ asyncResult: true });
+appActions.loadLanguageData = Reflux.createAction({ asyncResult: true });
+
+appActions.loadDestinationFieldsData = Reflux.createAction({ asyncResult: true });
+appActions.loadSourceFieldsData = Reflux.createAction({ asyncResult: true });
+appActions.loadMappingFieldsData = Reflux.createAction({ asyncResult: true });
+
+appActions.loadValueMappingData = Reflux.createAction({ asyncResult: true });
 module.exports = appActions;

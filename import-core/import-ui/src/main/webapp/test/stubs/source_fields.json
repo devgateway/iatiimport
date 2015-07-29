@@ -1,0 +1,96 @@
+[
+    {
+        "type": "STRING",
+        "fieldName": "iati-identifier",
+        "displayName": "IATI Identifier",
+        "attributes": null,
+        "childFields": null,
+        "possibleValues": null,
+        "filters": []
+    },
+    {
+        "type": "MULTILANG_STRING",
+        "fieldName": "title",
+        "displayName": "Title",
+        "attributes": null,
+        "childFields": null,
+        "possibleValues": null,
+        "filters": []
+    },
+    {
+        "type": "LIST",
+        "fieldName": "activity-status",
+        "displayName": "Activity Status",
+        "attributes": null,
+        "childFields": null,
+        "possibleValues": [
+            {
+                "code": "1",
+                "value": "Pipeline/identification"
+            },
+            {
+                "code": "2",
+                "value": "Implementation"
+            },
+            {
+                "code": "3",
+                "value": "Completion"
+            },
+            {
+                "code": "4",
+                "value": "Post-completion"
+            },
+            {
+                "code": "5",
+                "value": "Cancelled"
+            },
+            {
+                "code": "6",
+                "value": "Suspended"
+            }
+        ],
+        "filters": []
+    },
+    {
+        "type": "LIST",
+        "fieldName": "activity-scope",
+        "displayName": "Activity Scope",
+        "attributes": null,
+        "childFields": null,
+        "possibleValues": [
+            {
+                "code": "1",
+                "value": "Global"
+            },
+            {
+                "code": "2",
+                "value": "Regional"
+            },
+            {
+                "code": "3",
+                "value": "Multi-national"
+            },
+            {
+                "code": "4",
+                "value": "National"
+            },
+            {
+                "code": "5",
+                "value": "Sub-national: Multi-first-level administrative areas"
+            },
+            {
+                "code": "6",
+                "value": "Sub-national: Single first-level administrative area"
+            },
+            {
+                "code": "7",
+                "value": "Sub-national: Single second-level administrative area"
+            },
+            {
+                "code": "8",
+                "value": "Single location"
+            }
+        ],
+        "filters": []
+    }
+]

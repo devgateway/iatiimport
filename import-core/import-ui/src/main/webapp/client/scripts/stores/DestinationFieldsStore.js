@@ -7,30 +7,23 @@ var appActions = require('./../actions');
 
 
 var DestinationFieldsStore = Reflux.createStore({
-
   init: function() {
     this.listenTo(appActions.loadDestinationFieldsData, this.handleLoadDestinationFieldsData);
   },
-
   handleLoadDestinationFieldsData: function() {
     var self = this;    
     $.ajax({
         url: '/importer/data/destination/field',        
-        error: function() {        	
-        	self.trigger({            
-                destinationFieldsData: []
-              });
+        error: function() {  
+        	appActions.loadDestinationFieldsData.failed();       	
         },
         dataType: 'json',
-        success: function(data) {        	
-        	self.trigger({            
-                destinationFieldsData: data
-              });
+        success: function(data) {
+        	appActions.loadDestinationFieldsData.completed(data);        	
         },
         type: 'GET'
      }); 
   }
-
 });
 
 module.exports = DestinationFieldsStore;

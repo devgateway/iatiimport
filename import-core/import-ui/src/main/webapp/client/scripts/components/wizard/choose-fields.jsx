@@ -11,50 +11,90 @@ var fieldMappingStore = require('./../../stores/FieldMappingStore');
 var _ = require('lodash/dist/lodash.underscore');
 
 var ChooseFields = React.createClass({
-    mixins: [
-        reactAsync.Mixin, Reflux.ListenerMixin
-    ],
+    mixins: [Reflux.ListenerMixin],
+    getInitialState: function() {
+       return {sourceFieldsData:[], destinationFieldsData:[], mappingFieldsData:[]};
+    },
+    destDataLoaded:false,
+    sourceDataLoaded:false,
+    mappingDataLoaded:false,
+    errorMsg: "",
     componentDidMount: function() {
         this.listenTo(destinationFieldsStore, this.updateDestinationFields);
         this.listenTo(sourceFieldsStore, this.updateSourceFields);
         this.listenTo(fieldMappingStore, this.updateFieldMappingStore);
-    },
-    getInitialStateAsync: function() {
-        appActions.loadDestinationFieldsData();
-        destinationFieldsStore.listen(function(data) {
-            try {
-                return cb(null, {
-                    destinationFieldsData: data.destinationFieldsData
-                });
-            } catch (err) {}
-        });
-        appActions.loadSourceFieldsData();
-        sourceFieldsStore.listen(function(data) {
-            try {
-                return cb(null, {
-                    sourceFieldsData: data.sourceFieldsData
-                });
-            } catch (err) {}
-        });
-        appActions.loadMappingFieldsData();
-    },
-    
+        this.loadData();
+    },    
     updateSourceFields: function(data) {
         this.setState({
-            sourceFieldsData: data.sourceFieldsData
+            sourceFieldsData: data
         });
     },
     updateDestinationFields: function(data) {
         this.setState({
-            destinationFieldsData: data.destinationFieldsData
+            destinationFieldsData: data
         });
-    },   
+    }, 
     updateFieldMappingStore: function(data) {
         this.setState({
-            mappingFieldsData: data.mappingFieldsData
+            mappingFieldsData: data
         });
+    }, 
+    clearFlags: function(){
+        this.destDataLoaded = false;
+        this.sourceDataLoaded = false;
+        this.mappingDataLoaded = false;
+    }, 
+    displayError: function(){
+        if(this.destDataLoaded && this.sourceDataLoaded && this.mappingDataLoaded){
+           this.props.eventHandlers.displayError(this.errorMsg); 
+        }
+    },
+    hideLoadingIcon: function(){
+        if(this.destDataLoaded && this.sourceDataLoaded && this.mappingDataLoaded){
+           this.props.eventHandlers.hideLoadingIcon();
+        }
     },   
-
+    loadData: function(){
+        this.clearFlags(); 
+        this.errorMsg = "";
+        this.props.eventHandlers.showLoadingIcon();
+      appActions.loadDestinationFieldsData.triggerPromise().then(function(data) {                             
+	    this.updateDestinationFields(data);
+	    this.destDataLoaded = true; 
+	    this.hideLoadingIcon();
+      }.bind(this)).catch(function(err) {
+        this.destDataLoaded = true; 
+        this.hideLoadingIcon();        
+        this.errorMsg += " Error retrieving destination fields.";
+         this.displayError(); 
+      }.bind(this)); 
+      
+      appActions.loadSourceFieldsData.triggerPromise().then(function(data) {                              
+        this.updateSourceFields(data);
+        this.sourceDataLoaded = true;
+        this.hideLoadingIcon();
+      }.bind(this)).catch(function(err) {
+        this.sourceDataLoaded = true;
+        this.hideLoadingIcon();        
+        this.errorMsg += " Error retrieving source fields.";  
+        this.displayError();      
+      }.bind(this));
+      
+      appActions.loadMappingFieldsData.triggerPromise().then(function(data) {                              
+        this.updateFieldMappingStore(data); 
+        this.mappingDataLoaded = true;
+        this.hideLoadingIcon();
+      }.bind(this)).catch(function(err) {
+        this.mappingDataLoaded = true;
+        this.hideLoadingIcon();       
+        this.errorMsg += " Error retrieving field mappings.";  
+        this.displayError();       
+      }.bind(this));
+    },  
+    selectFieldMapping: function(event){
+      this.props.eventHandlers.selectFieldMapping(event);
+    },
     getOptions: function(sourceField){    
     var options = [];
     $.map(this.state.destinationFieldsData, function(item, i) {
@@ -104,6 +144,20 @@ var ChooseFields = React.createClass({
         var rows = [];
         if (this.state.destinationFieldsData && this.state.sourceFieldsData) {                    
            $.map(this.state.sourceFieldsData, function(item, i) {
+                var options = this.getOptions(item);                
+                rows.push(<tr key={item.fieldName}>
+                    <td>
+                        <input value={item.fieldName} aria-label="Field1" type="checkbox" onChange = {this.selectFieldMapping} className="source-selector"/>
+                    </td>
+                    <td>
+                        <div className="table_cell">
+                            {item.displayName}
+                        </div>
+                    </td>
+                    <td>                   
+                    <CustomSelect options={options} value="value" label="label" data={{sourceField:item.fieldName}} handleChange = {this.props.eventHandlers.updateFieldMappings}/>
+                    </td>
+                </tr>);
                 var options = this.getOptions(item);
                 if(item.mappable) {
                     var selected = _.some(this.state.mappingFieldsData, function(v) { return item.uniqueFieldName == v.sourceField.uniqueFieldName});

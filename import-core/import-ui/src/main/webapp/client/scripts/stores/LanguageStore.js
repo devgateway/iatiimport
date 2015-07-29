@@ -16,16 +16,12 @@ var LanguageStore = Reflux.createStore({
     var self = this;    
     $.ajax({
         url: '/importer/data/source/languages',        
-        error: function() {        	
-        	self.trigger({            
-                languageData: []
-              });
+        error: function() {
+        	appActions.loadLanguageData.failed();        	
         },
         dataType: 'json',
-        success: function(data) {        	
-        	self.trigger({            
-                languageData: data
-              });
+        success: function(data) {  
+        	appActions.loadLanguageData.completed(data);       	
         },
         type: 'GET'
      }); 
