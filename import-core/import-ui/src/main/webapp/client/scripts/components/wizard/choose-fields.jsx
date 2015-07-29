@@ -146,8 +146,8 @@ var ChooseFields = React.createClass({
            $.map(this.state.sourceFieldsData, function(item, i) {
                 var options = this.getOptions(item);                
                 rows.push(<tr key={item.fieldName}>
-                    <td>
-                        <input value={item.fieldName} aria-label="Field1" type="checkbox" onChange = {this.selectFieldMapping} className="source-selector"/>
+                    <td>                        
+                       <input value={item.uniqueFieldName} aria-label="Field1" type="checkbox" checked={selected} onChange={this.handleToggle.bind(this, item)} className="source-selector"/>
                     </td>
                     <td>
                         <div className="table_cell">
