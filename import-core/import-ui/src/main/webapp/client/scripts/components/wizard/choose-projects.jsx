@@ -18,23 +18,22 @@ var ChooseProjects = React.createClass({
     },
     componentWillMount: function () {
      this.listenTo(projectStore, this.updateProject);             
-     appActions.loadProjectData.triggerPromise().then(function(data) { 
-     var self  = this;
-     //delay for testing - loading spinner. should be removed
-     setTimeout(function(){
-        self.props.eventHandlers.hideLoadingIcon();                       
-        self.updateProject(data);     
-     }, 3000);
-                
-      }.bind(this)).catch(function(err) {
-        console.log("Error retrieving project data");
-     });    
+     this.loadData();
     },
     updateProject: function (data) {        
         this.setState({
             projectData: data
         });
-    },   
+    }, 
+    loadData: function(){
+     appActions.loadProjectData.triggerPromise().then(function(data) { 
+        this.props.eventHandlers.hideLoadingIcon();                       
+        this.updateProject(data);                
+      }.bind(this)).catch(function(err) {
+        this.props.eventHandlers.hideLoadingIcon();        
+        this.props.eventHandlers.displayError("Error retrieving project data");
+     }.bind(this)); 
+    },  
     selectAll: function(){ 
     },
     selectProject: function(event) {       

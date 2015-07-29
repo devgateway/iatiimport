@@ -14,6 +14,8 @@ var FilterData = React.createClass({
      getInitialState: function() {
        return {filterData: [], languageData:[]};
     },
+    languageDataLoaded: false,
+    filterDataLoaded: false,    
     componentDidMount: function() {
         this.listenTo(languageStore, this.updateLanguages);
         this.listenTo(filterStore, this.updateFilters);
@@ -29,21 +31,37 @@ var FilterData = React.createClass({
             languageData: data
         });
     },
-    loadData: function(){    
-      appActions.loadLanguageData.triggerPromise().then(function(data) {      
-        this.props.eventHandlers.hideLoadingIcon();                       
-        this.updateLanguages(data); 
-      }.bind(this)).catch(function(err) {
-        console.log("Error retrieving languages");
-      }); 
+    loadData: function(){      
+      this.props.eventHandlers.showLoadingIcon();
+      appActions.loadLanguageData.triggerPromise().then(function(data) {                            
+         this.updateLanguages(data); 
+         this.languageDataLoaded = true;
+         this.hideLoadingIcon();
+      }.bind(this)).catch(function(err) {       
+        this.languageDataLoaded = true;
+        this.hideLoadingIcon(); 
+        this.props.eventHandlers.displayError("Error retrieving languages");
+      }.bind(this));
       
-      appActions.loadFilterData.triggerPromise().then(function(data) {      
-        this.props.eventHandlers.hideLoadingIcon();                       
-        this.updateFilters(data); 
+      appActions.loadFilterData.triggerPromise().then(function(data) {                              
+        this.updateFilters(data);
+        this.filterDataLoaded = true; 
+        this.hideLoadingIcon(); 
       }.bind(this)).catch(function(err) {
-        console.log("Error retrieving filters");        
-      });
+         this.filterDataLoaded = true; 
+         this.hideLoadingIcon(); 
+         this.props.eventHandlers.displayError("Error retrieving filters");                 
+      }.bind(this));
     },
+    clearFlags: function(){     
+        this.languageDataLoaded = false;
+        this.filterDataLoaded = false;        
+    }, 
+    hideLoadingIcon: function(){
+        if(this.languageDataLoaded && this.filterDataLoaded){
+           this.props.eventHandlers.hideLoadingIcon();
+        }
+    }, 
     handleToggle: function(field, value, event) {        
         var currentField = _.find(this.state.filterData, { 'fieldName': field.fieldName });
         var filterExists = _.some(currentField.filters, function(a) { return a == value.code});
@@ -75,7 +93,6 @@ var FilterData = React.createClass({
     },
     render: function() {
         var filters = [];
-
         if (this.state.filterData) {
             $.map(this.state.filterData, function(filter, i) {
                 var filterValues = [];

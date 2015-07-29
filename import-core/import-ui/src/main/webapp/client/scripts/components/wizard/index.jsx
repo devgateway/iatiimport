@@ -33,15 +33,21 @@ var Wizard = React.createClass({
     var destinationProcessor = this.props.params.dst;
     this.initImportSession(sourceProcessor, destinationProcessor);
   },
-  hideLoadingIcon: function(){
-     $(this.refs.loadingIcon.getDOMNode()).hide();
+  hideLoadingIcon: function(){    
+    $(this.refs.loadingIcon.getDOMNode()).hide();
   },
   showLoadingIcon:  function(){
     $(this.refs.loadingIcon.getDOMNode()).show();
   },
+  displayError: function(msg){      
+     $(this.refs.message.getDOMNode()).html(msg);     
+     var box = $(this.refs.messageBox.getDOMNode());
+     box.show();
+     box.fadeOut({duration:3000});     
+  },
   // Steps and transitions
   uploadFile: function() {
-    $(this.refs.loadingIcon.getDOMNode()).show(); 
+    
     this.transitionTo('filter', this.props.params);
   },
 
@@ -113,16 +119,22 @@ var Wizard = React.createClass({
     eventHandlers.mapValues           = this.mapValues;
     eventHandlers.launchImport        = this.launchImport;
     eventHandlers.hideLoadingIcon     = this.hideLoadingIcon;
-
+    eventHandlers.showLoadingIcon     = this.showLoadingIcon;
+    eventHandlers.displayError = this.displayError;
+    
     return (
       <div>
-      <div className="container " >      
-      
+      <div className="container " >     
       <h2>{this.props.i18nLib.t('wizard.import_process')}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       <small>{this.state.info.sourceProcessorName} to {this.state.info.destinationProcessorName} </small></h2>
       <div className="row">
       <WizardSteps {...this.props}/>
       <div className="col-sm-9 col-md-9 main " >
+      <div className="alert alert-danger message-box" role="alert" ref="messageBox">
+       <span className="glyphicon glyphicon-exclamation-sign error-box" aria-hidden="true"></span>
+       <span className="sr-only">Error:</span>
+         <span ref="message">Enter a valid email address</span>
+       </div>
       <div className="loading-icon" ref="loadingIcon">Loading ...</div>      
       <RouteHandler eventHandlers={eventHandlers} {...this.props}/>
       </div>

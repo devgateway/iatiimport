@@ -15,6 +15,9 @@ var ChooseFields = React.createClass({
     getInitialState: function() {
        return {sourceFieldsData:[], destinationFieldsData:[], mappingFieldsData:[]};
     },
+    destDataLoaded:false,
+    sourceDataLoaded:false,
+    mappingDataLoaded:false,
     componentDidMount: function() {
         this.listenTo(destinationFieldsStore, this.updateDestinationFields);
         this.listenTo(sourceFieldsStore, this.updateSourceFields);
@@ -36,27 +39,48 @@ var ChooseFields = React.createClass({
             mappingFieldsData: data
         });
     }, 
-     loadData: function(){      
-      appActions.loadDestinationFieldsData.triggerPromise().then(function(data) {      
-        this.props.eventHandlers.hideLoadingIcon();                       
-        this.updateDestinationFields(data); 
+    clearFlags: function(){
+        this.destDataLoaded = false;
+        this.sourceDataLoaded = false;
+        this.mappingDataLoaded = false;
+    }, 
+    hideLoadingIcon: function(){
+        if(this.destDataLoaded && this.sourceDataLoaded && this.mappingDataLoaded){
+           this.props.eventHandlers.hideLoadingIcon();
+        }
+    },   
+    loadData: function(){
+        this.clearFlags(); 
+        this.props.eventHandlers.showLoadingIcon();
+      appActions.loadDestinationFieldsData.triggerPromise().then(function(data) {                             
+	    this.updateDestinationFields(data);
+	    this.destDataLoaded = true; 
+	    this.hideLoadingIcon();
       }.bind(this)).catch(function(err) {
-        console.log("Error retrieving destination fields");
-      }); 
+        this.destDataLoaded = true; 
+        this.hideLoadingIcon();        
+        this.props.eventHandlers.displayError("Error retrieving destination fields");
+      }.bind(this)); 
       
-      appActions.loadSourceFieldsData.triggerPromise().then(function(data) {      
-        this.props.eventHandlers.hideLoadingIcon();                       
-        this.updateSourceFields(data); 
+      appActions.loadSourceFieldsData.triggerPromise().then(function(data) {                              
+        this.updateSourceFields(data);
+        this.sourceDataLoaded = true;
+        this.hideLoadingIcon();
       }.bind(this)).catch(function(err) {
-        console.log("Error retrieving source fields");        
-      });
+        this.sourceDataLoaded = true;
+        this.hideLoadingIcon();        
+        this.props.eventHandlers.displayError("Error retrieving source fields");        
+      }.bind(this));
       
-      appActions.loadMappingFieldsData.triggerPromise().then(function(data) {      
-        this.props.eventHandlers.hideLoadingIcon();                       
+      appActions.loadMappingFieldsData.triggerPromise().then(function(data) {                              
         this.updateFieldMappingStore(data); 
+        this.mappingDataLoaded = true;
+        this.hideLoadingIcon();
       }.bind(this)).catch(function(err) {
-        console.log("Error retrieving field mappings");        
-      });
+        this.mappingDataLoaded = true;
+        this.hideLoadingIcon();         
+        this.props.eventHandlers.displayError("Error retrieving field mappings");       
+      }.bind(this));
     },  
     selectFieldMapping: function(event){
       this.props.eventHandlers.selectFieldMapping(event);

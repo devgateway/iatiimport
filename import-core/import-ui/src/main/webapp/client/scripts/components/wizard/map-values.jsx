@@ -29,14 +29,14 @@ var MapValues = React.createClass({
           mappings: data
       });
   },
-  loadData: function(){      
+  loadData: function(){
+      this.props.eventHandlers.showLoadingIcon();      
       appActions.loadValueMappingData.triggerPromise().then(function(data) {      
         this.props.eventHandlers.hideLoadingIcon();                       
         this.updateValueMappingStore(data); 
-      }.bind(this)).catch(function(err) {
-        console.log("Error retrieving value mappings");
-      }); 
-   
+      }.bind(this)).catch(function(err) {        
+        this.props.eventHandlers.displayError("Error retrieving value mappings");
+      }.bind(this));   
   },  
   switchTab: function(idx) {
     this.setState({

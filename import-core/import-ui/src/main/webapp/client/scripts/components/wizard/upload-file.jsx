@@ -43,13 +43,15 @@ var UploadFile = React.createClass({
            $el.fileinput('clear');
         })
     },    
-    loadData: function(){    
-        appActions.loadFileData.triggerPromise().then(function(data) {      
+    loadData: function(){  
+      this.props.eventHandlers.showLoadingIcon();  
+      appActions.loadFileData.triggerPromise().then(function(data) {      
         this.props.eventHandlers.hideLoadingIcon();                       
         this.updateFileData(data); 
-      }.bind(this)).catch(function(err) {
-        console.log("Error retrieving uploaded files");
-      }); 
+      }.bind(this)).catch(function(err) {       
+        this.props.eventHandlers.hideLoadingIcon(); 
+        this.props.eventHandlers.displayError("Error retrieving uploaded files");
+      }.bind(this)); 
     },
     updateFileData: function(data) {
         this.setState({
