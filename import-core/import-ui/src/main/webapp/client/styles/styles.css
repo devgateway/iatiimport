@@ -262,13 +262,17 @@
 
 .loading-icon {
     background: url('/images/ajax-loader.gif') no-repeat center center;
-    min-height: 50px;
+    min-height: 100px;
+    width:200px;
+    border-radius: 10px;
     color: #FFF;
 	position: absolute;
     top: 30%;
     left: 45%;
     z-index: 100;
     display:none;
+    background-color: #000; 
+    opacity: 0.6;   
 }
 
 .message-box{

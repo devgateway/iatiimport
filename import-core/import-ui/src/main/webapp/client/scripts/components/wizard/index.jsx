@@ -135,7 +135,7 @@ var Wizard = React.createClass({
        <span className="sr-only">Error:</span>
          <span ref="message"></span>
        </div>
-      <div className="loading-icon" ref="loadingIcon">Loading ...</div>      
+      <div className="loading-icon" ref="loadingIcon"></div>      
       <RouteHandler eventHandlers={eventHandlers} {...this.props}/>
       </div>
       </div>
