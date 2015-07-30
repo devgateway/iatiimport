@@ -33,10 +33,12 @@ var Wizard = React.createClass({
     var destinationProcessor = this.props.params.dst;
     this.initImportSession(sourceProcessor, destinationProcessor);
   },
-  hideLoadingIcon: function(){    
-    $(this.refs.loadingIcon.getDOMNode()).hide();
+  hideLoadingIcon: function(){ 
+	  if(!_.isEmpty(this.state.info)){
+	     $(this.refs.loadingIcon.getDOMNode()).hide();
+	  }    
   },
-  showLoadingIcon:  function(){
+  showLoadingIcon:  function(){    
     $(this.refs.loadingIcon.getDOMNode()).show();
   },
   displayError: function(msg){      
@@ -86,6 +88,7 @@ var Wizard = React.createClass({
     }.bind(this));
   },
   initImportSession: function(sourceProcessor, destinationProcessor) {
+    this.showLoadingIcon();
     var compiledURL = _.template(appConfig.TOOL_START_ENDPOINT);
     var token = appConfig.DESTINATION_AUTH_TOKEN || "default_token";
     var url = compiledURL({
@@ -95,7 +98,7 @@ var Wizard = React.createClass({
         'host': appConfig.DESTINATION_API_HOST
       });
 
-    $.get(url, function(result) {
+    $.get(url , function(result) {
       this.setState({
                       info: {
                         authenticationToken: result.authenticationToken,
@@ -105,9 +108,11 @@ var Wizard = React.createClass({
                         destinationProcessor: destinationProcessor
                       }
                     });
+       this.hideLoadingIcon();     
     }.bind(this)).fail(function() {
-      console.log("Error loading state of session.");
-    });
+       this.hideLoadingIcon();
+       this.displayError("Error loading state of session.");
+    }.bind(this));
   },
   
   render: function() {
