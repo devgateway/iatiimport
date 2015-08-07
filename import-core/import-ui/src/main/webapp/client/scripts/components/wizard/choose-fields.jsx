@@ -144,20 +144,6 @@ var ChooseFields = React.createClass({
         var rows = [];
         if (this.state.destinationFieldsData && this.state.sourceFieldsData) {                    
            $.map(this.state.sourceFieldsData, function(item, i) {
-                var options = this.getOptions(item);                
-                rows.push(<tr key={item.fieldName}>
-                    <td>                        
-                       <input value={item.uniqueFieldName} aria-label="Field1" type="checkbox" checked={selected} onChange={this.handleToggle.bind(this, item)} className="source-selector"/>
-                    </td>
-                    <td>
-                        <div className="table_cell">
-                            {item.displayName}
-                        </div>
-                    </td>
-                    <td>                   
-                    <CustomSelect initialOption={value} options={options} value="value" label="label" data={item} handleChange={this.handleSelectToggle}/>
-                    </td>
-                </tr>);
                 var options = this.getOptions(item);
                 if(item.mappable) {
                     var selected = _.some(this.state.mappingFieldsData, function(v) { return item.uniqueFieldName == v.sourceField.uniqueFieldName});
