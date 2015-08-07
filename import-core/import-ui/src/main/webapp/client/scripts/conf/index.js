@@ -5,7 +5,7 @@ module.exports = {
   TOOL_REST_PATH: '/importer/import',
   TOOL_START_ENDPOINT: '/importer/import/new/<%=sourceProcessor%>/<%=destinationProcessor%>/<%=authenticationToken%>?host=<%=host%>',
   DESTINATION_API_HOST: 'http://localhost:9010',
-  DESTINATION_AUTH_TOKEN_ENDPOINT: '/mockup/session_info_alt.json',
+  DESTINATION_AUTH_TOKEN_ENDPOINT: '/rest/security/user',
   USE_AUTHENTICATION_TOKEN: true,
   DESTINATION_AUTH_TOKEN: undefined,
   DEBUG: true
