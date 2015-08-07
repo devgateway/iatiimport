@@ -278,3 +278,10 @@
 .message-box{
 	display:none;
 }
+
+.server-status-message {
+    width: 50%;
+    margin: auto;
+    margin-top: 20px;
+    margin-bottom: 30px;
+}

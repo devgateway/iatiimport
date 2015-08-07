@@ -19,4 +19,5 @@ appActions.loadSourceFieldsData = Reflux.createAction({ asyncResult: true });
 appActions.loadMappingFieldsData = Reflux.createAction({ asyncResult: true });
 
 appActions.loadValueMappingData = Reflux.createAction({ asyncResult: true });
+appActions.checkBackendStatus = Reflux.createAction({ asyncResult: true });
 module.exports = appActions;
