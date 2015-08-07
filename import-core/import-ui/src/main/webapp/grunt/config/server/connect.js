@@ -14,7 +14,7 @@ var taskConfig = function(grunt) {
     server: {
       proxies: [
         {
-          context: '/importer',
+          context: ['/importer','/system'],
           host: 'localhost',
           port: 8080
         },
