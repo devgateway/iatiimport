@@ -142,15 +142,17 @@ var ChooseFields = React.createClass({
     },
     render: function() {
         var rows = [];
-        if (this.state.destinationFieldsData && this.state.sourceFieldsData) {                    
+        if (this.state.destinationFieldsData && this.state.sourceFieldsData) {  
+           
            $.map(this.state.sourceFieldsData, function(item, i) {
                 var options = this.getOptions(item);
                 if(item.mappable) {
-                    var selected = _.some(this.state.mappingFieldsData, function(v) { return item.uniqueFieldName == v.sourceField.uniqueFieldName});
+                    var selected = _.some(this.state.mappingFieldsData, function(v) { return item.uniqueFieldName == v.sourceField.uniqueFieldName});				
+					
                     var mapping = _.find(this.state.mappingFieldsData, function(v) { return item.uniqueFieldName == v.sourceField.uniqueFieldName});
                     var value = "";
-                    if(mapping && mapping.destinationField) {
-                        value = mapping.destinationField.uniqueFieldName;
+                    if(mapping && mapping.destinationField) {					    
+                        value = mapping.destinationField.uniqueFieldName;				
                     }
                     rows.push(<tr key={item.uniqueFieldName}>
                         <td>
@@ -161,7 +163,7 @@ var ChooseFields = React.createClass({
                                 {item.displayName}
                             </div>
                         </td>
-                        <td>                   
+                        <td>             
                         <CustomSelect initialOption={value} options={options} value="value" label="label" data={item} handleChange={this.handleSelectToggle}/>
                         </td>
                     </tr>);
