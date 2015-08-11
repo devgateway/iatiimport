@@ -19,7 +19,7 @@ var taskConfig = function(grunt) {
           port: 8080
         },
         {
-          context: ['/aim', '/TEMPLATE', '/repository', '/rest', '/index.do', '/showDesktop.do', '/wicket'],
+          context: ['/aim', '/TEMPLATE', '/repository', '/rest', '/index.do', '/showDesktop.do', '/wicket', '/ckeditor_4.4.6', '/showLayout.do'],
           host: 'localhost',
           port: 8081
         }
