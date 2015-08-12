@@ -56,6 +56,14 @@ var MapValues = React.createClass({
 
   render: function() {
     var sourceFields = [];
+    var message = "";
+    if(!_.some(this.state.mappings, function(v){ return v.sourceField.type == 'LIST'})) {
+      message = <div className="panel panel-default">
+                  <div className="panel-body">
+                    {this.props.i18nLib.t('wizard.map_values.empty_list')}
+                  </div>
+                </div>;
+    }
     $.map(this.state.mappings, function(mapping, i) {
       if (mapping.sourceField.fieldName && mapping.destinationField.fieldName && mapping.sourceField.type == "LIST") {
         sourceFields.push({
@@ -70,6 +78,7 @@ var MapValues = React.createClass({
       <div className="panel panel-default">
         <div className="panel-heading"><strong>{this.props.i18nLib.t('wizard.map_values.map_field_values')}</strong></div>
         <div className="panel-body">
+          {message}
           <TabbedArea activeTab={this.state.activeTab} paneModels={sourceFields} switchTab={this.switchTab}/>
         </div>
         <div className="buttons">
