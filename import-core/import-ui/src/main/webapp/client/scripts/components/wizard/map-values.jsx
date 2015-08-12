@@ -65,7 +65,7 @@ var MapValues = React.createClass({
                 </div>;
     }
     $.map(this.state.mappings, function(mapping, i) {
-      if (mapping.sourceField.fieldName && mapping.destinationField.fieldName && mapping.sourceField.type == "LIST") {
+      if (mapping.sourceField && mapping.destinationField && mapping.sourceField.fieldName && mapping.destinationField.fieldName && mapping.sourceField.type == "LIST") {
         sourceFields.push({
           tabName : mapping.sourceField.displayName,
           children: [<MappingTableSimple key={i} mapping={mapping} handleUpdates={this.updateValueMappings} {...this.props}/>],

@@ -26,6 +26,7 @@ var ChooseProjects = React.createClass({
         });
     }, 
     loadData: function(){
+	 this.props.eventHandlers.showLoadingIcon();
      appActions.loadProjectData.triggerPromise().then(function(data) { 
         this.props.eventHandlers.hideLoadingIcon();                       
         this.updateProject(data);                
