@@ -48,8 +48,11 @@ var PreviousImports = React.createClass({
                         {project.title}
                     </td>
                     <td>
+                        {project.note}
+                    </td> 
+                    <td>
                         {project.status}
-                    </td>                    
+                    </td>                   
                 </tr>);
             });
         }
@@ -62,7 +65,10 @@ var PreviousImports = React.createClass({
                         <tr>
                            <th>
                                  Project Name
-                            </th>
+                            </th>                            
+                            <th>
+                                 Note
+                            </th> 
                             <th>
                                  Status
                             </th>                           
