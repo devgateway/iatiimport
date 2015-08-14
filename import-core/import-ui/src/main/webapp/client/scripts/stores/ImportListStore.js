@@ -9,10 +9,10 @@ var ImportListStore = Reflux.createStore({
   init: function() {
     this.listenTo(appActions.loadImportListData, this.handleLoadImportListData);    
   },
-  handleLoadImportListData: function() {
+  handleLoadImportListData: function(data) {
     var self = this;    
     $.ajax({
-    	url: '/mockup/import_list.json',         
+    	url: '/importer/reports/previousimports?size='+ data.size + '&page=' + data.page,    	
         error: function() {        	
         	appActions.loadImportListData.failed();
         },

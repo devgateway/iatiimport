@@ -9,15 +9,17 @@ var Router = require('react-router');
 var RouteHandler = Router.RouteHandler;
 var appActions = require('./../../actions');
 var importLogStore = require('./../../stores/ImportLogStore');
+var Pagination = require('react-bootstrap/lib/Pagination');
 var PreviousImports = React.createClass({ 
   mixins: [
         Reflux.ListenerMixin,Router.Navigation
     ],
    getInitialState: function() {
     return {     
-      importLog: {
-       projects:[]
-      }
+      importLog: {       
+      },
+      pageSize:10, 
+      activePage:1
     };
    },  
    componentWillMount: function () {
@@ -29,8 +31,15 @@ var PreviousImports = React.createClass({
             importLog: data
         });
     }, 
-    loadData: function(){	 
-     appActions.loadImportLog.triggerPromise().then(function(data) {                                      
+    handlePageSelect:function(event, selectedEvent){    
+	      this.setState({
+	      activePage: selectedEvent.eventKey
+	      });
+	      this.loadData();
+    },
+    loadData: function(){
+     var sortParams = {size:10, page:this.state.activePage - 1}  
+     appActions.loadImportLog(this.props.params.id,sortParams).then(function(data) {                                      
         this.updateImportLog(data);                
       }.bind(this)).catch(function(err) {
         console.log('Error loading import logs');
@@ -40,15 +49,16 @@ var PreviousImports = React.createClass({
     this.transitionTo('previousimports');
   },
   render: function() {  
-        var projects = [];        
-        if (this.state.importLog && this.state.importLog.projects.length > 0) {        
-          $.map(this.state.importLog.projects, function (project, i) {                      
+        var projects = []; 
+        var itemsSize = this.state.importLog.totalElements > this.state.pageSize?(this.state.importLog.totalElements / this.state.pageSize).toFixed(0) : 1;               
+        if (this.state.importLog.content && this.state.importLog.content.length > 0) {        
+          $.map(this.state.importLog.content, function (project, i) {                      
             projects.push(<tr key={project.id}>
                    <td>
                         {project.title}
                     </td>
                     <td>
-                        {project.note}
+                        {project.notes}
                     </td> 
                     <td>
                         {project.status}
@@ -59,7 +69,7 @@ var PreviousImports = React.createClass({
     return (
      <div className="container " >
       <h2>Import Log </h2> 
-      <span>File Name: {this.state.importLog.fileName}</span>     
+      <span>File Name: {}</span>     
          <table className="table file-list">
                     <thead>
                         <tr>
@@ -78,9 +88,9 @@ var PreviousImports = React.createClass({
                         {projects}
                     </tbody>
                 </table>
+         <Pagination bsSize='small' items={itemsSize} activePage={this.state.activePage} onSelect={this.handlePageSelect} />
         <div className="buttons">
-          <button className="btn btn-warning navbar-btn btn-custom" type="button" onClick={this.goBackToList}>Back to Import List</button>&nbsp;
-          
+          <button className="btn btn-warning navbar-btn btn-custom" type="button" onClick={this.goBackToList}>Back to Import List</button>&nbsp;         
         </div>
       </div>
       );

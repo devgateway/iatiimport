@@ -11,36 +11,46 @@ var Router = require('react-router');
 var RouteHandler = Router.RouteHandler;
 var appActions = require('./../../actions');
 var importListStore = require('./../../stores/ImportListStore');
+var Pagination = require('react-bootstrap/lib/Pagination');
 var ImportList = React.createClass({ 
   mixins: [
         Reflux.ListenerMixin
     ],
   getInitialState: function() {
     return {     
-      importListData: []
+      importListData: [],
+      pageSize:10, 
+      activePage:1
     };
   },  
    componentWillMount: function () {
      this.listenTo(importListStore, this.updateImportList);             
      this.loadData();
     },
-    updateImportList: function (data) {        
+    updateImportList: function (data) {                  
         this.setState({
             importListData: data
         });
     }, 
     loadData: function(){	 
-     appActions.loadImportListData.triggerPromise().then(function(data) {                                       
+     var params = {size:10, page:this.state.activePage - 1}
+     appActions.loadImportListData(params).then(function(data) {                                       
         this.updateImportList(data);                
-      }.bind(this)).catch(function(err) {
-        console.log(err);
+      }.bind(this)).catch(function(err) {       
         console.log('Error loading importList');
      }.bind(this));
   },
+  handlePageSelect:function(event, selectedEvent){    
+    this.setState({
+      activePage: selectedEvent.eventKey
+    });
+    this.loadData();
+  },
   render: function() {  
         var importList = [];
-        if (this.state.importListData && this.state.importListData.length > 0) {        
-        $.map(this.state.importListData, function (item, i) {    
+        var itemsSize = this.state.importListData.totalElements > this.state.pageSize?(this.state.importListData.totalElements / this.state.pageSize).toFixed(0) : 1;       
+        if (this.state.importListData.content && this.state.importListData.content.length > 0) {        
+        $.map(this.state.importListData.content, function (item, i) {    
             var createdDate = moment(item.createdDate).fromNow();
             importList.push(<tr key={item.id}>
                    <td>
@@ -83,6 +93,7 @@ var ImportList = React.createClass({
                         {importList}
                     </tbody>
                 </table>
+                <Pagination bsSize='small' items={itemsSize} activePage={this.state.activePage} onSelect={this.handlePageSelect} />
       </div>
       );
   }
