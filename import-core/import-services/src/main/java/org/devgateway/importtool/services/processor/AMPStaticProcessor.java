@@ -23,6 +23,7 @@ import org.devgateway.importtool.services.processor.helper.FieldType;
 import org.devgateway.importtool.services.processor.helper.FieldValue;
 import org.devgateway.importtool.services.processor.helper.FieldValueMapping;
 import org.devgateway.importtool.services.processor.helper.IDestinationProcessor;
+import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
 import org.devgateway.importtool.services.processor.helper.InternalDocument;
 import org.devgateway.importtool.services.processor.helper.JsonBean;
 import org.devgateway.importtool.services.processor.helper.TokenHeaderInterceptor;
@@ -133,74 +134,6 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 	}
 
-	private List<FieldValue> getAT() {
-		// TODO: Replace with information from endpoints once it's available
-		List<FieldValue> list = new ArrayList<FieldValue>();
-		FieldValue fv1 = new FieldValue();
-		fv1.setIndex(0);
-		fv1.setCode("211");
-		fv1.setValue("Planned");
-		list.add(fv1);
-		FieldValue fv2 = new FieldValue();
-		fv2.setIndex(1);
-		fv2.setCode("212");
-		fv2.setValue("Actual");
-		list.add(fv2);
-		return list;
-	}
-
-	private List<FieldValue> getFI() {
-		// TODO: Replace with information from endpoints once it's available
-		List<FieldValue> list = new ArrayList<FieldValue>();
-		FieldValue fv1 = new FieldValue();
-		fv1.setIndex(0);
-		fv1.setCode("101");
-		fv1.setValue("Budget");
-		list.add(fv1);
-		FieldValue fv2 = new FieldValue();
-		fv2.setIndex(1);
-		fv2.setCode("103");
-		fv2.setValue("Dedicated");
-		list.add(fv2);
-		FieldValue fv3 = new FieldValue();
-		fv3.setIndex(2);
-		fv3.setCode("105");
-		fv3.setValue("Project");
-		list.add(fv3);
-		FieldValue fv4 = new FieldValue();
-		fv4.setIndex(3);
-		fv4.setCode("98");
-		fv4.setValue("DPS on Budget");
-		list.add(fv4);
-		return list;
-	}
-
-	private List<FieldValue> getToA() {
-		// TODO: Replace with information from endpoints once it's available
-		List<FieldValue> list = new ArrayList<FieldValue>();
-		FieldValue fv1 = new FieldValue();
-		fv1.setIndex(0);
-		fv1.setCode("80");
-		fv1.setValue("Grant");
-		list.add(fv1);
-		FieldValue fv2 = new FieldValue();
-		fv2.setIndex(1);
-		fv2.setCode("82");
-		fv2.setValue("Loan");
-		list.add(fv2);
-		FieldValue fv3 = new FieldValue();
-		fv3.setIndex(2);
-		fv3.setCode("145");
-		fv3.setValue("Debt Relief");
-		list.add(fv3);
-		FieldValue fv4 = new FieldValue();
-		fv4.setIndex(3);
-		fv4.setCode("219");
-		fv4.setValue("Government Funds");
-		list.add(fv4);
-		return list;
-	}
-
 	private List<FieldValue> getCodeListValues(String codeListName) {
 		String result = "";
 		List<FieldValue> possibleValues = new ArrayList<FieldValue>();
@@ -227,7 +160,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			}
 
 		} catch (Exception e) {
-			log.error("Couldn't retrieve values from Endpoint. Exception: " + e.getMessage());
+			log.error("Couldn't retrieve values from Endpoint. Exception: " + e.getMessage() + ", URL:" + codeListName);
 		}
 
 		return possibleValues;
@@ -351,12 +284,19 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 		JsonBean project = new JsonBean();
 		// Mandatory Fields
-		project.set("project_code", source.getIdentifier());
+		project.set("project_code", source.getIdentifier() + System.currentTimeMillis());
 		// project.set("project_title",
 		// source.getMultilangFields().get("title"));
 		Map<String, String> title = new HashMap<String, String>();
 		title.put("en", System.currentTimeMillis() + "");
 		project.set("project_title", title);
+		
+		
+		Field adjustmentType = this.getFields().stream().filter(n -> {
+			return n.getFieldName().equals("adjustment_type");
+		}).findFirst().get();
+		
+		String adjustmentTypeValue = adjustmentType.getPossibleValues().stream().filter(n -> { return n.getValue().equals("Actual");}).findFirst().get().getCode();
 		// List of selected fields
 		for (FieldMapping mapping : fieldMapping) {
 			Field sourceField = mapping.getSourceField();
@@ -383,7 +323,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				project.set(destinationField.getFieldName(), getString(source, mapping));
 				break;
 			case TRANSACTION:
-				project.set("fundings", getTransaction(source, fieldMapping, mapping));
+				project.set("fundings", getTransaction(source, fieldMapping, mapping, adjustmentTypeValue));
 				break;
 			case ORGANIZATION:
 				// TODO: Implement Organization. For now only Funding
@@ -393,15 +333,14 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				break;
 			}
 		}
-		//System.out.println("Result:" + project.toString());
+		// System.out.println("Result:" + project.toString());
 
 		ActionResult result;
 
 		RestTemplate restTemplate = getRestTemplate();
 		try {
-			// String resultPost = restTemplate.postForObject(baseURL +
-			// "/rest/activity", project, String.class);
-			String resultPost = "";
+			//String resultPost = restTemplate.postForObject(baseURL + "/rest/activity", project, String.class);
+			 String resultPost = "";
 			ObjectMapper mapper = new ObjectMapper();
 			JsonNode jsonNode;
 			jsonNode = mapper.readTree(resultPost);
@@ -425,17 +364,18 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		return result;
 	}
 
-	private List<JsonBean> getTransaction(InternalDocument source, List<FieldMapping> fieldMapping, FieldMapping valueMapping) {
+	private List<JsonBean> getTransaction(InternalDocument source, List<FieldMapping> fieldMapping, FieldMapping valueMapping, String adjustmentTypeValue) {
 		List<JsonBean> fundingDetails = new ArrayList<JsonBean>();
 		Map<String, Map<String, String>> transactions = source.getTransactionFields();
 		transactions.forEach((key, value) -> {
-			System.out.println(key);
-			System.out.println(value);
+			System.out.println("Key:" + key);
+			System.out.println("Value:" + value);
 		});
+		
 		JsonBean fundingDetail = new JsonBean();
 		// getCodeFromList(source, valueMapping);
 		fundingDetail.set("transaction_type", 1);
-		fundingDetail.set("adjustment_type", 212);
+		fundingDetail.set("adjustment_type", adjustmentTypeValue);
 		fundingDetail.set("transaction_date", "2011-08-25T00:00:00.000-0300");
 		fundingDetail.set("currency", 10);
 		fundingDetail.set("transaction_amount", 100000);
@@ -453,27 +393,6 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		return fundings;
 	}
 
-	private List<JsonBean> getTransactionForReal(InternalDocument source, List<FieldMapping> fieldMapping, FieldMapping valueMapping) {
-		List<JsonBean> fundingDetails = new ArrayList<JsonBean>();
-		JsonBean fundingDetail = new JsonBean();
-		// getCodeFromList(source, valueMapping);
-		fundingDetail.set("transaction_type", 1);
-		fundingDetail.set("adjustment_type", 212);
-		fundingDetail.set("transaction_date", "2011-08-25T00:00:00.000-0300");
-		fundingDetail.set("currency", 10);
-		fundingDetail.set("transaction_amount", 100000);
-
-		fundingDetails.add(fundingDetail);
-		List<JsonBean> fundings = new ArrayList<JsonBean>();
-		JsonBean funding = new JsonBean();
-		funding.set("donor_organization_id", 38);
-		funding.set("type_of_assistance", 80);
-		funding.set("financal_instrument", 87);
-		funding.set("funding_details", fundingDetails);
-		fundings.add(funding);
-
-		return fundings;
-	}
 
 	private String getString(InternalDocument source, FieldMapping mapping) {
 		return source.getStringFields().get(mapping.getSourceField().getFieldName());
