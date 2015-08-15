@@ -134,10 +134,10 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 	}
 
+
 	private List<FieldValue> getCodeListValues(String codeListName) {
 		String result = "";
 		List<FieldValue> possibleValues = new ArrayList<FieldValue>();
-		RestTemplate restTemplate = getRestTemplate();
 		result = restTemplate.getForObject(baseURL + this.getFieldsEndpoint() + "/" + codeListName, String.class);
 
 		try {
@@ -162,7 +162,6 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		} catch (Exception e) {
 			log.error("Couldn't retrieve values from Endpoint. Exception: " + e.getMessage() + ", URL:" + codeListName);
 		}
-
 		return possibleValues;
 	}
 
@@ -392,7 +391,6 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 		return fundings;
 	}
-
 
 	private String getString(InternalDocument source, FieldMapping mapping) {
 		return source.getStringFields().get(mapping.getSourceField().getFieldName());

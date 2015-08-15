@@ -109,7 +109,7 @@ class ImportController {
 		request.getSession().removeAttribute(AUTH_TOKEN);
 		request.getSession().removeAttribute(DOCUMENT_MAPPER);
 		try {
-			repository.deleteAll();
+			//repository.deleteAll();
 			// Iterable<File> list = repository.findAll();
 			// repository.delete(list);
 		} catch (Exception e) {

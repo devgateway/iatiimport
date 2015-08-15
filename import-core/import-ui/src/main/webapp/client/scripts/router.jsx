@@ -15,6 +15,9 @@ var ChooseFields = require('./components/wizard/choose-fields');
 var MapValues = require('./components/wizard/map-values');
 var MapValuesTab = require('./components/wizard/map-values-table');
 var Import = require('./components/wizard/review-import');
+var Reports = require('./components/reports/index');
+var ImportList = require('./components/reports/import-list');
+var ImportLog = require('./components/reports/import-log');
 
 var routes = (
 	<Route name="layout" path="/" handler={Home}>
@@ -28,7 +31,11 @@ var routes = (
 			</Route>			
 			<Route name="import" path="import" handler={Import}/>		  
 		</Route>
-		
+		<Route path="reports" handler = {Reports}>
+		   <Route name="previousimports" path="previousimports" handler={ImportList}/>
+		   <Route name="importlog" path="importlog/:id" handler={ImportLog}/>
+		</Route>
+			
 	</Route>
 );
 
