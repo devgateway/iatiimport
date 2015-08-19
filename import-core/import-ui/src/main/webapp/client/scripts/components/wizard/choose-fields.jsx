@@ -4,11 +4,15 @@ var Reflux = require('reflux');
 var appActions = require('./../../actions');
 var Router = require('react-router');
 var Link = Router.Link;
+var SaveMappingsDialog = require('./save-mappings-dlg.jsx');
+var FieldMappingsDropdown = require('./field-mappings-dropdown.jsx');
 var CustomSelect = require('./custom-select');
 var destinationFieldsStore = require('./../../stores/DestinationFieldsStore');
 var sourceFieldsStore = require('./../../stores/SourceFieldsStore');
 var fieldMappingStore = require('./../../stores/FieldMappingStore');
+var fieldMappingTemplateStore = require('./../../stores/FieldMappingTemplateStore');
 var _ = require('lodash/dist/lodash.underscore');
+var formActions = require('./../../actions/form');
 
 var ChooseFields = React.createClass({
     mixins: [Reflux.ListenerMixin],
@@ -140,6 +144,12 @@ var ChooseFields = React.createClass({
             this.forceUpdate();
         }
     },
+    saveMappings: function(){     
+     formActions.saveFieldMappingsTemplate(this.state.mappingFieldsData).then(function() {
+        this.forceUpdate();
+        $('#saveMapFields').hide();     
+     }.bind(this));
+    },
     render: function() {
         var rows = [];
         if (this.state.destinationFieldsData && this.state.sourceFieldsData) {  
@@ -175,18 +185,7 @@ var ChooseFields = React.createClass({
             <div className="panel panel-default">
                 <div className="panel-heading"><strong>{this.props.i18nLib.t('wizard.map_fields.choose_map_fields')}</strong></div>
                 <div className="panel-body">
-                    <ul className="nav nav-pills navbar-right">
-                        <li className="dropdown" role="presentation">
-                            <a aria-expanded="false" className="dropdown-toggle" data-toggle="dropdown" href="#" role="button">
-                                {this.props.i18nLib.t('wizard.map_fields.load_existing_template')}
-                                <span className="caret"></span>
-                            </a>
-                            <ul className="dropdown-menu" role="menu">
-                                <li role="presentation"><a aria-controls="template1" href="#template1">{this.props.i18nLib.t('wizard.map_fields.usual_field_mapping')}</a></li>
-                                <li role="presentation"><a aria-controls="template2" href="#template2">{this.props.i18nLib.t('wizard.map_fields.other_field_mapping')}</a></li>
-                            </ul>
-                        </li>
-                    </ul>
+                    <FieldMappingsDropdown {...this.props}/>
                     <table className="table">
                         <thead>
                             <tr>
@@ -208,9 +207,10 @@ var ChooseFields = React.createClass({
                     </table>
                 </div>
                 <div className="buttons">
-                    <button className="btn btn-warning navbar-btn btn-custom" type="button">{this.props.i18nLib.t('wizard.map_fields.save')}</button>&nbsp;
+                    <button className="btn btn-warning navbar-btn btn-custom" type="button" data-toggle="modal" data-target="#saveMapFields">{this.props.i18nLib.t('wizard.map_fields.save')}</button>&nbsp;
                     <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.handleNext}>{this.props.i18nLib.t('wizard.map_fields.next')}</button>
                 </div>
+                 <SaveMappingsDialog {...this.props} saveHandler={this.saveMappings} />		 
                 </div>
             ); } }); 
             

@@ -11,7 +11,7 @@ var FieldMappingStore = Reflux.createStore({
 
   init: function() {
     this.listenTo(appActions.loadMappingFieldsData, this.handleLoadMappingFieldsData);
-    this.listenTo(formActions.updateSelectedFields, this.handleUpdateSelectedFields);
+    this.listenTo(formActions.updateSelectedFields, this.handleUpdateSelectedFields);    
   },
   handleUpdateSelectedFields: function(data) {
     var self = this;

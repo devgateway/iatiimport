@@ -8,6 +8,7 @@ var formActions = Reflux.createActions([
 ]);
 
 formActions.updateSelectedFields = Reflux.createAction({ asyncResult: true });
+formActions.saveFieldMappingsTemplate = Reflux.createAction({ asyncResult: true });
 module.exports = formActions;
 
 
