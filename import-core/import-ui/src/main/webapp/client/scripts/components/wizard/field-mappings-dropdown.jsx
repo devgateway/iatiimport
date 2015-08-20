@@ -20,6 +20,9 @@ var FieldMappingsDropdown = React.createClass({
         console.log('Error loading mapping templates')
       }.bind(this)); 
     },
+    loadTemplate: function(e){
+        this.props.loadMappingTemplate(e.target.getAttribute('data-id')); 
+    },
     updateMappingTemplatesData: function(data) {
         this.setState({
             mappingTemplatesData: data
@@ -29,14 +32,14 @@ var FieldMappingsDropdown = React.createClass({
     var templates = [];    
     if(this.state.mappingTemplatesData.length > 0){
      templates = this.state.mappingTemplatesData.map(function(item, index){
-        return <li role="presentation"><a aria-controls="template1" href="#template1">{item.name}</a></li>  
+        return <li role="presentation" className="template-dropdown-item" data-id = {item.id} onClick= {this.loadTemplate}>{item.name}</li>  
      }.bind(this));
     }
       
     return (
           <ul className="nav nav-pills navbar-right">
                         <li className="dropdown" role="presentation">
-                            <a aria-expanded="false" className="dropdown-toggle" data-toggle="dropdown" href="#" role="button">
+                            <a aria-expanded="false" className="dropdown-toggle" data-toggle="dropdown" href="#" role="button" >
                                 {this.props.i18nLib.t('wizard.map_fields.load_existing_template')}
                                 <span className="caret"></span>
                             </a>

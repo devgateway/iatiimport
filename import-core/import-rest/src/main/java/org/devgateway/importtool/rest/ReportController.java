@@ -45,8 +45,7 @@ class ReportController {
 	}
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/projects/{fileId}")
-	public ResponseEntity<Page<Project>> listProjects(Pageable pageable, @PathVariable Long fileId, HttpServletRequest request) {
-		List<Project> projects = new ArrayList<Project>();		
+	public ResponseEntity<Page<Project>> listProjects(Pageable pageable, @PathVariable Long fileId, HttpServletRequest request) {				
 		Page<Project>  list = projectRepository.findByFileId(fileId, pageable);
 		return new ResponseEntity<>(list, HttpStatus.OK);
 	}

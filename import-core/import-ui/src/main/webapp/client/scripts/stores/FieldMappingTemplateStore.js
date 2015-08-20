@@ -11,10 +11,10 @@ var FieldMappingTemplateStore = Reflux.createStore({
   init: function() {    
     this.listenTo(formActions.saveFieldMappingsTemplate, this.handleSaveFieldMappingTemplate);
     this.listenTo(appActions.loadFieldMappingsTemplateList, this.handleLoadFieldMappingsTemplateList);
+    this.listenTo(appActions.loadFieldMappingsById, this.handleLoadFieldMappingsById);
     
   }, 
   handleSaveFieldMappingTemplate: function(data){	
-	  console.log('saving template');
 	  var self = this;
 	    $.ajax({
 	      headers: { 
@@ -41,7 +41,7 @@ var FieldMappingTemplateStore = Reflux.createStore({
 	        'Accept': 'application/json',
 	        'Content-Type': 'application/json' 
 	      },
-	      url: '/mockup/field-mappings-templates.json',
+	      url: '/importer/fieldmappingtemplate/list',
 	      data: JSON.stringify(data),
 	      error: function() {
 	    	  appActions.loadFieldMappingsTemplateList.failed();
@@ -49,6 +49,24 @@ var FieldMappingTemplateStore = Reflux.createStore({
 	      dataType: 'json',
 	      success: function(data) {
 	    	  appActions.loadFieldMappingsTemplateList.completed(data);
+	      },
+	      type: 'GET'
+	    });
+  },
+  handleLoadFieldMappingsById: function(id){	  
+	  var self = this;
+	    $.ajax({
+	      headers: { 
+	        'Accept': 'application/json',
+	        'Content-Type': 'application/json' 
+	      },
+	      url: '/importer/fieldmappingtemplate/'+ id,	      
+	      error: function() {
+	    	  appActions.loadFieldMappingsById.failed();
+	      },
+	      dataType: 'json',
+	      success: function(data) {
+	    	  appActions.loadFieldMappingsById.completed(data);
 	      },
 	      type: 'GET'
 	    });

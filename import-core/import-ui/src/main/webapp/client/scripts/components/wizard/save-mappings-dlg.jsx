@@ -4,7 +4,7 @@ var SaveMappingsDialog = React.createClass({
        return {name: ''};
     },
     saveMappings: function(){     
-      this.props.saveHandler();
+      this.props.saveHandler(this.state.name);
     },
     handleNameChange(e){
       this.setState({

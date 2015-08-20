@@ -13,6 +13,7 @@ var fieldMappingStore = require('./../../stores/FieldMappingStore');
 var fieldMappingTemplateStore = require('./../../stores/FieldMappingTemplateStore');
 var _ = require('lodash/dist/lodash.underscore');
 var formActions = require('./../../actions/form');
+var appActions = require('./../../actions');
 
 var ChooseFields = React.createClass({
     mixins: [Reflux.ListenerMixin],
@@ -144,9 +145,18 @@ var ChooseFields = React.createClass({
             this.forceUpdate();
         }
     },
-    saveMappings: function(){     
-     formActions.saveFieldMappingsTemplate(this.state.mappingFieldsData).then(function() {
+    saveMappings: function(name){     
+     formActions.saveFieldMappingsTemplate({fieldMapping:this.state.mappingFieldsData, name:name}).then(function() {
         this.forceUpdate();
+        $('#saveMapFields').hide();     
+     }.bind(this));
+    },
+    loadMappingTemplate: function(id){     
+     appActions.loadFieldMappingsById(id).then(function(data) {           
+           this.setState({
+                mappingFieldsData: data.fieldMapping
+            });            
+            this.forceUpdate();
         $('#saveMapFields').hide();     
      }.bind(this));
     },
@@ -185,7 +195,7 @@ var ChooseFields = React.createClass({
             <div className="panel panel-default">
                 <div className="panel-heading"><strong>{this.props.i18nLib.t('wizard.map_fields.choose_map_fields')}</strong></div>
                 <div className="panel-body">
-                    <FieldMappingsDropdown {...this.props}/>
+                    <FieldMappingsDropdown {...this.props} loadMappingTemplate = {this.loadMappingTemplate} />
                     <table className="table">
                         <thead>
                             <tr>
