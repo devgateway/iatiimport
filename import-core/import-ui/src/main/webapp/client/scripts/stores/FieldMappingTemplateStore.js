@@ -24,11 +24,11 @@ var FieldMappingTemplateStore = Reflux.createStore({
 	      url: '/importer/fieldmappingtemplate/save',
 	      data: JSON.stringify(data),
 	      error: function() {
-	        formActions.saveFieldMappingsTemplate.failed();
+	    	formActions.saveFieldMappingsTemplate.failed();
 	      },
 	      dataType: 'json',
 	      success: function(data) {
-	        formActions.saveFieldMappingsTemplate.completed(data);
+	    	 formActions.saveFieldMappingsTemplate.completed(data);
 	      },
 	      type: 'POST'
 	    });

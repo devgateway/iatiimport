@@ -145,30 +145,21 @@ var ChooseFields = React.createClass({
             this.forceUpdate();
         }
     },
-    saveMappings: function(name){     
-     formActions.saveFieldMappingsTemplate({fieldMapping:this.state.mappingFieldsData, name:name}).then(function() {
-        this.forceUpdate();
-        $('#saveMapFields').hide();     
-     }.bind(this));
-    },
     loadMappingTemplate: function(id){     
      appActions.loadFieldMappingsById(id).then(function(data) {           
            this.setState({
                 mappingFieldsData: data.fieldMapping
             });            
-            this.forceUpdate();
-        $('#saveMapFields').hide();     
+            this.forceUpdate();             
      }.bind(this));
-    },
+    },    
     render: function() {
         var rows = [];
-        if (this.state.destinationFieldsData && this.state.sourceFieldsData) {  
-           
+        if (this.state.destinationFieldsData && this.state.sourceFieldsData) {             
            $.map(this.state.sourceFieldsData, function(item, i) {
                 var options = this.getOptions(item);
                 if(item.mappable) {
                     var selected = _.some(this.state.mappingFieldsData, function(v) { return item.uniqueFieldName == v.sourceField.uniqueFieldName});				
-					
                     var mapping = _.find(this.state.mappingFieldsData, function(v) { return item.uniqueFieldName == v.sourceField.uniqueFieldName});
                     var value = "";
                     if(mapping && mapping.destinationField) {					    
@@ -220,7 +211,7 @@ var ChooseFields = React.createClass({
                     <button className="btn btn-warning navbar-btn btn-custom" type="button" data-toggle="modal" data-target="#saveMapFields">{this.props.i18nLib.t('wizard.map_fields.save')}</button>&nbsp;
                     <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.handleNext}>{this.props.i18nLib.t('wizard.map_fields.next')}</button>
                 </div>
-                 <SaveMappingsDialog {...this.props} saveHandler={this.saveMappings} />		 
+                 <SaveMappingsDialog {...this.props} mappingFieldsData = {this.state.mappingFieldsData} />		 
                 </div>
             ); } }); 
             

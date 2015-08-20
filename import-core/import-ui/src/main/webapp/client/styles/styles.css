@@ -288,4 +288,5 @@
 
 .template-dropdown-item{
 	padding: 3px 20px;
+	cursor: pointer;
 }

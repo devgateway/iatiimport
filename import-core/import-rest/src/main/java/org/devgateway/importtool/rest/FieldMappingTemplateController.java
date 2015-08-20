@@ -52,12 +52,14 @@ class FieldMappingTemplateController {
 		try{
 		   String mapping = mapper.writeValueAsString(fieldMappingTemplateRequest.getFieldMapping());
 		   fieldMappingTemplate.setMappingTemplate(mapping);
-		}catch(JsonProcessingException jse){
-			jse.printStackTrace();
+		   fieldMappingTemplateRepository.save(fieldMappingTemplate);		
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>("{\"error\": \"Error saving template.\"}",HttpStatus.OK);
 		}
 		
-		fieldMappingTemplateRepository.save(fieldMappingTemplate);
-		return new ResponseEntity<>("Saved", HttpStatus.OK);
+		
+		return new ResponseEntity<>("{}", HttpStatus.OK);
 	}
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/list")

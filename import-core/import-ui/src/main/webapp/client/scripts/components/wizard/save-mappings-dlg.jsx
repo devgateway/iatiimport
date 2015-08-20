@@ -1,15 +1,30 @@
 var React = require('react');
+var formActions = require('./../../actions/form');
 var SaveMappingsDialog = React.createClass({
     getInitialState: function() {
        return {name: ''};
     },
-    saveMappings: function(){     
-      this.props.saveHandler(this.state.name);
+    saveMappings: function(){       
+     formActions.saveFieldMappingsTemplate({fieldMapping:this.props.mappingFieldsData, name:this.state.name}).then(function(data) {
+        if(data.error){
+           this.displayError("Error saving template");
+        }else{          
+            this.props.refreshParent();
+            $('#saveMapFields').modal('hide');
+        }            
+     }.bind(this)).catch(function(err) {
+        this.displayError("Error saving template");
+        console.log("Error saving template");
+     }.bind(this));
     },
     handleNameChange(e){
-      this.setState({
-            name: e.target.value
-        });       
+       this.setState({name: e.target.value});       
+    },
+    displayError: function(msg){      
+	     $(this.refs.message.getDOMNode()).html(msg);     
+	     var box = $(this.refs.messageBox.getDOMNode());
+	     box.show();
+	     box.fadeOut({duration:10000});     
     },
     render: function () {
     return (
@@ -21,6 +36,11 @@ var SaveMappingsDialog = React.createClass({
 			        <h4 className="modal-title" id="myModalLabel2">Save Mapping</h4>
 			      </div>
 			      <div className="modal-body">
+			      <div className="alert alert-danger message-box" role="alert" ref="messageBox">
+                   <span className="glyphicon glyphicon-exclamation-sign error-box" aria-hidden="true"></span>
+                    <span className="sr-only">Error:</span>
+                      <span ref="message"></span>
+                   </div>
 			        Mapping Name: <input ref="mappingsName" type="text" onChange = {this.handleNameChange} />
 			      </div>
 			      <div className="modal-footer">
