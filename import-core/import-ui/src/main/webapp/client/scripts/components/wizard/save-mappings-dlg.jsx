@@ -9,7 +9,7 @@ var SaveMappingsDialog = React.createClass({
         if(data.error){
            this.displayError("Error saving template");
         }else{          
-            this.props.refreshParent();
+            this.props.reloadTemplateData();
             $('#saveMapFields').modal('hide');
         }            
      }.bind(this)).catch(function(err) {

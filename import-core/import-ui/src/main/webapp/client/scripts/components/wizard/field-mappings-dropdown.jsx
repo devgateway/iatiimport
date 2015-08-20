@@ -1,37 +1,22 @@
 var React = require('react');
-var fieldMappingTemplateStore = require('./../../stores/FieldMappingTemplateStore');
+
 var Reflux = require('reflux');
 var reactAsync = require('react-async');
 var appActions = require('./../../actions');
 var FieldMappingsDropdown = React.createClass({
     mixins: [Reflux.ListenerMixin],
     getInitialState: function() {
-       return {mappingTemplatesData:[]};
+       return {};
     },  
-    componentDidMount: function() {     
-        this.listenTo(fieldMappingTemplateStore, this.updateMappingTemplatesData);
-        this.loadData();
-    },
-    loadData: function(){        
-      appActions.loadFieldMappingsTemplateList.triggerPromise().then(function(data) {                              
-        this.updateMappingTemplatesData(data); 
-      }.bind(this)).catch(function(err) { 
-        console.log(err);      
-        console.log('Error loading mapping templates')
-      }.bind(this)); 
-    },
+    componentDidMount: function() {        
+    },    
     loadTemplate: function(e){
         this.props.loadMappingTemplate(e.target.getAttribute('data-id')); 
-    },
-    updateMappingTemplatesData: function(data) {
-        this.setState({
-            mappingTemplatesData: data
-        });
-    }, 
+    },    
     render: function () {
     var templates = [];    
-    if(this.state.mappingTemplatesData.length > 0){
-     templates = this.state.mappingTemplatesData.map(function(item, index){
+    if(this.props.mappingTemplatesData.length > 0){
+     templates = this.props.mappingTemplatesData.map(function(item, index){
         return <li role="presentation" className="template-dropdown-item" data-id = {item.id} onClick= {this.loadTemplate}>{item.name}</li>  
      }.bind(this));
     }

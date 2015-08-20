@@ -13,12 +13,13 @@ var fieldMappingStore = require('./../../stores/FieldMappingStore');
 var fieldMappingTemplateStore = require('./../../stores/FieldMappingTemplateStore');
 var _ = require('lodash/dist/lodash.underscore');
 var formActions = require('./../../actions/form');
+
 var appActions = require('./../../actions');
 
 var ChooseFields = React.createClass({
     mixins: [Reflux.ListenerMixin],
     getInitialState: function() {
-       return {sourceFieldsData:[], destinationFieldsData:[], mappingFieldsData:[]};
+       return {sourceFieldsData:[], destinationFieldsData:[], mappingFieldsData:[],mappingTemplatesData:[]};
     },
     destDataLoaded:false,
     sourceDataLoaded:false,
@@ -28,6 +29,7 @@ var ChooseFields = React.createClass({
         this.listenTo(destinationFieldsStore, this.updateDestinationFields);
         this.listenTo(sourceFieldsStore, this.updateSourceFields);
         this.listenTo(fieldMappingStore, this.updateFieldMappingStore);
+        this.listenTo(fieldMappingTemplateStore, this.updateMappingTemplatesData);
         this.loadData();
     },    
     updateSourceFields: function(data) {
@@ -44,7 +46,12 @@ var ChooseFields = React.createClass({
         this.setState({
             mappingFieldsData: data
         });
-    }, 
+    },
+    updateMappingTemplatesData: function(data) {
+        this.setState({
+            mappingTemplatesData: data
+        });
+    },  
     clearFlags: function(){
         this.destDataLoaded = false;
         this.sourceDataLoaded = false;
@@ -95,6 +102,13 @@ var ChooseFields = React.createClass({
         this.hideLoadingIcon();       
         this.errorMsg += " Error retrieving field mappings.";  
         this.displayError();       
+      }.bind(this));
+      
+      appActions.loadFieldMappingsTemplateList.triggerPromise().then(function(data) {                              
+        this.updateMappingTemplatesData(data); 
+      }.bind(this)).catch(function(err) { 
+        console.log(err);      
+        console.log('Error loading mapping templates')
       }.bind(this));
     },  
     selectFieldMapping: function(event){
@@ -152,7 +166,15 @@ var ChooseFields = React.createClass({
             });            
             this.forceUpdate();             
      }.bind(this));
-    },    
+    },  
+    reloadTemplateData: function(){
+        appActions.loadFieldMappingsTemplateList.triggerPromise().then(function(data) {                              
+        this.updateMappingTemplatesData(data); 
+      }.bind(this)).catch(function(err) { 
+        console.log(err);      
+        console.log('Error loading mapping templates')
+      }.bind(this));
+    },  
     render: function() {
         var rows = [];
         if (this.state.destinationFieldsData && this.state.sourceFieldsData) {             
@@ -186,7 +208,7 @@ var ChooseFields = React.createClass({
             <div className="panel panel-default">
                 <div className="panel-heading"><strong>{this.props.i18nLib.t('wizard.map_fields.choose_map_fields')}</strong></div>
                 <div className="panel-body">
-                    <FieldMappingsDropdown {...this.props} loadMappingTemplate = {this.loadMappingTemplate} />
+                    <FieldMappingsDropdown {...this.props} mappingTemplatesData = {this.state.mappingTemplatesData} loadMappingTemplate = {this.loadMappingTemplate} />
                     <table className="table">
                         <thead>
                             <tr>
@@ -211,7 +233,7 @@ var ChooseFields = React.createClass({
                     <button className="btn btn-warning navbar-btn btn-custom" type="button" data-toggle="modal" data-target="#saveMapFields">{this.props.i18nLib.t('wizard.map_fields.save')}</button>&nbsp;
                     <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.handleNext}>{this.props.i18nLib.t('wizard.map_fields.next')}</button>
                 </div>
-                 <SaveMappingsDialog {...this.props} mappingFieldsData = {this.state.mappingFieldsData} />		 
+                 <SaveMappingsDialog {...this.props} reloadTemplateData = {this.reloadTemplateData} mappingFieldsData = {this.state.mappingFieldsData} />		 
                 </div>
             ); } }); 
             
