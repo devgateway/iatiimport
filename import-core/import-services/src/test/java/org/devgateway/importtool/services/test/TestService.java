@@ -78,6 +78,7 @@ public class TestService {
 		Assert.assertEquals(matched, true);
 	}
 
+	@SuppressWarnings("unused")
 	@Test
 	public void testKosovoImport() throws Throwable {
 		// Select type of Source -> Destination process
@@ -173,6 +174,7 @@ public class TestService {
 	}
 
 	// @Test
+	@SuppressWarnings("unused")
 	public void testActivityStatusImport() throws Throwable {
 		// Select type of Source -> Destination process
 		ISourceProcessor sourceProcessor = new IATI201Processor();

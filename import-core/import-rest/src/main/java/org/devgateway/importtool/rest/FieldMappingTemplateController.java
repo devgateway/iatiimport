@@ -2,10 +2,8 @@ package org.devgateway.importtool.rest;
 
 
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,21 +17,14 @@ import org.devgateway.importtool.services.request.FieldMappingTemplateRequest;
 import org.devgateway.importtool.services.response.FieldMappingTemplateReponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.core.JsonProcessingException;
-
-import java.io.IOException;
 
 @RestController
 @RequestMapping(value = "/importer/fieldmappingtemplate")
@@ -54,6 +45,7 @@ class FieldMappingTemplateController {
 		   fieldMappingTemplate.setMappingTemplate(mapping);
 		   fieldMappingTemplateRepository.save(fieldMappingTemplate);		
 		} catch (Exception e) {
+			log.error(e.getMessage());
 			e.printStackTrace();
 			return new ResponseEntity<>("{\"error\": \"Error saving template.\"}",HttpStatus.OK);
 		}
@@ -84,6 +76,7 @@ class FieldMappingTemplateController {
 			List<FieldMapping> fieldMappings = mapper.readValue(fieldMappingTemplate.getMappingTemplate(), mapper.getTypeFactory().constructCollectionType(List.class, FieldMapping.class));
 			fieldMappingTemplateReponse.setFieldMapping(fieldMappings);
 	     }catch(IOException ioex){
+				log.error(ioex.getMessage());
 				ioex.printStackTrace();
 		}			
 	    fieldMappingTemplateReponse.setId(fieldMappingTemplate.getId());
