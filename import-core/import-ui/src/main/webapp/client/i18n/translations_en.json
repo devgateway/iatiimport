@@ -65,6 +65,7 @@
             },
             'map_values' : {
                 'map_field_values' : 'Map Fields Values',
+                'empty_list' : 'No mappable fields',
                 'save' : 'Save',
                 'update' : 'Update',
                 'next' : 'Next >>',

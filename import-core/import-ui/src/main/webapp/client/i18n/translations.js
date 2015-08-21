@@ -71,6 +71,7 @@ module.exports = {
 					},
 					'map_values' : {
 						'map_field_values' : 'Map Fields Values',
+						'empty_list' : 'No mappable fields',
 						'save' : 'Save',
 						'update' : 'Update',
 						'next' : 'Next >>',
@@ -160,6 +161,7 @@ module.exports = {
 					},
 					'map_values' : {
 						'map_field_values' : 'Plan valeurs des champs',
+						'empty_list' : 'No mappable fields',
 						'save' : 'Sauvegarder',
 						'update' : 'Mise À Jour',
 						'next' : 'Suivant >>',
