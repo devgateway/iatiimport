@@ -24,7 +24,8 @@ var Content = React.createClass({
     this.setState({
         destinationSessionData: data.sessionData
     });
-    appConfig.DESTINATION_AUTH_TOKEN = this.state.destinationSessionData.token
+    appConfig.DESTINATION_AUTH_TOKEN = this.state.destinationSessionData.token;
+    appConfig.DESTINATION_USERNAME = this.state.destinationSessionData['user-name'];
   },
   updateSession : function (data) {
       this.setState({
