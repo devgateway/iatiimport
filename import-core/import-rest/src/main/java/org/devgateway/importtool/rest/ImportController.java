@@ -2,7 +2,7 @@ package org.devgateway.importtool.rest;
 
 import static org.devgateway.importtool.services.processor.helper.Constants.DESTINATION_PROCESSOR;
 import static org.devgateway.importtool.services.processor.helper.Constants.SOURCE_PROCESSOR;
-import static org.devgateway.importtool.services.processor.helper.Constants.AUTH_TOKEN;
+import static org.devgateway.importtool.services.processor.helper.Constants.SESSION_TOKEN;
 import static org.devgateway.importtool.services.processor.helper.Constants.DOCUMENT_MAPPER;
 
 import java.io.ByteArrayInputStream;
@@ -45,57 +45,36 @@ class ImportController {
 
 	@Autowired
 	private FileRepository repository;
-	
+
 	private Log log = LogFactory.getLog(getClass());
 
-	@RequestMapping(method = RequestMethod.GET, value = "/new/{sourceProcessorName}/{destinationProcessorName}/{authenticationToken}")
-	ResponseEntity<AuthenticationToken> initiateImport(
-			@PathVariable String sourceProcessorName,
-			@PathVariable String destinationProcessorName,
-			@PathVariable String authenticationToken, HttpServletRequest request) {
-		ISourceProcessor srcProcessor;
-		log.debug("Initializing srcProcessor.");
-		if (request.getSession().getAttribute(SOURCE_PROCESSOR) == null) {
-			log.debug("Creating new processor and putting it in session.");
-			srcProcessor = getSourceProcessor(sourceProcessorName);
-			request.getSession().setAttribute(SOURCE_PROCESSOR, srcProcessor);
-		} else {
-			log.debug("Already in session.");
-			srcProcessor = (ISourceProcessor) request.getSession()
-					.getAttribute(SOURCE_PROCESSOR);
-		}
-		log.debug(srcProcessor);
+	@RequestMapping(method = RequestMethod.GET, value = "/new/{sourceProcessorName}/{destinationProcessorName}/{authenticationToken}/{userName}")
+	ResponseEntity<ImportSessionToken> initiateImport(@PathVariable String sourceProcessorName, @PathVariable String destinationProcessorName, @PathVariable String authenticationToken, @PathVariable String userName, HttpServletRequest request) {
+		log.debug("Initialized import");
+		request.getSession().removeAttribute(SOURCE_PROCESSOR);
+		request.getSession().removeAttribute(DESTINATION_PROCESSOR);
+		request.getSession().removeAttribute(SESSION_TOKEN);
+		request.getSession().removeAttribute(DOCUMENT_MAPPER);
+		ISourceProcessor srcProcessor = getSourceProcessor(sourceProcessorName);
+		request.getSession().setAttribute(SOURCE_PROCESSOR, srcProcessor);
 
-		log.debug("Initializing destProcessor:");
 		IDestinationProcessor destProcessor = getDestinationProcessor(destinationProcessorName, authenticationToken);
-		log.debug(destProcessor);
-		
 		request.getSession().setAttribute(DESTINATION_PROCESSOR, destProcessor);
 
-		AuthenticationToken authObject = new AuthenticationToken(
-				authenticationToken, new Date(),
-				srcProcessor.getDescriptiveName(),
-				destProcessor.getDescriptiveName());
-		request.getSession().setAttribute(AUTH_TOKEN, authObject);
+		ImportSessionToken importSessionToken = new ImportSessionToken(authenticationToken, userName, new Date(), srcProcessor.getDescriptiveName(), destProcessor.getDescriptiveName());
+		request.getSession().setAttribute(SESSION_TOKEN, importSessionToken);
 
-		return new ResponseEntity<>(authObject, HttpStatus.OK);
-	}
-
-	@RequestMapping(method = RequestMethod.GET, value = "/new/{sourceProcessorName}/{destinationProcessorName}")
-	ResponseEntity<String> initiateImport() {
-
-		return new ResponseEntity<>("{}", HttpStatus.OK);
+		return new ResponseEntity<>(importSessionToken, HttpStatus.OK);
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/uploaded")
 	public ResponseEntity<List<File>> listFiles(HttpServletRequest request) {
 		List<File> fileList = new ArrayList<File>();
-		AuthenticationToken authToken = (AuthenticationToken) request
-				.getSession().getAttribute(AUTH_TOKEN);
-		if (repository == null || authToken == null)
+		ImportSessionToken importSessionToken = (ImportSessionToken) request.getSession().getAttribute(SESSION_TOKEN);
+		if (repository == null || importSessionToken == null) {
 			return new ResponseEntity<>(fileList, HttpStatus.OK);
-		Iterable<File> list = repository.findByAuthor(authToken
-				.getAuthenticationToken());
+		}
+		Iterable<File> list = repository.findBySessionId(importSessionToken.getImportTokenSessionId());
 		list.forEach(n -> {
 			fileList.add(n);
 		});
@@ -106,71 +85,58 @@ class ImportController {
 	public ResponseEntity<String> wipe(HttpServletRequest request) {
 		request.getSession().removeAttribute(SOURCE_PROCESSOR);
 		request.getSession().removeAttribute(DESTINATION_PROCESSOR);
-		request.getSession().removeAttribute(AUTH_TOKEN);
+		request.getSession().removeAttribute(SESSION_TOKEN);
 		request.getSession().removeAttribute(DOCUMENT_MAPPER);
 		try {
-			//repository.deleteAll();
+			// repository.deleteAll();
 			// Iterable<File> list = repository.findAll();
 			// repository.delete(list);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return new ResponseEntity<>(
-					"{ 'error': ' " + e.getMessage() + "'}",
-					HttpStatus.SERVICE_UNAVAILABLE);
+			return new ResponseEntity<>("{ 'error': ' " + e.getMessage() + "'}", HttpStatus.SERVICE_UNAVAILABLE);
 		}
 		return new ResponseEntity<>("{'error': ''}", HttpStatus.OK);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/upload")
-	public ResponseEntity<String> handleFileUpload(
-			@RequestParam("file_data") MultipartFile file,
-			HttpServletRequest request) {
+	public ResponseEntity<String> handleFileUpload(@RequestParam("file_data") MultipartFile file, HttpServletRequest request) {
 		if (!file.isEmpty()) {
 			try {
 				InputStream is = new ByteArrayInputStream(file.getBytes());
-				ISourceProcessor srcProcessor = (ISourceProcessor) request
-						.getSession().getAttribute(SOURCE_PROCESSOR);
-				AuthenticationToken authToken = (AuthenticationToken) request
-						.getSession().getAttribute(AUTH_TOKEN);
+				ISourceProcessor srcProcessor = (ISourceProcessor) request.getSession().getAttribute(SOURCE_PROCESSOR);
+				ImportSessionToken authToken = (ImportSessionToken) request.getSession().getAttribute(SESSION_TOKEN);
 				srcProcessor.setInput(is);
 				File uploadedFile = new File();
 				uploadedFile.setData(file.getBytes());
 				uploadedFile.setCreatedDate(new Date());
 				uploadedFile.setFileName(file.getOriginalFilename());
 				uploadedFile.setAuthor(authToken.getAuthenticationToken());
+				uploadedFile.setSessionId(authToken.getImportTokenSessionId());
 
 				repository.save(uploadedFile);
 
 				return new ResponseEntity<>("{}", HttpStatus.OK);
 			} catch (Exception e) {
 				e.printStackTrace();
-				return new ResponseEntity<>(
-						"{\"error\": \"Error uploading file. Check if the initial steps are done.\"}",
-						HttpStatus.OK);
+				return new ResponseEntity<>("{\"error\": \"Error uploading file. Check if the initial steps are done.\"}", HttpStatus.OK);
 			}
 		} else {
-			return new ResponseEntity<>(
-					"{\"error\": \"Error uploading file.\"}", HttpStatus.OK);
+			return new ResponseEntity<>("{\"error\": \"Error uploading file.\"}", HttpStatus.OK);
 		}
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/filter")
-	ResponseEntity<AuthenticationToken> filter(
-			@PathVariable String authenticationToken) {
-		AuthenticationToken authObject = new AuthenticationToken(
-				authenticationToken, new Date(), "", null);
+	ResponseEntity<ImportSessionToken> filter(@PathVariable String authenticationToken) {
+		ImportSessionToken authObject = new ImportSessionToken(authenticationToken,"", new Date(), "", null);
+		//TODO: Execute the filters
 		return new ResponseEntity<>(authObject, HttpStatus.OK);
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/projects")
-	ResponseEntity<List<DocumentMapping>> processedProjects(
-			HttpServletRequest request) {
-		ISourceProcessor srcProcessor = (ISourceProcessor) request.getSession()
-				.getAttribute(SOURCE_PROCESSOR);
-		IDestinationProcessor destProcessor = (IDestinationProcessor) request
-				.getSession().getAttribute(DESTINATION_PROCESSOR);
-		IDocumentMapper documentMapper = (IDocumentMapper) request.getSession()
-				.getAttribute(DOCUMENT_MAPPER);
+	ResponseEntity<List<DocumentMapping>> processedProjects(HttpServletRequest request) {
+		ISourceProcessor srcProcessor = (ISourceProcessor) request.getSession().getAttribute(SOURCE_PROCESSOR);
+		IDestinationProcessor destProcessor = (IDestinationProcessor) request.getSession().getAttribute(DESTINATION_PROCESSOR);
+		IDocumentMapper documentMapper = (IDocumentMapper) request.getSession().getAttribute(DOCUMENT_MAPPER);
 		if (documentMapper == null) {
 			documentMapper = new DocumentMapper();
 			request.getSession().setAttribute(DOCUMENT_MAPPER, documentMapper);
@@ -186,26 +152,24 @@ class ImportController {
 			}
 		}
 
-		return new ResponseEntity<>(documentMapper.getDocumentMappings(),
-				HttpStatus.OK);
+		return new ResponseEntity<>(documentMapper.getDocumentMappings(), HttpStatus.OK);
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/execute")
 	ResponseEntity<List<ActionResult>> execute(HttpServletRequest request) {
-		IDocumentMapper documentMapper = (IDocumentMapper) request.getSession()
-				.getAttribute(DOCUMENT_MAPPER);
+		IDocumentMapper documentMapper = (IDocumentMapper) request.getSession().getAttribute(DOCUMENT_MAPPER);
 		if (documentMapper == null) {
 			documentMapper = new DocumentMapper();
 			request.getSession().setAttribute(DOCUMENT_MAPPER, documentMapper);
 		}
 		List<ActionResult> results = documentMapper.execute();
-		
-//		List<ActionResult> results = new ArrayList<ActionResult>();
-//		results.add(new ActionResult("1", "INSERT", "ok", "project 1"));
-//		results.add(new ActionResult("2", "INSERT", "ok", "project 2"));
-//		results.add(new ActionResult("3", "INSERT", "ok", "project 3"));
-//		results.add(new ActionResult("4", "INSERT", "ok", "project 4"));
-//		
+
+		// List<ActionResult> results = new ArrayList<ActionResult>();
+		// results.add(new ActionResult("1", "INSERT", "ok", "project 1"));
+		// results.add(new ActionResult("2", "INSERT", "ok", "project 2"));
+		// results.add(new ActionResult("3", "INSERT", "ok", "project 3"));
+		// results.add(new ActionResult("4", "INSERT", "ok", "project 4"));
+		//
 		return new ResponseEntity<>(results, HttpStatus.OK);
 	}
 

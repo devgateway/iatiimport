@@ -95,6 +95,7 @@ var Wizard = React.createClass({
         'sourceProcessor': sourceProcessor,
         'destinationProcessor': destinationProcessor,
         'authenticationToken': appConfig.DESTINATION_AUTH_TOKEN,
+        'username': appConfig.DESTINATION_USERNAME,
         'host': appConfig.DESTINATION_API_HOST
       });
 

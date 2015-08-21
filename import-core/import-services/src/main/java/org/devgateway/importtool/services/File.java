@@ -1,12 +1,15 @@
 package org.devgateway.importtool.services;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.springframework.hateoas.Identifiable;
 
 import javax.persistence.*;
+
 import java.io.Serializable;
 import java.util.Date;
+import java.util.UUID;
 
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, isGetterVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.ANY)
 @Entity
@@ -28,6 +31,9 @@ public class File implements Identifiable<Long>, Serializable {
 
 	@Column(name = "author")
 	private String author;
+
+	@Column(name = "session_id")
+	private UUID sessionId;
 
 	@Column(name = "created_date")
 	private Date createdDate;
@@ -79,6 +85,14 @@ public class File implements Identifiable<Long>, Serializable {
 
 	public void setAuthor(String author) {
 		this.author = author;
+	}
+
+	public UUID getSessionId() {
+		return sessionId;
+	}
+
+	public void setSessionId(UUID sessionId) {
+		this.sessionId = sessionId;
 	}
 
 }

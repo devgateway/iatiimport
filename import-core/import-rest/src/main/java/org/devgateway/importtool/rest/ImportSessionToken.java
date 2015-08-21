@@ -1,15 +1,20 @@
 package org.devgateway.importtool.rest;
 
 import java.util.Date;
+import java.util.UUID;
 
-public class AuthenticationToken {
+public class ImportSessionToken {
 	private String authenticationToken;
+	private String userName;
 	private Date creationDate;
 	private String sourceProcessorName;
 	private String destinationProcessorName;
+	private UUID importTokenSessionId;
 
-	public AuthenticationToken(String authenticationToken, Date creationDate, String sourceProcessorName, String destinationProcessorName) {
+	public ImportSessionToken(String authenticationToken, String userName, Date creationDate, String sourceProcessorName, String destinationProcessorName) {
+		this.importTokenSessionId = UUID.randomUUID();
 		this.authenticationToken = authenticationToken;
+		this.userName = userName;
 		this.creationDate = creationDate;
 		this.setSourceProcessorName(sourceProcessorName);
 		this.setDestinationProcessorName(destinationProcessorName);
@@ -45,6 +50,18 @@ public class AuthenticationToken {
 
 	public void setDestinationProcessorName(String destinationProcessorName) {
 		this.destinationProcessorName = destinationProcessorName;
+	}
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	public UUID getImportTokenSessionId() {
+		return importTokenSessionId;
 	}
 
 }
