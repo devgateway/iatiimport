@@ -10,17 +10,17 @@ public interface ISourceProcessor {
 
 	public List<Field> getFields();
 
-	public List<InternalDocument> getDocuments();
-
-	public String getIdField();
-
-	public List<String> getLanguages();
-
 	public List<Field> getFilterFields();
-
-	public String getTitleField();
 
 	public void setFilterFields(List<Field> fields);
 
-	//public Boolean isFormatValid();
+	public List<String> getLanguages();
+
+	public List<InternalDocument> getDocuments() throws Exception;
+
+	public String getIdField();
+
+	public String getTitleField();
+
+	public Boolean isFormatValid();
 }

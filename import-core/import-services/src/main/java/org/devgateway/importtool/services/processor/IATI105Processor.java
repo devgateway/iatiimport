@@ -391,4 +391,10 @@ public class IATI105Processor implements ISourceProcessor {
 		filterFieldList = fields;
 	}
 
+	@Override
+	public Boolean isFormatValid() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

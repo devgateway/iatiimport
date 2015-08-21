@@ -124,6 +124,7 @@ public class AMPProcessor implements IDestinationProcessor {
 		return list;
 	}
 
+	@SuppressWarnings("unused")
 	private List<FieldValue> getPossibleValues(String fieldName) {
 		List<FieldValue> list = new ArrayList<FieldValue>();
 		String result = null;

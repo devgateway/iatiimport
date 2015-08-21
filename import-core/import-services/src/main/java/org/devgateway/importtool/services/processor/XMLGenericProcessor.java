@@ -155,4 +155,10 @@ public class XMLGenericProcessor implements ISourceProcessor {
 		
 	}
 
+	@Override
+	public Boolean isFormatValid() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

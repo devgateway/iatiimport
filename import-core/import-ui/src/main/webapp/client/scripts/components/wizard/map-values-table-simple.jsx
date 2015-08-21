@@ -21,8 +21,8 @@ var MappingTableSimple = React.createClass({
            options.push({value:destinationValue.code, label:destinationValue.value});      
        });
        $.each(valuesIndex, function(key, value) {  
-           var sourceValue = _.find(sourceField.possibleValues, function(v){ return v.index == key;})
-           var destinationValue = _.find(destinationField.possibleValues, function(v){ return v.index == value;})
+           var sourceValue = _.find(sourceField.possibleValues, function(v){ return v.index == key;});
+           var destinationValue = _.find(destinationField.possibleValues, function(v){ return v.index == value;});
            var destValue = destinationValue ? destinationValue.code : undefined;
 
            rows.push(<tr key = {key}>

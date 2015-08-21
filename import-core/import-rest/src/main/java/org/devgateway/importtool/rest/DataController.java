@@ -110,7 +110,7 @@ class DataController {
 				FieldValueMapping fvm = new FieldValueMapping();
 				fvm.setSourceField(fieldMapping.getSourceField());
 				fvm.setDestinationField(fieldMapping.getDestinationField());
-				if (fieldMapping.getSourceField().getType() == FieldType.LIST) {
+				if (fieldMapping.getSourceField().getType() == FieldType.LIST || fieldMapping.getSourceField().getType() == FieldType.ORGANIZATION) {
 					Field source = fieldMapping.getSourceField();
 					source.getPossibleValues().stream().forEach(fieldValue -> {
 						fvm.getValueIndexMapping().put(fieldValue.getIndex(), null);
@@ -129,7 +129,7 @@ class DataController {
 					FieldValueMapping fvm = new FieldValueMapping();
 					fvm.setSourceField(fieldMapping.getSourceField());
 					fvm.setDestinationField(fieldMapping.getDestinationField());
-					if (fieldMapping.getSourceField().getType() == FieldType.LIST) {
+					if (fieldMapping.getSourceField().getType() == FieldType.LIST || fieldMapping.getSourceField().getType() == FieldType.ORGANIZATION) {
 						Field source = fieldMapping.getSourceField();
 						source.getPossibleValues().stream().forEach(fieldValue -> {
 							fvm.getValueIndexMapping().put(fieldValue.getIndex(), null);
@@ -205,7 +205,11 @@ class DataController {
 	ResponseEntity<List<InternalDocument>> getSourceProjects(HttpServletRequest request) {
 		List<InternalDocument> docList = new ArrayList<InternalDocument>();
 		ISourceProcessor processor = (ISourceProcessor) request.getSession().getAttribute(SOURCE_PROCESSOR);
-		docList = processor.getDocuments();
+		try {
+			docList = processor.getDocuments();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		return new ResponseEntity<>(docList, HttpStatus.OK);
 	}

@@ -57,7 +57,7 @@ var MapValues = React.createClass({
   render: function() {
     var sourceFields = [];
     var message = "";
-    if(!_.some(this.state.mappings, function(v){ return v.sourceField.type == 'LIST'})) {
+    if(!_.some(this.state.mappings, function(v){ return v.sourceField.type == 'LIST' || v.sourceField.type == 'ORGANIZATION' })) {
       message = <div className="panel panel-default">
                   <div className="panel-body">
                     {this.props.i18nLib.t('wizard.map_values.empty_list')}
@@ -65,7 +65,7 @@ var MapValues = React.createClass({
                 </div>;
     }
     $.map(this.state.mappings, function(mapping, i) {
-      if (mapping.sourceField && mapping.destinationField && mapping.sourceField.fieldName && mapping.destinationField.fieldName && mapping.sourceField.type == "LIST") {
+      if (mapping.sourceField && mapping.destinationField && mapping.sourceField.fieldName && mapping.destinationField.fieldName && (mapping.sourceField.type == "LIST" || mapping.sourceField.type == "ORGANIZATION")) {
         sourceFields.push({
           tabName : mapping.sourceField.displayName,
           children: [<MappingTableSimple key={i} mapping={mapping} handleUpdates={this.updateValueMappings} {...this.props}/>],

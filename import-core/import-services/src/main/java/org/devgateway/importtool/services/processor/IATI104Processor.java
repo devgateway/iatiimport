@@ -41,14 +41,19 @@ public class IATI104Processor implements ISourceProcessor {
 
 	private Log log = LogFactory.getLog(getClass());
 
+	// Global Lists for fields and the filters
 	private List<Field> fieldList = new ArrayList<Field>();
 	private List<Field> filterFieldList = new ArrayList<Field>();
+
+	// Field names on the source document that hold key information
 	private String DEFAULT_ID_FIELD = "iati-identifier";
 	private String DEFAULT_TITLE_FIELD = "title";
 	private String descriptiveName = "IATI 1.04";
 
+	// XML Document that will hold the entire imported file
 	private Document doc;
 
+	// Map that holds information about how the field names map to code lists
 	private static Map<String, String> mappingNameFile = new HashMap<String, String>();
 	static {
 		mappingNameFile.put("activity-status", "ActivityStatus");
@@ -66,152 +71,6 @@ public class IATI104Processor implements ISourceProcessor {
 
 	public IATI104Processor() {
 		instantiateStaticFields();
-	}
-
-	private void instantiateStaticFields() {
-		// Text fields
-		fieldList.add(new Field("IATI Identifier", "iati-identifier", FieldType.STRING, false));
-		fieldList.add(new Field("Title", "title", FieldType.MULTILANG_STRING, false));
-		fieldList.add(new Field("Description", "description", FieldType.MULTILANG_STRING, true));
-		// fieldList.add(new Field("Currency", "default-currency",
-		// FieldType.STRING, false));
-
-		// Code Lists
-		Field activityStatus = new Field("Activity Status", "activity-status", FieldType.LIST, true);
-		activityStatus.setPossibleValues(getCodeListValues("activity-status"));
-		fieldList.add(activityStatus);
-		filterFieldList.add(activityStatus);
-
-		Field activityScope = new Field("Activity Scope", "activity-scope", FieldType.LIST, true);
-		activityScope.setPossibleValues(getCodeListValues("activity-scope"));
-		fieldList.add(activityScope);
-		filterFieldList.add(activityScope);
-
-		Field aidType = new Field("Aid Type", "default-aid-type", FieldType.LIST, true);
-		aidType.setPossibleValues(getCodeListValues("default-aid-type"));
-		fieldList.add(aidType);
-		filterFieldList.add(aidType);
-
-		Field financeType = new Field("Finance Type", "default-finance-type", FieldType.LIST, true);
-		financeType.setPossibleValues(getCodeListValues("default-finance-type"));
-		fieldList.add(financeType);
-		filterFieldList.add(financeType);
-
-		Field flowType = new Field("Flow Type", "default-flow-type", FieldType.LIST, true);
-		flowType.setPossibleValues(getCodeListValues("default-flow-type"));
-		fieldList.add(flowType);
-		filterFieldList.add(flowType);
-
-		Field tiedStatus = new Field("Tied Status", "default-tied-status", FieldType.LIST, true);
-		tiedStatus.setPossibleValues(getCodeListValues("default-tied-status"));
-		fieldList.add(tiedStatus);
-		filterFieldList.add(tiedStatus);
-
-		Field policyMarker = new Field("PolicyMarker", "policy-marker", FieldType.LIST, true);
-		policyMarker.setPossibleValues(getCodeListValues("policy-marker"));
-		fieldList.add(policyMarker);
-		filterFieldList.add(policyMarker);
-
-		Field recipientCountry = new Field("Recipient Country", "recipient-country", FieldType.LIST, true);
-		recipientCountry.setPossibleValues(getCodeListValues("recipient-country"));
-		fieldList.add(recipientCountry);
-		filterFieldList.add(recipientCountry);
-
-		Field sector = new Field("Sector", "sector", FieldType.LIST, true);
-		sector.setPossibleValues(getCodeListValues("sector"));
-		sector.setMultiple(true);
-		sector.setPercentage(true);
-		fieldList.add(sector);
-
-		filterFieldList.add(sector);
-
-		// Dates
-		Field activityDateStartPlanned = new Field("Activity Date Start Planned", "activity-date", FieldType.DATE, true);
-		activityDateStartPlanned.setSubType("start-planned");
-		fieldList.add(activityDateStartPlanned);
-
-		Field activityDateEndPlanned = new Field("Activity Date End Planned", "activity-date", FieldType.DATE, true);
-		fieldList.add(activityDateEndPlanned);
-		activityDateEndPlanned.setSubType("end-planned");
-
-		Field activityDateStartActual = new Field("Activity Date Start Actual", "activity-date", FieldType.DATE, true);
-		activityDateStartActual.setSubType("start-actual");
-		fieldList.add(activityDateStartActual);
-
-		Field activityDateEndActual = new Field("Activity Date End Actual", "activity-date", FieldType.DATE, true);
-		fieldList.add(activityDateEndActual);
-		activityDateEndActual.setSubType("end-actual");
-
-		// Transaction Fields
-		Field commitments = new Field("Commitments", "transaction", FieldType.TRANSACTION, true);
-		commitments.setSubType("C");
-		fieldList.add(commitments);
-
-		Field disbursements = new Field("Disbursements", "transaction", FieldType.TRANSACTION, true);
-		disbursements.setSubType("D");
-		fieldList.add(disbursements);
-
-		// Organization Fields
-		Field participatingOrg = new Field("Funding Organization", "participating-org", FieldType.ORGANIZATION, true);
-		participatingOrg.setSubType("Funding");
-		participatingOrg.setPossibleValues(getOrganizations("Funding"));
-		fieldList.add(participatingOrg);
-	}
-
-	private List<FieldValue> getOrganizations(String role) {
-		List<FieldValue> orgList = new ArrayList<FieldValue>();
-		FieldValue fv = new FieldValue();
-		// TODO: Parse XML and get the participating org and their codes
-		fv.setCode("EC-ELARG");
-		fv.setCode("DG Neighbourhood and Enlargement Negotiations");
-		orgList.add(fv);
-		return orgList;
-	}
-
-	private List<FieldValue> getCodeListValues(String codeListName) {
-		return getCodeListValues(codeListName, false);
-	}
-
-	private List<FieldValue> getCodeListValues(String codeListName, Boolean concatenate) {
-		String standardFieldName = mappingNameFile.get(codeListName);
-		List<FieldValue> possibleValues = new ArrayList<FieldValue>();
-		InputStream is = this.getClass().getResourceAsStream("IATI201/codelist/" + standardFieldName + ".xml");
-		if (is != null) {
-			try {
-				DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-				factory.setValidating(true);
-				factory.setIgnoringElementContentWhitespace(true);
-				DocumentBuilder builder = factory.newDocumentBuilder();
-				Document doc = builder.parse(is);
-				NodeList nodeList = doc.getElementsByTagName(standardFieldName);
-				int index = 0;
-				for (int i = 0; i < nodeList.getLength(); i++) {
-					Node node = nodeList.item(i);
-					if (node.getNodeType() == Node.ELEMENT_NODE) {
-						Element element = (Element) node;
-						Element codeElement = (Element) element.getElementsByTagName("code").item(0);
-						String code = codeElement.getChildNodes().item(0).getNodeValue();
-
-						Element nameElement = (Element) element.getElementsByTagName("name").item(0);
-						String name = nameElement.getChildNodes().item(0).getNodeValue();
-
-						FieldValue fv = new FieldValue();
-						fv.setIndex(index++);
-						fv.setCode(code);
-						if (concatenate) {
-							fv.setValue(code + " - " + name);
-						} else {
-							fv.setValue(name);
-						}
-
-						possibleValues.add(fv);
-					}
-				}
-			} catch (ParserConfigurationException | SAXException | IOException e) {
-				log.error("IOException Parsing Source File: " + e);
-			}
-		}
-		return possibleValues;
 	}
 
 	@Override
@@ -235,9 +94,13 @@ public class IATI104Processor implements ISourceProcessor {
 	}
 
 	@Override
-	public List<InternalDocument> getDocuments() {
+	public List<InternalDocument> getDocuments() throws Exception {
 		List<InternalDocument> docList = new ArrayList<InternalDocument>();
-		docList = extractDocuments(doc);
+		if (this.isFormatValid()) {
+			docList = extractDocuments(doc);
+		} else {
+			throw new Exception("Format not valid");
+		}
 		return docList;
 	}
 
@@ -305,14 +168,79 @@ public class IATI104Processor implements ISourceProcessor {
 		return filterFieldList;
 	}
 
-	private List<InternalDocument> extractDocuments(Document doc) {
+	@Override
+	public String getDescriptiveName() {
+		return this.descriptiveName;
+	}
+
+	@Override
+	public void setFilterFields(List<Field> fields) {
+		filterFieldList = fields;
+	}
+
+	@Override
+	public Boolean isFormatValid() {
+		// TODO Implement validation of XML to verify if the format of the
+		// source file is the expected one
+		return true;
+	}
+
+	// Private methods. Includes methods to get values for the different types
+	// of data being managed.
+
+	private List<FieldValue> getCodeListValues(String codeListName) {
+		return getCodeListValues(codeListName, false);
+	}
+
+	private List<FieldValue> getCodeListValues(String codeListName, Boolean concatenate) {
+		String standardFieldName = mappingNameFile.get(codeListName);
+		List<FieldValue> possibleValues = new ArrayList<FieldValue>();
+		InputStream is = this.getClass().getResourceAsStream("IATI201/codelist/" + standardFieldName + ".xml");
+		if (is != null) {
+			try {
+				DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+				factory.setValidating(false);
+				factory.setIgnoringElementContentWhitespace(true);
+				DocumentBuilder builder = factory.newDocumentBuilder();
+				Document doc = builder.parse(is);
+				NodeList nodeList = doc.getElementsByTagName(standardFieldName);
+				int index = 0;
+				for (int i = 0; i < nodeList.getLength(); i++) {
+					Node node = nodeList.item(i);
+					if (node.getNodeType() == Node.ELEMENT_NODE) {
+						Element element = (Element) node;
+						Element codeElement = (Element) element.getElementsByTagName("code").item(0);
+						String code = codeElement.getChildNodes().item(0).getNodeValue();
+
+						Element nameElement = (Element) element.getElementsByTagName("name").item(0);
+						String name = nameElement.getChildNodes().item(0).getNodeValue();
+
+						FieldValue fv = new FieldValue();
+						fv.setIndex(index++);
+						fv.setCode(code);
+						if (concatenate) {
+							fv.setValue(code + " - " + name);
+						} else {
+							fv.setValue(name);
+						}
+
+						possibleValues.add(fv);
+					}
+				}
+			} catch (ParserConfigurationException | SAXException | IOException e) {
+				log.error("IOException Parsing Source File: " + e);
+			}
+		}
+		return possibleValues;
+	}
+
+	private List<InternalDocument> extractDocuments(Document doc) throws Exception {
 		// Extract global values
 
 		NodeList nodeList = doc.getElementsByTagName("iati-activity");
 		List<InternalDocument> list = new ArrayList<InternalDocument>();
 
 		for (int i = 0; i < nodeList.getLength(); i++) {
-			// Creo el nuevo documento.
 			InternalDocument document = new InternalDocument();
 			Element element = (Element) nodeList.item(i);
 			document.addStringField("default-currency", element.getAttribute("default-currency"));
@@ -327,7 +255,6 @@ public class IATI104Processor implements ISourceProcessor {
 						fieldNodeList = element.getElementsByTagName(field.getFieldName());
 						String[] codeValues = new String[fieldNodeList.getLength()];
 						for (int j = 0; j < fieldNodeList.getLength(); j++) {
-							System.out.println(fieldNodeList.getLength());
 							Element fieldElement = (Element) fieldNodeList.item(j);
 							codeValues[j] = fieldElement.getAttribute("code");
 						}
@@ -355,6 +282,32 @@ public class IATI104Processor implements ISourceProcessor {
 						}
 					}
 					document.addStringField(field.getFieldName(), stringValue);
+					break;
+				case ORGANIZATION:
+					String stringOrgValue = "";
+					fieldNodeList = element.getElementsByTagName(field.getFieldName());
+					if (fieldNodeList.getLength() > 0) {
+						int index = 0;
+						for (int j = 0; j < fieldNodeList.getLength(); j++) {
+							Element fieldElement = (Element) fieldNodeList.item(j);
+							if (fieldElement.getAttribute("role").equals(field.getSubType())) {
+								stringOrgValue = fieldElement.getChildNodes().item(j).getNodeValue();
+								Map<String, String> orgFields = new HashMap<String, String>();
+								orgFields.put("value", stringOrgValue);
+								orgFields.put("role", field.getSubType());
+								orgFields.put("ref", fieldElement.getAttribute("ref"));
+								orgFields.put("type", fieldElement.getAttribute("type"));
+								FieldValue fv = new FieldValue();
+								fv.setCode(stringOrgValue);
+								fv.setValue(stringOrgValue);
+								if(field.getPossibleValues() == null) {
+									field.setPossibleValues(new ArrayList<FieldValue>());
+								}
+								field.getPossibleValues().add(fv);
+								document.addOrganizationField(field.getFieldName() + "_" + field.getSubType() + "_" + index++, orgFields);
+							}
+						}
+					}
 					break;
 				case MULTILANG_STRING:
 					String mlStringValue = "";
@@ -386,16 +339,12 @@ public class IATI104Processor implements ISourceProcessor {
 							String receivingOrganization = "";
 
 							Element e = (Element) nodes.item(j);
-
 							// Reference
 							reference = e.getAttribute("ref");
-
 							// Amount
 							String localValue = e.getElementsByTagName("value").item(0).getChildNodes().item(0).getNodeValue();
-
 							// Date
 							String localDate = e.getElementsByTagName("transaction-date").item(0).getChildNodes().item(0).getNodeValue();
-
 							// Receiving Org
 							receivingOrganization = e.getElementsByTagName("receiver-org").item(0).getChildNodes().getLength() > 0 ? e.getElementsByTagName("receiver-org").item(0).getChildNodes().item(0).getNodeValue() : null;
 
@@ -406,12 +355,11 @@ public class IATI104Processor implements ISourceProcessor {
 							transactionFields.put("value", localValue);
 							transactionFields.put("subtype", field.getSubType());
 
-							document.addTransactionField("transaction_" + field.getSubType() + "_" + j, transactionFields);
+							document.addTransactionField("transaction" + field.getSubType() + "_" + j, transactionFields);
 						}
 
 					} catch (XPathExpressionException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+						throw new Exception("Document couldn't be parsed.");
 					}
 					break;
 				case DATE:
@@ -455,11 +403,6 @@ public class IATI104Processor implements ISourceProcessor {
 		return false;
 	}
 
-	@Override
-	public String getDescriptiveName() {
-		return this.descriptiveName;
-	}
-
 	private List<String> extractLanguage(NodeList elementsByTagName) {
 		List<String> list = new ArrayList<String>();
 		try {
@@ -478,9 +421,91 @@ public class IATI104Processor implements ISourceProcessor {
 		return list;
 	}
 
-	@Override
-	public void setFilterFields(List<Field> fields) {
-		filterFieldList = fields;
+	private void instantiateStaticFields() {
+		// Text fields
+		fieldList.add(new Field("IATI Identifier", "iati-identifier", FieldType.STRING, false));
+		fieldList.add(new Field("Title", "title", FieldType.MULTILANG_STRING, false));
+		fieldList.add(new Field("Description", "description", FieldType.MULTILANG_STRING, true));
+		fieldList.add(new Field("Currency", "default-currency", FieldType.STRING, false));
+
+		// Code Lists
+		Field activityStatus = new Field("Activity Status", "activity-status", FieldType.LIST, true);
+		activityStatus.setPossibleValues(getCodeListValues("activity-status"));
+		fieldList.add(activityStatus);
+		filterFieldList.add(activityStatus);
+
+		Field activityScope = new Field("Activity Scope", "activity-scope", FieldType.LIST, true);
+		activityScope.setPossibleValues(getCodeListValues("activity-scope"));
+		fieldList.add(activityScope);
+		filterFieldList.add(activityScope);
+
+		Field aidType = new Field("Aid Type", "default-aid-type", FieldType.LIST, true);
+		aidType.setPossibleValues(getCodeListValues("default-aid-type"));
+		fieldList.add(aidType);
+		filterFieldList.add(aidType);
+
+		Field financeType = new Field("Finance Type", "default-finance-type", FieldType.LIST, true);
+		financeType.setPossibleValues(getCodeListValues("default-finance-type"));
+		fieldList.add(financeType);
+		filterFieldList.add(financeType);
+
+		Field flowType = new Field("Flow Type", "default-flow-type", FieldType.LIST, true);
+		flowType.setPossibleValues(getCodeListValues("default-flow-type"));
+		fieldList.add(flowType);
+		filterFieldList.add(flowType);
+
+		Field tiedStatus = new Field("Tied Status", "default-tied-status", FieldType.LIST, true);
+		tiedStatus.setPossibleValues(getCodeListValues("default-tied-status"));
+		fieldList.add(tiedStatus);
+		filterFieldList.add(tiedStatus);
+
+		Field policyMarker = new Field("PolicyMarker", "policy-marker", FieldType.LIST, true);
+		policyMarker.setPossibleValues(getCodeListValues("policy-marker"));
+		fieldList.add(policyMarker);
+		filterFieldList.add(policyMarker);
+
+		Field recipientCountry = new Field("Recipient Country", "recipient-country", FieldType.LIST, true);
+		recipientCountry.setPossibleValues(getCodeListValues("recipient-country"));
+		fieldList.add(recipientCountry);
+		filterFieldList.add(recipientCountry);
+
+		Field sector = new Field("Sector", "sector", FieldType.LIST, true);
+		sector.setPossibleValues(getCodeListValues("sector"));
+		sector.setMultiple(true);
+		sector.setPercentage(true);
+		fieldList.add(sector);
+		filterFieldList.add(sector);
+
+		// Dates
+		Field activityDateStartPlanned = new Field("Activity Date Start Planned", "activity-date", FieldType.DATE, true);
+		activityDateStartPlanned.setSubType("start-planned");
+		fieldList.add(activityDateStartPlanned);
+
+		Field activityDateEndPlanned = new Field("Activity Date End Planned", "activity-date", FieldType.DATE, true);
+		fieldList.add(activityDateEndPlanned);
+		activityDateEndPlanned.setSubType("end-planned");
+
+		Field activityDateStartActual = new Field("Activity Date Start Actual", "activity-date", FieldType.DATE, true);
+		activityDateStartActual.setSubType("start-actual");
+		fieldList.add(activityDateStartActual);
+
+		Field activityDateEndActual = new Field("Activity Date End Actual", "activity-date", FieldType.DATE, true);
+		fieldList.add(activityDateEndActual);
+		activityDateEndActual.setSubType("end-actual");
+
+		// Transaction Fields
+		Field commitments = new Field("Commitments", "transaction", FieldType.TRANSACTION, true);
+		commitments.setSubType("C");
+		fieldList.add(commitments);
+
+		Field disbursements = new Field("Disbursements", "transaction", FieldType.TRANSACTION, true);
+		disbursements.setSubType("D");
+		fieldList.add(disbursements);
+
+		// Organization Fields
+		Field participatingOrg = new Field("Funding Organization", "participating-org", FieldType.ORGANIZATION, true);
+		participatingOrg.setSubType("Funding");
+		fieldList.add(participatingOrg);
 	}
 
 }

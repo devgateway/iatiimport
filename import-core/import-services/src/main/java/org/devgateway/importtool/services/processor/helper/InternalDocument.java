@@ -9,6 +9,7 @@ public class InternalDocument {
 	private Map<String, String> stringFields = new HashMap<String, String>();
 	private Map<String, String[]> stringMultiFields = new HashMap<String, String[]>();
 	private Map<String, Map<String, String>> multilangFields = new HashMap<String, Map<String, String>>();
+	private Map<String, Map<String, String>> organizationFields = new HashMap<String, Map<String, String>>();
 	private Map<String, Map<String, String>> transactionFields = new HashMap<String, Map<String, String>>();
 	private Map<String, Date> dateFields = new HashMap<String, Date>();
 
@@ -26,6 +27,10 @@ public class InternalDocument {
 
 	public void addTransactionField(String fieldName, Map<String, String> transaction) {
 		getTransactionFields().put(fieldName, transaction);
+	}
+
+	public void addOrganizationField(String fieldName, Map<String, String> organization) {
+		getOrganizationFields().put(fieldName, organization);
 	}
 
 	public void addDateField(String fieldName, Date activityDate) {
@@ -77,5 +82,14 @@ public class InternalDocument {
 	public void setStringMultiFields(Map<String, String[]> stringMultiFields) {
 		this.stringMultiFields = stringMultiFields;
 	}
+
+	public Map<String, Map<String, String>> getOrganizationFields() {
+		return organizationFields;
+	}
+
+	public void setOrganizationFields(Map<String, Map<String, String>> organizationFields) {
+		this.organizationFields = organizationFields;
+	}
+
 
 }
