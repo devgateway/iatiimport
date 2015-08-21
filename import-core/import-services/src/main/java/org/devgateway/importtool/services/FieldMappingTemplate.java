@@ -1,7 +1,6 @@
 package org.devgateway.importtool.services;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.springframework.hateoas.Identifiable;
 
 import javax.persistence.*;

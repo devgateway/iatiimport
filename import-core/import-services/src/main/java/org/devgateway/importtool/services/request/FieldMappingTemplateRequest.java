@@ -1,11 +1,6 @@
 package org.devgateway.importtool.services.request;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.springframework.hateoas.Identifiable;
 import org.devgateway.importtool.services.processor.helper.FieldMapping;
-import javax.persistence.*;
-import java.io.Serializable;
 import java.util.List;
 import java.util.ArrayList;
 

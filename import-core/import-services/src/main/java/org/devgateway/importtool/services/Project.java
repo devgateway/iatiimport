@@ -1,12 +1,11 @@
 package org.devgateway.importtool.services;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.springframework.hateoas.Identifiable;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
+
 
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, isGetterVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.ANY)
 @Entity
