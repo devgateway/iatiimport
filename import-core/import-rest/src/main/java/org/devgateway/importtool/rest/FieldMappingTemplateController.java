@@ -85,6 +85,11 @@ class FieldMappingTemplateController {
 		return new ResponseEntity<>(fieldMappingTemplateReponse, HttpStatus.OK);
 	}
 	
+	@RequestMapping(method = RequestMethod.DELETE, value = "/delete/{id}")
+	public ResponseEntity<String> delete(@PathVariable Long id, HttpServletRequest request) {
+		fieldMappingTemplateRepository.delete(id);	
+		return new ResponseEntity<>("{}", HttpStatus.OK);
+	}
 	
 	
 
