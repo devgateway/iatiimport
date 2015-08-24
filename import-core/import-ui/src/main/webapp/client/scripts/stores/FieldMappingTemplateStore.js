@@ -79,7 +79,7 @@ var FieldMappingTemplateStore = Reflux.createStore({
 	        'Accept': 'application/json',
 	        'Content-Type': 'application/json' 
 	      },
-	      url: '/importer/fieldmappingtemplate/'+ id,	      
+	      url: '/importer/fieldmappingtemplate/delete/'+ id,	      
 	      error: function() {
 	    	  appActions.deleteMappingTemplate.failed();
 	      },

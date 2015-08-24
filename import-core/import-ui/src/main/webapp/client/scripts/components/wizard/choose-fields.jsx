@@ -170,11 +170,11 @@ var ChooseFields = React.createClass({
 	deleteMappingTemplate: function(id){     
 		appActions.deleteMappingTemplate(id).then(function(data) {    	   
 			var templateData = this.state.mappingTemplatesData;   	   
-			var afterDelete = templateData.filter(function (item) {    		   
+			var dataAfterDelete = templateData.filter(function (item) {    		   
 				return item.id != id;
 			});    	     
 			this.setState({
-				mappingTemplatesData: afterDelete
+				mappingTemplatesData: dataAfterDelete
 			});            
 			this.forceUpdate();             
 		}.bind(this));

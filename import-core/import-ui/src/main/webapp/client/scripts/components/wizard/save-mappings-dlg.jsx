@@ -8,8 +8,9 @@ var SaveMappingsDialog = React.createClass({
      formActions.saveFieldMappingsTemplate({fieldMapping:this.props.mappingFieldsData, name:this.state.name}).then(function(data) {
         if(data.error){
            this.displayError("Error saving template");
-        }else{          
-            this.props.reloadTemplateData();
+        }else{ 
+        	this.refs.mappingsName.getDOMNode().value = ''; 
+            this.props.reloadTemplateData();            
             $('#saveMapFields').modal('hide');
         }            
      }.bind(this)).catch(function(err) {
@@ -32,7 +33,7 @@ var SaveMappingsDialog = React.createClass({
 			  <div ref="saveMappingDialog" className="modal-dialog">
 			    <div className="modal-content">
 			      <div className="modal-header">
-			        <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+			        <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">ï¿½</span></button>
 			        <h4 className="modal-title" id="myModalLabel2">Save Mapping</h4>
 			      </div>
 			      <div className="modal-body">

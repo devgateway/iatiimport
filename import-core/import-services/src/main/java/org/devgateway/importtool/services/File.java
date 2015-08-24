@@ -26,6 +26,7 @@ public class File implements Identifiable<Long>, Serializable {
 	@Column(name = "file_name")
 	private String fileName;
 
+	@Lob
 	@Column(name = "file_data")
 	private byte[] data;
 
