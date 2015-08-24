@@ -12,6 +12,7 @@ var FieldMappingTemplateStore = Reflux.createStore({
     this.listenTo(formActions.saveFieldMappingsTemplate, this.handleSaveFieldMappingTemplate);
     this.listenTo(appActions.loadFieldMappingsTemplateList, this.handleLoadFieldMappingsTemplateList);
     this.listenTo(appActions.loadFieldMappingsById, this.handleLoadFieldMappingsById);
+    this.listenTo(appActions.deleteMappingTemplate, this.handleDeleteMappingTemplate);
     
   }, 
   handleSaveFieldMappingTemplate: function(data){	
@@ -71,6 +72,24 @@ var FieldMappingTemplateStore = Reflux.createStore({
 	      type: 'GET'
 	    });
   },
+  handleDeleteMappingTemplate: function(id){	  
+	  var self = this;
+	    $.ajax({
+	      headers: { 
+	        'Accept': 'application/json',
+	        'Content-Type': 'application/json' 
+	      },
+	      url: '/importer/fieldmappingtemplate/'+ id,	      
+	      error: function() {
+	    	  appActions.deleteMappingTemplate.failed();
+	      },
+	      dataType: 'json',
+	      success: function(data) {
+	    	  appActions.deleteMappingTemplate.completed(data);
+	      },
+	      type: 'DELETE'
+	    });
+  }
 });
 
 module.exports = FieldMappingTemplateStore;

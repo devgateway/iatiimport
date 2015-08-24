@@ -26,4 +26,6 @@ appActions.loadImportLog = Reflux.createAction({ asyncResult: true });
 appActions.loadFieldMappingsTemplateList = Reflux.createAction({ asyncResult: true });
 appActions.loadFieldMappingsById = Reflux.createAction({ asyncResult: true });
 
+appActions.deleteMappingTemplate   = Reflux.createAction({ asyncResult: true });
+
 module.exports = appActions;

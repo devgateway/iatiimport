@@ -290,3 +290,10 @@
 	padding: 3px 20px;
 	cursor: pointer;
 }
+.template-dropdown-item-link{
+  
+}
+.template-dropdown-item-delete{
+  color:#ff0000;
+}
+
