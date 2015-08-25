@@ -18,7 +18,7 @@ var SaveMappingsDialog = React.createClass({
         console.log("Error saving template");
      }.bind(this));
     },
-    handleNameChange(e){
+    handleNameChange: function(e){
        this.setState({name: e.target.value});       
     },
     displayError: function(msg){      
