@@ -5,7 +5,7 @@ var SaveMappingsDialog = React.createClass({
        return {name: ''};
     },
     saveMappings: function(){       
-     formActions.saveValueMappingsTemplate({fieldMapping:this.props.mappingFieldsData, name:this.state.name}).then(function(data) {
+     formActions.saveFieldMappingsTemplate({fieldMapping:this.props.mappingFieldsData, name:this.state.name}).then(function(data) {
         if(data.error){
            this.displayError("Error saving template");
         }else{ 

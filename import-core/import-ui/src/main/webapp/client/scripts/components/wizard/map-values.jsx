@@ -11,7 +11,7 @@ var SaveMappingsDialog = require('./save-value-mappings-dlg.jsx');
 var valueMappingStore = require('./../../stores/ValueMappingStore');
 var valueMappingTemplateStore = require('./../../stores/ValueMappingTemplateStore');
 var _ = require('lodash/dist/lodash.underscore');
-var FieldMappingsDropdown = require('./field-mappings-dropdown.jsx');
+var FieldMappingsDropdown = require('./mappings-dropdown.jsx');
 
 
 var MapValues = React.createClass({

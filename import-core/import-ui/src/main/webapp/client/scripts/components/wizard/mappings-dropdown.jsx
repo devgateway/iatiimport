@@ -23,8 +23,8 @@ var FieldMappingsDropdown = React.createClass({
 		if(this.props.mappingTemplatesData.length > 0){
 			templates = this.props.mappingTemplatesData.map(function(item, index){
 				return (<li role="presentation" className="template-dropdown-item" ><div className="row">
-		          <div className="col-md-8 template-dropdown-item-link" title = {item.name} data-id = {item.id}  onClick= {this.loadTemplate}>{item.name}</div>
-		          <div className="col-md-4 template-dropdown-item-delete glyphicon glyphicon-remove" data-id = {item.id} data-name = {item.name} onClick= {this.deleteTemplate}></div>
+		          <div className="wordwrap col-md-8 template-dropdown-item-link" title = {item.name} data-id = {item.id}  onClick= {this.loadTemplate}>{item.name}</div>
+		          <div className="wordwrap col-md-4 template-dropdown-item-delete glyphicon glyphicon-remove" data-id = {item.id} data-name = {item.name} onClick= {this.deleteTemplate}></div>
 		          </div>
 				</li> );
 			}.bind(this));
