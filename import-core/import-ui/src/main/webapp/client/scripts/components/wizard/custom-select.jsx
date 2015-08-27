@@ -5,6 +5,9 @@ var CustomSelect = React.createClass({
              value: null
          }
      },
+     componentDidMount: function() {
+    	 
+     },
      change: function(event){
          this.setState({value: event.target.value});             
          this.props.handleChange(this.props.data, event.target.value); 
@@ -14,7 +17,7 @@ var CustomSelect = React.createClass({
            return <option key={option[this.props.value]} value={option[this.props.value]}>{option[this.props.label]}</option>;
         }.bind(this));
         return(           
-               <select className="form-control" onChange={this.change} value={this.state.value || this.props.initialOption}>
+               <select className="form-control" onChange={this.change} value={this.props.initialOption}>
                  <option value="" >Select</option>
                  {optionNodes}
                </select>          

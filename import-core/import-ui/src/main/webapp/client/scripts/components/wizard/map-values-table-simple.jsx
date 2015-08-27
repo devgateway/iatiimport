@@ -23,7 +23,7 @@ var MappingTableSimple = React.createClass({
        $.each(valuesIndex, function(key, value) {  
            var sourceValue = _.find(sourceField.possibleValues, function(v){ return v.index == key;});
            var destinationValue = _.find(destinationField.possibleValues, function(v){ return v.index == value;});
-           var destValue = destinationValue ? destinationValue.code : undefined;
+           var destValue = destinationValue ? destinationValue.code : "";
 
            rows.push(<tr key = {key}>
                         <td>

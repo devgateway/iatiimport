@@ -4,14 +4,30 @@ var SaveMappingsDialog = React.createClass({
     getInitialState: function() {
        return {name: ''};
     },
-    saveMappings: function(){       
-     formActions.saveFieldMappingsTemplate({fieldMapping:this.props.mappingFieldsData, name:this.state.name}).then(function(data) {
+    saveMappings: function(){
+     var mapped = [];
+     $.map(this.props.mappings, function(item, i) {
+    	 var indexMappings = [];
+    	 for (var key in item.valueIndexMapping) {    		  
+    		    if (Object.prototype.hasOwnProperty.call(item.valueIndexMapping, key)) {    		    	
+    		        if(item.valueIndexMapping[key] !==  null){    		        	
+    		        	indexMappings.push(item.valueIndexMapping);
+    		        }    		       
+    		    }
+    		}
+    	 
+    	 if(item.destinationField && item.sourceField && indexMappings.length > 0){    		 
+        	 mapped.push(item); 
+    	 }
+    	 
+     });
+     formActions.saveValueMappingsTemplate({fieldValueMapping:mapped, name:this.state.name}).then(function(data) {
         if(data.error){
            this.displayError("Error saving template");
         }else{ 
         	this.refs.mappingsName.getDOMNode().value = ''; 
             this.props.reloadTemplateData();            
-            $('#saveMapFields').modal('hide');
+            $('#saveMapValues').modal('hide');
         }            
      }.bind(this)).catch(function(err) {
         this.displayError("Error saving template");
@@ -29,7 +45,7 @@ var SaveMappingsDialog = React.createClass({
     },
     render: function () {
     return (
-          <div className="modal fade" id="saveMapFields" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2" aria-hidden="true" >
+          <div className="modal fade" id="saveMapValues" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2" aria-hidden="true" >
 			  <div ref="saveMappingDialog" className="modal-dialog">
 			    <div className="modal-content">
 			      <div className="modal-header">
