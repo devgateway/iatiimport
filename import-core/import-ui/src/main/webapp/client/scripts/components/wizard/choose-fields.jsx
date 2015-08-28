@@ -13,7 +13,6 @@ var fieldMappingStore = require('./../../stores/FieldMappingStore');
 var fieldMappingTemplateStore = require('./../../stores/FieldMappingTemplateStore');
 var _ = require('lodash/dist/lodash.underscore');
 var formActions = require('./../../actions/form');
-
 var appActions = require('./../../actions');
 
 var ChooseFields = React.createClass({
@@ -124,7 +123,6 @@ var ChooseFields = React.createClass({
 		return options
 	}, 
 	checkAll: function() {
-
 	},
 	handleNext: function() {
 		this.props.eventHandlers.chooseFields(this.state.mappingFieldsData);

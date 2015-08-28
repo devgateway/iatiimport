@@ -5,8 +5,7 @@ var CustomSelect = React.createClass({
              value: null
          }
      },
-     componentDidMount: function() {
-    	 
+     componentDidMount: function() {    	 
      },
      change: function(event){
          this.setState({value: event.target.value});             
