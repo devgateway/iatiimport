@@ -3,7 +3,7 @@ var React = require('react');
 var Reflux = require('reflux');
 var reactAsync = require('react-async');
 var appActions = require('./../../actions');
-var FieldMappingsDropdown = React.createClass({
+var MappingsDropdown = React.createClass({
 	mixins: [Reflux.ListenerMixin],
 	getInitialState: function() {
 		return {};
@@ -46,4 +46,4 @@ var FieldMappingsDropdown = React.createClass({
 	}
 });
 
-module.exports = FieldMappingsDropdown;
+module.exports = MappingsDropdown;

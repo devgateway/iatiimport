@@ -18,7 +18,7 @@ var Content = React.createClass({
     // from the path '/wizard/:id'
     var id = this.props.params.id;
     this.listenTo(destinationSessionStore, this.updateDestinationSession);
-//    this.listenTo(sessionStore, this.updateSession);
+    //this.listenTo(sessionStore, this.updateSession);
   },
   updateDestinationSession : function (data) {
     this.setState({

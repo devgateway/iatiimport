@@ -6,115 +6,114 @@ var WizardSteps = require('./wizard-steps');
 var ImportReport = require('./import-report');
 var UploadFile = require('./upload-file');
 var appConfig = require('./../../conf');
-
 var Router = require('react-router');
 var RouteHandler = Router.RouteHandler;
 var Navigation = Router.Navigation;
-
 var formActions = require('./../../actions/form');
 
 var Wizard = React.createClass({
-  mixins: [Navigation],
-  getInitialState: function() {
-    return {
-      info: {},
-      results: []
-    };
-  },
+	mixins: [Navigation],
+	getInitialState: function() {
+		return {
+			info: {},
+			results: []
+		};
+	},
+	
+	componentWillReceiveProps: function(nextProps) {
+		if(this.props.params.src !== nextProps.params.src || this.props.params.dst !== nextProps.params.dst) {
+			this.initImportSession(nextProps.params.src, nextProps.params.dst);
+		}
+	},
+	
+	componentDidMount  : function() {
+		var sourceProcessor = this.props.params.src;
+		var destinationProcessor = this.props.params.dst;
+		this.initImportSession(sourceProcessor, destinationProcessor);
+	},
+	
+	hideLoadingIcon: function(){ 
+		if(!_.isEmpty(this.state.info)){
+			$(this.refs.loadingIcon.getDOMNode()).hide();
+		}    
+	},
+	
+	showLoadingIcon:  function(){    
+		$(this.refs.loadingIcon.getDOMNode()).show();
+	},
+	
+	displayError: function(msg){      
+		$(this.refs.message.getDOMNode()).html(msg);     
+		var box = $(this.refs.messageBox.getDOMNode());
+		box.show();
+		box.fadeOut({duration:10000});     
+	},
+	// Steps and transitions
+	uploadFile: function() {
+		this.transitionTo('filter', this.props.params);
+	},
 
-  componentWillReceiveProps: function(nextProps) {
-    if(this.props.params.src !== nextProps.params.src || this.props.params.dst !== nextProps.params.dst) {
-      this.initImportSession(nextProps.params.src, nextProps.params.dst);
-    }
-  },
+	filterData: function(data) {
+		formActions.updateFilters(data).then(function() { 
+			this.transitionTo('projects', this.props.params);
+		}.bind(this));
+	},
 
-  componentDidMount  : function() {
-    var sourceProcessor = this.props.params.src;
-    var destinationProcessor = this.props.params.dst;
-    this.initImportSession(sourceProcessor, destinationProcessor);
-  },
-  hideLoadingIcon: function(){ 
-	  if(!_.isEmpty(this.state.info)){
-	     $(this.refs.loadingIcon.getDOMNode()).hide();
-	  }    
-  },
-  showLoadingIcon:  function(){    
-    $(this.refs.loadingIcon.getDOMNode()).show();
-  },
-  displayError: function(msg){      
-     $(this.refs.message.getDOMNode()).html(msg);     
-     var box = $(this.refs.messageBox.getDOMNode());
-     box.show();
-     box.fadeOut({duration:10000});     
-  },
-  // Steps and transitions
-  uploadFile: function() {
-    
-    this.transitionTo('filter', this.props.params);
-  },
+	chooseProjects: function(data) {
+		formActions.updateSelectedProjects(data).then(function() { 
+			this.transitionTo('fields', this.props.params);
+		}.bind(this));
+	},
 
-  filterData: function(data) {
-    formActions.updateFilters(data).then(function() { 
-      this.transitionTo('projects', this.props.params);
-    }.bind(this));
-  },
+	chooseFields: function(data) {
+		formActions.updateSelectedFields.triggerPromise(data).then(function() { 
 
-  chooseProjects: function(data) {
-    formActions.updateSelectedProjects(data).then(function() { 
-      this.transitionTo('fields', this.props.params);
-    }.bind(this));
-  },
+			this.transitionTo('mapvalues', this.props.params);
+		}.bind(this)).catch(function(err) {
+			console.log("Error retrieving values");
+		})
+	},
 
-  chooseFields: function(data) {
-    formActions.updateSelectedFields.triggerPromise(data).then(function() { 
-    
-      this.transitionTo('mapvalues', this.props.params);
-    }.bind(this)).catch(function(err) {
-      console.log("Error retrieving values");
-    })
-  },
+	mapValues: function(data) {
+		formActions.updateSelectedValues(data).then(function() { 
+			this.transitionTo('import', this.props.params);
+		}.bind(this));
+	},
 
-  mapValues: function(data) {
-    formActions.updateSelectedValues(data).then(function() { 
-        
-      this.transitionTo('import', this.props.params);
-    }.bind(this));
-  },
+	launchImport: function() {
+		$.get('/importer/import/execute', function(result) {
+			this.setState({results: result});
+			$("#modalResults").modal("show");
+		}.bind(this));
+	},
+	initImportSession: function(sourceProcessor, destinationProcessor) {
+		this.showLoadingIcon();
+		var compiledURL = _.template(appConfig.TOOL_START_ENDPOINT);
+		var token = appConfig.DESTINATION_AUTH_TOKEN || "default_token";
+		var url = compiledURL({
+			'sourceProcessor': sourceProcessor,
+			'destinationProcessor': destinationProcessor,
+			'authenticationToken': appConfig.DESTINATION_AUTH_TOKEN,
+			'username': appConfig.DESTINATION_USERNAME,
+			'host': appConfig.DESTINATION_API_HOST
+		});
 
-  launchImport: function() {
-    $.get('/importer/import/execute', function(result) {
-      this.setState({results: result});
-      $("#modalResults").modal("show");
-    }.bind(this));
-  },
-  initImportSession: function(sourceProcessor, destinationProcessor) {
-    this.showLoadingIcon();
-    var compiledURL = _.template(appConfig.TOOL_START_ENDPOINT);
-    var token = appConfig.DESTINATION_AUTH_TOKEN || "default_token";
-    var url = compiledURL({
-        'sourceProcessor': sourceProcessor,
-        'destinationProcessor': destinationProcessor,
-        'authenticationToken': appConfig.DESTINATION_AUTH_TOKEN,
-        'username': appConfig.DESTINATION_USERNAME,
-        'host': appConfig.DESTINATION_API_HOST
-      });
-
-    $.get(url , function(result) {
-      this.setState({
-                      info: {
-                        authenticationToken: result.authenticationToken,
-                        sourceProcessorName: result.sourceProcessorName,
-                        sourceProcessor: sourceProcessor,
-                        destinationProcessorName: result.destinationProcessorName,
-                        destinationProcessor: destinationProcessor
-                      }
-                    });
-       this.hideLoadingIcon();     
-    }.bind(this)).fail(function() {
-       this.hideLoadingIcon();
-       this.displayError("Error loading state of session.");
-    }.bind(this));
-  },
+		$.get(url , function(result) {
+			this.setState({
+				info: {
+					authenticationToken: result.authenticationToken,
+					sourceProcessorName: result.sourceProcessorName,
+					sourceProcessor: sourceProcessor,
+					destinationProcessorName: result.destinationProcessorName,
+					destinationProcessor: destinationProcessor
+				}
+			});
+			this.hideLoadingIcon();     
+		}.bind(this)).fail(function() {
+			this.hideLoadingIcon();
+			this.displayError("Error loading state of session.");
+		}.bind(this));
+	},
   
   render: function() {
     var eventHandlers = {};

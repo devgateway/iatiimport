@@ -10,97 +10,97 @@ var languageStore = require('./../../stores/LanguageStore');
 var filterStore = require('./../../stores/FilterStore');
 
 var FilterData = React.createClass({
-    mixins: [Reflux.ListenerMixin],
-     getInitialState: function() {
-       return {filterData: [], languageData:[]};
-    },
-    languageDataLoaded: false,
-    filterDataLoaded: false,
-    errorMsg:"",
-    componentDidMount: function() {
-        this.listenTo(languageStore, this.updateLanguages);
-        this.listenTo(filterStore, this.updateFilters);
-        this.loadData();
-    },    
-    updateFilters: function(data) {
-        this.setState({
-            filterData: data
-        });
-    },
-    updateLanguages: function(data) {
-        this.setState({
-            languageData: data
-        });
-    },
-    loadData: function(){      
-      this.clearFlags();
-      this.errorMsg = "";
-      this.props.eventHandlers.showLoadingIcon();
-      appActions.loadLanguageData.triggerPromise().then(function(data) {                            
-         this.updateLanguages(data); 
-         this.languageDataLoaded = true;
-         this.hideLoadingIcon();
-      }.bind(this)).catch(function(err) {       
-        this.languageDataLoaded = true;
-        this.hideLoadingIcon(); 
-        this.errorMsg += " Error retrieving languages.";
-        this.displayError();        
-      }.bind(this));
-      
-      appActions.loadFilterData.triggerPromise().then(function(data) {                              
-        this.updateFilters(data);
-        this.filterDataLoaded = true; 
-        this.hideLoadingIcon(); 
-      }.bind(this)).catch(function(err) {
-         this.filterDataLoaded = true; 
-         this.hideLoadingIcon(); 
-         this.errorMsg += " Error retrieving filters.";
-         this.displayError();                          
-      }.bind(this));
-    },
-    clearFlags: function(){     
-        this.languageDataLoaded = false;
-        this.filterDataLoaded = false;        
-    }, 
-    hideLoadingIcon: function(){
-        if(this.languageDataLoaded && this.filterDataLoaded){
-           this.props.eventHandlers.hideLoadingIcon();
-        }
-    }, 
-    displayError: function(){
-        if(this.languageDataLoaded && this.filterDataLoaded){
-           this.props.eventHandlers.displayError(this.errorMsg); 
-        }
-    },
-    handleToggle: function(field, value, event) {        
-        var currentField = _.find(this.state.filterData, { 'fieldName': field.fieldName });
-        var filterExists = _.some(currentField.filters, function(a) { return a == value.code});
-        if(!filterExists && event.target.checked) {
-            currentField.filters.push(value.code);
-        }
-        else
-        {
-            currentField.filters = _.without(currentField.filters, value.code);
-        }
-        var currentFilterData = this.state.filterData;
+	mixins: [Reflux.ListenerMixin],
+	getInitialState: function() {
+		return {filterData: [], languageData:[]};
+	},
+	languageDataLoaded: false,
+	filterDataLoaded: false,
+	errorMsg:"",
+	componentDidMount: function() {
+		this.listenTo(languageStore, this.updateLanguages);
+		this.listenTo(filterStore, this.updateFilters);
+		this.loadData();
+	},    
+	updateFilters: function(data) {
+		this.setState({
+			filterData: data
+		});
+	},
+	updateLanguages: function(data) {
+		this.setState({
+			languageData: data
+		});
+	},
+	loadData: function(){      
+		this.clearFlags();
+		this.errorMsg = "";
+		this.props.eventHandlers.showLoadingIcon();
+		appActions.loadLanguageData.triggerPromise().then(function(data) {                            
+			this.updateLanguages(data); 
+			this.languageDataLoaded = true;
+			this.hideLoadingIcon();
+		}.bind(this)).catch(function(err) {       
+			this.languageDataLoaded = true;
+			this.hideLoadingIcon(); 
+			this.errorMsg += " Error retrieving languages.";
+			this.displayError();        
+		}.bind(this));
 
-        this.setState( { filterData: this.state.filterData });
-    },
-    handleNext: function() {
-        this.props.eventHandlers.filterData(this.state.filterData);
-    },
-    selectAll: function(field, event) {
-        if(event.target.checked) {
-            field.filters = _.pluck(field.possibleValues, 'code');
-        } 
-        else
-        {
-            field.filters = [];
-        }
-        this.setState({
-            filterData: this.state.filterData
-        });
-    },
+		appActions.loadFilterData.triggerPromise().then(function(data) {                              
+			this.updateFilters(data);
+			this.filterDataLoaded = true; 
+			this.hideLoadingIcon(); 
+		}.bind(this)).catch(function(err) {
+			this.filterDataLoaded = true; 
+			this.hideLoadingIcon(); 
+			this.errorMsg += " Error retrieving filters.";
+			this.displayError();                          
+		}.bind(this));
+	},
+	clearFlags: function(){     
+		this.languageDataLoaded = false;
+		this.filterDataLoaded = false;        
+	}, 
+	hideLoadingIcon: function(){
+		if(this.languageDataLoaded && this.filterDataLoaded){
+			this.props.eventHandlers.hideLoadingIcon();
+		}
+	}, 
+	displayError: function(){
+		if(this.languageDataLoaded && this.filterDataLoaded){
+			this.props.eventHandlers.displayError(this.errorMsg); 
+		}
+	},
+	handleToggle: function(field, value, event) {        
+		var currentField = _.find(this.state.filterData, { 'fieldName': field.fieldName });
+		var filterExists = _.some(currentField.filters, function(a) { return a == value.code});
+		if(!filterExists && event.target.checked) {
+			currentField.filters.push(value.code);
+		}
+		else
+		{
+			currentField.filters = _.without(currentField.filters, value.code);
+		}
+		var currentFilterData = this.state.filterData;
+
+		this.setState( { filterData: this.state.filterData });
+	},
+	handleNext: function() {
+		this.props.eventHandlers.filterData(this.state.filterData);
+	},
+	selectAll: function(field, event) {
+		if(event.target.checked) {
+			field.filters = _.pluck(field.possibleValues, 'code');
+		} 
+		else
+		{
+			field.filters = [];
+		}
+		this.setState({
+			filterData: this.state.filterData
+		});
+	},
     render: function() {
         var filters = [];
         if (this.state.filterData) {

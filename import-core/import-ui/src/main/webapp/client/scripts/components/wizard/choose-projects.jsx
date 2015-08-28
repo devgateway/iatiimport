@@ -26,14 +26,14 @@ var ChooseProjects = React.createClass({
         });
     }, 
     loadData: function(){
-	 this.props.eventHandlers.showLoadingIcon();
-     appActions.loadProjectData.triggerPromise().then(function(data) { 
-        this.props.eventHandlers.hideLoadingIcon();                       
-        this.updateProject(data);                
-      }.bind(this)).catch(function(err) {
-        this.props.eventHandlers.hideLoadingIcon();        
-        this.props.eventHandlers.displayError("Error retrieving project data");
-     }.bind(this)); 
+    	this.props.eventHandlers.showLoadingIcon();
+    	appActions.loadProjectData.triggerPromise().then(function(data) { 
+    		this.props.eventHandlers.hideLoadingIcon();                       
+    		this.updateProject(data);                
+    	}.bind(this)).catch(function(err) {
+    		this.props.eventHandlers.hideLoadingIcon();        
+    		this.props.eventHandlers.displayError("Error retrieving project data");
+    	}.bind(this)); 
     },  
     selectAll: function(){ 
     },
@@ -47,11 +47,11 @@ var ChooseProjects = React.createClass({
         this.selectAll(event.target.checked, 'UPDATE');
     },
     selectAll: function(checked, operation){
-        _.each(this.state.projectData, function(item){ 
-            if(item.operation === operation)
-                item.selected = checked;
-        });
-        this.forceUpdate();
+    	_.each(this.state.projectData, function(item){ 
+    		if(item.operation === operation)
+    			item.selected = checked;
+    	});
+    	this.forceUpdate();
     },
     handleToggle: function(item, event) {
         item.selected = event.target.checked;
@@ -64,7 +64,7 @@ var ChooseProjects = React.createClass({
     checkAll: function(operation){
         var projects = _.where(this.state.projectData, {operation: operation});
         var projectsSelected = _.where(this.state.projectData, {operation: operation, selected: true});
-        if(projects.length === projectsSelected.length)
+        if(projects.length === projectsSelected.length){}
             return true;
         else
             return false;
