@@ -10,6 +10,7 @@ var Router = require('react-router');
 var RouteHandler = Router.RouteHandler;
 var Navigation = Router.Navigation;
 var formActions = require('./../../actions/form');
+var Cookies = require('js-cookie');
 
 var Wizard = React.createClass({
 	mixins: [Navigation],
@@ -86,30 +87,35 @@ var Wizard = React.createClass({
 			$("#modalResults").modal("show");
 		}.bind(this));
 	},
-	initImportSession: function(sourceProcessor, destinationProcessor) {
+	initImportSession: function(sourceProcessor, destinationProcessor) {			
 		this.showLoadingIcon();
 		var compiledURL = _.template(appConfig.TOOL_START_ENDPOINT);
-		var token = appConfig.DESTINATION_AUTH_TOKEN || "default_token";
 		var url = compiledURL({
 			'sourceProcessor': sourceProcessor,
 			'destinationProcessor': destinationProcessor,
-			'authenticationToken': appConfig.DESTINATION_AUTH_TOKEN,
-			'username': appConfig.DESTINATION_USERNAME,
+			'authenticationToken': Cookies.get("DESTINATION_AUTH_TOKEN"),
+			'username': Cookies.get("DESTINATION_USERNAME"),
 			'host': appConfig.DESTINATION_API_HOST
 		});
 
-		$.get(url , function(result) {
+		$.get(url , function(result) {			
 			this.setState({
 				info: {
 					authenticationToken: result.authenticationToken,
 					sourceProcessorName: result.sourceProcessorName,
 					sourceProcessor: sourceProcessor,
 					destinationProcessorName: result.destinationProcessorName,
-					destinationProcessor: destinationProcessor
+					destinationProcessor: destinationProcessor,
+					status:'SUCCESS'
 				}
 			});
 			this.hideLoadingIcon();     
-		}.bind(this)).fail(function() {
+		}.bind(this)).fail(function(err) {	
+			this.setState({
+				info: {
+					status:'FAIL'
+				}
+			});
 			this.hideLoadingIcon();
 			this.displayError("Error loading state of session.");
 		}.bind(this));

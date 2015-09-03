@@ -64,7 +64,7 @@ var ChooseProjects = React.createClass({
     checkAll: function(operation){
         var projects = _.where(this.state.projectData, {operation: operation});
         var projectsSelected = _.where(this.state.projectData, {operation: operation, selected: true});
-        if(projects.length === projectsSelected.length){}
+        if(projects.length === projectsSelected.length)
             return true;
         else
             return false;
