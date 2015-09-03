@@ -1,6 +1,7 @@
 var React = require('react');
 var reactAsync = require('react-async');
 var Reflux = require('reflux');
+var Cookies = require('js-cookie');
 var appActions = require('./../actions');
 var appConfig = require('./../conf');
 var destinationSessionStore = require('./../stores/DestinationSessionStore');
@@ -17,15 +18,16 @@ var Content = React.createClass({
   componentDidMount  : function() {
     // from the path '/wizard/:id'
     var id = this.props.params.id;
-    this.listenTo(destinationSessionStore, this.updateDestinationSession);
-    //this.listenTo(sessionStore, this.updateSession);
+    this.listenTo(destinationSessionStore, this.updateDestinationSession);    
   },
   updateDestinationSession : function (data) {
     this.setState({
         destinationSessionData: data.sessionData
     });
     appConfig.DESTINATION_AUTH_TOKEN = this.state.destinationSessionData.token;
-    appConfig.DESTINATION_USERNAME = this.state.destinationSessionData['user-name'];
+    appConfig.DESTINATION_USERNAME = this.state.destinationSessionData['user-name'];    
+    Cookies.set("DESTINATION_AUTH_TOKEN", this.state.destinationSessionData.token);
+    Cookies.set("DESTINATION_USERNAME", this.state.destinationSessionData['user-name']);
   },
   updateSession : function (data) {
       this.setState({
