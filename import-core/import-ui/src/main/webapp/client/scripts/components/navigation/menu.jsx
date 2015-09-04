@@ -36,13 +36,23 @@ var Menu = React.createClass({
                     var subMenu = (item.children && item.children.length > 0) ? <SubMenu items={item.children} {...self.props} /> : '';
                     var caret = (item.children && item.children.length > 0) ? 'caret' : '';
                     if (item.position == NAVBAR_LEFT) {
-                        menusLeft.push(<li className="dropdown" key={item.label}>
-                            <Link aria-expanded="true" className="dropdown-toggle" data-toggle="dropdown" role="button" to={item.url}>
-                                <div className={iconClass}></div>{self.props.i18nLib.t(item["i18n-key"])}
-                                <span className={caret}></span>                               
-                            </Link>
-                                {subMenu}
-                        </li>);
+                    	if(item.children){
+                    		menusLeft.push(<li className="dropdown" key={item.label}>
+                    		<Link aria-expanded="true" className="dropdown-toggle" data-toggle="dropdown" role="button" to={item.url}>
+                    		<div className={iconClass}></div>{self.props.i18nLib.t(item["i18n-key"])}
+                    		<span className={caret}></span>                               
+                    		</Link>
+                    		{subMenu}
+                    		</li>);
+                    	}else{
+                    		menusLeft.push(<li className="dropdown" key={item.label}>
+                    		<Link aria-expanded="true" className="dropdown-toggle"  role="button" to={item.url}>
+                    		<div className={iconClass}></div>{self.props.i18nLib.t(item["i18n-key"])}
+                    		<span className={caret}></span>                               
+                    		</Link>
+                    		{subMenu}
+                    		</li>);
+                    	}                        
                     } else {
                         menusRight.push(<li className="dropdown" key={item.label}>
                             <a aria-expanded="true" className="dropdown-toggle" data-toggle="dropdown" href="#" role="button">
