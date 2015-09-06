@@ -55,8 +55,8 @@ var ChooseProjects = React.createClass({
     	});
     	this.forceUpdate();
     },
-    handleToggle: function(item, event) {
-        item.selected = event.target.checked;
+    handleToggle: function(item, event) {    	
+        item.selected = event.target.checked;       
         this.forceUpdate();
     },
     handleAutocompleteToggle: function(item, datum) {
@@ -83,7 +83,7 @@ var ChooseProjects = React.createClass({
     	}
       
     },
-    render: function () {
+    render: function () {  
         var newProjects = [];
         var existingProjects = [];
         var language = this.props.i18nLib.lng() || 'en';        
@@ -173,7 +173,7 @@ var ChooseProjects = React.createClass({
                     </div>
                 </div>
                 <div className="buttons">
-                    <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.handleNext}>{this.props.i18nLib.t('wizard.choose_projects.next')}</button>
+                    <button ref="nextButton"  disabled = { _.where(this.state.projectData, {selected: true}).length > 0 ? "" : "disabled"} className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.handleNext}>{this.props.i18nLib.t('wizard.choose_projects.next')}</button>
                 </div>
                 </div>
             ); } }); 

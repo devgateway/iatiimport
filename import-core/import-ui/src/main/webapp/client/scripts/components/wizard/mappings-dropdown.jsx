@@ -29,8 +29,8 @@ var MappingsDropdown = React.createClass({
 				</li> );
 			}.bind(this));
 		}
-
-		return (
+		if(this.props.mappingTemplatesData.length > 0){
+		     return (
 				<ul className="nav nav-pills navbar-right">
 				<li className="dropdown" role="presentation">
 				<a aria-expanded="false" className="dropdown-toggle" data-toggle="dropdown" href="#" role="button" >
@@ -42,7 +42,9 @@ var MappingsDropdown = React.createClass({
 				</ul>
 				</li>
 				</ul>
-		);
+		    );
+		}
+		return (<span></span>);
 	}
 });
 

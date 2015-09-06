@@ -99,7 +99,7 @@ var UploadFile = React.createClass({
                 </table>
                 <br /><br /><br />
                 <div className="buttons">
-                    <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.props.eventHandlers.uploadFile}>{this.props.i18nLib.t('wizard.upload_file.next')}</button>
+                    <button disabled = {this.state.fileData.length > 0 ? "" : "disabled"} className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.props.eventHandlers.uploadFile}>{this.props.i18nLib.t('wizard.upload_file.next')}</button>
                 </div>
             </div>
             );
