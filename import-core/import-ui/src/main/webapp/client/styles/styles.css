@@ -246,7 +246,7 @@
 	height:40px;
 }
 .btn-custom{
-	width:200px;
+	width:150px;
 }
 
 #language-selector{
@@ -303,4 +303,13 @@
    white-space: -pre-wrap;        
    white-space: -o-pre-wrap;      
    word-wrap: break-word;      
+}
+
+.not-active {
+   pointer-events: none;
+   cursor: default;
+}
+
+.btn-previous{
+	float:left;
 }

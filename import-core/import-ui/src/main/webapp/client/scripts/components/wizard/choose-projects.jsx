@@ -77,12 +77,15 @@ var ChooseProjects = React.createClass({
     	        _.each(processedData, function(item){
                  //item.sourceDocument.dateFields = {};
     	        });
-    	        this.props.eventHandlers.chooseProjects(processedData);    		
+    	        this.props.eventHandlers.chooseProjects(processedData, constants.DIRECTION_NEXT);    		
     	}else{
     		this.props.eventHandlers.displayError("Please select at least one project to proceed");
     	}
       
     },
+    handlePrevious: function(){    	       
+    	this.props.eventHandlers.chooseProjects(this.state.projectData, constants.DIRECTION_PREVIOUS);	
+	},
     render: function () {  
         var newProjects = [];
         var existingProjects = [];
@@ -172,8 +175,15 @@ var ChooseProjects = React.createClass({
                         </div>
                     </div>
                 </div>
-                <div className="buttons">
-                    <button ref="nextButton"  disabled = { _.where(this.state.projectData, {selected: true}).length > 0 ? "" : "disabled"} className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.handleNext}>{this.props.i18nLib.t('wizard.choose_projects.next')}</button>
+                <div className="buttons">                
+                    <div className="row">                          
+                        <div className="col-md-6">                
+                           <button ref="previousButton"   className="btn btn-success navbar-btn btn-custom btn-previous" type="button" onClick={this.handlePrevious}>{this.props.i18nLib.t('wizard.choose_projects.previous')}</button>
+                         </div>
+                       <div className="col-md-6">                
+                          <button ref="nextButton"  disabled = { _.where(this.state.projectData, {selected: true}).length > 0 ? "" : "disabled"} className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.handleNext}>{this.props.i18nLib.t('wizard.choose_projects.next')}</button>               
+                       </div>
+                   </div>                   
                 </div>
                 </div>
             ); } }); 

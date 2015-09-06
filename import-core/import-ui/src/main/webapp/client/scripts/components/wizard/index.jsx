@@ -61,33 +61,50 @@ var Wizard = React.createClass({
 		this.transitionTo('filter', this.props.params);
 	},
 
-	filterData: function(data) {
+	filterData: function(data, direction) {
 		formActions.updateFilters(data).then(function() { 
-			this.transitionTo('projects', this.props.params);
+			if(constants.DIRECTION_NEXT === direction){
+				this.transitionTo('projects', this.props.params);
+			}else{
+				this.transitionTo('upload', this.props.params);
+			}			
 		}.bind(this));
 	},
 
-	chooseProjects: function(data) {
+	chooseProjects: function(data,direction) {
 		formActions.updateSelectedProjects(data).then(function() { 
-			this.transitionTo('fields', this.props.params);
+			if(constants.DIRECTION_NEXT === direction){
+			    this.transitionTo('fields', this.props.params);
+			}else{
+				this.transitionTo('filter', this.props.params);
+			}	
 		}.bind(this));
 	},
 
-	chooseFields: function(data) {
+	chooseFields: function(data, direction) {
 		formActions.updateSelectedFields.triggerPromise(data).then(function() { 
-
-			this.transitionTo('mapvalues', this.props.params);
+			if(constants.DIRECTION_NEXT === direction){
+				this.transitionTo('mapvalues', this.props.params);
+			}else{
+				this.transitionTo('projects', this.props.params);
+			}			
 		}.bind(this)).catch(function(err) {
 			console.log("Error retrieving values");
 		})
 	},
 
-	mapValues: function(data) {
-		formActions.updateSelectedValues(data).then(function() { 
-			this.transitionTo('import', this.props.params);
+	mapValues: function(data, direction) {
+		formActions.updateSelectedValues(data).then(function() {
+			if(constants.DIRECTION_NEXT === direction){
+				this.transitionTo('import', this.props.params);
+			}else{
+				this.transitionTo('fields', this.props.params);
+			}			
 		}.bind(this));
 	},
-
+	navigateBack: function(){
+    	this.transitionTo('mapvalues', this.props.params);
+    },
 	launchImport: function() {
 		$.get('/importer/import/execute', function(result) {
 			this.setState({results: result});
@@ -140,6 +157,7 @@ var Wizard = React.createClass({
     eventHandlers.showLoadingIcon     = this.showLoadingIcon;
     eventHandlers.displayError = this.displayError;
     eventHandlers.updateCurrentStep = this.updateCurrentStep;
+    eventHandlers.navigateBack  = this.navigateBack;
     
     return (
       <div>

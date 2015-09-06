@@ -5,6 +5,9 @@ var ReviewImport = React.createClass({
 	componentDidMount: function() {
 		this.props.eventHandlers.updateCurrentStep(constants.REVIEW_IMPORT);		
 	}, 
+	handlePrevious: function(){
+		this.props.eventHandlers.navigateBack();
+	},	
     render: function () {
         return (
             <div className="panel panel-default">
@@ -38,9 +41,17 @@ var ReviewImport = React.createClass({
                         <div className="col-sm-3 col-md-3"></div>
                     </div>
                     <div className="buttons">
-                        <button className="btn btn-warning navbar-btn btn-custom" type="button">{this.props.i18nLib.t('wizard.review_import.close')}</button>&nbsp;
-                        <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.props.eventHandlers.launchImport}>{this.props.i18nLib.t('wizard.review_import.proceed_import')}</button>
-                    </div>
+                    
+                    <div className="row">                          
+                    <div className="col-md-6">                
+                       <button ref="previousButton"   className="btn btn-success navbar-btn btn-custom btn-previous" type="button" onClick={this.handlePrevious}>{this.props.i18nLib.t('wizard.review_import.previous')}</button>
+                     </div>
+                   <div className="col-md-6">                
+                   <button className="btn btn-warning navbar-btn btn-custom" type="button">{this.props.i18nLib.t('wizard.review_import.close')}</button>&nbsp;
+                   <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.props.eventHandlers.launchImport}>{this.props.i18nLib.t('wizard.review_import.proceed_import')}</button>               
+                   </div>
+                   </div>                        
+                   </div>
                 </div>
             </div>
 

@@ -55,7 +55,10 @@ var MapValues = React.createClass({
     });
   },
   handleNext: function() {
-    this.props.eventHandlers.mapValues(this.state.mappings);
+    this.props.eventHandlers.mapValues(this.state.mappings, constants.DIRECTION_NEXT);
+  },
+  handlePrevious: function() {
+	    this.props.eventHandlers.mapValues(this.state.mappings, constants.DIRECTION_PREVIOUS);
   },
   updateValueMappings: function(sourceFieldData, selectedDestinationValue) {
     var mapping = _.find(this.state.mappings, function(v) { return v.sourceField.uniqueFieldName == sourceFieldData.sourceFieldName });
@@ -129,8 +132,16 @@ var MapValues = React.createClass({
           <TabbedArea activeTab={this.state.activeTab} paneModels={sourceFields} switchTab={this.switchTab}/>
         </div>
         <div className="buttons">
-          <button className="btn btn-warning navbar-btn btn-custom" type="button" data-toggle="modal" data-target="#saveMapValues">{this.props.i18nLib.t('wizard.map_values.save')}</button>&nbsp;
-          <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.handleNext}>{this.props.i18nLib.t('wizard.map_values.next')}</button>
+          
+        <div className="row">                          
+        <div className="col-md-6">                
+           <button ref="previousButton"   className="btn btn-success navbar-btn btn-custom btn-previous" type="button" onClick={this.handlePrevious}>{this.props.i18nLib.t('wizard.map_values.previous')}</button>
+         </div>
+       <div className="col-md-6">                
+       <button className="btn btn-warning navbar-btn btn-custom" type="button" data-toggle="modal" data-target="#saveMapValues">{this.props.i18nLib.t('wizard.map_values.save')}</button>&nbsp;
+       <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.handleNext}>{this.props.i18nLib.t('wizard.map_values.next')}</button>               
+       </div>
+      </div>         
         </div>
         <SaveMappingsDialog {...this.props} reloadTemplateData = {this.loadTemplateData} mappings = {this.state.mappings} />
         </div>

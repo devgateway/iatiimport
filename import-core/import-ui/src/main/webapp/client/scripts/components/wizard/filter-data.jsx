@@ -88,7 +88,10 @@ var FilterData = React.createClass({
 		this.setState( { filterData: this.state.filterData });
 	},
 	handleNext: function() {
-		this.props.eventHandlers.filterData(this.state.filterData);
+		this.props.eventHandlers.filterData(this.state.filterData,constants.DIRECTION_NEXT);
+	},
+	handlePrevious: function(){
+		this.props.eventHandlers.filterData(this.state.filterData,constants.DIRECTION_PREVIOUS);
 	},
 	selectAll: function(field, event) {
 		if(event.target.checked) {
@@ -159,7 +162,10 @@ var FilterData = React.createClass({
                     </div>
                 </div>
                 <div className="buttons">
-                    <button className="btn btn-success navbar-btn btn-custom btn-next" type="button" onClick={this.handleNext}>{this.props.i18nLib.t('wizard.filter_data.next')}</button>
+                    <div className="row">                          
+                          <div className="col-md-6"><button className="btn btn-success navbar-btn btn-custom btn-previous" type="button" onClick={this.handlePrevious}>{this.props.i18nLib.t('wizard.filter_data.previous')}</button></div>
+                          <div className="col-md-6"><button className="btn btn-success navbar-btn btn-custom btn-next" type="button" onClick={this.handleNext}>{this.props.i18nLib.t('wizard.filter_data.next')}</button></div>
+                     </div>                   
                 </div>
                 </div>
             ); 

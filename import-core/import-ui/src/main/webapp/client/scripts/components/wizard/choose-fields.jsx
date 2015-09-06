@@ -127,7 +127,10 @@ var ChooseFields = React.createClass({
 	checkAll: function() {
 	},
 	handleNext: function() {
-		this.props.eventHandlers.chooseFields(this.state.mappingFieldsData);
+		this.props.eventHandlers.chooseFields(this.state.mappingFieldsData, constants.DIRECTION_NEXT);
+	},
+	handlePrevious: function() {
+		this.props.eventHandlers.chooseFields(this.state.mappingFieldsData, constants.DIRECTION_PREVIOUS);
 	},
 	selectAll: function(event){
 		this.forceUpdate();
@@ -242,8 +245,15 @@ var ChooseFields = React.createClass({
                     </table>
                 </div>
                 <div className="buttons">
-                    <button className="btn btn-warning navbar-btn btn-custom" type="button" data-toggle="modal" data-target="#saveMapFields">{this.props.i18nLib.t('wizard.map_fields.save')}</button>&nbsp;
-                    <button disabled = {this.state.mappingFieldsData.length > 0 ? "" : "disabled"}  className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.handleNext}>{this.props.i18nLib.t('wizard.map_fields.next')}</button>
+                <div className="row">                          
+                <div className="col-md-6">                
+                   <button ref="previousButton"  className="btn btn-success navbar-btn btn-custom btn-previous" type="button" onClick={this.handlePrevious}>{this.props.i18nLib.t('wizard.map_fields.previous')}</button>
+                 </div>
+               <div className="col-md-6">                
+                  <button className="btn btn-warning navbar-btn btn-custom" type="button" data-toggle="modal" data-target="#saveMapFields">{this.props.i18nLib.t('wizard.map_fields.save')}</button>&nbsp;
+                  <button disabled = {this.state.mappingFieldsData.length > 0 ? "" : "disabled"}  className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.handleNext}>{this.props.i18nLib.t('wizard.map_fields.next')}</button>               
+               </div>
+                </div>                   
                 </div>
                  <SaveMappingsDialog {...this.props} reloadTemplateData = {this.reloadTemplateData} mappingFieldsData = {this.state.mappingFieldsData} />		 
                 </div>

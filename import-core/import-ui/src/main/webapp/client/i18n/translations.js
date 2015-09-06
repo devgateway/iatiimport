@@ -40,13 +40,15 @@ module.exports = {
 						'upload_date' : 'Date and Time',
 						 'action':'Action',
 						'view' : 'View',
-						'next' : 'Next >>'
+						'next' : 'Next >>',
+						'previous' : '<< Previous'
 					},
 					'filter_data' : {
 						'filter_information': 'Filter Information',
 						'select_filters' : 'Select for each field, which values you would like to include as part of the import process',
 						'language' : 'Language',
-						'next' : 'Next >>'
+						'next' : 'Next >>',
+						'previous' : '<< Previous'
 					},
 					'choose_projects' : {
 						'choose_projects' : 'Choose Projects',
@@ -56,7 +58,8 @@ module.exports = {
 						'source_project' : 'Source Project',
 						'destination_project' : 'Destination Project',
 						'update' : 'Update',
-						'next' : 'Next >>'
+						'next' : 'Next >>',
+						'previous' : '<< Previous'
 					},
 					'map_fields' : {
 						'choose_map_fields' : 'Choose and Map Fields',
@@ -67,7 +70,8 @@ module.exports = {
 						'save' : 'Save',
 						'load_existing_template' : 'Load Existing Template',
 						'usual_field_mapping' : 'Usual Field Mapping',
-						'other_field_mapping' : 'Other Field Mapping'
+						'other_field_mapping' : 'Other Field Mapping',
+						'previous' : '<< Previous'
 					},
 					'map_values' : {
 						'map_field_values' : 'Map Fields Values',
@@ -76,7 +80,8 @@ module.exports = {
 						'update' : 'Update',
 						'next' : 'Next >>',
 						 'source_value':'Source Value',
-						 'destination_value':'Destination Value'
+						 'destination_value':'Destination Value',
+						 'previous' : '<< Previous'
 					},
 					'review_import' : {
 						'review_import' : 'Review and Import',
@@ -86,7 +91,8 @@ module.exports = {
 						'fields_selected' : 'Fields Selected',
 						'values_mapped' : 'Values Mapped',
 						'proceed_import' : 'Proceed with Import',
-						'close' : 'Close '
+						'close' : 'Close ',
+						'previous' : '<< Previous'
 					}
 				}
 			}
@@ -130,13 +136,15 @@ module.exports = {
 						'upload_date' : 'Date et heure',
 						'action':'Action',
 						'view' : 'Vue',
-						'next' : 'Suivant >>'
+						'next' : 'Suivant >>',
+						'previous' : '<< Previous'
 					},
 					'filter_data' : {
 						'filter_information': 'Filtrer l\'information',
 						'select_filters' : 'Sélectionnez pour chaque champ , les valeurs que vous souhaitez inclure dans le cadre du processus d\'importation',
 						'language' : 'Langue',
-						'next' : 'Suivant >>'
+						'next' : 'Suivant >>',
+						'previous' : '<< Previous'
 					},
 					'choose_projects' : {
 						'choose_projects' : 'Choisissez Projets',
@@ -146,7 +154,8 @@ module.exports = {
 						'source_project' : 'Projet de Source',
 						'destination_project' : 'Destination Project',
 						'update' : 'Mise À Jour',
-						'next' : 'Suivant >>'
+						'next' : 'Suivant >>',
+						'previous' : '<< Previous'
 					},
 					'map_fields' : {
 						'choose_map_fields' : 'Choisissez et Carte champs',
@@ -157,7 +166,8 @@ module.exports = {
 						'save' : 'Sauvegarder',
 						'load_existing_template' : 'Charge modèle existant',
 						'usual_field_mapping' : 'Correspondance des champs d\'habitude',
-						'other_field_mapping' : 'Autre Correspondance des champs'
+						'other_field_mapping' : 'Autre Correspondance des champs',
+						'previous' : '<< Previous'
 					},
 					'map_values' : {
 						'map_field_values' : 'Plan valeurs des champs',
@@ -166,7 +176,8 @@ module.exports = {
 						'update' : 'Mise À Jour',
 						'next' : 'Suivant >>',
 						'source_value':'Valeur Source',
-						'destination_value':'Destinations Valeur'
+						'destination_value':'Destinations Valeur',
+						'previous' : '<< Previous'
 					},
 					'review_import' : {
 						'review_import' : 'Examen et à l\'importation',
@@ -176,7 +187,8 @@ module.exports = {
 						'fields_selected' : 'Champs Sélectionnés',
 						'values_mapped' : 'Valeurs Mappées',
 						'proceed_import' : 'Procéder à l\'importation',
-						'close' : 'Fermer '
+						'close' : 'Fermer ',
+						'previous' : '<< Previous'
 					}
 				}
 			}
