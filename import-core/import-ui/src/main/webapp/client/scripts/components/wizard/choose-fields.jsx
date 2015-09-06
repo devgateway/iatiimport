@@ -14,6 +14,7 @@ var fieldMappingTemplateStore = require('./../../stores/FieldMappingTemplateStor
 var _ = require('lodash/dist/lodash.underscore');
 var formActions = require('./../../actions/form');
 var appActions = require('./../../actions');
+var constants = require('./../../utils/constants');
 
 var ChooseFields = React.createClass({
 	mixins: [Reflux.ListenerMixin],
@@ -25,6 +26,7 @@ var ChooseFields = React.createClass({
 	mappingDataLoaded:false,
 	errorMsg: "",
 	componentDidMount: function() {
+		this.props.eventHandlers.updateCurrentStep(constants.CHOOSE_FIELDS);
 		this.listenTo(destinationFieldsStore, this.updateDestinationFields);
 		this.listenTo(sourceFieldsStore, this.updateSourceFields);
 		this.listenTo(fieldMappingStore, this.updateFieldMappingStore);

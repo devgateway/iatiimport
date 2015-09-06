@@ -8,6 +8,7 @@ var Router = require('react-router');
 var Link = Router.Link;
 var AutoComplete = require('./autocomplete');
 var _ = require('lodash/dist/lodash.underscore');
+var constants = require('./../../utils/constants');
 
 var ChooseProjects = React.createClass({
     mixins: [
@@ -17,6 +18,7 @@ var ChooseProjects = React.createClass({
        return {projectData: []};
     },
     componentWillMount: function () {
+     this.props.eventHandlers.updateCurrentStep(constants.CHOOSE_PROJECTS);
      this.listenTo(projectStore, this.updateProject);             
      this.loadData();
     },
@@ -70,12 +72,16 @@ var ChooseProjects = React.createClass({
             return false;
     },
     handleNext: function() {
-        debugger;
-        var processedData = this.state.projectData;
-        _.each(processedData, function(item){
-//            item.sourceDocument.dateFields = {};
-        });
-        this.props.eventHandlers.chooseProjects(processedData);
+    	if(_.where(this.state.projectData, {selected: true}).length > 0){
+    		  var processedData = this.state.projectData;    	        
+    	        _.each(processedData, function(item){
+                 //item.sourceDocument.dateFields = {};
+    	        });
+    	        this.props.eventHandlers.chooseProjects(processedData);    		
+    	}else{
+    		this.props.eventHandlers.displayError("Please select at least one project to proceed");
+    	}
+      
     },
     render: function () {
         var newProjects = [];

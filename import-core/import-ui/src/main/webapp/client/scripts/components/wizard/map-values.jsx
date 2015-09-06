@@ -12,7 +12,7 @@ var valueMappingStore = require('./../../stores/ValueMappingStore');
 var valueMappingTemplateStore = require('./../../stores/ValueMappingTemplateStore');
 var _ = require('lodash/dist/lodash.underscore');
 var FieldMappingsDropdown = require('./mappings-dropdown.jsx');
-
+var constants = require('./../../utils/constants');
 
 var MapValues = React.createClass({
     mixins: [Reflux.ListenerMixin],
@@ -24,6 +24,7 @@ var MapValues = React.createClass({
     }
   },
   componentDidMount: function() {
+	  this.props.eventHandlers.updateCurrentStep(constants.MAP_VALUES);
       this.listenTo(valueMappingStore, this.updateValueMappingStore);
       this.listenTo(valueMappingTemplateStore, this.updateMappingTemplatesData);
       this.loadData();

@@ -11,13 +11,16 @@ var RouteHandler = Router.RouteHandler;
 var Navigation = Router.Navigation;
 var formActions = require('./../../actions/form');
 var Cookies = require('js-cookie');
+var constants = require('./../../utils/constants');
 
 var Wizard = React.createClass({
 	mixins: [Navigation],
 	getInitialState: function() {
 		return {
 			info: {},
-			results: []
+			results: [],
+			currentStep: constants.UPLOAD_FILE,
+			completedSteps: []
 		};
 	},
 	
@@ -32,7 +35,11 @@ var Wizard = React.createClass({
 		var destinationProcessor = this.props.params.dst;
 		this.initImportSession(sourceProcessor, destinationProcessor);
 	},
-	
+	updateCurrentStep : function(step){
+	  var completedSteps = this.state.completedSteps; 
+	  completedSteps.push(step);
+	  this.setState({currentStep:step, completedSteps: completedSteps})
+	},
 	hideLoadingIcon: function(){ 
 		if(!_.isEmpty(this.state.info)){
 			$(this.refs.loadingIcon.getDOMNode()).hide();
@@ -121,7 +128,7 @@ var Wizard = React.createClass({
 		}.bind(this));
 	},
   
-  render: function() {
+  render: function() {	
     var eventHandlers = {};
     eventHandlers.uploadFile          = this.uploadFile;
     eventHandlers.filterData          = this.filterData;
@@ -132,6 +139,7 @@ var Wizard = React.createClass({
     eventHandlers.hideLoadingIcon     = this.hideLoadingIcon;
     eventHandlers.showLoadingIcon     = this.showLoadingIcon;
     eventHandlers.displayError = this.displayError;
+    eventHandlers.updateCurrentStep = this.updateCurrentStep;
     
     return (
       <div>
@@ -139,7 +147,7 @@ var Wizard = React.createClass({
       <h2>{this.props.i18nLib.t('wizard.import_process')}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       <small>{this.state.info.sourceProcessorName} to {this.state.info.destinationProcessorName} </small></h2>
       <div className="row">
-      <WizardSteps {...this.props}/>
+      <WizardSteps {...this.props} currentStep = {this.state.currentStep} completedSteps= {this.state.completedSteps} />
       <div className="col-sm-9 col-md-9 main " >
       <div className="alert alert-danger message-box" role="alert" ref="messageBox">
        <span className="glyphicon glyphicon-exclamation-sign error-box" aria-hidden="true"></span>

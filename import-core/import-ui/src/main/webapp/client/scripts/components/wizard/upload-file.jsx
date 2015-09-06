@@ -6,6 +6,7 @@ var reactAsync = require('react-async');
 var Reflux = require('reflux');
 var appActions = require('./../../actions');
 var appConfig = require('./../../conf');
+var constants = require('./../../utils/constants');
 
 var UploadFile = React.createClass({
     mixins: [Reflux.ListenerMixin
@@ -13,7 +14,8 @@ var UploadFile = React.createClass({
     getInitialState: function() {
        return {fileData: []};
     },
-    componentDidMount: function() {     
+    componentDidMount: function() {  
+    	this.props.eventHandlers.updateCurrentStep(constants.UPLOAD_FILE);
         this.listenTo(fileStore, this.updateFileData);
         this.loadData();     
         var $el = $(this.refs.iatiFileInput.getDOMNode());

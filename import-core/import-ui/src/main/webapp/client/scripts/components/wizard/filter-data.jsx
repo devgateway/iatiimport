@@ -5,9 +5,9 @@ var appActions = require('./../../actions');
 var Router = require('react-router');
 var Link = Router.Link;
 var _ = require('lodash/dist/lodash.underscore');
-
 var languageStore = require('./../../stores/LanguageStore');
 var filterStore = require('./../../stores/FilterStore');
+var constants = require('./../../utils/constants');
 
 var FilterData = React.createClass({
 	mixins: [Reflux.ListenerMixin],
@@ -18,6 +18,7 @@ var FilterData = React.createClass({
 	filterDataLoaded: false,
 	errorMsg:"",
 	componentDidMount: function() {
+		this.props.eventHandlers.updateCurrentStep(constants.FILTER_DATA);
 		this.listenTo(languageStore, this.updateLanguages);
 		this.listenTo(filterStore, this.updateFilters);
 		this.loadData();

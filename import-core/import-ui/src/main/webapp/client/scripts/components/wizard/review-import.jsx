@@ -1,5 +1,10 @@
 var React = require('react');
+var constants = require('./../../utils/constants');
+
 var ReviewImport = React.createClass({
+	componentDidMount: function() {
+		this.props.eventHandlers.updateCurrentStep(constants.REVIEW_IMPORT);		
+	}, 
     render: function () {
         return (
             <div className="panel panel-default">
