@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value = "/importer/reports")
+@RequestMapping(value = "/reports")
 class ReportController {
 	@Autowired
 	private FileRepository fileRepository;

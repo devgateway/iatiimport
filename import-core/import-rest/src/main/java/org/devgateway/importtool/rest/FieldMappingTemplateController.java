@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
-@RequestMapping(value = "/importer/fieldmappingtemplate")
+@RequestMapping(value = "/fieldmappingtemplate")
 class FieldMappingTemplateController {
 	@Autowired
 	private FieldMappingTemplateRepository fieldMappingTemplateRepository;
