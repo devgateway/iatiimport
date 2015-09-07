@@ -16,7 +16,7 @@ var CustomSelect = React.createClass({
            return <option key={option[this.props.value]} value={option[this.props.value]}>{option[this.props.label]}</option>;
         }.bind(this));
         return(           
-               <select className="form-control" onChange={this.change} value={this.props.initialOption}>
+               <select className="form-control" onChange={this.change} value={this.props.initialOption} disabled = {this.props.disabled}>
                  <option value="" >Select</option>
                  {optionNodes}
                </select>          

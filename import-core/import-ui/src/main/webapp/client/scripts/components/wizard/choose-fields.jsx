@@ -211,8 +211,8 @@ var ChooseFields = React.createClass({
                                 {item.displayName}
                             </div>
                         </td>
-                        <td>             
-                        <CustomSelect initialOption={value} options={options} value="value" label="label" data={item} handleChange={this.handleSelectToggle}/>
+                        <td >             
+                        <CustomSelect disabled = {mapping ? "" : "disabled"} initialOption={value} options={options} value="value" label="label" data={item} handleChange={this.handleSelectToggle}/>
                         </td>
                     </tr>);
                 }                
