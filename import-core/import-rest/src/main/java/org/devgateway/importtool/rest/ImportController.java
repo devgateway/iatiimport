@@ -40,7 +40,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping(value = "/importer/import")
+@RequestMapping(value = "/import")
 class ImportController {
 
 	@Autowired
@@ -144,13 +144,13 @@ class ImportController {
 
 		documentMapper.setSourceProcessor(srcProcessor);
 		documentMapper.setDestinationProcessor(destProcessor);
-		if (!documentMapper.isInitialized()) {
+//		if (!documentMapper.isInitialized()) {
 			try {
 				documentMapper.initialize();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		}
+	//	}
 
 		return new ResponseEntity<>(documentMapper.getDocumentMappings(), HttpStatus.OK);
 	}

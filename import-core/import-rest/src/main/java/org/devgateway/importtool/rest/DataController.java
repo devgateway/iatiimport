@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value = "/importer/data")
+@RequestMapping(value = "/data")
 class DataController {
 
 	@RequestMapping(method = RequestMethod.GET, value = "/source/filters")
