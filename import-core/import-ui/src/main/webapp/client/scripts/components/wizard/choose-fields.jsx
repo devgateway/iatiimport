@@ -189,31 +189,6 @@ var ChooseFields = React.createClass({
 			console.log(err);      
 			console.log('Error loading mapping templates')
 		}.bind(this));
-	},  
-	createGroupHeader: function(type){
-		var header;
-		switch(type){
-		case constants.FIELD_TYPE.MULTILANG_STRING:
-			header = <tr className="group-header"><td className = "group-title">Multi-language Fields</td> <td ></td> <td ></td></tr>;
-			break;
-		case constants.FIELD_TYPE.STRING:
-			header = <tr className="group-header"><td className = "group-title">String Fields</td> <td ></td> <td ></td></tr>;
-			break;
-		case constants.FIELD_TYPE.LIST:
-			header = <tr className="group-header"><td className = "group-title">List Fields</td> <td ></td> <td ></td></tr>;
-			break;
-		case constants.FIELD_TYPE.DATE:
-			header = <tr className="group-header"><td className = "group-title">Date Fields</td> <td ></td> <td ></td></tr>;
-			break;
-		case constants.FIELD_TYPE.ORGANIZATION:
-			header = <tr className="group-header"><td className = "group-title">Organization Fields</td> <td ></td> <td ></td></tr>;
-			break;
-		case constants.FIELD_TYPE.TRANSACTION:
-			header = <tr className="group-header"><td className = "group-title">Transaction Fields</td> <td ></td> <td ></td></tr>;
-			break;
-		default:
-		}
-		return header;
 	},
     render: function() {
     	var rows = {}
@@ -223,7 +198,7 @@ var ChooseFields = React.createClass({
                 if(item.mappable) {                	
                 	if(!rows[item.type]){
                 		rows[item.type] = [];
-                		rows[item.type].push(this.createGroupHeader(item.type));
+                		rows[item.type].push(<tr className="group-header"><td className = "group-title">{constants.FIELD_TYPE_FRIENDLY_NAME[item.type]} Fields</td> <td ></td> <td ></td></tr>);
                 	}
                     var selected = _.some(this.state.mappingFieldsData, function(v) { return item.uniqueFieldName == v.sourceField.uniqueFieldName});				
                     var mapping = _.find(this.state.mappingFieldsData, function(v) { return item.uniqueFieldName == v.sourceField.uniqueFieldName});
