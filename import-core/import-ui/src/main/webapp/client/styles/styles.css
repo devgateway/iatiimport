@@ -313,3 +313,11 @@
 .btn-previous{
 	float:left;
 }
+
+.group-title{
+	font-weight: bold;
+	
+}
+.group-header{
+	border-bottom:3px solid #ddd;	
+}

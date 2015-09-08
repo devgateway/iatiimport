@@ -190,19 +190,48 @@ var ChooseFields = React.createClass({
 			console.log('Error loading mapping templates')
 		}.bind(this));
 	},  
+	createGroupHeader: function(type){
+		var header;
+		switch(type){
+		case constants.FIELD_TYPE.MULTILANG_STRING:
+			header = <tr className="group-header"><td className = "group-title">Multi-language Fields</td> <td ></td> <td ></td></tr>;
+			break;
+		case constants.FIELD_TYPE.STRING:
+			header = <tr className="group-header"><td className = "group-title">String Fields</td> <td ></td> <td ></td></tr>;
+			break;
+		case constants.FIELD_TYPE.LIST:
+			header = <tr className="group-header"><td className = "group-title">List Fields</td> <td ></td> <td ></td></tr>;
+			break;
+		case constants.FIELD_TYPE.DATE:
+			header = <tr className="group-header"><td className = "group-title">Date Fields</td> <td ></td> <td ></td></tr>;
+			break;
+		case constants.FIELD_TYPE.ORGANIZATION:
+			header = <tr className="group-header"><td className = "group-title">Organization Fields</td> <td ></td> <td ></td></tr>;
+			break;
+		case constants.FIELD_TYPE.TRANSACTION:
+			header = <tr className="group-header"><td className = "group-title">Transaction Fields</td> <td ></td> <td ></td></tr>;
+			break;
+		default:
+		}
+		return header;
+	},
     render: function() {
-        var rows = [];
+    	var rows = {}
         if (this.state.destinationFieldsData && this.state.sourceFieldsData) {             
-           $.map(this.state.sourceFieldsData, function(item, i) {
+           $.map(this.state.sourceFieldsData, function(item, i) {        	    
                 var options = this.getOptions(item);
-                if(item.mappable) {
+                if(item.mappable) {                	
+                	if(!rows[item.type]){
+                		rows[item.type] = [];
+                		rows[item.type].push(this.createGroupHeader(item.type));
+                	}
                     var selected = _.some(this.state.mappingFieldsData, function(v) { return item.uniqueFieldName == v.sourceField.uniqueFieldName});				
                     var mapping = _.find(this.state.mappingFieldsData, function(v) { return item.uniqueFieldName == v.sourceField.uniqueFieldName});
                     var value = "";
                     if(mapping && mapping.destinationField) {					    
                         value = mapping.destinationField.uniqueFieldName;				
                     }
-                    rows.push(<tr key={item.uniqueFieldName}>
+                    rows[item.type].push(<tr key={item.uniqueFieldName}>
                         <td>
                             <input value={item.uniqueFieldName} aria-label="Field1" type="checkbox" checked={selected} onChange={this.handleToggle.bind(this, item)}/>
                         </td>
@@ -239,8 +268,13 @@ var ChooseFields = React.createClass({
                                 </th>
                             </tr>
                         </thead>
-                        <tbody>
-                            {rows}
+                        <tbody>                       
+                        {rows[constants.FIELD_TYPE.MULTILANG_STRING]}                        
+                        {rows[constants.FIELD_TYPE.STRING]}                        
+                        {rows[constants.FIELD_TYPE.LIST]}                        
+                        {rows[constants.FIELD_TYPE.DATE]}                        
+                        {rows[constants.FIELD_TYPE.ORGANIZATION]}                        
+                        {rows[constants.FIELD_TYPE.TRANSACTION]}
                         </tbody>
                     </table>
                 </div>
