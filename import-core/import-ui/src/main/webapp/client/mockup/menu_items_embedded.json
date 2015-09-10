@@ -59,14 +59,6 @@
                 "enabled": true,
                 "type":"menu-item",
                  "url": "#/reports/previousimports"
-            },
-            {
-                "i18n-key":"header.nav.menu.submenu.logs",
-                "name": "logs",
-                "label": "Logs",
-                "enabled": true,
-                "type": "menu-item",
-                "url": "#/reports/logs"
             }
         ]
     },
