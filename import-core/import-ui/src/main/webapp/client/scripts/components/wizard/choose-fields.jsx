@@ -79,7 +79,7 @@ var ChooseFields = React.createClass({
 		}.bind(this)).catch(function(err) {
 			this.destDataLoaded = true; 
 			this.hideLoadingIcon();        
-			this.errorMsg += " Error retrieving destination fields.";
+			this.errorMsg += this.props.i18nLib.t('wizard.map_fields.msg_error_retrieving_destination_fields');
 			this.displayError(); 
 		}.bind(this)); 
 
@@ -90,7 +90,7 @@ var ChooseFields = React.createClass({
 		}.bind(this)).catch(function(err) {
 			this.sourceDataLoaded = true;
 			this.hideLoadingIcon();        
-			this.errorMsg += " Error retrieving source fields.";  
+			this.errorMsg += this.props.i18nLib.t('wizard.map_fields.msg_error_retrieving_source_fields');  
 			this.displayError();      
 		}.bind(this));
 
@@ -101,15 +101,15 @@ var ChooseFields = React.createClass({
 		}.bind(this)).catch(function(err) {
 			this.mappingDataLoaded = true;
 			this.hideLoadingIcon();       
-			this.errorMsg += " Error retrieving field mappings.";  
+			this.errorMsg += this.props.i18nLib.t('wizard.map_fields.msg_error_retrieving_mappings');  
 			this.displayError();       
 		}.bind(this));
 
 		appActions.loadFieldMappingsTemplateList.triggerPromise().then(function(data) {                              
 			this.updateMappingTemplatesData(data); 
-		}.bind(this)).catch(function(err) { 
-			console.log(err);      
-			console.log('Error loading mapping templates')
+		}.bind(this)).catch(function(err) {			     
+			this.errorMsg += this.props.i18nLib.t('wizard.map_fields.msg_error_retrieving_templates');
+			this.displayError();			
 		}.bind(this));
 	},  
 	selectFieldMapping: function(event){
@@ -186,19 +186,19 @@ var ChooseFields = React.createClass({
 		appActions.loadFieldMappingsTemplateList.triggerPromise().then(function(data) {                              
 			this.updateMappingTemplatesData(data); 
 		}.bind(this)).catch(function(err) { 
-			console.log(err);      
-			console.log('Error loading mapping templates')
+			this.errorMsg += this.props.i18nLib.t('wizard.map_fields.msg_error_retrieving_templates');
+			this.displayError();
 		}.bind(this));
 	},
     render: function() {
-    	var rows = {}
+    	var rows = {};
         if (this.state.destinationFieldsData && this.state.sourceFieldsData) {             
            $.map(this.state.sourceFieldsData, function(item, i) {        	    
                 var options = this.getOptions(item);
                 if(item.mappable) {                	
                 	if(!rows[item.type]){
                 		rows[item.type] = [];
-                		rows[item.type].push(<tr className="group-header"><td className = "group-title">{constants.FIELD_TYPE_FRIENDLY_NAME[item.type]} Fields</td> <td ></td> <td ></td></tr>);
+                		rows[item.type].push(<tr className="group-header"><td className = "group-title">{this.props.i18nLib.t('wizard.map_fields.' + item.type.toLowerCase())}</td> <td ></td> <td ></td></tr>);
                 	}
                     var selected = _.some(this.state.mappingFieldsData, function(v) { return item.uniqueFieldName == v.sourceField.uniqueFieldName});				
                     var mapping = _.find(this.state.mappingFieldsData, function(v) { return item.uniqueFieldName == v.sourceField.uniqueFieldName});

@@ -41,14 +41,19 @@ module.exports = {
 						 'action':'Action',
 						'view' : 'View',
 						'next' : 'Next >>',
-						'previous' : '<< Previous'
+						'previous' : '<< Previous',
+						 'msg_file_exists': ' File with same name already exists ',
+						 'msg_error_retrieving_files': 'Error retrieving uploaded files'
 					},
 					'filter_data' : {
 						'filter_information': 'Filter Information',
 						'select_filters' : 'Select for each field, which values you would like to include as part of the import process',
 						'language' : 'Language',
 						'next' : 'Next >>',
-						'previous' : '<< Previous'
+						'previous' : '<< Previous',
+						'msg_error_retrieving_languages': 'Error retrieving languages.',
+						'msg_error_retrieving_filters': ' Error retrieving filters.'
+						
 					},
 					'choose_projects' : {
 						'choose_projects' : 'Choose Projects',
@@ -59,7 +64,9 @@ module.exports = {
 						'destination_project' : 'Destination Project',
 						'update' : 'Update',
 						'next' : 'Next >>',
-						'previous' : '<< Previous'
+						'previous' : '<< Previous',
+						'msg_error_retrieving_projects': ' Error retrieving filters.',
+						'msg_error_select_project': ' Please select at least one project to proceed'
 					},
 					'map_fields' : {
 						'choose_map_fields' : 'Choose and Map Fields',
@@ -71,7 +78,17 @@ module.exports = {
 						'load_existing_template' : 'Load Existing Template',
 						'usual_field_mapping' : 'Usual Field Mapping',
 						'other_field_mapping' : 'Other Field Mapping',
-						'previous' : '<< Previous'
+						'previous' : '<< Previous',
+						'multilang_string': 'Multi-language Fields',
+					    'string': 'String Fields',
+					    'list':'List Fields',
+					    'date': 'Date Fields',
+					    'transaction': 'Transaction Fields',
+					    'organization': 'Orgarnization Fields',
+					    'msg_error_retrieving_destination_fields': ' Error retrieving destination fields.',
+					    'msg_error_retrieving_source_fields': ' Error retrieving source fields.',
+					    'msg_error_retrieving_mappings': ' Error retrieving field mappings.',
+					    'msg_error_retrieving_templates': ' Error loading mapping templates'					    
 					},
 					'map_values' : {
 						'map_field_values' : 'Map Fields Values',
@@ -137,14 +154,18 @@ module.exports = {
 						'action':'Action',
 						'view' : 'Vue',
 						'next' : 'Suivant >>',
-						'previous' : '<< Previous'
+						'previous' : '<< Previous',
+						 'msg_file_exists': ' File with same name already exists ',
+						 'msg_error_retrieving_files': 'Error retrieving uploaded files'
 					},
 					'filter_data' : {
 						'filter_information': 'Filtrer l\'information',
 						'select_filters' : 'Sélectionnez pour chaque champ , les valeurs que vous souhaitez inclure dans le cadre du processus d\'importation',
 						'language' : 'Langue',
 						'next' : 'Suivant >>',
-						'previous' : '<< Previous'
+						'previous' : '<< Previous',
+						'msg_error_retrieving_languages': 'Error retrieving languages.',
+						'msg_error_retrieving_filters': ' Error retrieving filters.'
 					},
 					'choose_projects' : {
 						'choose_projects' : 'Choisissez Projets',
@@ -155,7 +176,9 @@ module.exports = {
 						'destination_project' : 'Destination Project',
 						'update' : 'Mise À Jour',
 						'next' : 'Suivant >>',
-						'previous' : '<< Previous'
+						'previous' : '<< Previous',
+						'msg_error_retrieving_projects': ' Error retrieving filters.',
+						'msg_error_select_project': ' Please select at least one project to proceed'
 					},
 					'map_fields' : {
 						'choose_map_fields' : 'Choisissez et Carte champs',
@@ -167,7 +190,18 @@ module.exports = {
 						'load_existing_template' : 'Charge modèle existant',
 						'usual_field_mapping' : 'Correspondance des champs d\'habitude',
 						'other_field_mapping' : 'Autre Correspondance des champs',
-						'previous' : '<< Previous'
+						'previous' : '<< Previous',
+						'multilang_string': 'Les champs multi-langues',
+					    'string': 'Les champs à Cordes',
+					    'list':'Liste champs',
+					    'date': 'Champs de date',
+					    'transaction': 'Transaction champs',
+					    'organization': 'Orgarnization champs',
+					    'msg_error_retrieving_destination_fields': ' Error retrieving destination fields.',
+					    'msg_error_retrieving_source_fields': ' Error retrieving source fields.',
+					    'msg_error_retrieving_mappings': ' Error retrieving field mappings.',
+					    'msg_error_retrieving_templates': ' Error loading mapping templates'
+						
 					},
 					'map_values' : {
 						'map_field_values' : 'Plan valeurs des champs',

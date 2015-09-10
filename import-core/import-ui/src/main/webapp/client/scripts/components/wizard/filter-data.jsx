@@ -44,7 +44,7 @@ var FilterData = React.createClass({
 		}.bind(this)).catch(function(err) {       
 			this.languageDataLoaded = true;
 			this.hideLoadingIcon(); 
-			this.errorMsg += " Error retrieving languages.";
+			this.errorMsg += this.props.i18nLib.t('wizard.filter_data.msg_error_retrieving_languages');
 			this.displayError();        
 		}.bind(this));
 
@@ -55,7 +55,7 @@ var FilterData = React.createClass({
 		}.bind(this)).catch(function(err) {
 			this.filterDataLoaded = true; 
 			this.hideLoadingIcon(); 
-			this.errorMsg += " Error retrieving filters.";
+			this.errorMsg += this.props.i18nLib.t('wizard.filter_data.msg_error_retrieving_filters');
 			this.displayError();                          
 		}.bind(this));
 	},

@@ -34,7 +34,7 @@ var ChooseProjects = React.createClass({
     		this.updateProject(data);                
     	}.bind(this)).catch(function(err) {
     		this.props.eventHandlers.hideLoadingIcon();        
-    		this.props.eventHandlers.displayError("Error retrieving project data");
+    		this.props.eventHandlers.displayError(this.props.i18nLib.t('wizard.choose_projects.msg_error_retrieving_projects'));
     	}.bind(this)); 
     },  
     selectAll: function(){ 
@@ -79,7 +79,7 @@ var ChooseProjects = React.createClass({
     	        });
     	        this.props.eventHandlers.chooseProjects(processedData, constants.DIRECTION_NEXT);    		
     	}else{
-    		this.props.eventHandlers.displayError("Please select at least one project to proceed");
+    		this.props.eventHandlers.displayError(this.props.i18nLib.t('wizard.choose_projects.msg_error_select_project'));
     	}
       
     },

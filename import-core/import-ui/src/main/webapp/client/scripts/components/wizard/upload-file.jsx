@@ -36,7 +36,7 @@ var UploadFile = React.createClass({
                 });
                 if(alreadyExists) {
                     return {
-                        "message": " File with same name already exists "
+                        "message": self.props.i18nLib.t('wizard.upload_file.msg_file_exists')
                     }
                 }
          });
@@ -52,7 +52,7 @@ var UploadFile = React.createClass({
         this.updateFileData(data); 
       }.bind(this)).catch(function(err) {       
         this.props.eventHandlers.hideLoadingIcon(); 
-        this.props.eventHandlers.displayError("Error retrieving uploaded files");
+        this.props.eventHandlers.displayError(this.props.i18nLib.t('wizard.upload_file.msg_error_retrieving_files'));
       }.bind(this)); 
     },
     updateFileData: function(data) {
