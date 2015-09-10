@@ -98,7 +98,22 @@ module.exports = {
 						'next' : 'Next >>',
 						 'source_value':'Source Value',
 						 'destination_value':'Destination Value',
-						 'previous' : '<< Previous'
+						 'previous' : '<< Previous',
+						 'msg_error_retrieving_value_mappings': ' Error retrieving value mappings',
+						 'msg_error_loading_templates': ' Error loading mapping templates'
+					},
+					'save_field_mappings_dlg': {
+					    'msg_error_saving': 'Error saving template',
+					    'title': 'Save Field Mappings',
+					    'close': 'close',
+					    'save_mapping': 'Save Mapping'
+					  
+					},
+					'save_value_mappings_dlg':{
+					  'msg_error_saving': 'Error saving template',
+					  'title': 'Save Value Mappings',
+					  'close': 'close',
+					  'save_mapping': 'Save Mapping'	
 					},
 					'review_import' : {
 						'review_import' : 'Review and Import',
@@ -211,7 +226,9 @@ module.exports = {
 						'next' : 'Suivant >>',
 						'source_value':'Valeur Source',
 						'destination_value':'Destinations Valeur',
-						'previous' : '<< Previous'
+						'previous' : '<< Previous',
+						'msg_error_retrieving_value_mappings': ' Error retrieving value mappings',
+						'msg_error_loading_templates': ' Error loading mapping templates'
 					},
 					'review_import' : {
 						'review_import' : 'Examen et à l\'importation',
@@ -223,7 +240,20 @@ module.exports = {
 						'proceed_import' : 'Procéder à l\'importation',
 						'close' : 'Fermer ',
 						'previous' : '<< Previous'
-					}
+					},
+					'save_field_mappings_dlg': {
+					    'msg_error_saving': 'Error saving template',
+					    'title': 'Save Field Mappings',
+					    'close': 'close',
+					    'save_mapping': 'Save Mapping'
+					  
+					},
+					'save_value_mappings_dlg':{
+					  'msg_error_saving': 'Error saving template',
+					  'title': 'Save Value Mappings',
+					  'close': 'close',
+					  'save_mapping': 'Save Mapping'	
+					},
 				}
 			}
 		}

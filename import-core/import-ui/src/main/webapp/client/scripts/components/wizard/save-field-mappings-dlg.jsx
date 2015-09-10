@@ -7,15 +7,14 @@ var SaveMappingsDialog = React.createClass({
     saveMappings: function(){       
      formActions.saveFieldMappingsTemplate({fieldMapping:this.props.mappingFieldsData, name:this.state.name}).then(function(data) {
         if(data.error){
-           this.displayError("Error saving template");
+           this.displayError(this.props.i18nLib.t('wizard.save_field_mappings_dlg.msg_error_saving'));
         }else{ 
         	this.refs.mappingsName.getDOMNode().value = ''; 
             this.props.reloadTemplateData();            
             $('#saveMapFields').modal('hide');
         }            
      }.bind(this)).catch(function(err) {
-        this.displayError("Error saving template");
-        console.log("Error saving template");
+        this.displayError(this.props.i18nLib.t('wizard.save_field_mappings_dlg.msg_error_saving'));        
      }.bind(this));
     },
     handleNameChange: function(e){
@@ -34,7 +33,7 @@ var SaveMappingsDialog = React.createClass({
 			    <div className="modal-content">
 			      <div className="modal-header">
 			        <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">�</span></button>
-			        <h4 className="modal-title" id="myModalLabel2">Save Mapping</h4>
+			        <h4 className="modal-title" id="myModalLabel2">{this.props.i18nLib.t('wizard.save_field_mappings_dlg.title')}</h4>
 			      </div>
 			      <div className="modal-body">
 			      <div className="alert alert-danger message-box" role="alert" ref="messageBox">
@@ -45,8 +44,8 @@ var SaveMappingsDialog = React.createClass({
 			        Mapping Name: <input ref="mappingsName" type="text" onChange = {this.handleNameChange} />
 			      </div>
 			      <div className="modal-footer">
-			        <button type="button" className="btn btn-default" data-dismiss="modal">Close</button>
-			        <button type="button" className="btn btn-primary" onClick={this.saveMappings}>Save Mapping</button>
+			        <button type="button" className="btn btn-default" data-dismiss="modal">{this.props.i18nLib.t('wizard.save_field_mappings_dlg.close')}</button>
+			        <button type="button" className="btn btn-primary" onClick={this.saveMappings}>{this.props.i18nLib.t('wizard.save_field_mappings_dlg.save_mapping')}</button>
 			      </div>
 			    </div>
 			  </div>

@@ -45,7 +45,7 @@ var MapValues = React.createClass({
         this.props.eventHandlers.hideLoadingIcon();                       
         this.updateValueMappingStore(data); 
       }.bind(this)).catch(function(err) {        
-        this.props.eventHandlers.displayError("Error retrieving value mappings");
+        this.props.eventHandlers.displayError(this.props.i18nLib.t('wizard.map_values.msg_error_retrieving_value_mappings'));
       }.bind(this));
       this.loadTemplateData();
   },  
@@ -99,8 +99,7 @@ var MapValues = React.createClass({
 		appActions.loadValueMappingsTemplateList.triggerPromise().then(function(data) {                              
 			this.updateMappingTemplatesData(data); 
 		}.bind(this)).catch(function(err) { 
-			console.log(err);      
-			console.log('Error loading mapping templates')
+			this.props.eventHandlers.displayError(this.props.i18nLib.t('wizard.map_values.msg_error_loading_templates'));
 		}.bind(this));
   },
   render: function() {	
