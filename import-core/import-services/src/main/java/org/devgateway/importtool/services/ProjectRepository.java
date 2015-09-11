@@ -10,4 +10,5 @@ import org.springframework.data.domain.Pageable;
 public interface ProjectRepository extends PagingAndSortingRepository<Project, Long> {
 	List<Project> findAll();
 	Page<Project> findByFileId(Long id, Pageable pageable);
+	List<Project> deleteByFileId(Long id);
 }
