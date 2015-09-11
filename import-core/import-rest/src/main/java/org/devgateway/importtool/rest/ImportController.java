@@ -17,6 +17,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.services.File;
 import org.devgateway.importtool.services.FileRepository;
+import org.devgateway.importtool.services.ProjectRepository;
 import org.devgateway.importtool.services.processor.AMPStaticProcessor;
 import org.devgateway.importtool.services.processor.IATI104Processor;
 import org.devgateway.importtool.services.processor.IATI105Processor;
@@ -32,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -45,6 +47,8 @@ class ImportController {
 
 	@Autowired
 	private FileRepository repository;
+	@Autowired
+	private ProjectRepository projectRepository;
 
 	private Log log = LogFactory.getLog(getClass());
 
@@ -171,6 +175,14 @@ class ImportController {
 		// results.add(new ActionResult("4", "INSERT", "ok", "project 4"));
 		//
 		return new ResponseEntity<>(results, HttpStatus.OK);
+	}
+	
+	@Transactional
+	@RequestMapping(method = RequestMethod.DELETE, value = "/delete/{id}")
+	public ResponseEntity<String> delete(@PathVariable Long id, HttpServletRequest request) {
+		projectRepository.deleteByFileId(id);
+		repository.delete(id);	
+		return new ResponseEntity<>("{}", HttpStatus.OK);
 	}
 
 	private IDestinationProcessor getDestinationProcessor(String processorName, String authenticationToken) {
