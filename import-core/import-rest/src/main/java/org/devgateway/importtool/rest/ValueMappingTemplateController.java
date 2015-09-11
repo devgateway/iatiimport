@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
-@RequestMapping(value = "/importer/valuemappingtemplate")
+@RequestMapping(value = "/valuemappingtemplate")
 class ValueMappingTemplateController {
 	@Autowired
 	private ValueMappingTemplateRepository valueMappingTemplateRepository;
