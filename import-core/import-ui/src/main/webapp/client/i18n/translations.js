@@ -125,6 +125,9 @@ module.exports = {
 						'proceed_import' : 'Proceed with Import',
 						'close' : 'Close ',
 						'previous' : '<< Previous'
+					},
+					'mappings_dropdown':{
+						'confirm_delete': 'Are you sure you want to delete  __templateName__ ?'
 					}
 				}
 			}
@@ -254,6 +257,9 @@ module.exports = {
 					  'close': 'close',
 					  'save_mapping': 'Save Mapping'	
 					},
+					'mappings_dropdown':{
+						'confirm_delete': 'Are you sure you want to delete  __templateName__ ?'
+					}
 				}
 			}
 		}

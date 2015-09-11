@@ -14,7 +14,7 @@ var MappingsDropdown = React.createClass({
 		this.props.loadMappingTemplate(e.target.getAttribute('data-id')); 
 	}, 
 	deleteTemplate: function(e){
-		if(confirm("Are you sure you want to delete " + e.target.getAttribute('data-name') + "?")){
+		if(confirm(this.props.i18nLib.t('wizard.mappings_dropdown.confirm_delete', { templateName: e.target.getAttribute('data-name')}))){
 			this.props.deleteMappingTemplate(e.target.getAttribute('data-id'));   		
 		}        
 	},   
