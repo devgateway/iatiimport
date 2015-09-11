@@ -22,6 +22,7 @@ appActions.loadValueMappingData = Reflux.createAction({ asyncResult: true });
 appActions.checkBackendStatus = Reflux.createAction({ asyncResult: true });
 appActions.loadImportListData = Reflux.createAction({ asyncResult: true });
 appActions.loadImportLog = Reflux.createAction({ asyncResult: true });
+appActions.deleteImport = Reflux.createAction({ asyncResult: true });
 
 appActions.loadFieldMappingsTemplateList = Reflux.createAction({ asyncResult: true });
 appActions.loadFieldMappingsById = Reflux.createAction({ asyncResult: true });

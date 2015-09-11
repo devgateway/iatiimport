@@ -46,6 +46,20 @@ var ImportList = React.createClass({
     });
     this.loadData();
   },
+  handleDelete:function(e){	  
+	  if(confirm("Are you sure you want to delete " + e.target.getAttribute('data-name') + "?")){
+		  var id = e.target.getAttribute('data-id');
+		  appActions.deleteImport(id).then(function(data) {    	   
+				var importList = this.state.importListData;   	
+				importList.content  = importList.content.filter(function (item) {	return item.id != id;	});				    	     
+				this.setState({
+					importListData: importList
+				});            
+				this.forceUpdate();         
+			}.bind(this)); 		
+	} 
+	  
+  },
   render: function() {  
         var importList = [];
         var itemsSize = this.state.importListData.totalElements > this.state.pageSize?(this.state.importListData.totalElements / this.state.pageSize).toFixed(0) : 1;       
@@ -63,10 +77,11 @@ var ImportList = React.createClass({
                         {createdDate}
                     </td>
                     <td>
-                       <Link to="importlog" params={{id:item.id}}  >View Import	</Link>
+                       <Link to="importlog" params={{id:item.id}}  >View Import	</Link><span> | </span> 
+                       <span  className = "glyphicon glyphicon-remove" data-id={item.id}data-name={item.fileName} onClick={this.handleDelete}> Delete</span>
                     </td>
                 </tr>);
-            });
+            }.bind(this));
         }
       
     return (
