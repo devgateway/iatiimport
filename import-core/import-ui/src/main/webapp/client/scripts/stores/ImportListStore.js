@@ -11,9 +11,10 @@ var ImportListStore = Reflux.createStore({
     this.listenTo(appActions.deleteImport, this.handleDeleteImport);
   },
   handleLoadImportListData: function(data) {
-    var self = this;    
+    var self = this;   
+    var sort = '&sort=' + data.sort.field + ',' + data.sort.direction;
     $.ajax({
-    	url: '/importer/reports/previousimports?size='+ data.size + '&page=' + data.page,    	
+    	url: '/importer/reports/previousimports?size='+ data.size + '&page=' + data.page + sort,    	
         error: function() {        	
         	appActions.loadImportListData.failed();
         },

@@ -419,5 +419,11 @@ tbody.scrollablebody td, thead.scrollablebody th {
 .group-header{
 	border-bottom:3px solid #ddd;	
 }
+.fake-link{
+	color:#337ab7;
+}
+.fake-link:hover{
+	text-decoration: underline;
+}
 
 

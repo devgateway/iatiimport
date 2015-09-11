@@ -20,7 +20,8 @@ var ImportList = React.createClass({
     return {     
       importListData: [],
       pageSize:10, 
-      activePage:1
+      activePage:1,
+      sort: {field:'id', direction: 'asc'}
     };
   },  
    componentWillMount: function () {
@@ -32,19 +33,26 @@ var ImportList = React.createClass({
             importListData: data
         });
     }, 
-    loadData: function(){	 
-     var params = {size:10, page:this.state.activePage - 1}
+   loadData: function(){	 
+     var params = {size:10, page:this.state.activePage - 1, sort: this.state.sort}
      appActions.loadImportListData(params).then(function(data) {                                       
         this.updateImportList(data);                
       }.bind(this)).catch(function(err) {       
         console.log('Error loading importList');
      }.bind(this));
   },
+  onSort: function(e){	  
+	 var direction = (this.state.sort.direction == 'asc') ? 'desc' : 'asc';	  
+	 this.setState({ sort: {field:e.target.getAttribute('data-field'), direction: direction}},function() {
+		this.loadData();
+	 });	 
+  },
   handlePageSelect:function(event, selectedEvent){    
     this.setState({
-      activePage: selectedEvent.eventKey
-    });
-    this.loadData();
+      activePage: selectedEvent.eventKey}, function(){
+    	  this.loadData();
+      });
+    
   },
   handleDelete:function(e){	  
 	  if(confirm("Are you sure you want to delete " + e.target.getAttribute('data-name') + "?")){
@@ -78,7 +86,7 @@ var ImportList = React.createClass({
                     </td>
                     <td>
                        <Link to="importlog" params={{id:item.id}}  >View Import	</Link><span> | </span> 
-                       <span  className = "glyphicon glyphicon-remove" data-id={item.id}data-name={item.fileName} onClick={this.handleDelete}> Delete</span>
+                       <span  className = "fake-link" data-id={item.id}data-name={item.fileName} onClick={this.handleDelete}>Delete</span>
                     </td>
                 </tr>);
             }.bind(this));
@@ -92,12 +100,15 @@ var ImportList = React.createClass({
                         <tr>
                            <th>
                                  ID
+                                 <i className="fa fa-fw fa-sort" data-field="id" onClick={this.onSort}></i>
                             </th>
                             <th>
                                  File Name
+                                 <i className="fa fa-fw fa-sort" data-field="fileName" onClick={this.onSort}></i>
                             </th>
                             <th>
                                 Upload Date
+                                <i className="fa fa-fw fa-sort" data-field="createdDate" onClick={this.onSort}></i>
                             </th>
                             <th>
                                 Action
