@@ -103,7 +103,7 @@ public class DocumentMapper implements IDocumentMapper {
 	private void addDocumentMapping(InternalDocument srcDoc, InternalDocument destDoc, OperationType operation) {
 		// Look for an existing src mapping
 		Optional<DocumentMapping> mapping = this.getDocumentMappings().stream().filter(n -> {
-			return n.getSourceDocument() == srcDoc;
+			return n.getSourceDocument().getIdentifier().equals(srcDoc.getIdentifier());
 		}).findFirst();
 		if (!mapping.isPresent()) {
 			DocumentMapping newMapping = new DocumentMapping();

@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -17,6 +18,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.services.File;
 import org.devgateway.importtool.services.FileRepository;
+import org.devgateway.importtool.services.ImportSummary;
 import org.devgateway.importtool.services.ProjectRepository;
 import org.devgateway.importtool.services.processor.AMPStaticProcessor;
 import org.devgateway.importtool.services.processor.IATI104Processor;
@@ -26,6 +28,8 @@ import org.devgateway.importtool.services.processor.XMLGenericProcessor;
 import org.devgateway.importtool.services.processor.helper.ActionResult;
 import org.devgateway.importtool.services.processor.helper.DocumentMapper;
 import org.devgateway.importtool.services.processor.helper.DocumentMapping;
+import org.devgateway.importtool.services.processor.helper.Field;
+import org.devgateway.importtool.services.processor.helper.FieldValueMapping;
 import org.devgateway.importtool.services.processor.helper.IDestinationProcessor;
 import org.devgateway.importtool.services.processor.helper.IDocumentMapper;
 import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
@@ -185,6 +189,45 @@ class ImportController {
 		return new ResponseEntity<>("{}", HttpStatus.OK);
 	}
 
+	@RequestMapping(method = RequestMethod.GET, value = "/summary")
+	ResponseEntity<ImportSummary> getSummary(HttpServletRequest request) {
+		IDocumentMapper documentMapper = (IDocumentMapper) request.getSession().getAttribute(DOCUMENT_MAPPER);
+		if (documentMapper == null) {
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		} 
+		ImportSummary importSummmary = new ImportSummary();
+		importSummmary.setProjectCount(documentMapper.getDocumentMappings().size());
+		importSummmary.setFieldMappingCount(documentMapper.getFieldMappingObject().size());
+		
+		ImportSessionToken importSessionToken = (ImportSessionToken) request.getSession().getAttribute(SESSION_TOKEN);
+		if (repository != null || importSessionToken != null) {
+			importSummmary.setFileCount(repository.countBySessionId(importSessionToken.getImportTokenSessionId()));  
+		}
+
+		//filter count
+		ISourceProcessor processor = (ISourceProcessor) request.getSession().getAttribute(SOURCE_PROCESSOR);
+		if (processor != null) {			
+			List<Field> fields = processor.getFilterFields();
+			importSummmary.setFilterCount(fields.stream().filter(f -> f.getFilters().size() > 0).count());		
+		}
+		
+		
+		//value mapping count
+		int mappedValuesCount = 0;				
+		for(FieldValueMapping mapping : documentMapper.getValueMappingObject()){			
+			for (Map.Entry<Integer, Integer> entry : mapping.getValueIndexMapping().entrySet())
+			{
+				if(entry.getValue() != null){
+					++mappedValuesCount;
+				}
+			    
+			}
+		}
+		importSummmary.setValueMappingCount(mappedValuesCount);
+		
+		return new ResponseEntity<>(importSummmary, HttpStatus.OK);
+	}
+	
 	private IDestinationProcessor getDestinationProcessor(String processorName, String authenticationToken) {
 		IDestinationProcessor processor;
 		switch (processorName) {

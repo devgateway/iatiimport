@@ -117,11 +117,11 @@ module.exports = {
 					},
 					'review_import' : {
 						'review_import' : 'Review and Import',
-						'files_uploaded' : 'Files Uploaded',
-						'data_filtered' : 'Data Filtered',
-						'projects_selected' : 'Projects Selected',
-						'fields_selected' : 'Fields Selected',
-						'values_mapped' : 'Values Mapped',
+						'files_uploaded' : '__fileCount__ File(s) Uploaded',
+						'data_filtered' : '__filterCount__ Filter(s) Applied',
+						'projects_selected' : ' __projectCount__ Project(s) Selected',
+						'fields_selected' : '__fieldMappingCount__ Field(s) Selected',
+						'values_mapped' : '__valueMappingCount__ Value(s) Mapped',
 						'proceed_import' : 'Proceed with Import',
 						'close' : 'Close ',
 						'previous' : '<< Previous'

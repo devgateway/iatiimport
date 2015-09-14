@@ -1,10 +1,36 @@
 var React = require('react');
+var reactAsync = require('react-async');
+var Reflux = require('reflux');
+var appActions = require('./../../actions');
+var Router = require('react-router');
+
 var constants = require('./../../utils/constants');
+var importSummaryStore = require('./../../stores/ImportSummaryStore');
 
 var ReviewImport = React.createClass({
+	mixins: [Reflux.ListenerMixin],
+	getInitialState: function() {
+		return {importSummary:{}};
+	 },
 	componentDidMount: function() {
-		this.props.eventHandlers.updateCurrentStep(constants.REVIEW_IMPORT);		
+		this.props.eventHandlers.updateCurrentStep(constants.REVIEW_IMPORT);
+		this.listenTo(importSummaryStore, this.updateLanguages);
+		this.loadData();
 	}, 
+	updateImportSummary: function(data){
+		  this.setState({importSummary: data});
+	 },
+	loadData: function(){
+		    this.props.eventHandlers.showLoadingIcon();
+			appActions.loadImportSummary.triggerPromise().then(function(data) {                            
+				this.updateImportSummary(data); 			
+				this.props.eventHandlers.hideLoadingIcon();
+			}.bind(this)).catch(function(err) {       
+				this.hideLoadingIcon(); 
+				this.props.eventHandlers.hideLoadingIcon();        
+	    		this.props.eventHandlers.displayError(this.props.i18nLib.t('wizard.review_import.msg_error_retrieving_summary'));     
+			}.bind(this));
+	},
 	handlePrevious: function(){
 		this.props.eventHandlers.navigateBack();
 	},	
@@ -18,23 +44,23 @@ var ReviewImport = React.createClass({
                         <div className="col-sm-6 col-md-6">
                             <div className="form-group has-success has-feedback">
                             
-                                <input aria-describedby="inputSuccess2Status" className="form-control" id="inputSuccess2" type="text" value={this.props.i18nLib.t('wizard.review_import.files_uploaded')} readOnly="readonly"/>
+                                <input aria-describedby="inputSuccess2Status" className="form-control" id="inputSuccess2" type="text" value={this.props.i18nLib.t('wizard.review_import.files_uploaded',this.state.importSummary)} readOnly="readonly"/>
                                 <span aria-hidden="true" className="glyphicon glyphicon-ok form-control-feedback"></span>
                             </div>
                             <div className="form-group has-success has-feedback">
-                                <input aria-describedby="inputSuccess2Status" className="form-control" id="inputSuccess2" type="text" value={this.props.i18nLib.t('wizard.review_import.data_filtered')} readOnly="readonly"/>
+                                <input aria-describedby="inputSuccess2Status" className="form-control" id="inputSuccess2" type="text" value={this.props.i18nLib.t('wizard.review_import.data_filtered', this.state.importSummary)} readOnly="readonly"/>
                                 <span aria-hidden="true" className="glyphicon glyphicon-ok form-control-feedback"></span>
                             </div>
                             <div className="form-group has-success has-feedback">
-                                <input aria-describedby="inputSuccess2Status" className="form-control" id="inputSuccess2" type="text" value={this.props.i18nLib.t('wizard.review_import.projects_selected')} readOnly="readonly"/>
+                                <input aria-describedby="inputSuccess2Status" className="form-control" id="inputSuccess2" type="text" value={this.props.i18nLib.t('wizard.review_import.projects_selected', this.state.importSummary)} readOnly="readonly"/>
                                 <span aria-hidden="true" className="glyphicon glyphicon-ok form-control-feedback"></span>
                             </div>
                             <div className="form-group has-success has-feedback">
-                                <input aria-describedby="inputSuccess2Status" className="form-control" id="inputSuccess2" type="text" value={this.props.i18nLib.t('wizard.review_import.fields_selected')} readOnly="readonly"/>
+                                <input aria-describedby="inputSuccess2Status" className="form-control" id="inputSuccess2" type="text" value={this.props.i18nLib.t('wizard.review_import.fields_selected', this.state.importSummary)} readOnly="readonly"/>
                                 <span aria-hidden="true" className="glyphicon glyphicon-ok form-control-feedback"></span>
                             </div>
                             <div className="form-group has-success has-feedback">
-                                <input aria-describedby="inputSuccess2Status" className="form-control" id="inputSuccess2" type="text" value={this.props.i18nLib.t('wizard.review_import.values_mapped')} readOnly="readonly"/>
+                                <input aria-describedby="inputSuccess2Status" className="form-control" id="inputSuccess2" type="text" value={this.props.i18nLib.t('wizard.review_import.values_mapped', this.state.importSummary)} readOnly="readonly"/>
                                 <span aria-hidden="true" className="glyphicon glyphicon-ok form-control-feedback"></span>
                             </div>
                         </div>
