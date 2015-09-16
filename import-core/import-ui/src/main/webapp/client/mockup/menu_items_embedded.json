@@ -8,41 +8,7 @@
         "iconClass":"glyphicon-home",
          "url": "/"
          
-    },
-    {   "i18n-key":"header.nav.menu.import_process",
-        "name": "import_process",
-        "label": " Import Process",
-        "enabled": true,
-        "position": "navbar-left",
-        "iconClass":"glyphicon-import",
-        "url": "/",
-        "children": [
-            {    
-                "i18n-key":"header.nav.menu.submenu.iati104",
-                "name": "iati104",
-                "label": "IATI 1.04 to AMP",
-                "enabled": true,
-                "type":"menu-item",
-                "url": "#/wizard/IATI104/AMP"
-            },
-            {    
-                "i18n-key":"header.nav.menu.submenu.iati105",
-                "name": "iati105",
-                "label": "IATI 1.05 to AMP",
-                "enabled": true,
-                "type":"menu-item",
-                "url": "#/wizard/IATI105/AMP"
-            },
-            {
-                "i18n-key":"header.nav.menu.submenu.iati201",
-                "name": "iati2",
-                "label": "IATI 2.01 to AMP",
-                "enabled": true,
-                "type":"menu-item",
-                "url": "#/wizard/IATI201/AMP"
-            }
-        ]
-    },
+    },   
     {   
         "i18n-key":"header.nav.menu.reports",
         "name": "reports",

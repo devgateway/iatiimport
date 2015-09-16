@@ -5,6 +5,7 @@ var Reflux = require('reflux');
 var NAVBAR_LEFT = 'navbar-left';
 var appActions = require('./../../actions');
 var SubMenu = require('./sub-menu');
+var ImportProcessMenu = require('./import-process-menu');
 var Router = require('react-router');
 var Link = Router.Link;
 var Menu = React.createClass({
@@ -52,7 +53,8 @@ var Menu = React.createClass({
                     		</Link>
                     		{subMenu}
                     		</li>);
-                    	}                        
+                    	} 
+                    	
                     } else {
                         menusRight.push(<li className="dropdown" key={item.label}>
                             <a aria-expanded="true" className="dropdown-toggle" data-toggle="dropdown" href="#" role="button">
@@ -65,7 +67,7 @@ var Menu = React.createClass({
                 }
             });
         }
-
+        menusLeft.splice(1, 0, <ImportProcessMenu {...self.props} />);
         return (
             <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul className='nav navbar-nav'>

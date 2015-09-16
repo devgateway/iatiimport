@@ -33,6 +33,7 @@ appActions.loadValueMappingsById = Reflux.createAction({ asyncResult: true });
 appActions.deleteValueMappingsTemplate   = Reflux.createAction({ asyncResult: true });
 
 appActions.loadImportSummary  = Reflux.createAction({ asyncResult: true });
+appActions.loadImportProcessData = Reflux.createAction({ asyncResult: true });
 
 
 module.exports = appActions;
