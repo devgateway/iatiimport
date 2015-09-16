@@ -6,8 +6,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.devgateway.importtool.services.File;
-import org.devgateway.importtool.services.ImportProcess;
-import org.devgateway.importtool.services.ImportProcessRepository;
+import org.devgateway.importtool.services.Workflow;
+import org.devgateway.importtool.services.WorkflowRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,16 +16,16 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value = "/process")
-public class ImportProcessController {
+@RequestMapping(value = "/workflow")
+public class WorkflowController {
 
 	@Autowired
-	private ImportProcessRepository importProcessRepository;
+	private WorkflowRepository workflowRepository;
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/list")
-	public ResponseEntity<List<ImportProcess>> list(HttpServletRequest request) {
-		List<ImportProcess> processes  =  new ArrayList<ImportProcess>();		
-		Iterable<ImportProcess> list =  importProcessRepository.findAll();
+	public ResponseEntity<List<Workflow>> list(HttpServletRequest request) {
+		List<Workflow> processes  =  new ArrayList<Workflow>();		
+		Iterable<Workflow> list =  workflowRepository.findAll();
 		list.forEach(process -> {
 			processes.add(process);
 		});	
@@ -34,26 +34,26 @@ public class ImportProcessController {
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/populate")
 	public ResponseEntity<String> populate(HttpServletRequest request) {		
-		ImportProcess process1 = new ImportProcess();
+		Workflow process1 = new Workflow();
 		process1.setSourceProcessor("IATI104");
 		process1.setDestinationProcessor("AMP");		
 		process1.setLabel("IATI 1.04 to AMP 2.11");
 		process1.setDescription("Import process for IATI 1.04 to AMP 2.11");
-		importProcessRepository.save(process1);
+		workflowRepository.save(process1);
 		
-		ImportProcess process2 = new ImportProcess();
+		Workflow process2 = new Workflow();
 		process2.setSourceProcessor("IATI105");
 		process2.setDestinationProcessor("AMP");
 		process2.setLabel("IATI 1.05 to AMP 2.11");
 		process2.setDescription("Import process for IATI 1.05 to AMP 2.11");
-		importProcessRepository.save(process2);
+		workflowRepository.save(process2);
 		
-		ImportProcess process3 = new ImportProcess();
+		Workflow process3 = new Workflow();
 		process3.setSourceProcessor("IATI201");
 		process3.setDestinationProcessor("AMP");
 		process3.setLabel("IATI 2.01 to AMP 2.11");		
 		process3.setDescription("Import process for IATI 2.01 to AMP 2.11");
-		importProcessRepository.save(process3);
+		workflowRepository.save(process3);
 		
 		return new ResponseEntity<>("Successful!", HttpStatus.OK);
 		

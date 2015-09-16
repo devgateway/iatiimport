@@ -5,21 +5,21 @@ var request = require('superagent');
 var appConfig = require('./../conf');
 var appActions = require('./../actions');
 
-var ImportProcessStore = Reflux.createStore({
+var WorkflowStore = Reflux.createStore({
 
   init: function() {
-    this.listenTo(appActions.loadImportProcessData, this.handleLoadImportProcessData);
+    this.listenTo(appActions.loadWorkflowData, this.handleLoadWorkflowData);
   },
-  handleLoadImportProcessData: function() {
+  handleLoadWorkflowData: function() {
     var self = this;    
     $.ajax({
-        url: 'importer/process/list',        
+        url: 'importer/workflow/list',        
         error: function() {
-        	appActions.loadImportProcessData.failed();
+        	appActions.loadWorkflowData.failed();
         },
         dataType: 'json',
         success: function(data) {
-        	appActions.loadImportProcessData.completed(data);
+        	appActions.loadWorkflowData.completed(data);
         },
         type: 'GET'
      }); 
@@ -27,4 +27,4 @@ var ImportProcessStore = Reflux.createStore({
 
 });
 
-module.exports = ImportProcessStore;
+module.exports = WorkflowStore;

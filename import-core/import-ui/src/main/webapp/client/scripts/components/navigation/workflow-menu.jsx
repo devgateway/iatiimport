@@ -1,34 +1,34 @@
 var React = require('react');
-var importProcessStore = require('./../../stores/importProcessStore');
+var workflowStore = require('./../../stores/WorkflowStore');
 var Reflux = require('reflux');
 var NAVBAR_LEFT = 'navbar-left';
 var appActions = require('./../../actions');
 var SubMenu = require('./sub-menu');
 var Router = require('react-router');
 var Link = Router.Link;
-var ImportProcessMenu = React.createClass({
+var WorkflowMenu = React.createClass({
     mixins: [Reflux.ListenerMixin
     ],
     getInitialState: function() {
-		return {importProcessData: []};
+		return {workflowData: []};
 	},
     componentDidMount   : function () {  
-    	this.listenTo(importProcessStore, this.updateProcessData);
+    	this.listenTo(workflowStore, this.updateWorkflowData);
     	this.loadData();
     },
-    updateProcessData: function(data){
-       this.setState({importProcessData:data});
+    updateWorkflowData: function(data){
+       this.setState({workflowData:data});
     },
     loadData: function(){
-    	appActions.loadImportProcessData.triggerPromise().then(function(data) {
-    		this.updateProcessData(data);
+    	appActions.loadWorkflowData.triggerPromise().then(function(data) {
+    		this.updateWorkflowData(data);
     	}.bind(this));
      },
     render: function () {  
     	var items = [];    	
-    	if (this.state.importProcessData) {    		
-            $.map(this.state.importProcessData, function(importProcess, i) {            	
-            	items.push({name: importProcess.label, url: "#/wizard/" + importProcess.sourceProcessor + "/" + importProcess.destinationProcessor, label: importProcess.label, type: "menu-item"});
+    	if (this.state.workflowData) {    		
+            $.map(this.state.workflowData, function(workflow, i) {            	
+            	items.push({name: workflow.label, url: "#/wizard/" + workflow.sourceWorkflowor + "/" + workflow.destinationWorkflowor, label: workflow.label, type: "menu-item"});
             }.bind(this));
             
     	}
@@ -45,4 +45,4 @@ var ImportProcessMenu = React.createClass({
     }
 });
 
-module.exports = ImportProcessMenu;
+module.exports = WorkflowMenu;

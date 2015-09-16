@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, isGetterVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.ANY)
 @Entity
 @Table(name = "import_process")
-public class ImportProcess implements Identifiable<Long>, Serializable {
+public class Workflow implements Identifiable<Long>, Serializable {
 
 	private static final long serialVersionUID = 1L;
 
