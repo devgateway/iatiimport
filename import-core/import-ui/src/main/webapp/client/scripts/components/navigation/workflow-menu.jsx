@@ -27,8 +27,9 @@ var WorkflowMenu = React.createClass({
     render: function () {  
     	var items = [];    	
     	if (this.state.workflowData) {    		
-            $.map(this.state.workflowData, function(workflow, i) {            	
-            	items.push({name: workflow.label, url: "#/wizard/" + workflow.sourceWorkflowor + "/" + workflow.destinationWorkflowor, label: workflow.label, type: "menu-item"});
+            $.map(this.state.workflowData, function(workflow, i) { 
+            	var label = workflow.sourceProcessor.label + " to " +  workflow.destinationProcessor.label;
+            	items.push({name: workflow.label, url: "#/wizard/" + workflow.sourceProcessor.name + "/" + workflow.destinationProcessor.name, label: label, type: "menu-item"});
             }.bind(this));
             
     	}
