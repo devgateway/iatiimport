@@ -25,7 +25,16 @@
                 "enabled": true,
                 "type":"menu-item",
                  "url": "#/reports/previousimports"
+            },
+            {
+                "i18n-key":"header.nav.menu.submenu.workflow_list",
+                "name": "workflow_list",
+                "label": "Workflow List",
+                "enabled": true,
+                "type":"menu-item",
+                 "url": "#/reports/workflowlist"
             }
+            
         ]
     },
     {

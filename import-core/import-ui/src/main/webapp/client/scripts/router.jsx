@@ -18,6 +18,7 @@ var Import = require('./components/wizard/review-import');
 var Reports = require('./components/reports/index');
 var ImportList = require('./components/reports/import-list');
 var ImportLog = require('./components/reports/import-log');
+var WorkflowList = require('./components/reports/workflow-list');
 
 var routes = (
 	<Route name="layout" path="/" handler={Home}>
@@ -32,7 +33,8 @@ var routes = (
 			<Route name="import" path="import" handler={Import}/>		  
 		</Route>
 		<Route path="reports" handler = {Reports}>
-		   <Route name="previousimports" path="previousimports" handler={ImportList}/>
+		   <Route name="previousimports" path="previousimports" handler={ImportList}/>" +
+		   <Route name="workflowlist" path="workflowlist" handler={WorkflowList}/>
 		   <Route name="importlog" path="importlog/:id" handler={ImportLog}/>
 		</Route>
 			

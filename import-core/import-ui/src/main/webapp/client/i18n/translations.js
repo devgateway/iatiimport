@@ -18,7 +18,8 @@ module.exports = {
 								'logs' : 'Logs',
 								'previous_imports' : 'Previous Imports',
 								'en':'English ',
-								'fr':'French '
+								'fr':'French ',
+								'workflow_list': 'Workflow List'
 								 
 							}
 						}
