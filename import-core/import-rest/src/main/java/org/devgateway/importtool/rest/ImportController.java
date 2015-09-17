@@ -4,6 +4,7 @@ import static org.devgateway.importtool.services.processor.helper.Constants.DEST
 import static org.devgateway.importtool.services.processor.helper.Constants.SOURCE_PROCESSOR;
 import static org.devgateway.importtool.services.processor.helper.Constants.SESSION_TOKEN;
 import static org.devgateway.importtool.services.processor.helper.Constants.DOCUMENT_MAPPER;
+import static org.devgateway.importtool.services.processor.helper.Constants.WORKFLOW_LIST;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -20,6 +22,7 @@ import org.devgateway.importtool.services.File;
 import org.devgateway.importtool.services.FileRepository;
 import org.devgateway.importtool.services.ImportSummary;
 import org.devgateway.importtool.services.ProjectRepository;
+import org.devgateway.importtool.services.Workflow;
 import org.devgateway.importtool.services.processor.AMPStaticProcessor;
 import org.devgateway.importtool.services.processor.IATI104Processor;
 import org.devgateway.importtool.services.processor.IATI105Processor;
@@ -210,8 +213,7 @@ class ImportController {
 			List<Field> fields = processor.getFilterFields();
 			importSummmary.setFilterCount(fields.stream().filter(f -> f.getFilters().size() > 0).count());		
 		}
-		
-		
+				
 		//value mapping count
 		int mappedValuesCount = 0;				
 		for(FieldValueMapping mapping : documentMapper.getValueMappingObject()){			
@@ -223,40 +225,47 @@ class ImportController {
 			    
 			}
 		}
-		importSummmary.setValueMappingCount(mappedValuesCount);
-		
+		importSummmary.setValueMappingCount(mappedValuesCount);		
 		return new ResponseEntity<>(importSummmary, HttpStatus.OK);
 	}
 	
-	private IDestinationProcessor getDestinationProcessor(String processorName, String authenticationToken) {
-		IDestinationProcessor processor;
-		switch (processorName) {
-		case "AMP":
-		default:
-			processor = new AMPStaticProcessor(authenticationToken);
-			break;
-		}
+	@SuppressWarnings("unchecked")
+	private IDestinationProcessor getDestinationProcessor(String processorName, String authenticationToken,HttpServletRequest request) {
+		   IDestinationProcessor processor = null;		  
+			@SuppressWarnings("unchecked")
+			List<Workflow> workflows = (List<Workflow>)request.getSession().getAttribute(WORKFLOW_LIST);
+			if(workflows != null){
+				Optional<Workflow> optional = workflows.stream().filter(w -> w.getDestinationProcessor().getName().equals(processorName)).findFirst();
+				if(optional.isPresent()){				
+					try {			
+						Class<IDestinationProcessor> clazz = (Class<IDestinationProcessor>)Class.forName(optional.get().getSourceProcessor().getClassName());
+						processor = clazz.newInstance();
+					} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {					
+						log.error("Error loading processor class: " + e);
+					}
+				}
+			}
 		return processor;
 	}
 
-	private ISourceProcessor getSourceProcessor(String processorName) {
-		ISourceProcessor processor;
-		switch (processorName) {
-		case "IATI201":
-			processor = new IATI201Processor();
-			break;
-		case "IATI105":
-			processor = new IATI105Processor();
-			break;
-		case "IATI104":
-			processor = new IATI104Processor();
-			break;
-		case "XMLGeneric":
+	@SuppressWarnings("unchecked")
+	private ISourceProcessor getSourceProcessor(String processorName, HttpServletRequest request) {
+		ISourceProcessor processor = null;		
+		List<Workflow> workflows = (List<Workflow>)request.getSession().getAttribute(WORKFLOW_LIST);
+		if(workflows != null){
+			Optional<Workflow> optional = workflows.stream().filter(w -> w.getSourceProcessor().getName().equals(processorName)).findFirst();
+			if(optional.isPresent()){				
+				try {			
+					Class<ISourceProcessor> clazz = (Class<ISourceProcessor>)Class.forName(optional.get().getSourceProcessor().getClassName());
+					processor = clazz.newInstance();
+				} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {					
+					log.error("Error loading processor class: " + e);
+				}
+			}
+		}
+		
+		if(processor == null){
 			processor = new XMLGenericProcessor();
-			break;
-		default:
-			processor = new XMLGenericProcessor();
-			break;
 		}
 		return processor;
 	}
