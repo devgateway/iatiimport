@@ -28,6 +28,7 @@ public class WorkflowConfig {
 	private final String LABEL_TAG = "label";
 	private final String CLASS_NAME_TAG = "class-name";
 	private final String DESCRIPTION_TAG = "description";
+	private final String 	ENABLED_TAG = "enabled";
 	
 	public List<Workflow> getWorkflows() {
 		List<Workflow> workflows = new ArrayList<Workflow>();
@@ -40,9 +41,9 @@ public class WorkflowConfig {
 				Document doc = builder.parse(stream);
 				NodeList nodeList = doc.getElementsByTagName(WORKFLOW_TAG_NAME);
 				for (int i = 0; i < nodeList.getLength(); i++) {
-					Element element = (Element) nodeList.item(i);
-					Element destination = (Element) element.getElementsByTagName(DESTINATION_PROCESSOR_TAG_NAME).item(0);
-					Element source = (Element) element.getElementsByTagName(SOURCE_PROCESSOR_TAG_NAME).item(0);
+					Element workflowEl = (Element) nodeList.item(i);
+					Element destination = (Element) workflowEl.getElementsByTagName(DESTINATION_PROCESSOR_TAG_NAME).item(0);
+					Element source = (Element) workflowEl.getElementsByTagName(SOURCE_PROCESSOR_TAG_NAME).item(0);
 					
 					Workflow workflow = new Workflow();					
 					Processor destinationProcessor = new Processor();
@@ -55,9 +56,10 @@ public class WorkflowConfig {
 					sourceProcessor.setName(source.getElementsByTagName(NAME_TAG).item(0).getTextContent());
 					sourceProcessor.setLabel(source.getElementsByTagName(LABEL_TAG).item(0).getTextContent());
 					sourceProcessor.setClassName(source.getElementsByTagName(CLASS_NAME_TAG).item(0).getTextContent());
-					workflow.setSourceProcessor(sourceProcessor);					
-					workflow.setDescription(destination.getElementsByTagName(DESCRIPTION_TAG).item(0).getTextContent());
+					workflow.setSourceProcessor(sourceProcessor);
 					
+					workflow.setDescription(workflowEl.getElementsByTagName(DESCRIPTION_TAG).item(0).getTextContent());
+					workflow.setEnabled(Boolean.parseBoolean(workflowEl.getElementsByTagName(ENABLED_TAG).item(0).getTextContent()));
 					workflows.add(workflow);
 				}
 			} catch (ParserConfigurationException | SAXException | IOException e) {

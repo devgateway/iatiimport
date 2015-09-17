@@ -28,8 +28,10 @@ var WorkflowMenu = React.createClass({
     	var items = [];    	
     	if (this.state.workflowData) {    		
             $.map(this.state.workflowData, function(workflow, i) { 
-            	var label = workflow.sourceProcessor.label + " to " +  workflow.destinationProcessor.label;
-            	items.push({name: workflow.label, url: "#/wizard/" + workflow.sourceProcessor.name + "/" + workflow.destinationProcessor.name, label: label, type: "menu-item"});
+            	if(workflow.enabled){
+            		var label = workflow.sourceProcessor.label + " to " +  workflow.destinationProcessor.label;
+                	items.push({name: workflow.label, url: "#/wizard/" + workflow.sourceProcessor.name + "/" + workflow.destinationProcessor.name, label: label, type: "menu-item"});	
+            	}            	
             }.bind(this));
             
     	}
