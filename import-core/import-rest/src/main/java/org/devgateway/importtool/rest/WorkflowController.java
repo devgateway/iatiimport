@@ -1,13 +1,12 @@
 package org.devgateway.importtool.rest;
-import static org.devgateway.importtool.services.processor.helper.Constants.SOURCE_PROCESSOR;
 
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.devgateway.importtool.services.Workflow;
-import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
-import org.devgateway.importtool.services.processor.helper.WorkflowConfig;
+import org.devgateway.importtool.services.WorkflowService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,13 +19,15 @@ import static org.devgateway.importtool.services.processor.helper.Constants.WORK
 @RequestMapping(value = "/workflow")
 public class WorkflowController {
 	
+	@Autowired
+	WorkflowService workflowService;
+	
 	@RequestMapping(method = RequestMethod.GET, value = "/list")
 	public ResponseEntity<List<Workflow>> list(HttpServletRequest request) {
 		@SuppressWarnings("unchecked")
 		List<Workflow> workflows = (List<Workflow>)request.getSession().getAttribute(WORKFLOW_LIST);		
 		if(workflows == null){
-			WorkflowConfig workflowConfig = new WorkflowConfig();
-			 workflows = workflowConfig.getWorkflows();	
+			workflows = workflowService.getWorkflows();	
 			request.getSession().setAttribute(WORKFLOW_LIST, workflows);
 		}		
 		return new ResponseEntity<>(workflows, HttpStatus.OK);		

@@ -1,4 +1,4 @@
-package org.devgateway.importtool.services.processor.helper;
+package org.devgateway.importtool.services;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,23 +12,19 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.services.Workflow;
+import org.devgateway.importtool.services.processor.helper.Processor;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-public class WorkflowConfig {
+import static org.devgateway.importtool.services.processor.helper.Constants.*;
+
+@org.springframework.stereotype.Service
+public class WorkflowService {
 
 	private Log log = LogFactory.getLog(getClass());
-	private final String WORKFLOW_FILE = "workflows.xml";
-	private final String WORKFLOW_TAG_NAME = "workflow";
-	private final String DESTINATION_PROCESSOR_TAG_NAME = "destination-processor";
-	private final String SOURCE_PROCESSOR_TAG_NAME = "source-processor";
-	private final String NAME_TAG = "name";
-	private final String LABEL_TAG = "label";
-	private final String CLASS_NAME_TAG = "class-name";
-	private final String DESCRIPTION_TAG = "description";
-	private final String 	ENABLED_TAG = "enabled";
+
 	
 	public List<Workflow> getWorkflows() {
 		List<Workflow> workflows = new ArrayList<Workflow>();
