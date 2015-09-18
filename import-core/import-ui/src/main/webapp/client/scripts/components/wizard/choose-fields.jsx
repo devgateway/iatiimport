@@ -190,6 +190,12 @@ var ChooseFields = React.createClass({
 			this.displayError();
 		}.bind(this));
 	},
+	isMappingComplete: function(){
+		var notMapped = _.filter(this.state.mappingFieldsData, function(m) {  
+			return _.isUndefined(m.destinationField) || _.isNull(m.destinationField)
+	    });		
+		return (this.state.mappingFieldsData.length > 0 && notMapped.length == 0) 
+	},
     render: function() {
     	var rows = {};
         if (this.state.destinationFieldsData && this.state.sourceFieldsData) {             
@@ -260,7 +266,7 @@ var ChooseFields = React.createClass({
                  </div>
                <div className="col-md-6">                
                   <button className="btn btn-warning navbar-btn btn-custom" type="button" data-toggle="modal" data-target="#saveMapFields">{this.props.i18nLib.t('wizard.map_fields.save')}</button>&nbsp;
-                  <button disabled = {(this.state.mappingFieldsData.length > 0 && _.filter(this.state.mappingFieldsData, function(m) {  return _.isUndefined(m.destinationField) || _.isNull(m.destinationField)}).length == 0 )? "" : "disabled"}  className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.handleNext}>{this.props.i18nLib.t('wizard.map_fields.next')}</button>               
+                  <button disabled = {this.isMappingComplete() ? "" : "disabled"}  className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.handleNext}>{this.props.i18nLib.t('wizard.map_fields.next')}</button>               
                </div>
                 </div>                   
                 </div>
