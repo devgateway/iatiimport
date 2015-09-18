@@ -66,10 +66,10 @@ class ImportController {
 		request.getSession().removeAttribute(DESTINATION_PROCESSOR);
 		request.getSession().removeAttribute(SESSION_TOKEN);
 		request.getSession().removeAttribute(DOCUMENT_MAPPER);
-		ISourceProcessor srcProcessor = getSourceProcessor(sourceProcessorName);
+		ISourceProcessor srcProcessor = getSourceProcessor(sourceProcessorName, request);
 		request.getSession().setAttribute(SOURCE_PROCESSOR, srcProcessor);
 
-		IDestinationProcessor destProcessor = getDestinationProcessor(destinationProcessorName, authenticationToken);
+		IDestinationProcessor destProcessor = getDestinationProcessor(destinationProcessorName, authenticationToken,request);
 		request.getSession().setAttribute(DESTINATION_PROCESSOR, destProcessor);
 
 		ImportSessionToken importSessionToken = new ImportSessionToken(authenticationToken, userName, new Date(), srcProcessor.getDescriptiveName(), destProcessor.getDescriptiveName());
