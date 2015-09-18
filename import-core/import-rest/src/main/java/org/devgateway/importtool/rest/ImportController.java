@@ -25,10 +25,7 @@ import org.devgateway.importtool.services.FileRepository;
 import org.devgateway.importtool.services.ImportSummary;
 import org.devgateway.importtool.services.ProjectRepository;
 import org.devgateway.importtool.services.Workflow;
-import org.devgateway.importtool.services.processor.AMPStaticProcessor;
-import org.devgateway.importtool.services.processor.IATI104Processor;
-import org.devgateway.importtool.services.processor.IATI105Processor;
-import org.devgateway.importtool.services.processor.IATI201Processor;
+import org.devgateway.importtool.services.WorkflowService;
 import org.devgateway.importtool.services.processor.XMLGenericProcessor;
 import org.devgateway.importtool.services.processor.helper.ActionResult;
 import org.devgateway.importtool.services.processor.helper.DocumentMapper;
@@ -58,6 +55,9 @@ class ImportController {
 	private FileRepository repository;
 	@Autowired
 	private ProjectRepository projectRepository;
+	
+	@Autowired
+	WorkflowService workflowService;
 
 	private Log log = LogFactory.getLog(getClass());
 
@@ -235,20 +235,23 @@ class ImportController {
 	@SuppressWarnings("unchecked")
 	private IDestinationProcessor getDestinationProcessor(String processorName, String authenticationToken,HttpServletRequest request) {
 		   IDestinationProcessor processor = null;		  
-			@SuppressWarnings("unchecked")
 			List<Workflow> workflows = (List<Workflow>)request.getSession().getAttribute(WORKFLOW_LIST);
-			if(workflows != null){
-				Optional<Workflow> optional = workflows.stream().filter(w -> w.getDestinationProcessor().getName().equals(processorName)).findFirst();
-				if(optional.isPresent()){				
-					try {						
-						Constructor<?> c = Class.forName(optional.get().getDestinationProcessor().getClassName()).getDeclaredConstructor(String.class);
-						c.setAccessible(true);
-						processor = (IDestinationProcessor)c.newInstance(new Object[] {authenticationToken});
-					} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException e) {					
-						log.error("Error loading processor class: " + e);
-					}
+			if(workflows == null){
+				workflows = workflowService.getWorkflows();	
+				request.getSession().setAttribute(WORKFLOW_LIST, workflows);
+			}			
+			
+			Optional<Workflow> optional = workflows.stream().filter(w -> w.getDestinationProcessor().getName().equals(processorName)).findFirst();
+			if(optional.isPresent()){				
+				try {						
+					Constructor<?> c = Class.forName(optional.get().getDestinationProcessor().getClassName()).getDeclaredConstructor(String.class);
+					c.setAccessible(true);
+					processor = (IDestinationProcessor)c.newInstance(new Object[] {authenticationToken});
+				} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException e) {					
+					log.error("Error loading processor class: " + e);
 				}
 			}
+			
 		return processor;
 	}
 
@@ -256,16 +259,21 @@ class ImportController {
 	private ISourceProcessor getSourceProcessor(String processorName, HttpServletRequest request) {		
 		ISourceProcessor processor = null;		
 		List<Workflow> workflows = (List<Workflow>)request.getSession().getAttribute(WORKFLOW_LIST);
-		if(workflows != null){
-			Optional<Workflow> optional = workflows.stream().filter(w -> w.getSourceProcessor().getName().equals(processorName)).findFirst();
-			if(optional.isPresent()){				
-				try {					
-					Class<ISourceProcessor> clazz = (Class<ISourceProcessor>)Class.forName(optional.get().getSourceProcessor().getClassName());
-					processor = (ISourceProcessor)clazz.newInstance();
-				} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {					
-					log.error("Error loading processor class: " + e);
-				}
+		
+		if(workflows == null){
+			workflows = workflowService.getWorkflows();	
+			request.getSession().setAttribute(WORKFLOW_LIST, workflows);
+		}
+				
+		Optional<Workflow> optional = workflows.stream().filter(w -> w.getSourceProcessor().getName().equals(processorName)).findFirst();
+		if(optional.isPresent()){				
+			try {					
+				Class<ISourceProcessor> clazz = (Class<ISourceProcessor>)Class.forName(optional.get().getSourceProcessor().getClassName());
+				processor = (ISourceProcessor)clazz.newInstance();
+			} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {					
+				log.error("Error loading processor class: " + e);
 			}
+
 		}
 		
 		if(processor == null){
