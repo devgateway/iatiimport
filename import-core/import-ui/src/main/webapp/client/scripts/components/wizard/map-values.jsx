@@ -102,6 +102,16 @@ var MapValues = React.createClass({
 			this.props.eventHandlers.displayError(this.props.i18nLib.t('wizard.map_values.msg_error_loading_templates'));
 		}.bind(this));
   },
+  isMappingComplete: function(){
+	var notMapped = _.filter(this.state.mappings, function(m) {  var hasNull = false;    
+	     for (var member in m.valueIndexMapping) {
+	        if (m.valueIndexMapping[member] == null)
+	            hasNull = true;
+	    }
+	    return !_.isEmpty(m.valueIndexMapping) && hasNull;
+	});  
+	return notMapped.length == 0
+  },  
   render: function() {	
     var sourceFields = [];
     var message = "";
@@ -138,7 +148,7 @@ var MapValues = React.createClass({
          </div>
        <div className="col-md-6">                
        <button className="btn btn-warning navbar-btn btn-custom" type="button" data-toggle="modal" data-target="#saveMapValues">{this.props.i18nLib.t('wizard.map_values.save')}</button>&nbsp;
-       <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.handleNext}>{this.props.i18nLib.t('wizard.map_values.next')}</button>               
+       <button disabled = {this.isMappingComplete() ? "" : "disabled"} className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.handleNext}>{this.props.i18nLib.t('wizard.map_values.next')}</button>               
        </div>
       </div>         
         </div>
