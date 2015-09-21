@@ -4,11 +4,15 @@ import static org.devgateway.importtool.services.processor.helper.Constants.DEST
 import static org.devgateway.importtool.services.processor.helper.Constants.DOCUMENT_MAPPER;
 import static org.devgateway.importtool.services.processor.helper.Constants.SOURCE_PROCESSOR;
 
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import java.util.Optional;
+
 import javax.servlet.http.HttpServletRequest;
+
 
 import org.devgateway.importtool.services.processor.helper.DocumentMapping;
 import org.devgateway.importtool.services.processor.helper.Field;
@@ -91,6 +95,18 @@ class DataController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		documentMapper.setFieldMappingObject(fieldMapping);
+		
+		//update field value mappings
+		List<FieldValueMapping> fieldValueMapping = new ArrayList<FieldValueMapping>();
+		fieldMapping.stream().forEach(mapping -> {
+			Optional<FieldValueMapping> fv = documentMapper.getValueMappingObject().stream().filter(n -> { return n.getSourceField().getUniqueFieldName().equals(mapping.getSourceField().getUniqueFieldName());}).findFirst();
+			if(fv.isPresent()){ 
+				fieldValueMapping.add(fv.get());
+			}
+			
+         });		
+		documentMapper.setValueMappingObject(fieldValueMapping);		
+		
 		return new ResponseEntity<>(documentMapper.getFieldMappingObject(), HttpStatus.OK);
 	}
 
