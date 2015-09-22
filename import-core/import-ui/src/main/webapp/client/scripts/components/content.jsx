@@ -43,10 +43,7 @@ var Content = React.createClass({
       return (
         <div className="container">
           <br/>
-            <div className="jumbotron">
-            Session information for the destination system could not be retrieved. Verify if backend services are working correctly.
-            
-            </div>
+          <div className="alert alert-danger server-status-message" role="alert" ><span className="glyphicon glyphicon-exclamation-sign error-box" aria-hidden="true"></span><span className="sr-only">Error:</span><span > Session information for the destination system could not be retrieved. Verify if backend services are working correctly.</span> </div>           
         </div>
       );
     }

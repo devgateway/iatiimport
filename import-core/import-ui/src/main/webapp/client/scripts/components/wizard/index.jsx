@@ -159,6 +159,13 @@ var Wizard = React.createClass({
     eventHandlers.updateCurrentStep = this.updateCurrentStep;
     eventHandlers.navigateBack  = this.navigateBack;
     
+    var error; 
+    if(Cookies.get("DESTINATION_AUTH_TOKEN") == "undefined"){
+    	error = (<div className="container"><br/><div className="alert alert-danger server-status-message" role="alert" ><span className="glyphicon glyphicon-exclamation-sign error-box" aria-hidden="true"></span><span className="sr-only">Error:</span><span > Session information for the destination system could not be retrieved. Verify if backend services are working correctly.</span> </div></div>);
+    }    
+    if(error){
+    	return error;
+    }
     return (
       <div>
       <div className="container " >     
