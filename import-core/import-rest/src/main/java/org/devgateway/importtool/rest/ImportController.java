@@ -8,6 +8,8 @@ import static org.devgateway.importtool.services.processor.helper.Constants.WORK
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -23,10 +25,7 @@ import org.devgateway.importtool.services.FileRepository;
 import org.devgateway.importtool.services.ImportSummary;
 import org.devgateway.importtool.services.ProjectRepository;
 import org.devgateway.importtool.services.Workflow;
-import org.devgateway.importtool.services.processor.AMPStaticProcessor;
-import org.devgateway.importtool.services.processor.IATI104Processor;
-import org.devgateway.importtool.services.processor.IATI105Processor;
-import org.devgateway.importtool.services.processor.IATI201Processor;
+import org.devgateway.importtool.services.WorkflowService;
 import org.devgateway.importtool.services.processor.XMLGenericProcessor;
 import org.devgateway.importtool.services.processor.helper.ActionResult;
 import org.devgateway.importtool.services.processor.helper.DocumentMapper;
@@ -56,6 +55,9 @@ class ImportController {
 	private FileRepository repository;
 	@Autowired
 	private ProjectRepository projectRepository;
+	
+	@Autowired
+	WorkflowService workflowService;
 
 	private Log log = LogFactory.getLog(getClass());
 
@@ -69,9 +71,10 @@ class ImportController {
 		ISourceProcessor srcProcessor = getSourceProcessor(sourceProcessorName, request);
 		request.getSession().setAttribute(SOURCE_PROCESSOR, srcProcessor);
 
-		IDestinationProcessor destProcessor = getDestinationProcessor(destinationProcessorName, authenticationToken,request);
+		IDestinationProcessor destProcessor = getDestinationProcessor(destinationProcessorName, authenticationToken, request);
 		request.getSession().setAttribute(DESTINATION_PROCESSOR, destProcessor);
-
+		log.debug(srcProcessor.getDescriptiveName());
+		log.debug(destProcessor.getDescriptiveName());
 		ImportSessionToken importSessionToken = new ImportSessionToken(authenticationToken, userName, new Date(), srcProcessor.getDescriptiveName(), destProcessor.getDescriptiveName());
 		request.getSession().setAttribute(SESSION_TOKEN, importSessionToken);
 
@@ -232,36 +235,45 @@ class ImportController {
 	@SuppressWarnings("unchecked")
 	private IDestinationProcessor getDestinationProcessor(String processorName, String authenticationToken,HttpServletRequest request) {
 		   IDestinationProcessor processor = null;		  
-			@SuppressWarnings("unchecked")
 			List<Workflow> workflows = (List<Workflow>)request.getSession().getAttribute(WORKFLOW_LIST);
-			if(workflows != null){
-				Optional<Workflow> optional = workflows.stream().filter(w -> w.getDestinationProcessor().getName().equals(processorName)).findFirst();
-				if(optional.isPresent()){				
-					try {			
-						Class<IDestinationProcessor> clazz = (Class<IDestinationProcessor>)Class.forName(optional.get().getSourceProcessor().getClassName());
-						processor = clazz.newInstance();
-					} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {					
-						log.error("Error loading processor class: " + e);
-					}
+			if(workflows == null){
+				workflows = workflowService.getWorkflows();	
+				request.getSession().setAttribute(WORKFLOW_LIST, workflows);
+			}			
+			
+			Optional<Workflow> optional = workflows.stream().filter(w -> w.getDestinationProcessor().getName().equals(processorName)).findFirst();
+			if(optional.isPresent()){				
+				try {						
+					Constructor<?> c = Class.forName(optional.get().getDestinationProcessor().getClassName()).getDeclaredConstructor(String.class);
+					c.setAccessible(true);
+					processor = (IDestinationProcessor)c.newInstance(new Object[] {authenticationToken});
+				} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException e) {					
+					log.error("Error loading processor class: " + e);
 				}
 			}
+			
 		return processor;
 	}
 
 	@SuppressWarnings("unchecked")
-	private ISourceProcessor getSourceProcessor(String processorName, HttpServletRequest request) {
+	private ISourceProcessor getSourceProcessor(String processorName, HttpServletRequest request) {		
 		ISourceProcessor processor = null;		
 		List<Workflow> workflows = (List<Workflow>)request.getSession().getAttribute(WORKFLOW_LIST);
-		if(workflows != null){
-			Optional<Workflow> optional = workflows.stream().filter(w -> w.getSourceProcessor().getName().equals(processorName)).findFirst();
-			if(optional.isPresent()){				
-				try {			
-					Class<ISourceProcessor> clazz = (Class<ISourceProcessor>)Class.forName(optional.get().getSourceProcessor().getClassName());
-					processor = clazz.newInstance();
-				} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {					
-					log.error("Error loading processor class: " + e);
-				}
+		
+		if(workflows == null){
+			workflows = workflowService.getWorkflows();	
+			request.getSession().setAttribute(WORKFLOW_LIST, workflows);
+		}
+				
+		Optional<Workflow> optional = workflows.stream().filter(w -> w.getSourceProcessor().getName().equals(processorName)).findFirst();
+		if(optional.isPresent()){				
+			try {					
+				Class<ISourceProcessor> clazz = (Class<ISourceProcessor>)Class.forName(optional.get().getSourceProcessor().getClassName());
+				processor = (ISourceProcessor)clazz.newInstance();
+			} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {					
+				log.error("Error loading processor class: " + e);
 			}
+
 		}
 		
 		if(processor == null){
