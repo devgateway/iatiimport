@@ -30,6 +30,7 @@ public class XMLGenericProcessor implements ISourceProcessor {
 	private InputStream input;
 	private Log log = LogFactory.getLog(getClass());
 	private String descriptiveName = "XML Generic";
+	private Document doc;
 	
 
 	@Override
@@ -46,7 +47,7 @@ public class XMLGenericProcessor implements ISourceProcessor {
 		factory.setIgnoringElementContentWhitespace(true);
 		try {
 			DocumentBuilder builder = factory.newDocumentBuilder();
-			Document doc = builder.parse(input);
+			doc = builder.parse(input);
 			fieldList = extract(doc);
 			
 			// Do something with the document here.
@@ -159,6 +160,9 @@ public class XMLGenericProcessor implements ISourceProcessor {
 	public Boolean isFormatValid() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	public Document getDoc() {
+		return doc;
 	}
 
 }

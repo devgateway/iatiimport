@@ -1,14 +1,20 @@
 [
 	{
 		"field_name": "activity_status",
-		"field_type": "string"
+		"field_label": "Activity Status",
+		"field_type": "string",
+		"translatable":false
 	},
 	{
 		"field_name": "title",
-		"field_type": "string"
+		"field_label": "Title",
+		"field_type": "string",
+		"translatable":false
 	},
 	{
 		"field_name": "sectors",
-		"field_type": "array"
+		"field_label": "Sectors",
+		"field_type": "array",
+		"translatable":false
 	}
 ]

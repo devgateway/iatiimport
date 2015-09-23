@@ -42,6 +42,10 @@ public class IATI105Processor implements ISourceProcessor {
 	private String descriptiveName = "IATI 1.05";
 
 	private Document doc;
+	
+	public Document getDoc() {
+		return doc;
+	}
 
 	private static Map<String, String> mappingNameFile = new HashMap<String, String>();
 	static {
