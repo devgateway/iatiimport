@@ -16,7 +16,7 @@ var AutoComplete = React.createClass({
         var language = this.props.language;
         $el.typeahead(null, {
             name      : this.props.name,
-            display: function(v){ return v.fields.title[language];},
+            display: function(v){ return v.multilangFields.title[language];},
             source    : searchEngine.ttAdapter()
         });
         
@@ -32,7 +32,7 @@ var AutoComplete = React.createClass({
     },
     render: function () {
         var language = this.props.language;
-        var value = this.props.value ? this.props.value.fields.title[language] : undefined;
+        var value = this.props.value ? this.props.value.multilangFields.title[language] : undefined;
         return (
             <div className="autocomplete">
                 <input className="typeahead" placeholder={this.props.placeholder} ref={this.props.refId} type="text" />
