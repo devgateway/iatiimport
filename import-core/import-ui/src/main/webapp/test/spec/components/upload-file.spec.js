@@ -11,8 +11,14 @@ describe('Upload File ', function() {
   var TestUtils = React.addons.TestUtils;
   var instance,i18n,eventHandlers;
   beforeEach(function() {   
-	  i18n = {t:function(key){}};
-	  eventHandlers = {};
+	  i18n = {t:function(key){},lng:function(){}};
+	  eventHandlers = {updateCurrentStep:function(step){		  
+	  },
+	  showLoadingIcon:function(){		  
+	  },
+	  hideLoadingIcon: function(){		  
+	  }
+	  };	
       instance = TestUtils.renderIntoDocument(<UploadFile i18nLib = {i18n} eventHandlers = {eventHandlers} />);
       instance.setState({
           fileData: stubFiles

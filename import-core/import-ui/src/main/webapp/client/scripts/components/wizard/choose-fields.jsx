@@ -214,7 +214,7 @@ var ChooseFields = React.createClass({
                     }
                     rows[item.type].push(<tr key={item.uniqueFieldName}>
                         <td>
-                            <input value={item.uniqueFieldName} aria-label="Field1" type="checkbox" checked={selected} onChange={this.handleToggle.bind(this, item)}/>
+                            <input value={item.uniqueFieldName} aria-label="Field1" type="checkbox" className="source-selector" checked={selected} onChange={this.handleToggle.bind(this, item)}/>
                         </td>
                         <td>
                             <div className="table_cell">

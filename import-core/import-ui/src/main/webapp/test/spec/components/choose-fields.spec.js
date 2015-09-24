@@ -14,8 +14,15 @@ describe('Choose Fields ', function() {
   //review how the test setup is done.
   beforeEach(function() { 	 
 	  i18n = {t:function(key){}};
-	  eventHandlers = {};	  
-	  jasmineReact.spyOnClass(ChooseFields, "selectFieldMapping");	  
+	  eventHandlers = {updateCurrentStep:function(step){		  
+	  },
+	  showLoadingIcon:function(){		  
+	  },
+	  hideLoadingIcon: function(){		  
+	  }
+	  };	
+	  
+	  jasmineReact.spyOnClass(ChooseFields, "handleToggle");	  
       instance = jasmineReact.render(<ChooseFields i18nLib = {i18n} eventHandlers = {eventHandlers} />, document.body);
       instance.setState({
           destinationFieldsData: destinationFields
@@ -26,17 +33,18 @@ describe('Choose Fields ', function() {
     });
   it('should display source fields on list', function() {	
 	  var table = TestUtils.scryRenderedDOMComponentsWithClass(instance, "table");
-	  var columns = TestUtils.scryRenderedDOMComponentsWithTag(table[0], "td");
-	   expect(columns[0].props.children.type).toBe("input");
-	   expect(columns[1].props.children.type).toBe("div");  
-	   expect(columns[1].props.children.props.children).toBe("IATI Identifier");	   
+	   var columns = TestUtils.scryRenderedDOMComponentsWithTag(table[0], "td");	
+	   expect(columns[3].props.children.type).toBe("input");
+	   expect(columns[4].props.children.type).toBe("div");  
+	 //  expect(columns[0].props.children).toBe("String Fields");
+	   	   
 	  
   });
   
-  it('should call selectFieldMapping on project checkbox change', function() {
+  it('should call selectFieldMapping on checkbox change', function() {
 	  var checkboxes = TestUtils.scryRenderedDOMComponentsWithClass(instance, "source-selector");
 	  TestUtils.Simulate.change(checkboxes[0]);
-	  expect(jasmineReact.classPrototype(ChooseFields).selectFieldMapping).toHaveBeenCalled();  
+	  expect(jasmineReact.classPrototype(ChooseFields).handleToggle).toHaveBeenCalled();  
   });
 
 
