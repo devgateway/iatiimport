@@ -13,7 +13,7 @@ var WorkflowStore = Reflux.createStore({
   handleLoadWorkflowData: function() {
     var self = this;    
     $.ajax({
-        url: 'importer/workflow/list',        
+        url: '/importer/workflow/list',        
         error: function() {
         	appActions.loadWorkflowData.failed();
         },
