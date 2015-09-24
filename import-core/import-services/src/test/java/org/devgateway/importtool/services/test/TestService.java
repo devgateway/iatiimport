@@ -84,7 +84,6 @@ public class TestService {
 		// Select type of Source -> Destination process
 		ISourceProcessor sourceProcessor = new IATI104Processor();
 		IDestinationProcessor destinationProcessor = new AMPProcessor();
-		destinationProcessor.setTestMode(false);
 		destinationProcessor.setAuthenticationToken("27368298-48e3-48ef-9f75-13a58f2f5cb6");
 
 		// Upload Source
@@ -179,7 +178,6 @@ public class TestService {
 		// Select type of Source -> Destination process
 		ISourceProcessor sourceProcessor = new IATI201Processor();
 		IDestinationProcessor destinationProcessor = new AMPProcessor();
-		destinationProcessor.setTestMode(true);
 
 		// Upload Source
 		InputStream is = this.getClass().getResourceAsStream("sample_files/activity-standard-example-minimal.xml");

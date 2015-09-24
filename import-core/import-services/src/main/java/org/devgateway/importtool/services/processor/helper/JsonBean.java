@@ -81,7 +81,7 @@ public class JsonBean {
 		} catch (IOException e) {
 				
 		}
-		return "JsonBean [" + json  +"]";
+		return json.toString();
 	}
 	
 }

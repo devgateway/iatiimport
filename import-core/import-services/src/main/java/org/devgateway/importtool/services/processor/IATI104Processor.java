@@ -287,7 +287,6 @@ public class IATI104Processor implements ISourceProcessor {
 					String stringOrgValue = "";
 					fieldNodeList = element.getElementsByTagName(field.getFieldName());
 					if (fieldNodeList.getLength() > 0) {
-						int index = 0;
 						for (int j = 0; j < fieldNodeList.getLength(); j++) {
 							Element fieldElement = (Element) fieldNodeList.item(j);
 							if (fieldElement.getAttribute("role").equals(field.getSubType())) {
@@ -300,11 +299,13 @@ public class IATI104Processor implements ISourceProcessor {
 								FieldValue fv = new FieldValue();
 								fv.setCode(stringOrgValue);
 								fv.setValue(stringOrgValue);
+								int index = field.getPossibleValues() == null ? 0 : field.getPossibleValues().size();
+								fv.setIndex(index);
 								if(field.getPossibleValues() == null) {
 									field.setPossibleValues(new ArrayList<FieldValue>());
 								}
 								field.getPossibleValues().add(fv);
-								document.addOrganizationField(field.getFieldName() + "_" + field.getSubType() + "_" + index++, orgFields);
+								document.addOrganizationField(field.getFieldName() + "_" + field.getSubType() + "_" + index, orgFields);
 							}
 						}
 					}
@@ -346,7 +347,7 @@ public class IATI104Processor implements ISourceProcessor {
 							// Date
 							String localDate = e.getElementsByTagName("transaction-date").item(0).getChildNodes().item(0).getNodeValue();
 							// Receiving Org
-							receivingOrganization = e.getElementsByTagName("receiver-org").item(0).getChildNodes().getLength() > 0 ? e.getElementsByTagName("receiver-org").item(0).getChildNodes().item(0).getNodeValue() : null;
+							receivingOrganization = (e.getElementsByTagName("receiver-org").item(0) != null && e.getElementsByTagName("receiver-org").item(0).getChildNodes().getLength() > 0) ? e.getElementsByTagName("receiver-org").item(0).getChildNodes().item(0).getNodeValue() : null;
 
 							Map<String, String> transactionFields = new HashMap<String, String>();
 							transactionFields.put("date", localDate);
@@ -426,7 +427,7 @@ public class IATI104Processor implements ISourceProcessor {
 		fieldList.add(new Field("IATI Identifier", "iati-identifier", FieldType.STRING, false));
 		fieldList.add(new Field("Title", "title", FieldType.MULTILANG_STRING, false));
 		fieldList.add(new Field("Description", "description", FieldType.MULTILANG_STRING, true));
-		fieldList.add(new Field("Currency", "default-currency", FieldType.STRING, false));
+		//fieldList.add(new Field("Currency", "default-currency", FieldType.STRING, false));
 
 		// Code Lists
 		Field activityStatus = new Field("Activity Status", "activity-status", FieldType.LIST, true);

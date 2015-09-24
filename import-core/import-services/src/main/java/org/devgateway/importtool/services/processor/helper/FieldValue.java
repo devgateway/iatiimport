@@ -18,7 +18,7 @@ public class FieldValue {
 	}
 	
 	public String toString() {
-		return this.code;
+		return this.value + " - " + this.code;
 	}
 	public int getIndex() {
 		return index;

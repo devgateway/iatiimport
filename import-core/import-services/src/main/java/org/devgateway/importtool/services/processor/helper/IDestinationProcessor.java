@@ -13,10 +13,6 @@ public interface IDestinationProcessor {
 
 	public String getIdField();
 
-	public Boolean getTestMode();
-
-	public void setTestMode(Boolean testMode);
-
 	public ActionResult insert(InternalDocument source, List<FieldMapping> fieldMapping, List<FieldValueMapping> valueMapping);
 
 	public ActionResult update(InternalDocument source, InternalDocument destination, List<FieldMapping> fieldMapping, List<FieldValueMapping> valueMapping);
