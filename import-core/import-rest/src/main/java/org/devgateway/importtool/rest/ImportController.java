@@ -5,6 +5,7 @@ import static org.devgateway.importtool.services.processor.helper.Constants.SOUR
 import static org.devgateway.importtool.services.processor.helper.Constants.SESSION_TOKEN;
 import static org.devgateway.importtool.services.processor.helper.Constants.DOCUMENT_MAPPER;
 import static org.devgateway.importtool.services.processor.helper.Constants.WORKFLOW_LIST;
+import static org.devgateway.importtool.services.processor.helper.Constants.CURRENT_FILE_ID;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -23,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.services.File;
 import org.devgateway.importtool.services.FileRepository;
 import org.devgateway.importtool.services.ImportSummary;
+import org.devgateway.importtool.services.Project;
 import org.devgateway.importtool.services.ProjectRepository;
 import org.devgateway.importtool.services.Workflow;
 import org.devgateway.importtool.services.WorkflowService;
@@ -55,14 +57,15 @@ class ImportController {
 	private FileRepository repository;
 	@Autowired
 	private ProjectRepository projectRepository;
-	
+
 	@Autowired
 	WorkflowService workflowService;
 
 	private Log log = LogFactory.getLog(getClass());
 
 	@RequestMapping(method = RequestMethod.GET, value = "/new/{sourceProcessorName}/{destinationProcessorName}/{authenticationToken}/{userName}")
-	ResponseEntity<ImportSessionToken> initiateImport(@PathVariable String sourceProcessorName, @PathVariable String destinationProcessorName, @PathVariable String authenticationToken, @PathVariable String userName, HttpServletRequest request) {
+	ResponseEntity<ImportSessionToken> initiateImport(@PathVariable String sourceProcessorName, @PathVariable String destinationProcessorName, @PathVariable String authenticationToken, @PathVariable String userName,
+			HttpServletRequest request) {
 		log.debug("Initialized import");
 		request.getSession().removeAttribute(SOURCE_PROCESSOR);
 		request.getSession().removeAttribute(DESTINATION_PROCESSOR);
@@ -101,14 +104,6 @@ class ImportController {
 		request.getSession().removeAttribute(DESTINATION_PROCESSOR);
 		request.getSession().removeAttribute(SESSION_TOKEN);
 		request.getSession().removeAttribute(DOCUMENT_MAPPER);
-		try {
-			// repository.deleteAll();
-			// Iterable<File> list = repository.findAll();
-			// repository.delete(list);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>("{ 'error': ' " + e.getMessage() + "'}", HttpStatus.SERVICE_UNAVAILABLE);
-		}
 		return new ResponseEntity<>("{'error': ''}", HttpStatus.OK);
 	}
 
@@ -128,6 +123,7 @@ class ImportController {
 				uploadedFile.setSessionId(authToken.getImportTokenSessionId());
 
 				repository.save(uploadedFile);
+				request.getSession().setAttribute(CURRENT_FILE_ID, uploadedFile.getId());
 
 				return new ResponseEntity<>("{}", HttpStatus.OK);
 			} catch (Exception e) {
@@ -141,8 +137,8 @@ class ImportController {
 
 	@RequestMapping(method = RequestMethod.POST, value = "/filter")
 	ResponseEntity<ImportSessionToken> filter(@PathVariable String authenticationToken) {
-		ImportSessionToken authObject = new ImportSessionToken(authenticationToken,"", new Date(), "", null);
-		//TODO: Execute the filters
+		ImportSessionToken authObject = new ImportSessionToken(authenticationToken, "", new Date(), "", null);
+		// TODO: Execute the filters
 		return new ResponseEntity<>(authObject, HttpStatus.OK);
 	}
 
@@ -158,13 +154,13 @@ class ImportController {
 
 		documentMapper.setSourceProcessor(srcProcessor);
 		documentMapper.setDestinationProcessor(destProcessor);
-//		if (!documentMapper.isInitialized()) {
-			try {
-				documentMapper.initialize();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-	//	}
+		// if (!documentMapper.isInitialized()) {
+		try {
+			documentMapper.initialize();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		// }
 
 		return new ResponseEntity<>(documentMapper.getDocumentMappings(), HttpStatus.OK);
 	}
@@ -178,20 +174,29 @@ class ImportController {
 		}
 		List<ActionResult> results = documentMapper.execute();
 
-		// List<ActionResult> results = new ArrayList<ActionResult>();
-		// results.add(new ActionResult("1", "INSERT", "ok", "project 1"));
-		// results.add(new ActionResult("2", "INSERT", "ok", "project 2"));
-		// results.add(new ActionResult("3", "INSERT", "ok", "project 3"));
-		// results.add(new ActionResult("4", "INSERT", "ok", "project 4"));
-		//
+		Long fileId = (Long)request.getSession().getAttribute(CURRENT_FILE_ID);
+		results.forEach(n -> {
+			insertLog(n, fileId);
+		});
+
 		return new ResponseEntity<>(results, HttpStatus.OK);
 	}
-	
+
+	private void insertLog(ActionResult result, Long id) {
+		Project project = new Project();
+		File file = repository.findById(id);
+		project.setFile(file);
+		project.setTitle(result.getMessage());
+		project.setNotes(result.getOperation());
+		project.setStatus(result.getStatus());
+		projectRepository.save(project);
+	}
+
 	@Transactional
 	@RequestMapping(method = RequestMethod.DELETE, value = "/delete/{id}")
 	public ResponseEntity<String> delete(@PathVariable Long id, HttpServletRequest request) {
 		projectRepository.deleteByFileId(id);
-		repository.delete(id);	
+		repository.delete(id);
 		return new ResponseEntity<>("{}", HttpStatus.OK);
 	}
 
@@ -200,83 +205,82 @@ class ImportController {
 		IDocumentMapper documentMapper = (IDocumentMapper) request.getSession().getAttribute(DOCUMENT_MAPPER);
 		if (documentMapper == null) {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-		} 
+		}
 		ImportSummary importSummmary = new ImportSummary();
 		importSummmary.setProjectCount(documentMapper.getDocumentMappings().size());
 		importSummmary.setFieldMappingCount(documentMapper.getFieldMappingObject().size());
-		
+
 		ImportSessionToken importSessionToken = (ImportSessionToken) request.getSession().getAttribute(SESSION_TOKEN);
 		if (repository != null || importSessionToken != null) {
-			importSummmary.setFileCount(repository.countBySessionId(importSessionToken.getImportTokenSessionId()));  
+			importSummmary.setFileCount(repository.countBySessionId(importSessionToken.getImportTokenSessionId()));
 		}
 
-		//filter count
+		// filter count
 		ISourceProcessor processor = (ISourceProcessor) request.getSession().getAttribute(SOURCE_PROCESSOR);
-		if (processor != null) {			
+		if (processor != null) {
 			List<Field> fields = processor.getFilterFields();
-			importSummmary.setFilterCount(fields.stream().filter(f -> f.getFilters().size() > 0).count());		
+			importSummmary.setFilterCount(fields.stream().filter(f -> f.getFilters().size() > 0).count());
 		}
-				
-		//value mapping count
-		int mappedValuesCount = 0;				
-		for(FieldValueMapping mapping : documentMapper.getValueMappingObject()){			
-			for (Map.Entry<Integer, Integer> entry : mapping.getValueIndexMapping().entrySet())
-			{
-				if(entry.getValue() != null){
+
+		// value mapping count
+		int mappedValuesCount = 0;
+		for (FieldValueMapping mapping : documentMapper.getValueMappingObject()) {
+			for (Map.Entry<Integer, Integer> entry : mapping.getValueIndexMapping().entrySet()) {
+				if (entry.getValue() != null) {
 					++mappedValuesCount;
 				}
-			    
+
 			}
 		}
-		importSummmary.setValueMappingCount(mappedValuesCount);		
+		importSummmary.setValueMappingCount(mappedValuesCount);
 		return new ResponseEntity<>(importSummmary, HttpStatus.OK);
 	}
-	
+
 	@SuppressWarnings("unchecked")
-	private IDestinationProcessor getDestinationProcessor(String processorName, String authenticationToken,HttpServletRequest request) {
-		   IDestinationProcessor processor = null;		  
-			List<Workflow> workflows = (List<Workflow>)request.getSession().getAttribute(WORKFLOW_LIST);
-			if(workflows == null){
-				workflows = workflowService.getWorkflows();	
-				request.getSession().setAttribute(WORKFLOW_LIST, workflows);
-			}			
-			
-			Optional<Workflow> optional = workflows.stream().filter(w -> w.getDestinationProcessor().getName().equals(processorName)).findFirst();
-			if(optional.isPresent()){				
-				try {						
-					Constructor<?> c = Class.forName(optional.get().getDestinationProcessor().getClassName()).getDeclaredConstructor(String.class);
-					c.setAccessible(true);
-					processor = (IDestinationProcessor)c.newInstance(new Object[] {authenticationToken});
-				} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException e) {					
-					log.error("Error loading processor class: " + e);
-				}
+	private IDestinationProcessor getDestinationProcessor(String processorName, String authenticationToken, HttpServletRequest request) {
+		IDestinationProcessor processor = null;
+		List<Workflow> workflows = (List<Workflow>) request.getSession().getAttribute(WORKFLOW_LIST);
+		if (workflows == null) {
+			workflows = workflowService.getWorkflows();
+			request.getSession().setAttribute(WORKFLOW_LIST, workflows);
+		}
+
+		Optional<Workflow> optional = workflows.stream().filter(w -> w.getDestinationProcessor().getName().equals(processorName)).findFirst();
+		if (optional.isPresent()) {
+			try {
+				Constructor<?> c = Class.forName(optional.get().getDestinationProcessor().getClassName()).getDeclaredConstructor(String.class);
+				c.setAccessible(true);
+				processor = (IDestinationProcessor) c.newInstance(new Object[] { authenticationToken });
+			} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException e) {
+				log.error("Error loading processor class: " + e);
 			}
-			
+		}
+
 		return processor;
 	}
 
 	@SuppressWarnings("unchecked")
-	private ISourceProcessor getSourceProcessor(String processorName, HttpServletRequest request) {		
-		ISourceProcessor processor = null;		
-		List<Workflow> workflows = (List<Workflow>)request.getSession().getAttribute(WORKFLOW_LIST);
-		
-		if(workflows == null){
-			workflows = workflowService.getWorkflows();	
+	private ISourceProcessor getSourceProcessor(String processorName, HttpServletRequest request) {
+		ISourceProcessor processor = null;
+		List<Workflow> workflows = (List<Workflow>) request.getSession().getAttribute(WORKFLOW_LIST);
+
+		if (workflows == null) {
+			workflows = workflowService.getWorkflows();
 			request.getSession().setAttribute(WORKFLOW_LIST, workflows);
 		}
-				
+
 		Optional<Workflow> optional = workflows.stream().filter(w -> w.getSourceProcessor().getName().equals(processorName)).findFirst();
-		if(optional.isPresent()){				
-			try {					
-				Class<ISourceProcessor> clazz = (Class<ISourceProcessor>)Class.forName(optional.get().getSourceProcessor().getClassName());
-				processor = (ISourceProcessor)clazz.newInstance();
-			} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {					
+		if (optional.isPresent()) {
+			try {
+				Class<ISourceProcessor> clazz = (Class<ISourceProcessor>) Class.forName(optional.get().getSourceProcessor().getClassName());
+				processor = (ISourceProcessor) clazz.newInstance();
+			} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
 				log.error("Error loading processor class: " + e);
 			}
 
 		}
-		
-		if(processor == null){
+
+		if (processor == null) {
 			processor = new XMLGenericProcessor();
 		}
 		return processor;

@@ -29,7 +29,8 @@ class ReportController {
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/previousimports")
 	public ResponseEntity<Page<File>> listFiles(Pageable pageable, HttpServletRequest request) {				
-		Page<File> list = fileRepository.findAll(pageable);		
+		Page<File> list = fileRepository.findAll(pageable);
+		list.forEach(file -> { file.setData(null);});
 		return new ResponseEntity<>(list, HttpStatus.OK);
 	}
 	
