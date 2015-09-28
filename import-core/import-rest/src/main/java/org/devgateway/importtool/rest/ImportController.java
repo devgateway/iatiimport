@@ -248,7 +248,7 @@ class ImportController {
 					c.setAccessible(true);
 					processor = (IDestinationProcessor)c.newInstance(new Object[] {authenticationToken});
 				} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException e) {					
-					log.error("Error loading processor class: " + e);
+					log.error("Error loading destination processor class: " + optional.get().getDestinationProcessor().getClassName() + " " + e);
 				}
 			}
 			
