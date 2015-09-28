@@ -284,13 +284,13 @@ public class IATI104Processor implements ISourceProcessor {
 					document.addStringField(field.getFieldName(), stringValue);
 					break;
 				case ORGANIZATION:
-					String stringOrgValue = "";
+					
 					fieldNodeList = element.getElementsByTagName(field.getFieldName());
 					if (fieldNodeList.getLength() > 0) {
 						for (int j = 0; j < fieldNodeList.getLength(); j++) {
 							Element fieldElement = (Element) fieldNodeList.item(j);
 							if (fieldElement.getAttribute("role").equals(field.getSubType())) {
-								stringOrgValue = fieldElement.getChildNodes().item(j).getNodeValue();
+								final String stringOrgValue = fieldElement.getChildNodes().item(j).getNodeValue();
 								Map<String, String> orgFields = new HashMap<String, String>();
 								orgFields.put("value", stringOrgValue);
 								orgFields.put("role", field.getSubType());
@@ -304,7 +304,9 @@ public class IATI104Processor implements ISourceProcessor {
 								if(field.getPossibleValues() == null) {
 									field.setPossibleValues(new ArrayList<FieldValue>());
 								}
-								field.getPossibleValues().add(fv);
+								if(!field.getPossibleValues().stream().anyMatch(n->{ return n.getCode().equals(stringOrgValue);})) {
+									field.getPossibleValues().add(fv);
+								}
 								document.addOrganizationField(field.getFieldName() + "_" + field.getSubType() + "_" + index, orgFields);
 							}
 						}
