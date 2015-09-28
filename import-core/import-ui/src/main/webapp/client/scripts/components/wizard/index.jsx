@@ -121,28 +121,38 @@ var Wizard = React.createClass({
 			'username': Cookies.get("DESTINATION_USERNAME"),
 			'host': appConfig.DESTINATION_API_HOST
 		});
-
-		$.get(url , function(result) {			
-			this.setState({
-				info: {
-					authenticationToken: result.authenticationToken,
-					sourceProcessorName: result.sourceProcessorName,
-					sourceProcessor: sourceProcessor,
-					destinationProcessorName: result.destinationProcessorName,
-					destinationProcessor: destinationProcessor,
-					status:'SUCCESS'
-				}
-			});
-			this.hideLoadingIcon();     
-		}.bind(this)).fail(function(err) {	
-			this.setState({
-				info: {
-					status:'FAIL'
-				}
-			});
-			this.hideLoadingIcon();
-			this.displayError("Error loading state of session.");
-		}.bind(this));
+       
+		var self = this;
+		$.ajax({
+	        url: url,
+	        timeout:3000,
+	        error: function(result) {			
+	        	self.setState({
+					info: {
+						status:'FAIL'
+					}
+				});
+	        	self.hideLoadingIcon();
+	        	self.displayError("Error loading state of session.");
+	        },
+	        dataType: 'json',
+	        success: function(result) { 
+	        	self.setState({
+					info: {
+						authenticationToken: result.authenticationToken,
+						sourceProcessorName: result.sourceProcessorName,
+						sourceProcessor: sourceProcessor,
+						destinationProcessorName: result.destinationProcessorName,
+						destinationProcessor: destinationProcessor,
+						status:'SUCCESS'
+					}
+				});
+	        	self.hideLoadingIcon();
+	        },
+	        type: 'GET'
+	     }); 
+		
+		
 	},
   
   render: function() {	
