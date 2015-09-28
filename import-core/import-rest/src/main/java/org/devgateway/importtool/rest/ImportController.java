@@ -236,6 +236,7 @@ class ImportController {
 		return new ResponseEntity<>(importSummmary, HttpStatus.OK);
 	}
 
+	@SuppressWarnings("unchecked")
 	private IDestinationProcessor getDestinationProcessor(String processorName, String authenticationToken,HttpServletRequest request) {
 		   IDestinationProcessor processor = null;		  
 			List<Workflow> workflows = (List<Workflow>)request.getSession().getAttribute(WORKFLOW_LIST);
@@ -250,14 +251,14 @@ class ImportController {
 					Constructor<?> c = Class.forName(optional.get().getDestinationProcessor().getClassName()).getDeclaredConstructor(String.class);
 					c.setAccessible(true);
 					processor = (IDestinationProcessor)c.newInstance(new Object[] {authenticationToken});
-				} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException e) {					
+				} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException e) {
+					e.printStackTrace();
 					log.error("Error loading destination processor class: " + optional.get().getDestinationProcessor().getClassName() + " " + e);
 				}
 			}
 			
 		return processor;
 	}
-
 
 	@SuppressWarnings("unchecked")
 	private ISourceProcessor getSourceProcessor(String processorName, HttpServletRequest request) {		
@@ -285,6 +286,5 @@ class ImportController {
 		}
 		return processor;
 	}
-
 
 }

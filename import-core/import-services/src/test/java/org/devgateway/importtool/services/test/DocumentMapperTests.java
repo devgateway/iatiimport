@@ -26,7 +26,7 @@ public class DocumentMapperTests {
 	@Test
 	public void testInitialize() throws Exception {		
 				ISourceProcessor sourceProcessor = new IATI104Processor();
-				IDestinationProcessor destinationProcessor = new AMPProcessor();
+				AMPProcessor destinationProcessor = new AMPProcessor();
 				destinationProcessor.setTestMode(true);
 				destinationProcessor.setAuthenticationToken("27368298-48e3-48ef-9f75-13a58f2f5cb6");
 
@@ -45,8 +45,8 @@ public class DocumentMapperTests {
 	@Test
 	public void testExecute() throws Exception {
 		
-				ISourceProcessor sourceProcessor = new IATI104Processor();
-				IDestinationProcessor destinationProcessor = new AMPProcessor();
+		        IATI104Processor sourceProcessor = new IATI104Processor();
+		        AMPProcessor destinationProcessor = new AMPProcessor();
 				destinationProcessor.setTestMode(true);
 				destinationProcessor.setAuthenticationToken("27368298-48e3-48ef-9f75-13a58f2f5cb6");
 
