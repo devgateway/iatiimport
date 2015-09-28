@@ -108,7 +108,7 @@ var ChooseProjects = React.createClass({
                 } else {
                     existingProjects.push(<tr key={i}>
                         <td>
-                          <input aria-label="Source"  type="checkbox" checked={item.selected} onChange={this.handleToggle.bind(this, item)} />
+                          <input aria-label="Source" className="source" type="checkbox" checked={item.selected} onChange={this.handleToggle.bind(this, item)} />
                         </td>
                         <td>
                             {item.sourceDocument.multilangFields.title[language]}

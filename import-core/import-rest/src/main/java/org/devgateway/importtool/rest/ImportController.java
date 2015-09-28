@@ -236,54 +236,55 @@ class ImportController {
 		return new ResponseEntity<>(importSummmary, HttpStatus.OK);
 	}
 
-	@SuppressWarnings("unchecked")
-	private IDestinationProcessor getDestinationProcessor(String processorName, String authenticationToken, HttpServletRequest request) {
-		IDestinationProcessor processor = null;
-		List<Workflow> workflows = (List<Workflow>) request.getSession().getAttribute(WORKFLOW_LIST);
-		if (workflows == null) {
-			workflows = workflowService.getWorkflows();
-			request.getSession().setAttribute(WORKFLOW_LIST, workflows);
-		}
-
-		Optional<Workflow> optional = workflows.stream().filter(w -> w.getDestinationProcessor().getName().equals(processorName)).findFirst();
-		if (optional.isPresent()) {
-			try {
-				Constructor<?> c = Class.forName(optional.get().getDestinationProcessor().getClassName()).getDeclaredConstructor(String.class);
-				c.setAccessible(true);
-				processor = (IDestinationProcessor) c.newInstance(new Object[] { authenticationToken });
-			} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException e) {
-				log.error("Error loading processor class: " + e);
+	private IDestinationProcessor getDestinationProcessor(String processorName, String authenticationToken,HttpServletRequest request) {
+		   IDestinationProcessor processor = null;		  
+			List<Workflow> workflows = (List<Workflow>)request.getSession().getAttribute(WORKFLOW_LIST);
+			if(workflows == null){
+				workflows = workflowService.getWorkflows();	
+				request.getSession().setAttribute(WORKFLOW_LIST, workflows);
+			}			
+			
+			Optional<Workflow> optional = workflows.stream().filter(w -> w.getDestinationProcessor().getName().equals(processorName)).findFirst();
+			if(optional.isPresent()){				
+				try {						
+					Constructor<?> c = Class.forName(optional.get().getDestinationProcessor().getClassName()).getDeclaredConstructor(String.class);
+					c.setAccessible(true);
+					processor = (IDestinationProcessor)c.newInstance(new Object[] {authenticationToken});
+				} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException e) {					
+					log.error("Error loading destination processor class: " + optional.get().getDestinationProcessor().getClassName() + " " + e);
+				}
 			}
-		}
-
+			
 		return processor;
 	}
 
-	@SuppressWarnings("unchecked")
-	private ISourceProcessor getSourceProcessor(String processorName, HttpServletRequest request) {
-		ISourceProcessor processor = null;
-		List<Workflow> workflows = (List<Workflow>) request.getSession().getAttribute(WORKFLOW_LIST);
 
-		if (workflows == null) {
-			workflows = workflowService.getWorkflows();
+	@SuppressWarnings("unchecked")
+	private ISourceProcessor getSourceProcessor(String processorName, HttpServletRequest request) {		
+		ISourceProcessor processor = null;		
+		List<Workflow> workflows = (List<Workflow>)request.getSession().getAttribute(WORKFLOW_LIST);
+		
+		if(workflows == null){
+			workflows = workflowService.getWorkflows();	
 			request.getSession().setAttribute(WORKFLOW_LIST, workflows);
 		}
-
+				
 		Optional<Workflow> optional = workflows.stream().filter(w -> w.getSourceProcessor().getName().equals(processorName)).findFirst();
-		if (optional.isPresent()) {
-			try {
-				Class<ISourceProcessor> clazz = (Class<ISourceProcessor>) Class.forName(optional.get().getSourceProcessor().getClassName());
-				processor = (ISourceProcessor) clazz.newInstance();
-			} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+		if(optional.isPresent()){				
+			try {					
+				Class<ISourceProcessor> clazz = (Class<ISourceProcessor>)Class.forName(optional.get().getSourceProcessor().getClassName());
+				processor = (ISourceProcessor)clazz.newInstance();
+			} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {					
 				log.error("Error loading processor class: " + e);
 			}
 
 		}
-
-		if (processor == null) {
+		
+		if(processor == null){
 			processor = new XMLGenericProcessor();
 		}
 		return processor;
 	}
+
 
 }

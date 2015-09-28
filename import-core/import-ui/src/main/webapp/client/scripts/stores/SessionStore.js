@@ -15,7 +15,8 @@ var SessionStore = Reflux.createStore({
   handleInitSession: function() {
     var self = this;    
     $.ajax({
-        url: appConfig.DESTINATION_AUTH_TOKEN_ENDPOINT,        
+        url: appConfig.DESTINATION_AUTH_TOKEN_ENDPOINT,
+        timeout:3000,
         error: function() {
           self.trigger({            
                 sessionData: []

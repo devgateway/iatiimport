@@ -121,28 +121,38 @@ var Wizard = React.createClass({
 			'username': Cookies.get("DESTINATION_USERNAME"),
 			'host': appConfig.DESTINATION_API_HOST
 		});
-
-		$.get(url , function(result) {			
-			this.setState({
-				info: {
-					authenticationToken: result.authenticationToken,
-					sourceProcessorName: result.sourceProcessorName,
-					sourceProcessor: sourceProcessor,
-					destinationProcessorName: result.destinationProcessorName,
-					destinationProcessor: destinationProcessor,
-					status:'SUCCESS'
-				}
-			});
-			this.hideLoadingIcon();     
-		}.bind(this)).fail(function(err) {	
-			this.setState({
-				info: {
-					status:'FAIL'
-				}
-			});
-			this.hideLoadingIcon();
-			this.displayError("Error loading state of session.");
-		}.bind(this));
+       
+		var self = this;
+		$.ajax({
+	        url: url,
+	        timeout:3000,
+	        error: function(result) {			
+	        	self.setState({
+					info: {
+						status:'FAIL'
+					}
+				});
+	        	self.hideLoadingIcon();
+	        	self.displayError("Error loading state of session.");
+	        },
+	        dataType: 'json',
+	        success: function(result) { 
+	        	self.setState({
+					info: {
+						authenticationToken: result.authenticationToken,
+						sourceProcessorName: result.sourceProcessorName,
+						sourceProcessor: sourceProcessor,
+						destinationProcessorName: result.destinationProcessorName,
+						destinationProcessor: destinationProcessor,
+						status:'SUCCESS'
+					}
+				});
+	        	self.hideLoadingIcon();
+	        },
+	        type: 'GET'
+	     }); 
+		
+		
 	},
   
   render: function() {	
@@ -159,6 +169,13 @@ var Wizard = React.createClass({
     eventHandlers.updateCurrentStep = this.updateCurrentStep;
     eventHandlers.navigateBack  = this.navigateBack;
     
+    var error; 
+    if(Cookies.get("DESTINATION_AUTH_TOKEN") == "undefined"){
+    	error = (<div className="container"><br/><div className="alert alert-danger server-status-message" role="alert" ><span className="glyphicon glyphicon-exclamation-sign error-box" aria-hidden="true"></span><span className="sr-only">Error:</span><span > Session information for the destination system could not be retrieved. Verify if backend services are working correctly.</span> </div></div>);
+    }    
+    if(error){
+    	return error;
+    }
     return (
       <div>
       <div className="container " >     

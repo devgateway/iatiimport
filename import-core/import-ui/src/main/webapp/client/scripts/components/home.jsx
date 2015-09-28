@@ -41,7 +41,7 @@ var Home = React.createClass({
     if(this.state.systemInfo.status == "OK"){
 	    content = <RouteHandler i18nLib = {this.state.i18nLib}/>;   
     }else if(this.state.systemInfo.status == "DOWN"){
-       content = <div className="alert alert-danger server-status-message" role="alert" ><span className="glyphicon glyphicon-exclamation-sign error-box" aria-hidden="true"></span><span className="sr-only">Error:</span><span >Unable to connect to the server.</span> </div>;
+       content = <div className="alert alert-danger server-status-message" role="alert" ><span className="glyphicon glyphicon-exclamation-sign error-box" aria-hidden="true"></span><span className="sr-only">Error:</span><span >Unable to connect to the Import Tool Server.</span> </div>;
           
     }
     

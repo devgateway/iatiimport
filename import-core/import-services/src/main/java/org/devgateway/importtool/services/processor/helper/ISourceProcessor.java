@@ -2,6 +2,7 @@ package org.devgateway.importtool.services.processor.helper;
 
 import java.io.InputStream;
 import java.util.List;
+import org.w3c.dom.Document;
 
 public interface ISourceProcessor {
 	public String getDescriptiveName();
@@ -23,4 +24,6 @@ public interface ISourceProcessor {
 	public String getTitleField();
 
 	public Boolean isFormatValid();
+	
+	public Document getDoc();
 }

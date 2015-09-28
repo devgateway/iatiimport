@@ -17,8 +17,14 @@ describe('Filter Data ', function() {
 	  	  
 	  jasmineReact.spyOnClass(FilterData, "handleToggle");
 	  jasmineReact.spyOnClass(FilterData, "handleNext");
-	  i18n = {t:function(key){}};
-	  eventHandlers = {};
+	  i18n = {t:function(key){},lng:function(){}};
+	  eventHandlers = {updateCurrentStep:function(step){		  
+	  },
+	  showLoadingIcon:function(){		  
+	  },
+	  hideLoadingIcon: function(){		  
+	  }
+	  };	
       instance = jasmineReact.render(<FilterData i18nLib = {i18n} eventHandlers = {eventHandlers} />, document.body);
       instance.setState({
     	  filterData: filters

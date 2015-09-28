@@ -53,6 +53,12 @@ public class IATI104Processor implements ISourceProcessor {
 	// XML Document that will hold the entire imported file
 	private Document doc;
 
+	public Document getDoc() {
+		return doc;
+	}
+
+	
+
 	// Map that holds information about how the field names map to code lists
 	private static Map<String, String> mappingNameFile = new HashMap<String, String>();
 	static {

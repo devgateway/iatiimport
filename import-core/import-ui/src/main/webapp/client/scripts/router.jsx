@@ -19,10 +19,12 @@ var Reports = require('./components/reports/index');
 var ImportList = require('./components/reports/import-list');
 var ImportLog = require('./components/reports/import-log');
 var WorkflowList = require('./components/reports/workflow-list');
+var ErrorPage = require('./components/error-page')
 
 var routes = (
 	<Route name="layout" path="/" handler={Home}>
-		<DefaultRoute handler={Content} />		
+		<DefaultRoute handler={Content} />	
+		<Route name="error" path="error" handler={ErrorPage} />
 		<Route path="wizard/:src/:dst" handler={Wizard}>	
 			<DefaultRoute name="upload" handler={UploadFile}/>
 			<Route name="filter" path="filter" handler={FilterData}/>

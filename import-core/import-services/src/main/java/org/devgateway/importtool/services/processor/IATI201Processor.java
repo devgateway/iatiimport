@@ -43,6 +43,10 @@ public class IATI201Processor implements ISourceProcessor {
 
 	private Document doc;
 
+	public Document getDoc() {
+		return doc;
+	}
+	
 	private static Map<String, String> mappingNameFile = new HashMap<String, String>();
 	static {
 		mappingNameFile.put("activity-status", "ActivityStatus");

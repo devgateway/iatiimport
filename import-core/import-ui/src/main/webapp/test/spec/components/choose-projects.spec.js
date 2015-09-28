@@ -12,9 +12,15 @@ describe('Choose Projects ', function() {
 
   //review how the test setup is done.
   beforeEach(function() { 	 
-	  i18n = {t:function(key){}};
-	  eventHandlers = {};	  
-	  jasmineReact.spyOnClass(ChooseProjects, "selectProject");	  
+	  i18n = {t:function(key){},lng:function(){}};
+	  eventHandlers = {updateCurrentStep:function(step){		  
+	  },
+	  showLoadingIcon:function(){		  
+	  },
+	  hideLoadingIcon: function(){		  
+	  }
+	  };	  
+	  jasmineReact.spyOnClass(ChooseProjects, "handleToggle");	  
       instance = jasmineReact.render(<ChooseProjects i18nLib = {i18n} eventHandlers = {eventHandlers} />, document.body);
       instance.setState({
     	  projectData: projects
@@ -24,13 +30,13 @@ describe('Choose Projects ', function() {
 	  var projects = TestUtils.scryRenderedDOMComponentsWithClass(instance, "table");
 	  var columns = TestUtils.scryRenderedDOMComponentsWithTag(projects[0], "td");	
 	  expect(columns[0].props.children.type).toBe("input");
-	  expect(columns[1].props.children).toBe("Activity title 1");	    
+	  expect(columns[1].props.children.trim()).toBe("Support to ICO".trim());	    
   });
   
   it('should call selectProject on project checkbox change', function() {	  
 	   var checks = TestUtils.scryRenderedDOMComponentsWithClass(instance, "source");	   
 	   TestUtils.Simulate.change(checks[0]);
-	   expect(jasmineReact.classPrototype(ChooseProjects).selectProject).toHaveBeenCalled();	  	    
+	   expect(jasmineReact.classPrototype(ChooseProjects).handleToggle).toHaveBeenCalled();	  	    
   });
 
 
