@@ -10,8 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.devgateway.importtool.services.ValueMappingTemplate;
-import org.devgateway.importtool.services.ValueMappingTemplateRepository;
+import org.devgateway.importtool.dao.ValueMappingTemplateRepository;
+import org.devgateway.importtool.model.ValueMappingTemplate;
 import org.devgateway.importtool.services.processor.helper.FieldValueMapping;
 import org.devgateway.importtool.services.request.ValueMappingTemplateRequest;
 import org.devgateway.importtool.services.response.ValueMappingTemplateReponse;

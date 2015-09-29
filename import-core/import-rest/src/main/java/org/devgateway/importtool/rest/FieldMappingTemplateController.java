@@ -10,8 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.devgateway.importtool.services.FieldMappingTemplate;
-import org.devgateway.importtool.services.FieldMappingTemplateRepository;
+import org.devgateway.importtool.dao.FieldMappingTemplateRepository;
+import org.devgateway.importtool.model.FieldMappingTemplate;
 import org.devgateway.importtool.services.processor.helper.FieldMapping;
 import org.devgateway.importtool.services.request.FieldMappingTemplateRequest;
 import org.devgateway.importtool.services.response.FieldMappingTemplateReponse;
@@ -29,6 +29,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @RestController
 @RequestMapping(value = "/fieldmappingtemplate")
 class FieldMappingTemplateController {
+	
 	@Autowired
 	private FieldMappingTemplateRepository fieldMappingTemplateRepository;
 	

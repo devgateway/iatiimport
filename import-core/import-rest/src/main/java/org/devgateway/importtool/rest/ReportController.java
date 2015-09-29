@@ -4,10 +4,10 @@ package org.devgateway.importtool.rest;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.devgateway.importtool.services.File;
-import org.devgateway.importtool.services.FileRepository;
-import org.devgateway.importtool.services.Project;
-import org.devgateway.importtool.services.ProjectRepository;
+import org.devgateway.importtool.dao.FileRepository;
+import org.devgateway.importtool.dao.ProjectRepository;
+import org.devgateway.importtool.model.File;
+import org.devgateway.importtool.model.Project;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

@@ -1,4 +1,4 @@
-package org.devgateway.importtool.services;
+package org.devgateway.importtool.model;
 
 public class ImportSummary {
 	private Long fileCount;

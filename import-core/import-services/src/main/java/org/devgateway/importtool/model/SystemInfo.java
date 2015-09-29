@@ -1,4 +1,4 @@
-package org.devgateway.importtool.services;
+package org.devgateway.importtool.model;
 import java.io.Serializable;
 public class SystemInfo implements  Serializable {
 	private static final long serialVersionUID = 1L;

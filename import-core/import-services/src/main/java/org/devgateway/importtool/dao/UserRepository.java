@@ -1,5 +1,6 @@
-package org.devgateway.importtool.services;
+package org.devgateway.importtool.dao;
 
+import org.devgateway.importtool.model.User;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 

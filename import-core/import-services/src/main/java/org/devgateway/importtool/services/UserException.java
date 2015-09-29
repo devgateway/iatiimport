@@ -1,5 +1,7 @@
 package org.devgateway.importtool.services;
 
+import org.devgateway.importtool.model.User;
+
 public class UserException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;

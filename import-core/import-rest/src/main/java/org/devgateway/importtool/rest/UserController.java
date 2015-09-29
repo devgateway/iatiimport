@@ -4,8 +4,8 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 import java.util.Optional;
 
-import org.devgateway.importtool.services.User;
-import org.devgateway.importtool.services.UserRepository;
+import org.devgateway.importtool.dao.UserRepository;
+import org.devgateway.importtool.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

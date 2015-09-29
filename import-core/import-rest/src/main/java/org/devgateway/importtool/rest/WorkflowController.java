@@ -4,7 +4,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.devgateway.importtool.services.Workflow;
+import org.devgateway.importtool.model.Workflow;
 import org.devgateway.importtool.services.WorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

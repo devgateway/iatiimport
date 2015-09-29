@@ -11,7 +11,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.devgateway.importtool.services.Workflow;
+import org.devgateway.importtool.model.Workflow;
 import org.devgateway.importtool.services.processor.helper.Processor;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

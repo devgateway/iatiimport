@@ -9,6 +9,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.devgateway.importtool.model.User;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -26,7 +27,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 @ComponentScan
 @Configuration
-@EnableJpaRepositories
+@EnableJpaRepositories(basePackages = {"org.devgateway.importtool.dao"})
 @ConfigurationProperties
 /***
  * Sample Service configuration

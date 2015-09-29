@@ -1,8 +1,9 @@
-package org.devgateway.importtool.services;
+package org.devgateway.importtool.dao;
 
 import java.util.List;
 import java.util.UUID;
 
+import org.devgateway.importtool.model.File;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.domain.Page;
