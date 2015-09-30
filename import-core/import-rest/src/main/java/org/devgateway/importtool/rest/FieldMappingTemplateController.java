@@ -32,8 +32,7 @@ class FieldMappingTemplateController {
 	
 	@Autowired
 	private FieldMappingTemplateRepository fieldMappingTemplateRepository;
-	
-	
+		
 	private Log log = LogFactory.getLog(getClass());
 	
 	@RequestMapping(method = RequestMethod.POST, value = "/save")
