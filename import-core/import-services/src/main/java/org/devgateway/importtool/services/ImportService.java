@@ -12,6 +12,7 @@ import org.devgateway.importtool.dao.ProjectRepository;
 import org.devgateway.importtool.model.File;
 import org.devgateway.importtool.model.ImportSummary;
 import org.devgateway.importtool.model.Project;
+import org.devgateway.importtool.security.ImportSessionToken;
 import org.devgateway.importtool.services.processor.helper.ActionResult;
 import org.devgateway.importtool.services.processor.helper.Field;
 import org.devgateway.importtool.services.processor.helper.FieldValueMapping;
