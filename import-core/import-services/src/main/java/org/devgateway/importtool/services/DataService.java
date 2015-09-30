@@ -1,16 +1,21 @@
 package org.devgateway.importtool.services;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+
 import org.devgateway.importtool.model.Language;
 import org.devgateway.importtool.services.processor.helper.Field;
 import org.devgateway.importtool.services.processor.helper.FieldMapping;
 import org.devgateway.importtool.services.processor.helper.FieldType;
+import org.devgateway.importtool.services.processor.helper.FieldValue;
 import org.devgateway.importtool.services.processor.helper.FieldValueMapping;
+import org.devgateway.importtool.services.processor.helper.IDestinationProcessor;
 import org.devgateway.importtool.services.processor.helper.IDocumentMapper;
 import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
 
+@org.springframework.stereotype.Service
 public class DataService {
 	public List<FieldValueMapping> getValueMapping(IDocumentMapper documentMapper){
 		if (documentMapper.getFieldMappingObject() != null && documentMapper.getFieldMappingObject().size() > 0 && (documentMapper.getValueMappingObject() == null || documentMapper.getValueMappingObject().size() == 0)) {
@@ -74,5 +79,29 @@ public class DataService {
 			listLanguages.add(new Language(tmp.getLanguage(), tmp.getDisplayLanguage()));
 		});
 		return listLanguages;
+    }
+    
+    public List<FieldValue> getSourceFieldValues(ISourceProcessor processor, String fieldName){    	
+		List<Field> fieldList = processor.getFields();
+		List<FieldValue> possibleValues =  null;
+		Field field = fieldList.stream().filter(n -> {
+			return fieldName.equals(n.getFieldName());
+		}).findFirst().get();
+		if (field != null) {		
+			possibleValues = field.getPossibleValues();
+		}
+		return possibleValues;    	
+    }
+    
+    public List<FieldValue> getDestinationFieldValues(IDestinationProcessor processor, String fieldName){
+    	List<Field> fieldList = processor.getFields();
+		List<FieldValue> possibleValues = null;
+		Field field = fieldList.stream().filter(n -> {
+			return fieldName.equals(n.getFieldName());
+		}).findFirst().get();
+		if (field != null) {
+			possibleValues = field.getPossibleValues();
+		}
+        return possibleValues;	
     }
 }
