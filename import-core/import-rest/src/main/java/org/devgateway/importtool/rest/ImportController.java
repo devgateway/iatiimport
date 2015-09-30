@@ -7,14 +7,11 @@ import static org.devgateway.importtool.services.processor.helper.Constants.DOCU
 import static org.devgateway.importtool.services.processor.helper.Constants.WORKFLOW_LIST;
 import static org.devgateway.importtool.services.processor.helper.Constants.CURRENT_FILE_ID;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
@@ -25,16 +22,14 @@ import org.devgateway.importtool.dao.FileRepository;
 import org.devgateway.importtool.dao.ProjectRepository;
 import org.devgateway.importtool.model.File;
 import org.devgateway.importtool.model.ImportSummary;
-import org.devgateway.importtool.model.Project;
 import org.devgateway.importtool.model.Workflow;
 import org.devgateway.importtool.security.ImportSessionToken;
+import org.devgateway.importtool.services.ImportService;
 import org.devgateway.importtool.services.WorkflowService;
 import org.devgateway.importtool.services.processor.XMLGenericProcessor;
 import org.devgateway.importtool.services.processor.helper.ActionResult;
 import org.devgateway.importtool.services.processor.helper.DocumentMapper;
 import org.devgateway.importtool.services.processor.helper.DocumentMapping;
-import org.devgateway.importtool.services.processor.helper.Field;
-import org.devgateway.importtool.services.processor.helper.FieldValueMapping;
 import org.devgateway.importtool.services.processor.helper.IDestinationProcessor;
 import org.devgateway.importtool.services.processor.helper.IDocumentMapper;
 import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
@@ -60,7 +55,10 @@ class ImportController {
 	private ProjectRepository projectRepository;
 
 	@Autowired
-	WorkflowService workflowService;
+	private WorkflowService workflowService;
+	
+	@Autowired
+	private ImportService importService;
 
 	private Log log = LogFactory.getLog(getClass());
 
@@ -72,16 +70,14 @@ class ImportController {
 		request.getSession().removeAttribute(DESTINATION_PROCESSOR);
 		request.getSession().removeAttribute(SESSION_TOKEN);
 		request.getSession().removeAttribute(DOCUMENT_MAPPER);
-		ISourceProcessor srcProcessor = getSourceProcessor(sourceProcessorName, request);
+		ISourceProcessor srcProcessor = importService.getSourceProcessor(sourceProcessorName);
 		request.getSession().setAttribute(SOURCE_PROCESSOR, srcProcessor);
-
-		IDestinationProcessor destProcessor = getDestinationProcessor(destinationProcessorName, authenticationToken, request);
+		IDestinationProcessor destProcessor = importService.getDestinationProcessor(destinationProcessorName, authenticationToken);
 		request.getSession().setAttribute(DESTINATION_PROCESSOR, destProcessor);
 		log.debug(srcProcessor.getDescriptiveName());
 		log.debug(destProcessor.getDescriptiveName());
 		ImportSessionToken importSessionToken = new ImportSessionToken(authenticationToken, userName, new Date(), srcProcessor.getDescriptiveName(), destProcessor.getDescriptiveName());
 		request.getSession().setAttribute(SESSION_TOKEN, importSessionToken);
-
 		return new ResponseEntity<>(importSessionToken, HttpStatus.OK);
 	}
 
@@ -111,21 +107,11 @@ class ImportController {
 	@RequestMapping(method = RequestMethod.POST, value = "/upload")
 	public ResponseEntity<String> handleFileUpload(@RequestParam("file_data") MultipartFile file, HttpServletRequest request) {
 		if (!file.isEmpty()) {
-			try {
-				InputStream is = new ByteArrayInputStream(file.getBytes());
+			try {				
 				ISourceProcessor srcProcessor = (ISourceProcessor) request.getSession().getAttribute(SOURCE_PROCESSOR);
 				ImportSessionToken authToken = (ImportSessionToken) request.getSession().getAttribute(SESSION_TOKEN);
-				srcProcessor.setInput(is);
-				File uploadedFile = new File();
-				uploadedFile.setData(file.getBytes());
-				uploadedFile.setCreatedDate(new Date());
-				uploadedFile.setFileName(file.getOriginalFilename());
-				uploadedFile.setAuthor(authToken.getAuthenticationToken());
-				uploadedFile.setSessionId(authToken.getImportTokenSessionId());
-
-				repository.save(uploadedFile);
+				File uploadedFile = importService.uploadFile(file, srcProcessor, authToken);				
 				request.getSession().setAttribute(CURRENT_FILE_ID, uploadedFile.getId());
-
 				return new ResponseEntity<>("{}", HttpStatus.OK);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -174,24 +160,15 @@ class ImportController {
 			request.getSession().setAttribute(DOCUMENT_MAPPER, documentMapper);
 		}
 		List<ActionResult> results = documentMapper.execute();
-
 		Long fileId = (Long)request.getSession().getAttribute(CURRENT_FILE_ID);
 		results.forEach(n -> {
-			insertLog(n, fileId);
+			importService.insertLog(n, fileId);
 		});
 
 		return new ResponseEntity<>(results, HttpStatus.OK);
 	}
 
-	private void insertLog(ActionResult result, Long id) {
-		Project project = new Project();
-		File file = repository.findById(id);
-		project.setFile(file);
-		project.setTitle(result.getMessage());
-		project.setNotes(result.getOperation());
-		project.setStatus(result.getStatus());
-		projectRepository.save(project);
-	}
+	
 
 	@Transactional
 	@RequestMapping(method = RequestMethod.DELETE, value = "/delete/{id}")
@@ -204,88 +181,14 @@ class ImportController {
 	@RequestMapping(method = RequestMethod.GET, value = "/summary")
 	ResponseEntity<ImportSummary> getSummary(HttpServletRequest request) {
 		IDocumentMapper documentMapper = (IDocumentMapper) request.getSession().getAttribute(DOCUMENT_MAPPER);
+		ISourceProcessor processor = (ISourceProcessor) request.getSession().getAttribute(SOURCE_PROCESSOR);
+		ImportSessionToken importSessionToken = (ImportSessionToken) request.getSession().getAttribute(SESSION_TOKEN);		
 		if (documentMapper == null) {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-		ImportSummary importSummmary = new ImportSummary();
-		importSummmary.setProjectCount(documentMapper.getDocumentMappings().size());
-		importSummmary.setFieldMappingCount(documentMapper.getFieldMappingObject().size());
-
-		ImportSessionToken importSessionToken = (ImportSessionToken) request.getSession().getAttribute(SESSION_TOKEN);
-		if (repository != null || importSessionToken != null) {
-			importSummmary.setFileCount(repository.countBySessionId(importSessionToken.getImportTokenSessionId()));
-		}
-
-		// filter count
-		ISourceProcessor processor = (ISourceProcessor) request.getSession().getAttribute(SOURCE_PROCESSOR);
-		if (processor != null) {
-			List<Field> fields = processor.getFilterFields();
-			importSummmary.setFilterCount(fields.stream().filter(f -> f.getFilters().size() > 0).count());
-		}
-
-		// value mapping count
-		int mappedValuesCount = 0;
-		for (FieldValueMapping mapping : documentMapper.getValueMappingObject()) {
-			for (Map.Entry<Integer, Integer> entry : mapping.getValueIndexMapping().entrySet()) {
-				if (entry.getValue() != null) {
-					++mappedValuesCount;
-				}
-
-			}
-		}
-		importSummmary.setValueMappingCount(mappedValuesCount);
-		return new ResponseEntity<>(importSummmary, HttpStatus.OK);
+		}		
+		return new ResponseEntity<>(importService.getSummary(documentMapper, importSessionToken, processor), HttpStatus.OK);
 	}
 
-	@SuppressWarnings("unchecked")
-	private IDestinationProcessor getDestinationProcessor(String processorName, String authenticationToken,HttpServletRequest request) {
-		   IDestinationProcessor processor = null;		  
-			List<Workflow> workflows = (List<Workflow>)request.getSession().getAttribute(WORKFLOW_LIST);
-			if(workflows == null){
-				workflows = workflowService.getWorkflows();	
-				request.getSession().setAttribute(WORKFLOW_LIST, workflows);
-			}			
-			
-			Optional<Workflow> optional = workflows.stream().filter(w -> w.getDestinationProcessor().getName().equals(processorName)).findFirst();
-			if(optional.isPresent()){				
-				try {						
-					Constructor<?> c = Class.forName(optional.get().getDestinationProcessor().getClassName()).getDeclaredConstructor(String.class);
-					c.setAccessible(true);
-					processor = (IDestinationProcessor)c.newInstance(new Object[] {authenticationToken});
-				} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException e) {
-					e.printStackTrace();
-					log.error("Error loading destination processor class: " + optional.get().getDestinationProcessor().getClassName() + " " + e);
-				}
-			}
-			
-		return processor;
-	}
-
-	@SuppressWarnings("unchecked")
-	private ISourceProcessor getSourceProcessor(String processorName, HttpServletRequest request) {		
-		ISourceProcessor processor = null;		
-		List<Workflow> workflows = (List<Workflow>)request.getSession().getAttribute(WORKFLOW_LIST);
-		
-		if(workflows == null){
-			workflows = workflowService.getWorkflows();	
-			request.getSession().setAttribute(WORKFLOW_LIST, workflows);
-		}
-				
-		Optional<Workflow> optional = workflows.stream().filter(w -> w.getSourceProcessor().getName().equals(processorName)).findFirst();
-		if(optional.isPresent()){				
-			try {					
-				Class<ISourceProcessor> clazz = (Class<ISourceProcessor>)Class.forName(optional.get().getSourceProcessor().getClassName());
-				processor = (ISourceProcessor)clazz.newInstance();
-			} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {					
-				log.error("Error loading processor class: " + e);
-			}
-
-		}
-		
-		if(processor == null){
-			processor = new XMLGenericProcessor();
-		}
-		return processor;
-	}
+	
 
 }
