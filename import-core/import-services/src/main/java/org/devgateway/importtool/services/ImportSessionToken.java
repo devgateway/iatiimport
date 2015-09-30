@@ -1,4 +1,4 @@
-package org.devgateway.importtool.rest;
+package org.devgateway.importtool.services;
 
 import java.util.Date;
 import java.util.UUID;

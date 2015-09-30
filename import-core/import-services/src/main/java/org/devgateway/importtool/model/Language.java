@@ -1,4 +1,4 @@
-package org.devgateway.importtool.rest;
+package org.devgateway.importtool.model;
 
 public class Language {
 	private String code;

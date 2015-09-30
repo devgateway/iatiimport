@@ -1,4 +1,4 @@
-package org.devgateway.importtool.services;
+package org.devgateway.importtool.exceptions;
 
 import org.devgateway.importtool.model.User;
 

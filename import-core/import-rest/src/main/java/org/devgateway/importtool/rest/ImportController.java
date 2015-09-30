@@ -27,6 +27,7 @@ import org.devgateway.importtool.model.File;
 import org.devgateway.importtool.model.ImportSummary;
 import org.devgateway.importtool.model.Project;
 import org.devgateway.importtool.model.Workflow;
+import org.devgateway.importtool.services.ImportSessionToken;
 import org.devgateway.importtool.services.WorkflowService;
 import org.devgateway.importtool.services.processor.XMLGenericProcessor;
 import org.devgateway.importtool.services.processor.helper.ActionResult;
