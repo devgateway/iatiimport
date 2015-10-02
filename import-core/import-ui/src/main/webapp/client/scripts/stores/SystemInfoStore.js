@@ -14,7 +14,7 @@ var SystemInfoStore = Reflux.createStore({
     var self = this;    
     $.ajax({
         url: '/importer/system/status',
-        timeout:1000,
+        timeout:10000,
         error: function() {        	
         	appActions.checkBackendStatus.failed();
         },
