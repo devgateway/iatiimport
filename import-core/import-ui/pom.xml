@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>import-ui</artifactId>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 
 	<name>Import UI</name>
 	<description>Frontend for Import Tool</description>
@@ -12,7 +12,7 @@
 	<parent>
 		<groupId>org.devgateway.importtool</groupId>
 		<artifactId>importtool</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>0.0.2-SNAPSHOT</version>
 	</parent>
 
 	<dependencies>
