@@ -1,0 +1,12 @@
+{ "header":{
+    "import_tool": "Import Tool",
+    "nav": {
+        "menu": {
+            "home": "Home ",
+            "import_process": "Import Process ",
+            "reports": "Reports ",
+            "close": "Close "
+        }
+    }
+   }
+}

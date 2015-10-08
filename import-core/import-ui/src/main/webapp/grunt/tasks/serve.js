@@ -27,10 +27,15 @@ var taskConfig = function(grunt) {
     if (target === 'nowatch') {
       return;
     }
-
     grunt.task.run([
+      'configureProxies:server',
       'connect:server'
     ]);
+/*
+    grunt.task.run([
+      'prism',
+      'connect:server'
+    ]);*/
 
     
     if (target === 'docs') {

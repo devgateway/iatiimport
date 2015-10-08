@@ -11,8 +11,9 @@ var taskConfig = function(grunt) {
         cwd: '<%= yeogurt.client %>/',
         dest: '<%= yeogurt.dist %>/',
         src: [
-          'styles/fonts/**/*.{woff,otf,ttf,eot,svg}',
+          'fonts/**/*.{woff,woff2,otf,ttf,eot,svg}',
           'images/**/*.{webp}',
+          'mockup/**/*.json',
           '!*.js',
           '*.{ico,png,txt}',
           '*.html'

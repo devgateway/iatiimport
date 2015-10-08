@@ -1,0 +1,36 @@
+[
+	{
+		"amp_activity_id": 1,
+		"amp_id": "8822220000",
+		"amp_identifier": "AA-AAA-123456789-ABC1234",
+		"internal_id": "AA-AAA-123456789-ABC1234",
+		"project_code": "001",
+		"project_title": "Project Title 1",		
+		"creation_date": "2001-01-01 12:00:00",
+		"activity_status": "1",
+		"edit": true
+	},
+	{
+		"amp_activity_id": 2,
+		"amp_id": "8822220001",
+		"amp_identifier": "AA-AAA-123456789-ABC1235",
+		"internal_id": "AA-AAA-123456789-ABC1235",
+		"project_code": "002",
+		"project_title": "Project Title 2",
+		"creation_date": "2001-01-01 12:00:00",
+		"activity_status": "2",
+		"edit": true
+		
+	},
+	{
+		"amp_activity_id": 3,
+		"amp_id": "8822220002",
+		"amp_identifier": "AA-AAA-123456789-ABC1236",
+		"internal_id": "AA-AAA-123456789-ABC1236",
+		"project_code": "003",
+		"project_title": "Project Title 3",
+		"creation_date": "2001-01-01 12:00:00",
+		"activity_status": "1",
+		"edit": true
+	}
+]

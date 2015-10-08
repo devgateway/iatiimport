@@ -1,0 +1,32 @@
+<codelist name="RelatedActivityType"   xml:lang="en" complete="1">
+    <metadata>
+        <name>Related Activity Type</name>
+    </metadata>
+    <codelist-items>
+        <codelist-item>
+            <code>1</code>
+            <name>Parent</name>
+            <description>An activity that contains sub-activities (sub-components)</description>
+        </codelist-item>
+        <codelist-item>
+            <code>2</code>
+            <name>Child</name>
+            <description>A sub-activity (sub-component) of a larger activity (the parent)</description>
+        </codelist-item>
+        <codelist-item>
+            <code>3</code>
+            <name>Sibling</name>
+            <description>A sub-activity (sub-component) related to another sub-activity of the same parent</description>
+        </codelist-item>
+        <codelist-item>
+            <code>4</code>
+            <name>Co-funded</name>
+            <description>An activity that receives funding from more than one organisation</description>
+        </codelist-item>
+        <codelist-item>
+            <code>5</code>
+            <name>Third Party</name>
+            <description>A report by another organisation on the same activity (excluding activities reported as part of financial transactions - eg. provider-activity-id - or a co-funded activity using code = 4)</description>
+        </codelist-item>
+    </codelist-items>
+</codelist>

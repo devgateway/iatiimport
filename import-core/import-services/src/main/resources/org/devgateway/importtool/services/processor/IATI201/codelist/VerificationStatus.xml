@@ -1,0 +1,14 @@
+<codelist date-last-modified="2015-03-25T12:12:01.855298+00:00" version="" name="VerificationStatus" xml:lang="en">
+  <VerificationStatus>
+    <code>0</code>
+    <name>Not verified</name>
+    <language>en</language>
+    <description>The data published for the activity has not been verified</description>
+  </VerificationStatus>
+  <VerificationStatus>
+    <code>1</code>
+    <name>Verified</name>
+    <language>en</language>
+    <description>The data published for the activity has been verified. </description>
+  </VerificationStatus>
+</codelist>

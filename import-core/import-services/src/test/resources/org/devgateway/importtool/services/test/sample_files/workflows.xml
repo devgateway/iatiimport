@@ -1,0 +1,44 @@
+<workflows>
+	<workflow>
+		<source-processor>
+			<name>IATI104</name>
+			<label>IATI 1.04</label>
+			<class-name>org.devgateway.importtool.services.processor.IATI104Processor</class-name>
+		</source-processor>
+		<destination-processor>
+			<name>AMP</name>
+			<label>AMP</label>
+			<class-name>org.devgateway.importtool.services.processor.AMPStaticProcessor</class-name>
+		</destination-processor>
+		<enabled>true</enabled>
+		<description>Import process for IATI 1.04 to AMP </description>
+	</workflow>
+	<workflow>
+		<source-processor>
+			<name>IATI105</name>
+			<label>IATI 1.05</label>
+			<class-name>org.devgateway.importtool.services.processor.IATI105Processor</class-name>
+		</source-processor>
+		<destination-processor>
+			<name>AMP</name>
+			<label>AMP</label>
+			<class-name>org.devgateway.importtool.services.processor.AMPStaticProcessor</class-name>
+		</destination-processor>
+		<enabled>true</enabled>
+		<description>Import process for IATI 1.05 to AMP 2.11 </description>
+	</workflow>
+	<workflow>
+		<source-processor>
+			<name>IATI201</name>
+			<label>IATI 2.01</label>
+			<class-name>org.devgateway.importtool.services.processor.IATI201Processor</class-name>
+		</source-processor>
+		<destination-processor>
+			<name>AMP</name>
+			<label>AMP</label>
+			<class-name>org.devgateway.importtool.services.processor.AMPStaticProcessor</class-name>
+		</destination-processor>
+		<enabled>true</enabled>
+		<description>Import process for IATI 2.01 to AMP 2.11 </description>
+	</workflow>
+</workflows>

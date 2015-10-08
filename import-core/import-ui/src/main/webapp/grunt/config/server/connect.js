@@ -9,14 +9,28 @@ var taskConfig = function(grunt) {
     options: {
       port: 9010,
       livereload: 35729,
-      hostname: '127.0.0.1'
+      hostname: 'localhost'
     },
     server: {
+      proxies: [
+        {
+          context: ['/importer','/system'],
+          host: 'localhost',
+          port: 8080
+        },
+        {
+          context: ['/aim', '/TEMPLATE', '/repository', '/rest', '/index.do', '/showDesktop.do', '/wicket', '/ckeditor_4.4.6', '/showLayout.do'],
+          host: 'localhost',
+          port: 8081
+        }
+
+      ],
       options: {
-        open: 'http://127.0.0.1:9010/',
+        open: 'http://localhost:9010/',
         base: '<%= yeogurt.client %>/.serve',
         middleware: function(connect) {
           return [
+            require('grunt-connect-proxy/lib/utils').proxyRequest,
             connect.static('.tmp'),
             connect().use('/bower_components', connect.static('./client/bower_components')),
             connect.static('client')

@@ -1,6 +1,7 @@
 package org.devgateway.importtool.services;
 
 import java.io.File;
+import java.util.Properties;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManagerFactory;
@@ -8,6 +9,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.devgateway.importtool.model.User;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -17,10 +19,16 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.beans.factory.annotation.Value;
+
+
 
 @ComponentScan
 @Configuration
-@EnableJpaRepositories
+@EnableJpaRepositories(basePackages = {"org.devgateway.importtool.dao"})
+@ConfigurationProperties
 /***
  * Sample Service configuration
  * Remove if not needed
@@ -33,6 +41,16 @@ public class ServiceConfiguration {
     public static final File STORAGE_DIRECTORY = new File(
             System.getProperty("user.home"), TOOL_NAME);
 
+    @Value("${spring.dataSource.url}")
+    private String dataSourceURL;
+    
+    @Value("${spring.dataSource.driverClassName}")
+    private String driverClassName;    
+    
+    @Value("${spring.jpa.hibernate.ddl-auto}")
+    private String ddlAuto;    
+    
+       
     public static final File STORAGE_UPLOADS_DIRECTORY = new File(STORAGE_DIRECTORY, "uploads");
 
     @PostConstruct
@@ -51,6 +69,7 @@ public class ServiceConfiguration {
         LocalContainerEntityManagerFactoryBean emf = new LocalContainerEntityManagerFactoryBean();
         emf.setPackagesToScan(User.class.getPackage().getName());
         emf.setDataSource(dataSource);
+        emf.setJpaProperties(getHibernateProperties());
         emf.setJpaVendorAdapter(adapter);
         return emf;
     }
@@ -59,7 +78,19 @@ public class ServiceConfiguration {
     PlatformTransactionManager transactionManager( EntityManagerFactory emf) {
         return new JpaTransactionManager(emf);
     }
-
+   @Bean
+    public DataSource getDataSource() {
+            DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
+            dataSourceBuilder.driverClassName(driverClassName);
+            dataSourceBuilder.url(dataSourceURL);
+            return dataSourceBuilder.build();   
+    }
+    Properties getHibernateProperties(){    	
+        Properties properties = new Properties();
+        properties.setProperty("hibernate.hbm2ddl.auto", ddlAuto);       
+        return properties;
+    }
+    
     @Configuration
     @Profile({"default", "test"})
     static class DefaultDataSourceConfiguration {
@@ -69,6 +100,8 @@ public class ServiceConfiguration {
         @PostConstruct
         protected void setupThings() throws Exception {
         	log.info("Passed");
+        	
+        	
         }
 
     }

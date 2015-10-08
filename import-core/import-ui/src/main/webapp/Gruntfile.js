@@ -81,4 +81,17 @@ module.exports = function(grunt) {
   invokeConfigFn(testConfig);
   invokeConfigFn(registerDefinitions);
 
+  grunt.loadNpmTasks('grunt-connect-proxy');
+
+/*  grunt.config.set('prism',
+  {
+    options: {
+      mode: 'proxy',
+      host: 'localhost',
+      port: 8080,
+      context: '/importer'
+    }
+  });
+
+  grunt.loadNpmTasks('grunt-connect-prism');*/
 };

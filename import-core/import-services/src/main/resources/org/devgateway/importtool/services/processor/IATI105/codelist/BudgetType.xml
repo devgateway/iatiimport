@@ -1,0 +1,18 @@
+<codelist name="BudgetType"   xml:lang="en" complete="1">
+    <metadata>
+        <name>Budget Type</name>
+        <description>DAC/CRS classification used to determine the character of resource flows (bilateral or multilateral).</description>
+    </metadata>
+    <codelist-items>
+        <codelist-item>
+            <code>1</code>
+            <name>Original</name>
+            <name xml:lang="en">Original</name>
+        </codelist-item>
+        <codelist-item>
+            <code>2</code>
+            <name>Revised</name>
+            <name xml:lang="fr">Révisé</name>
+        </codelist-item>
+    </codelist-items>
+</codelist>
