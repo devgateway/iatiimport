@@ -1,18 +1,14 @@
 package org.devgateway.importtool.rest;
 
-import static org.devgateway.importtool.services.processor.helper.Constants.DESTINATION_PROCESSOR;
-import static org.devgateway.importtool.services.processor.helper.Constants.SOURCE_PROCESSOR;
-import static org.devgateway.importtool.services.processor.helper.Constants.SESSION_TOKEN;
-import static org.devgateway.importtool.services.processor.helper.Constants.DOCUMENT_MAPPER;
-import static org.devgateway.importtool.services.processor.helper.Constants.WORKFLOW_LIST;
 import static org.devgateway.importtool.services.processor.helper.Constants.CURRENT_FILE_ID;
+import static org.devgateway.importtool.services.processor.helper.Constants.DESTINATION_PROCESSOR;
+import static org.devgateway.importtool.services.processor.helper.Constants.DOCUMENT_MAPPER;
+import static org.devgateway.importtool.services.processor.helper.Constants.SESSION_TOKEN;
+import static org.devgateway.importtool.services.processor.helper.Constants.SOURCE_PROCESSOR;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -22,11 +18,9 @@ import org.devgateway.importtool.dao.FileRepository;
 import org.devgateway.importtool.dao.ProjectRepository;
 import org.devgateway.importtool.model.File;
 import org.devgateway.importtool.model.ImportSummary;
-import org.devgateway.importtool.model.Workflow;
 import org.devgateway.importtool.security.ImportSessionToken;
 import org.devgateway.importtool.services.ImportService;
 import org.devgateway.importtool.services.WorkflowService;
-import org.devgateway.importtool.services.processor.XMLGenericProcessor;
 import org.devgateway.importtool.services.processor.helper.ActionResult;
 import org.devgateway.importtool.services.processor.helper.DocumentMapper;
 import org.devgateway.importtool.services.processor.helper.DocumentMapping;
@@ -74,8 +68,6 @@ class ImportController {
 		request.getSession().setAttribute(SOURCE_PROCESSOR, srcProcessor);
 		IDestinationProcessor destProcessor = importService.getDestinationProcessor(destinationProcessorName, authenticationToken);
 		request.getSession().setAttribute(DESTINATION_PROCESSOR, destProcessor);
-		log.debug(srcProcessor.getDescriptiveName());
-		log.debug(destProcessor.getDescriptiveName());
 		ImportSessionToken importSessionToken = new ImportSessionToken(authenticationToken, userName, new Date(), srcProcessor.getDescriptiveName(), destProcessor.getDescriptiveName());
 		request.getSession().setAttribute(SESSION_TOKEN, importSessionToken);
 		return new ResponseEntity<>(importSessionToken, HttpStatus.OK);

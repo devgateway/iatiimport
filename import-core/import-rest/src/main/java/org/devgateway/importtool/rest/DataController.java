@@ -4,26 +4,16 @@ import static org.devgateway.importtool.services.processor.helper.Constants.DEST
 import static org.devgateway.importtool.services.processor.helper.Constants.DOCUMENT_MAPPER;
 import static org.devgateway.importtool.services.processor.helper.Constants.SOURCE_PROCESSOR;
 
-
-
-
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
-
-
-
-
 
 import org.devgateway.importtool.model.Language;
 import org.devgateway.importtool.services.DataService;
 import org.devgateway.importtool.services.processor.helper.DocumentMapping;
 import org.devgateway.importtool.services.processor.helper.Field;
 import org.devgateway.importtool.services.processor.helper.FieldMapping;
-import org.devgateway.importtool.services.processor.helper.FieldType;
 import org.devgateway.importtool.services.processor.helper.FieldValue;
 import org.devgateway.importtool.services.processor.helper.FieldValueMapping;
 import org.devgateway.importtool.services.processor.helper.IDestinationProcessor;
