@@ -48,6 +48,8 @@ public class IATI104Processor implements ISourceProcessor {
 	// Field names on the source document that hold key information
 	private String DEFAULT_ID_FIELD = "iati-identifier";
 	private String DEFAULT_TITLE_FIELD = "title";
+	private String PROCESSOR_VERSION = "1.04";
+
 	private String descriptiveName = "IATI 1.04";
 
 	// XML Document that will hold the entire imported file
@@ -102,11 +104,7 @@ public class IATI104Processor implements ISourceProcessor {
 	@Override
 	public List<InternalDocument> getDocuments() throws Exception {
 		List<InternalDocument> docList = new ArrayList<InternalDocument>();
-		if (this.isFormatValid()) {
-			docList = extractDocuments(doc);
-		} else {
-			throw new Exception("Format not valid");
-		}
+		docList = extractDocuments(doc);
 		return docList;
 	}
 
@@ -182,13 +180,6 @@ public class IATI104Processor implements ISourceProcessor {
 	@Override
 	public void setFilterFields(List<Field> fields) {
 		filterFieldList = fields;
-	}
-
-	@Override
-	public Boolean isFormatValid() {
-		// TODO Implement validation of XML to verify if the format of the
-		// source file is the expected one
-		return true;
 	}
 
 	// Private methods. Includes methods to get values for the different types
@@ -515,6 +506,26 @@ public class IATI104Processor implements ISourceProcessor {
 		Field participatingOrg = new Field("Funding Organization", "participating-org", FieldType.ORGANIZATION, true);
 		participatingOrg.setSubType("Funding");
 		fieldList.add(participatingOrg);
+	}
+
+	@Override
+	public Boolean isValidInput() {
+		NodeList nodeList = doc.getElementsByTagName("iati-activities");
+		try {
+			for (int i = 0; i < nodeList.getLength(); i++) {
+				Node version = nodeList.item(i).getAttributes().getNamedItem("version");
+				if (version == null)
+					continue;
+				String ver = version.getNodeValue();
+				if(ver.equalsIgnoreCase(PROCESSOR_VERSION)) {
+					return true;
+				}
+			}
+		} catch (Exception e) {
+			log.error("Error validating IATI " + PROCESSOR_VERSION + " file");
+		}
+		
+		return false;
 	}
 
 }

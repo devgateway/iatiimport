@@ -48,14 +48,18 @@ public class IATI105Processor implements ISourceProcessor {
 	// Field names on the source document that hold key information
 	private String DEFAULT_ID_FIELD = "iati-identifier";
 	private String DEFAULT_TITLE_FIELD = "title";
+	private String PROCESSOR_VERSION = "1.05";
+
 	private String descriptiveName = "IATI 1.05";
 
 	// XML Document that will hold the entire imported file
 	private Document doc;
-	
+
 	public Document getDoc() {
 		return doc;
 	}
+
+	
 
 	// Map that holds information about how the field names map to code lists
 	private static Map<String, String> mappingNameFile = new HashMap<String, String>();
@@ -91,7 +95,6 @@ public class IATI105Processor implements ISourceProcessor {
 			try {
 				DocumentBuilder builder = factory.newDocumentBuilder();
 				this.doc = builder.parse(input);
-				reduceFilterFields(this.doc);
 			} catch (ParserConfigurationException | SAXException | IOException e) {
 				log.error("IOException Parsing Source File: " + e);
 			}
@@ -101,11 +104,7 @@ public class IATI105Processor implements ISourceProcessor {
 	@Override
 	public List<InternalDocument> getDocuments() throws Exception {
 		List<InternalDocument> docList = new ArrayList<InternalDocument>();
-		if (this.isFormatValid()) {
-			docList = extractDocuments(doc);
-		} else {
-			throw new Exception("Format not valid");
-		}
+		docList = extractDocuments(doc);
 		return docList;
 	}
 
@@ -138,7 +137,13 @@ public class IATI105Processor implements ISourceProcessor {
 		return list;
 	}
 
-	private void reduceFilterFields(Document doc) {
+	@Override
+	public List<Field> getFilterFields() {
+		Document doc = this.doc;
+		if (doc == null)
+			return filterFieldList;
+
+		// List<Field> filterFieldListReduced = new ArrayList<Field>();
 		for (Field field : filterFieldList) {
 			NodeList nodeList = doc.getElementsByTagName(field.getFieldName());
 			List<FieldValue> reducedPossibleValues = new ArrayList<FieldValue>();
@@ -164,11 +169,6 @@ public class IATI105Processor implements ISourceProcessor {
 			}
 			field.setPossibleValues(reducedPossibleValues);
 		}
-	}
-
-
-	@Override
-	public List<Field> getFilterFields() {
 		return filterFieldList;
 	}
 
@@ -180,13 +180,6 @@ public class IATI105Processor implements ISourceProcessor {
 	@Override
 	public void setFilterFields(List<Field> fields) {
 		filterFieldList = fields;
-	}
-
-	@Override
-	public Boolean isFormatValid() {
-		// TODO Implement validation of XML to verify if the format of the
-		// source file is the expected one
-		return true;
 	}
 
 	// Private methods. Includes methods to get values for the different types
@@ -513,6 +506,26 @@ public class IATI105Processor implements ISourceProcessor {
 		Field participatingOrg = new Field("Funding Organization", "participating-org", FieldType.ORGANIZATION, true);
 		participatingOrg.setSubType("Funding");
 		fieldList.add(participatingOrg);
+	}
+
+	@Override
+	public Boolean isValidInput() {
+		NodeList nodeList = doc.getElementsByTagName("iati-activities");
+		try {
+			for (int i = 0; i < nodeList.getLength(); i++) {
+				Node version = nodeList.item(i).getAttributes().getNamedItem("version");
+				if (version == null)
+					continue;
+				String ver = version.getNodeValue();
+				if(ver.equalsIgnoreCase(PROCESSOR_VERSION)) {
+					return true;
+				}
+			}
+		} catch (Exception e) {
+			log.error("Error validating IATI " + PROCESSOR_VERSION + " file");
+		}
+		
+		return false;
 	}
 
 }

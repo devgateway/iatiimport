@@ -17,6 +17,8 @@ public class Field {
 	private boolean isMultiple;
 	private boolean isPercentage;
 	private List<String> filters = new ArrayList<String>();
+	private List<Field> dependencies = new ArrayList<Field>();
+	private boolean isRequired;
 
 	// These types are silly but needed for now.
 	// Refactor to something more reasonable and generic (Make Field an
@@ -143,5 +145,21 @@ public class Field {
 
 	public void setPercentage(boolean isPercentage) {
 		this.isPercentage = isPercentage;
+	}
+
+	public List<Field> getDependencies() {
+		return dependencies;
+	}
+
+	public void setDependencies(List<Field> dependencies) {
+		this.dependencies = dependencies;
+	}
+
+	public boolean isRequired() {
+		return isRequired;
+	}
+
+	public void setRequired(boolean isRequired) {
+		this.isRequired = isRequired;
 	}
 }

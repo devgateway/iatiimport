@@ -387,7 +387,7 @@ public class IATI201Processor implements ISourceProcessor {
 	}
 
 	@Override
-	public Boolean isFormatValid() {
+	public Boolean isValidInput() {
 		// TODO Auto-generated method stub
 		return null;
 	}

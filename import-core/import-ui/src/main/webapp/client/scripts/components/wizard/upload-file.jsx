@@ -12,7 +12,7 @@ var UploadFile = React.createClass({
     mixins: [Reflux.ListenerMixin
     ],
     getInitialState: function() {
-       return {fileData: []};
+       return {fileData: [], valid : true};
     },
     componentDidMount: function() {  
     	this.props.eventHandlers.updateCurrentStep(constants.UPLOAD_FILE);
@@ -65,6 +65,13 @@ var UploadFile = React.createClass({
         if (this.state.fileData && this.state.fileData.length > 0) {        
         $.map(this.state.fileData, function (item, i) {    
             var createdDate = moment(item.createdDate).fromNow();
+            var isValidStyle = item.valid ? 'label label-success': 'label label-danger';
+            var isValidText = this.props.i18nLib.t('wizard.upload_file.' + (item.valid ? 'valid':'invalid'));
+            if(!item.valid) {
+                this.props.eventHandlers.displayError("The file seems to be invalid. Click Next if you want to proceed anyway.");
+            }
+
+
             files.push(<tr key={item.id}>
                     <td>
                         {item.fileName}
@@ -72,8 +79,11 @@ var UploadFile = React.createClass({
                     <td>
                         {createdDate}
                     </td>
+                    <td>
+                        <span className={isValidStyle}>{isValidText}</span>
+                    </td>
                 </tr>);
-            });
+            }.bind(this));
         }
         return (
             <div className="panel panel-default">
@@ -86,10 +96,13 @@ var UploadFile = React.createClass({
                     <thead>
                         <tr>
                             <th>
-                                 {this.props.i18nLib.t('wizard.upload_file.filename')}
+                                {this.props.i18nLib.t('wizard.upload_file.filename')}
                             </th>
                             <th>
                                 {this.props.i18nLib.t('wizard.upload_file.upload_date')}
+                            </th>
+                            <th>
+                                {this.props.i18nLib.t('wizard.upload_file.valid')}
                             </th>
                         </tr>
                     </thead>

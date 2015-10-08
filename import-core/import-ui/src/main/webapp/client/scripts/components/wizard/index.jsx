@@ -105,11 +105,17 @@ var Wizard = React.createClass({
 	navigateBack: function(){
     	this.transitionTo('mapvalues', this.props.params);
     },
+    goHome: function(){
+        window.location = "#";
+    },
 	launchImport: function() {
-		$.get('/importer/import/execute', function(result) {
-			this.setState({results: result});
-			$("#modalResults").modal("show");
-		}.bind(this));
+        this.showLoadingIcon();
+		$.get('/importer/import/execute')
+        .done(function(result) {
+            this.setState({results: result});
+            this.hideLoadingIcon();
+            $("#modalResults").modal("show");
+        }.bind(this));
 	},
 	initImportSession: function(sourceProcessor, destinationProcessor) {			
 		this.showLoadingIcon();
@@ -168,6 +174,7 @@ var Wizard = React.createClass({
     eventHandlers.displayError = this.displayError;
     eventHandlers.updateCurrentStep = this.updateCurrentStep;
     eventHandlers.navigateBack  = this.navigateBack;
+    eventHandlers.goHome = this.goHome;
     
     var error; 
     if(Cookies.get("DESTINATION_AUTH_TOKEN") == "undefined"){

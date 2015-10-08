@@ -1,7 +1,5 @@
 package org.devgateway.importtool.services;
 
-import static org.devgateway.importtool.services.processor.helper.Constants.WORKFLOW_LIST;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,7 +9,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -76,11 +73,12 @@ public class ImportService {
 		InputStream is = new ByteArrayInputStream(file.getBytes());
 		srcProcessor.setInput(is);
 		File uploadedFile = new File();
-		uploadedFile.setData(file.getBytes());
+		//uploadedFile.setData(file.getBytes());
 		uploadedFile.setCreatedDate(new Date());
 		uploadedFile.setFileName(file.getOriginalFilename());
 		uploadedFile.setAuthor(authToken.getAuthenticationToken());
 		uploadedFile.setSessionId(authToken.getImportTokenSessionId());
+		uploadedFile.setValid(srcProcessor.isValidInput());
 		fileRepository.save(uploadedFile);
 		return uploadedFile;
 	}
@@ -120,7 +118,6 @@ public class ImportService {
 		return processor;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public IDestinationProcessor getDestinationProcessor(String processorName, String authenticationToken) {
 		   IDestinationProcessor processor = null;		  
 			List<Workflow> workflows =  workflowService.getWorkflows();

@@ -23,7 +23,7 @@ public interface ISourceProcessor {
 
 	public String getTitleField();
 
-	public Boolean isFormatValid();
-	
 	public Document getDoc();
+
+	public Boolean isValidInput();
 }

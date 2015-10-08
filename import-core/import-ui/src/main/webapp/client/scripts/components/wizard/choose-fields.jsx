@@ -198,19 +198,42 @@ var ChooseFields = React.createClass({
 	},
     render: function() {
     	var rows = {};
-        if (this.state.destinationFieldsData && this.state.sourceFieldsData) {             
-           $.map(this.state.sourceFieldsData, function(item, i) {        	    
+        if (this.state.destinationFieldsData && this.state.sourceFieldsData) {
+           var infoMessages = "";
+           console.log(this.state.destinationFieldsData);
+           if(this.state.destinationFieldsData.length > 0) {
+                var requiredMessage = [];
+                var dependenciesMessage = [];
+                _.map(this.state.destinationFieldsData, function(item) {
+                        if(item.required) {
+                            requiredMessage.push(<div>Field <strong>{item.displayName}</strong> is required by the destination system.</div>);
+                        }
+                        if(item.dependencies.length > 0){
+                            var dependencies = _.pluck(item.dependencies, 'displayName').join(", ");
+                            dependenciesMessage.push(<div>Field: <strong>{item.displayName}</strong> has the following dependencies: {dependencies} </div>);
+                        }
+                    });
+                if(requiredMessage.length > 0 || dependenciesMessage.length > 0) {
+                    infoMessages = <div className="alert alert-info" role="alert">{requiredMessage} {dependenciesMessage}</div>;
+                }
+           };
+
+           $.map(this.state.sourceFieldsData, function(item, i) { 
                 var options = this.getOptions(item);
                 if(item.mappable) {                	
-                	if(!rows[item.type]){
+                	if(!rows[item.type]) {
                 		rows[item.type] = [];
                 		rows[item.type].push(<tr className="group-header"><td className = "group-title">{this.props.i18nLib.t('wizard.map_fields.' + item.type.toLowerCase())}</td> <td ></td> <td ></td></tr>);
                 	}
                     var selected = _.some(this.state.mappingFieldsData, function(v) { return item.uniqueFieldName == v.sourceField.uniqueFieldName});				
                     var mapping = _.find(this.state.mappingFieldsData, function(v) { return item.uniqueFieldName == v.sourceField.uniqueFieldName});
                     var value = "";
+                    var cellMessage = "";
                     if(mapping && mapping.destinationField) {					    
                         value = mapping.destinationField.uniqueFieldName;				
+                        if(mapping.destinationField.required) {
+                            cellMessage = <span className="label label-danger">Required</span>; 
+                        }
                     }
                     rows[item.type].push(<tr key={item.uniqueFieldName}>
                         <td>
@@ -223,6 +246,7 @@ var ChooseFields = React.createClass({
                         </td>
                         <td >             
                         <CustomSelect disabled = {mapping ? "" : "disabled"} initialOption={value} options={options} value="value" label="label" data={item} handleChange={this.handleSelectToggle}/>
+                        {cellMessage}
                         </td>
                     </tr>);
                 }                
@@ -234,6 +258,7 @@ var ChooseFields = React.createClass({
                 <div className="panel-heading"><strong>{this.props.i18nLib.t('wizard.map_fields.choose_map_fields')}</strong></div>
                 <div className="panel-body">
                     <FieldMappingsDropdown {...this.props} mappingTemplatesData = {this.state.mappingTemplatesData} deleteMappingTemplate = {this.deleteMappingTemplate} loadMappingTemplate = {this.loadMappingTemplate} />
+                    {infoMessages}
                     <table className="table">
                         <thead>
                             <tr>

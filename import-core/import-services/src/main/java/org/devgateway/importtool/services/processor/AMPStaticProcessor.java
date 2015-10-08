@@ -177,7 +177,15 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 			if (errorNode == null) {
 				Integer id = (int) resultPost.get("internal_id");
-				result = new ActionResult(id.toString(), "UPDATE", "OK", resultPost.getString("project_title"));
+				String message = "";
+				if (resultPost.get("project_title") instanceof Map) {
+					@SuppressWarnings("unchecked")
+					Map<String, String> titleMultilang = (Map<String, String>) resultPost.get("project_title");
+					message = (String) titleMultilang.entrySet().stream().map(i -> i.getValue()).collect(Collectors.joining(", "));
+				} else {
+					message = resultPost.getString("project_title");
+				}
+				result = new ActionResult(id.toString(), "UPDATE", "OK", message);
 			} else {
 				String error = errorNode.toString();
 				result = new ActionResult("N/A", "REJECT", "ERROR", "Error: " + error);
@@ -473,77 +481,6 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		return amountValue;
 	}
 
-	// private int getFinancingInstrument(String financingInstrument,
-	// List<FieldMapping> fieldMappings, List<FieldValueMapping> valueMappings)
-	// {
-	// FieldValueMapping vm = valueMappings.stream().filter(n -> {
-	// return n.getSourceField().getFieldName().equals("default-aid-type");
-	// }).findFirst().get();
-	// FieldValue fvs =
-	// vm.getSourceField().getPossibleValues().stream().filter(n -> {
-	// return n.getCode().equals(financingInstrument);
-	// }).findFirst().get();
-	// Integer sourceValueIndex = fvs.getIndex();
-	// Integer destinationValueIndex =
-	// vm.getValueIndexMapping().get(sourceValueIndex);
-	// FieldValue fvd =
-	// vm.getDestinationField().getPossibleValues().stream().filter(n -> {
-	// return n.getIndex() == destinationValueIndex;
-	// }).findFirst().get();
-	// return Integer.parseInt(fvd.getCode());
-	// }
-	//
-	// private int getTypeOfAssistance(String typeOfAssistance,
-	// List<FieldMapping> fieldMappings, List<FieldValueMapping> valueMappings)
-	// throws ValueMappingException {
-	// Optional<FieldValueMapping> optVm = valueMappings.stream().filter(n -> {
-	// return n.getSourceField().getFieldName().equals("default-finance-type");
-	// }).findFirst();
-	// if (!optVm.isPresent()) {
-	// throw new ValueMappingException("default-finance-type not found.");
-	// }
-	// FieldValueMapping vm = optVm.get();
-	//
-	// FieldValue fvs =
-	// vm.getSourceField().getPossibleValues().stream().filter(n -> {
-	// return n.getCode().equals(typeOfAssistance);
-	// }).findFirst().get();
-	// Integer sourceValueIndex = fvs.getIndex();
-	// Integer destinationValueIndex =
-	// vm.getValueIndexMapping().get(sourceValueIndex);
-	// FieldValue fvd =
-	// vm.getDestinationField().getPossibleValues().stream().filter(n -> {
-	// return n.getIndex() == destinationValueIndex;
-	// }).findFirst().get();
-	// return Integer.parseInt(fvd.getCode());
-	// }
-	//
-	// private int getDonorOrganization(String orgName, List<FieldMapping>
-	// fieldMappings, List<FieldValueMapping> valueMappings) throws
-	// ValueMappingException {
-	// Optional<FieldValueMapping> optVm = valueMappings.stream().filter(n -> {
-	// return n.getSourceField().getFieldName().equals("participating-org");
-	// }).findFirst();
-	//
-	// if (!optVm.isPresent()) {
-	// throw new ValueMappingException("participating-org not found.");
-	// }
-	// FieldValueMapping vm = optVm.get();
-	//
-	// FieldValue fvs =
-	// vm.getSourceField().getPossibleValues().stream().filter(n -> {
-	// return n.getValue().equals(orgName);
-	// }).findFirst().get();
-	// Integer sourceValueIndex = fvs.getIndex();
-	// Integer destinationValueIndex =
-	// vm.getValueIndexMapping().get(sourceValueIndex);
-	// FieldValue fvd =
-	// vm.getDestinationField().getPossibleValues().stream().filter(n -> {
-	// return n.getIndex() == destinationValueIndex;
-	// }).findFirst().get();
-	// return Integer.parseInt(fvd.getCode());
-	// }
-	//
 	private int getIdFromList(String fieldValue, String sourceField, List<FieldMapping> fieldMappings, List<FieldValueMapping> valueMappings, Boolean useCode) throws ValueMappingException {
 		Optional<FieldValueMapping> optVm = valueMappings.stream().filter(n -> {
 			return n.getSourceField().getFieldName().equals(sourceField);
@@ -555,11 +492,9 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		FieldValueMapping vm = optVm.get();
 
 		FieldValue fvs = vm.getSourceField().getPossibleValues().stream().filter(n -> {
-			if(useCode) {
+			if (useCode) {
 				return n.getCode().equals(fieldValue);
-			}
-			else
-			{
+			} else {
 				return n.getValue().equals(fieldValue);
 			}
 		}).findFirst().get();
@@ -700,6 +635,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		// Code Lists
 		Field activityStatus = new Field("Activity Status", "activity_status", FieldType.LIST, true);
 		activityStatus.setPossibleValues(getCodeListValues("activity_status"));
+		activityStatus.setRequired(true);
 		fieldList.add(activityStatus);
 
 		Field typeOfAssistence = new Field("Type of Assistance", "type_of_assistance", FieldType.LIST, true);
@@ -749,24 +685,6 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			fieldList.add(new Field("Actual Completion Date", "actual_completion_date", FieldType.DATE, true));
 		}
 
-		// Transactions
-		// Transaction Fields
-		Field actualCommitments = new Field("Actual Commitments", "transaction", FieldType.TRANSACTION, true);
-		actualCommitments.setSubType("AC");
-		fieldList.add(actualCommitments);
-
-		Field actualDisbursements = new Field("Actual Disbursements", "transaction", FieldType.TRANSACTION, true);
-		actualDisbursements.setSubType("AD");
-		fieldList.add(actualDisbursements);
-
-		Field plannedCommitments = new Field("Planned Commitments", "transaction", FieldType.TRANSACTION, true);
-		plannedCommitments.setSubType("PC");
-		fieldList.add(plannedCommitments);
-
-		Field plannedDisbursements = new Field("Planned Disbursements", "transaction", FieldType.TRANSACTION, true);
-		plannedDisbursements.setSubType("PD");
-		fieldList.add(plannedDisbursements);
-
 		// Organizations
 		Field fundingOrganization = new Field("Funding Organization", "donor_organization", FieldType.ORGANIZATION, true);
 		fundingOrganization.setPossibleValues(getCodeListValues("fundings~donor_organization_id"));
@@ -774,6 +692,33 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			fundingOrganization.setPercentage(true);
 		}
 		fieldList.add(fundingOrganization);
+
+		// Transactions
+		// Transaction Fields
+		List<Field> trnDependencies = new ArrayList<Field>();
+		trnDependencies.add(adjustmentType);
+		trnDependencies.add(transactionType);
+		trnDependencies.add(fundingOrganization);
+
+		Field actualCommitments = new Field("Actual Commitments", "transaction", FieldType.TRANSACTION, true);
+		actualCommitments.setSubType("AC");
+		actualCommitments.setDependencies(trnDependencies);
+		fieldList.add(actualCommitments);
+
+		Field actualDisbursements = new Field("Actual Disbursements", "transaction", FieldType.TRANSACTION, true);
+		actualDisbursements.setSubType("AD");
+		actualDisbursements.setDependencies(trnDependencies);
+		fieldList.add(actualDisbursements);
+
+		Field plannedCommitments = new Field("Planned Commitments", "transaction", FieldType.TRANSACTION, true);
+		plannedCommitments.setSubType("PC");
+		plannedCommitments.setDependencies(trnDependencies);
+		fieldList.add(plannedCommitments);
+
+		Field plannedDisbursements = new Field("Planned Disbursements", "transaction", FieldType.TRANSACTION, true);
+		plannedDisbursements.setSubType("PD");
+		plannedDisbursements.setDependencies(trnDependencies);
+		fieldList.add(plannedDisbursements);
 
 		// Currency
 		Field currency = new Field("Currency Code", "currency_code", FieldType.LIST, true);

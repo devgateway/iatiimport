@@ -32,6 +32,8 @@
                 'select_file' : 'Select files to upload',
                 'filename' : 'Filename',
                 'upload_date' : 'Date and Time',
+                'valid' : 'Valid',
+                'invalid' : 'Invalid',
                  'action':'Action',
                 'view' : 'View',
                 'next' : 'Next >>'
@@ -80,7 +82,8 @@
                 'fields_selected' : 'Fields Selected',
                 'values_mapped' : 'Values Mapped',
                 'proceed_import' : 'Proceed with Import',
-                'close' : 'Close '
+                'close' : 'Close ',
+                'restart' : 'Restart'
             }
         }
     }

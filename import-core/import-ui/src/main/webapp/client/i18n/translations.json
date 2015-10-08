@@ -34,6 +34,8 @@ module.exports = {
 						'select_file' : 'Select files to upload',
 						'filename' : 'Filename',
 						'upload_date' : 'Date and Time',
+		                'valid' : 'Valid',
+		                'invalid' : 'Invalid',
 						 'action':'Action',
 						'view' : 'View',
 						'next' : 'Next >>'
@@ -169,7 +171,8 @@ module.exports = {
 						'fields_selected' : 'Champs Sélectionnés',
 						'values_mapped' : 'Valeurs Mappées',
 						'proceed_import' : 'Procéder à l\'importation',
-						'close' : 'Fermer '
+						'close' : 'Fermer ',
+		                'restart' : 'Restart'
 					}
 				}
 			}

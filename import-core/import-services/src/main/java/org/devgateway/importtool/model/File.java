@@ -39,6 +39,9 @@ public class File implements Identifiable<Long>, Serializable {
 	@Column(name = "created_date")
 	private Date createdDate;
 
+	@Column(name = "is_valid")
+	private Boolean valid;
+
 	public File() {
 	}
 
@@ -86,6 +89,14 @@ public class File implements Identifiable<Long>, Serializable {
 
 	public void setAuthor(String author) {
 		this.author = author;
+	}
+
+	public Boolean isValid() {
+		return valid;
+	}
+
+	public void setValid(Boolean valid) {
+		this.valid = valid;
 	}
 
 	public UUID getSessionId() {

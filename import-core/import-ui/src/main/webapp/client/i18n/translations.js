@@ -38,6 +38,8 @@ module.exports = {
 					'upload_file' : {
 						'select_file' : 'Select files to upload',
 						'filename' : 'Filename',
+		                'valid' : 'Valid',
+		                'invalid' : 'Invalid',
 						'upload_date' : 'Date and Time',
 						 'action':'Action',
 						'view' : 'View',
@@ -125,7 +127,9 @@ module.exports = {
 						'values_mapped' : '__valueMappingCount__ Value(s) Mapped',
 						'proceed_import' : 'Proceed with Import',
 						'close' : 'Close ',
-						'previous' : '<< Previous'
+						'restart' : 'Restart',
+						'previous' : '<< Previous',
+						'question' :  'Are you sure you want to restart the process?'
 					},
 					'mappings_dropdown':{
 						'confirm_delete': 'Are you sure you want to delete  __templateName__ ?'
@@ -243,7 +247,9 @@ module.exports = {
 						'values_mapped' : 'Valeurs Mappées',
 						'proceed_import' : 'Procéder à l\'importation',
 						'close' : 'Fermer ',
-						'previous' : '<< Previous'
+		                'restart' : 'Restart',
+						'previous' : '<< Previous',
+						'question' :  'Are you sure you want to restart the process?'
 					},
 					'save_field_mappings_dlg': {
 					    'msg_error_saving': 'Error saving template',
