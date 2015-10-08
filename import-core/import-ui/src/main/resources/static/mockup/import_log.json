@@ -1,0 +1,31 @@
+[
+	{
+		"amp_activity_id": 1,
+		"amp_id": "8822220000",
+		"amp_identifier": "AA-AAA-123456789-ABC1234",
+		"title": "Project Title 1",
+		"created_date": "2001-01-01 12:00:00",
+		"notes":"To achieve compliance in non-article 5 CEITs in the CIS with the accelerated Montreal Protocol HCFC phase-out requirements through stabilization and progressive reduction of HCFC consumption. This will be achieved by implementation of legislative and regulatory measures, capacity building related to refrigeration servicing and customs controls, and targeted investment with particular emphasis on controlling demand in refrigeration servicing sector and phase-out of direct consumption in manufacturing where it occurs. The framework for this will be HCFC Phase Out Management Plans (HPMPs), to be finalized under the project utilizing results from the current GEF Regional HCFC survey and phase-out strategy project. Additionally, the project will be undertaken in cooperation with the current GEF capacity building projects in CEITs, parallel Multilateral Fund projects in article 5 CEITs involving development of HPMPs, and the ECA ODS Network.;",
+		"status": "FAILED"
+		 
+	},
+	{
+		"amp_activity_id": 2,
+		"amp_id": "8822220001",
+		"amp_identifier": "AA-AAA-123456789-ABC1235",
+		"title": "Project Title 2",
+		"created_date": "2001-01-01 12:00:00",
+		"notes":"To achieve compliance in non-article 5 CEITs in the CIS with the accelerated Montreal Protocol HCFC phase-out requirements through stabilization and progressive reduction of HCFC consumption. This will be achieved by implementation of legislative and regulatory measures, capacity building related to refrigeration servicing and customs controls, and targeted investment with particular emphasis on controlling demand in refrigeration servicing sector and phase-out of direct consumption in manufacturing where it occurs. The framework for this will be HCFC Phase Out Management Plans (HPMPs), to be finalized under the project utilizing results from the current GEF Regional HCFC survey and phase-out strategy project. Additionally, the project will be undertaken in cooperation with the current GEF capacity building projects in CEITs, parallel Multilateral Fund projects in article 5 CEITs involving development of HPMPs, and the ECA ODS Network.;",
+		"status": "IMPORTED"
+		
+	},
+	{
+		"amp_activity_id": 3,
+		"amp_id": "8822220002",
+		"amp_identifier": "AA-AAA-123456789-ABC1236",
+		"title": "Project Title 3",
+		"created_date": "2001-01-01 12:00:00",
+		"notes":"To achieve compliance in non-article 5 CEITs in the CIS with the accelerated Montreal Protocol HCFC phase-out requirements through stabilization and progressive reduction of HCFC consumption. This will be achieved by implementation of legislative and regulatory measures, capacity building related to refrigeration servicing and customs controls, and targeted investment with particular emphasis on controlling demand in refrigeration servicing sector and phase-out of direct consumption in manufacturing where it occurs. The framework for this will be HCFC Phase Out Management Plans (HPMPs), to be finalized under the project utilizing results from the current GEF Regional HCFC survey and phase-out strategy project. Additionally, the project will be undertaken in cooperation with the current GEF capacity building projects in CEITs, parallel Multilateral Fund projects in article 5 CEITs involving development of HPMPs, and the ECA ODS Network.;",
+		"status": "IMPORTED"
+	}
+]
