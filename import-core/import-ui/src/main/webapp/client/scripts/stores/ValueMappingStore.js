@@ -14,7 +14,6 @@ var ValueMappingStore = Reflux.createStore({
     this.listenTo(formActions.updateSelectedValues, this.handleUpdateSelectedValues);
   },
   handleUpdateSelectedValues: function(data) {
-    debugger;
     var self = this;
     $.ajax({
       headers: { 

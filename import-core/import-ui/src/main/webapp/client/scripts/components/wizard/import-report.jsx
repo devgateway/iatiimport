@@ -51,7 +51,7 @@ var ImportReport = React.createClass({
                         Status
                     </th>
                     <th>
-                        Message
+                        Message/Title
                     </th>
                 </tr>
             </thead>
@@ -63,7 +63,6 @@ var ImportReport = React.createClass({
       </div>
       <div className="modal-footer">
         <button type="button" className="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="button" className="btn btn-primary">Save Log</button>
       </div>
     </div>
   </div>

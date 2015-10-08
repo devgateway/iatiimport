@@ -52,7 +52,7 @@ var Content = React.createClass({
        token = <div>Destination System Token: {this.state.destinationSessionData.token} </div>
        url = <div>Destination System URL: {this.state.destinationSessionData.url} </div>
        username = <div> User: {this.state.destinationSessionData['user-name']} </div>;
-       team = <div> User: {this.state.destinationSessionData.team} </div>;
+       team = <div> Team: {this.state.destinationSessionData.team} </div>;
     };
     var debugInfo = <div className="jumbotron"> </div>;
     if(appConfig.DEBUG) {

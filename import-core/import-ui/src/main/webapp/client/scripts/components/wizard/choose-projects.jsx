@@ -101,7 +101,7 @@ var ChooseProjects = React.createClass({
                             {item.sourceDocument.multilangFields.title[language]} 
                         </td>
                         <td>                            
-                            <AutoComplete url="/importer/data/destination/project" display="title" language={language} placeholder="Destination Project Name 1" refId="destSearch" onSelect={this.handleAutocompleteToggle.bind(this, item)} value={item.destinationDocument}/> 
+                            <AutoComplete url="/importer/data/destination/project" display="title" language={language} placeholder="" refId="destSearch" onSelect={this.handleAutocompleteToggle.bind(this, item)} value={item.destinationDocument}/> 
                             
                         </td>
                     </tr>);
