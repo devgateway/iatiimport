@@ -24,17 +24,19 @@ var MappingTableSimple = React.createClass({
            var sourceValue = _.find(sourceField.possibleValues, function(v){ return v.index == key;});
            var destinationValue = _.find(destinationField.possibleValues, function(v){ return v.index == value;});
            var destValue = destinationValue ? destinationValue.code : "";
-
-           rows.push(<tr key = {key}>
-                        <td>
-                            <div className="table_cell">
-                                {sourceValue.value}
-                            </div>
-                        </td>
-                        <td>
-                         <CustomSelect initialOption={destValue} options={options} value="value" label="label" data={{sourceFieldName:sourceField.uniqueFieldName, sourceIndexValue:key}} handleChange = {this.props.handleUpdates}/>
-                        </td>
-                    </tr>);                                         
+          if(sourceValue){
+        	  rows.push(<tr key = {key}>
+              <td>
+                  <div className="table_cell">
+                      {sourceValue.value}
+                  </div>
+              </td>
+              <td>
+               <CustomSelect initialOption={destValue} options={options} value="value" label="label" data={{sourceFieldName:sourceField.uniqueFieldName, sourceIndexValue:key}} handleChange = {this.props.handleUpdates}/>
+              </td>
+          </tr>);   
+          }
+                                                   
           }.bind(this));
 
         return (                                              

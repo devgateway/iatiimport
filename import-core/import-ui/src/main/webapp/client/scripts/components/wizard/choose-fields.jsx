@@ -162,10 +162,23 @@ var ChooseFields = React.createClass({
 			this.forceUpdate();
 		}
 	},
-	loadMappingTemplate: function(id){     
-		appActions.loadFieldMappingsById(id).then(function(data) {           
+	loadMappingTemplate: function(id){ 
+		var mappingFieldsData = this.state.mappingFieldsData;
+		var self = this;
+		var mappings = [];
+		appActions.loadFieldMappingsById(id).then(function(data) {			
+			$.map(this.state.sourceFieldsData, function(item, i) { 
+				var mappingFromTemplate = _.find(data.fieldMapping, function(v) { return item.uniqueFieldName == v.sourceField.uniqueFieldName});
+				if(mappingFromTemplate){
+					mappingFromTemplate.destinationField = _.find(self.state.destinationFieldsData, {uniqueFieldName: mappingFromTemplate.destinationField.uniqueFieldName});
+					mappingFromTemplate.sourceField  = _.find(self.state.sourceFieldsData, {uniqueFieldName: mappingFromTemplate.sourceField.uniqueFieldName});
+					mappings.push(mappingFromTemplate);
+				}
+				
+                
+			});
 			this.setState({
-				mappingFieldsData: data.fieldMapping
+				mappingFieldsData: mappings
 			});            
 			this.forceUpdate();             
 		}.bind(this));
@@ -199,8 +212,7 @@ var ChooseFields = React.createClass({
     render: function() {
     	var rows = {};
         if (this.state.destinationFieldsData && this.state.sourceFieldsData) {
-           var infoMessages = "";
-           console.log(this.state.destinationFieldsData);
+           var infoMessages = "";           
            if(this.state.destinationFieldsData.length > 0) {
                 var requiredMessage = [];
                 var dependenciesMessage = [];
@@ -227,6 +239,7 @@ var ChooseFields = React.createClass({
                 	}
                     var selected = _.some(this.state.mappingFieldsData, function(v) { return item.uniqueFieldName == v.sourceField.uniqueFieldName});				
                     var mapping = _.find(this.state.mappingFieldsData, function(v) { return item.uniqueFieldName == v.sourceField.uniqueFieldName});
+                    
                     var value = "";
                     var cellMessage = "";
                     if(mapping && mapping.destinationField) {					    
