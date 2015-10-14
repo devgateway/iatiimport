@@ -43,7 +43,9 @@ var UploadFile = React.createClass({
         $el.on("fileuploaded",function(event, data, previewId, index) {
            self.loadData();
            $el.fileinput('clear');
-        })
+        });
+        
+        
     },    
     loadData: function(){  
       this.props.eventHandlers.showLoadingIcon();  
@@ -56,8 +58,11 @@ var UploadFile = React.createClass({
       }.bind(this)); 
     },
     updateFileData: function(data) {
-        this.setState({
-            fileData: data
+    	var $el = $(this.refs.iatiFileInput.getDOMNode());
+        this.setState({fileData: data}, function(){
+        	if(this.state.fileData.length > 0){
+        		$el.fileinput('disable');
+        	}
         });
     },
     render: function() {
@@ -90,7 +95,7 @@ var UploadFile = React.createClass({
                 <div className="panel-heading"><strong>{this.props.i18nLib.t('wizard.steps.upload_files')}</strong></div>
                 <div className="panel-body">
                     {this.props.i18nLib.t('wizard.upload_file.select_file')}
-                    <input className="file" ref="iatiFileInput" type="file"/>
+                    <input className="file" ref="iatiFileInput" type="file"   />
                 </div>
                 <table className="table file-list">
                     <thead>
