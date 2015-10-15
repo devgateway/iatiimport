@@ -88,17 +88,15 @@ public class IATI104Processor implements ISourceProcessor {
 
 	@Override
 	public void setInput(InputStream input) {
-		if (this.doc == null) {
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-			factory.setValidating(false);
-			factory.setIgnoringElementContentWhitespace(true);
-			try {
-				DocumentBuilder builder = factory.newDocumentBuilder();
-				this.doc = builder.parse(input);
-			} catch (ParserConfigurationException | SAXException | IOException e) {
-				log.error("IOException Parsing Source File: " + e);
-			}
-		}
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		factory.setValidating(false);
+		factory.setIgnoringElementContentWhitespace(true);
+		try {
+			DocumentBuilder builder = factory.newDocumentBuilder();
+			this.doc = builder.parse(input);
+		} catch (ParserConfigurationException | SAXException | IOException e) {
+			log.error("IOException Parsing Source File: " + e);
+		}		
 	}
 
 	@Override
