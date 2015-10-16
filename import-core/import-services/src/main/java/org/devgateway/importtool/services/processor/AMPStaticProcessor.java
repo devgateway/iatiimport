@@ -669,7 +669,10 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		fieldList.add(tertiarySector);
 
 		// Multi-language strings
-		fieldList.add(new Field("Activity Description", "description", getFieldType(fieldProps.get("description")), true));
+		FieldType ftDescription = getFieldType(fieldProps.get("description"));
+		if(ftDescription != null) {
+			fieldList.add(new Field("Activity Description", "description", ftDescription, true));
+		}
 
 		// Dates
 		if (fieldProps.get("planned_start_date") != null) {
@@ -728,6 +731,10 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	}
 
 	private FieldType getFieldType(Properties properties) {
+		if(properties == null || properties.get("field_type") == null)
+		{
+			return null;
+		}
 		FieldType ft = FieldType.STRING;
 		String fieldType = (String) properties.get("field_type");
 		switch (fieldType) {
