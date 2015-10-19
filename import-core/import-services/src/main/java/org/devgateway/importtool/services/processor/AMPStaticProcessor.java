@@ -583,11 +583,12 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	}
 
 	private List<JsonBean> getCodesFromList(InternalDocument source, FieldValueMapping mapping) {
-		List<JsonBean> beanList = new ArrayList<JsonBean>();
 		Object value = source.getStringMultiFields().get(mapping.getSourceField().getFieldName());
 		Map<Integer, Integer> valueMapIndex = mapping.getValueIndexMapping();
 		List<FieldValue> sourcePossibleValues = mapping.getSourceField().getPossibleValues();
 		String[] stringValues = (String[]) value;
+		HashMap<Integer, Integer> uniqueValues = new HashMap<Integer, Integer>();
+		
 		for (int i = 0; i < stringValues.length; i++) {
 			final int stringValueIndex = i;
 			Optional<FieldValue> optSourceValueIndex = sourcePossibleValues.stream().filter(n -> {
@@ -598,11 +599,24 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			List<FieldValue> destinationPossibleValues = mapping.getDestinationField().getPossibleValues();
 			FieldValue destinationValue = destinationPossibleValues.get(destinationValueIndex);
 			Integer intValue = Integer.parseInt(destinationValue.getCode());
-
+			Integer count = uniqueValues.get(intValue);
+			if(count == null) {
+				uniqueValues.put(intValue, 1);
+			}
+			else
+			{
+				uniqueValues.put(intValue, count + 1);
+			}
+		}
+		
+		List<JsonBean> beanList = new ArrayList<JsonBean>();
+		Integer divider = uniqueValues.size();
+		for(Entry<Integer, Integer> entry : uniqueValues.entrySet()) {
 			JsonBean bean = new JsonBean();
-			bean.set(mapping.getSourceField().getFieldName() + "_id", intValue);
-			if (mapping.getSourceField().isPercentage())
-				bean.set(mapping.getSourceField().getFieldName() + "_percentage", 100 / stringValues.length);
+			bean.set(mapping.getSourceField().getFieldName() + "_id", entry.getKey());
+			if (mapping.getSourceField().isPercentage() && entry.getValue() > 0){
+				bean.set(mapping.getSourceField().getFieldName() + "_percentage", 100 / divider);
+			}
 			beanList.add(bean);
 		}
 		return beanList;
