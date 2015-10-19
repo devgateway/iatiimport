@@ -39,6 +39,8 @@ import org.xml.sax.SAXException;
 @Scope("session")
 public class IATI104Processor implements ISourceProcessor {
 
+	private static final String ISO_DATE = "yyyy-MM-dd";
+
 	private Log log = LogFactory.getLog(getClass());
 
 	// Global Lists for fields and the filters
@@ -96,7 +98,7 @@ public class IATI104Processor implements ISourceProcessor {
 			this.doc = builder.parse(input);
 		} catch (ParserConfigurationException | SAXException | IOException e) {
 			log.error("IOException Parsing Source File: " + e);
-		}		
+		}
 	}
 
 	@Override
@@ -279,7 +281,7 @@ public class IATI104Processor implements ISourceProcessor {
 					document.addStringField(field.getFieldName(), stringValue);
 					break;
 				case ORGANIZATION:
-					
+
 					fieldNodeList = element.getElementsByTagName(field.getFieldName());
 					if (fieldNodeList.getLength() > 0) {
 						for (int j = 0; j < fieldNodeList.getLength(); j++) {
@@ -296,7 +298,7 @@ public class IATI104Processor implements ISourceProcessor {
 								fv.setValue(stringOrgValue);
 								int index = field.getPossibleValues() == null ? 0 : field.getPossibleValues().size();
 								fv.setIndex(index);
-								if(field.getPossibleValues() == null) {
+								if (field.getPossibleValues() == null) {
 									field.setPossibleValues(new ArrayList<FieldValue>());
 								}
 								if(!field.getPossibleValues().stream().anyMatch(n->{ return n.getCode().equals(stringOrgValue);})) {
@@ -343,6 +345,11 @@ public class IATI104Processor implements ISourceProcessor {
 							String localValue = e.getElementsByTagName("value").item(0).getChildNodes().item(0).getNodeValue();
 							// Date
 							String localDate = e.getElementsByTagName("transaction-date").item(0).getChildNodes().item(0).getNodeValue();
+							if (!isValidDate(localDate)) // TODO: Make it
+															// defensive
+							{
+								localDate = e.getElementsByTagName("transaction-date").item(0).getAttributes().getNamedItem("iso-date").getNodeValue();
+							}
 							// Receiving Org
 							receivingOrganization = (e.getElementsByTagName("receiver-org").item(0) != null && e.getElementsByTagName("receiver-org").item(0).getChildNodes().getLength() > 0) ? e.getElementsByTagName("receiver-org").item(0).getChildNodes().item(0).getNodeValue() : null;
 
@@ -515,15 +522,24 @@ public class IATI104Processor implements ISourceProcessor {
 				if (version == null)
 					continue;
 				String ver = version.getNodeValue();
-				if(ver.equalsIgnoreCase(PROCESSOR_VERSION)) {
+				if (ver.equalsIgnoreCase(PROCESSOR_VERSION)) {
 					return true;
 				}
 			}
 		} catch (Exception e) {
 			log.error("Error validating IATI " + PROCESSOR_VERSION + " file");
 		}
-		
+
 		return false;
 	}
 
+	public boolean isValidDate(String dateString) {
+		SimpleDateFormat df = new SimpleDateFormat(ISO_DATE);
+		try {
+			df.parse(dateString);
+			return true;
+		} catch (ParseException e) {
+			return false;
+		}
+	}
 }
