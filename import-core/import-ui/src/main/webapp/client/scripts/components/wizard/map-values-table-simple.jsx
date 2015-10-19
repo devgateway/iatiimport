@@ -2,13 +2,18 @@ var React = require('react');
 
 var CustomSelect = require('./custom-select');
 var _ = require('lodash/dist/lodash.underscore');
+var AutoComplete = require('./autocomplete');
 
 var MappingTableSimple = React.createClass({
   componentDidMount: function() {
-
+	  
+	            
   },
   getInitialStateAsync: function() {    
 
+  },
+  handleAutocompleteToggle: function() {
+     
   },
   render: function() { 
        var rows = [];
@@ -24,6 +29,15 @@ var MappingTableSimple = React.createClass({
            var sourceValue = _.find(sourceField.possibleValues, function(v){ return v.index == key;});
            var destinationValue = _.find(destinationField.possibleValues, function(v){ return v.index == value;});
            var destValue = destinationValue ? destinationValue.code : "";
+           var selector;
+           
+           //if there are more that 50 possible values use autocomplete
+           if(destinationField.possibleValues.length > 50){
+        	   selector = <AutoComplete display="value"  options= {options} placeholder="" refId={"value" + key} data={{sourceFieldName:sourceField.uniqueFieldName, sourceIndexValue:key}} handleChange = {this.props.handleUpdates} value={ destinationValue ? destinationValue.value : "" }/>
+           }else{
+        	   selector = <CustomSelect initialOption={destValue} options={options} value="value" label="label" data={{sourceFieldName:sourceField.uniqueFieldName, sourceIndexValue:key}} handleChange = {this.props.handleUpdates}/>
+           }
+           
           if(sourceValue){
         	  rows.push(<tr key = {key}>
               <td>
@@ -31,8 +45,8 @@ var MappingTableSimple = React.createClass({
                       {sourceValue.value}
                   </div>
               </td>
-              <td>
-               <CustomSelect initialOption={destValue} options={options} value="value" label="label" data={{sourceFieldName:sourceField.uniqueFieldName, sourceIndexValue:key}} handleChange = {this.props.handleUpdates}/>
+              <td>               	
+               { selector }               
               </td>
           </tr>);   
           }
