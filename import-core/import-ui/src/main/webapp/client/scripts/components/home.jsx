@@ -6,6 +6,7 @@ var Content = require('./content');
 var Router = require('react-router');
 var RouteHandler = Router.RouteHandler;
 var appActions = require('./../actions');
+var appConfig = require('./../conf');
 var translations = require('../../i18n/translations');
 var systemInfoStore = require('./../stores/SystemInfoStore');
 var Home = React.createClass({
@@ -38,7 +39,7 @@ var Home = React.createClass({
   },
   closeImportTool: function(){
 	  if (confirm("Close Import Tool Window?")) {
-		  window.location.href = '/aim/default/showDesktop.do'
+		  window.location.href = appConfig.AMP_DESKTOP_ENDPOINT;
 	  }  
   },
   render: function() { 
