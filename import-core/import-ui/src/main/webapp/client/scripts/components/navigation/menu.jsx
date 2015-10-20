@@ -57,7 +57,7 @@ var Menu = React.createClass({
                     	
                     } else {
                         menusRight.push(<li className="dropdown" key={item.label}>
-                            <a aria-expanded="true" className="dropdown-toggle" data-toggle="dropdown" href="#" role="button">
+                            <a aria-expanded="true" className="dropdown-toggle" data-toggle="dropdown" href="#" role="button" onClick={self.props.closeImportTool}>
                                 <div className={iconClass}></div>{self.props.i18nLib.t(item["i18n-key"])}
                                 <span className={caret}></span>
                             </a>
