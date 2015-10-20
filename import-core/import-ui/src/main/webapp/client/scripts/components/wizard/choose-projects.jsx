@@ -59,6 +59,16 @@ var ChooseProjects = React.createClass({
         item.selected = event.target.checked;       
         this.forceUpdate();
     },
+    handleOverrideTitle: function(item, event){
+    	 item.overrideTitle = event.target.checked;       
+         this.forceUpdate();
+    },
+    overrideTitleAll: function(event){
+    	_.each(this.state.projectData, function(item){   		
+    			item.overrideTitle = event.target.checked;
+    	});
+    	this.forceUpdate();
+    },
     handleAutocompleteToggle: function(item, datum) {
         item.destinationDocument = datum;
         this.forceUpdate();
@@ -66,6 +76,14 @@ var ChooseProjects = React.createClass({
     checkAll: function(operation){
         var projects = _.where(this.state.projectData, {operation: operation});
         var projectsSelected = _.where(this.state.projectData, {operation: operation, selected: true});
+        if(projects.length === projectsSelected.length)
+            return true;
+        else
+            return false;
+    },
+    overrideAll: function(operation){
+        var projects = _.where(this.state.projectData, {operation: operation});
+        var projectsSelected = _.where(this.state.projectData, {operation: operation, overrideTitle: true});
         if(projects.length === projectsSelected.length)
             return true;
         else
@@ -96,7 +114,7 @@ var ChooseProjects = React.createClass({
                     newProjects.push(<tr key={i}>
                         <td>
                            <input aria-label="Source" className="source"  type="checkbox" checked={item.selected} onChange={this.handleToggle.bind(this, item)} />
-                        </td>
+                        </td>                        
                         <td>
                             {item.sourceDocument.multilangFields.title[language]} 
                         </td>
@@ -104,6 +122,9 @@ var ChooseProjects = React.createClass({
                             <AutoComplete url="/importer/data/destination/project" display="title" language={language} placeholder="" refId="destSearch" onSelect={this.handleAutocompleteToggle.bind(this, item)} value={item.destinationDocument}/> 
                             
                         </td>
+                        <td>
+                            <input aria-label="override-title" className="override-title"  type="checkbox" checked={item.overrideTitle} onChange={this.handleOverrideTitle.bind(this, item)} />
+                         </td>
                     </tr>);
                 } else {
                     existingProjects.push(<tr key={i}>
@@ -116,6 +137,9 @@ var ChooseProjects = React.createClass({
                         <td>
                             {item.destinationDocument.multilangFields.title[language]}
                         </td>
+                        <td>
+                        <input aria-label="override-title" className="override-title"  type="checkbox" checked={item.overrideTitle} onChange={this.handleOverrideTitle.bind(this, item)} />
+                     </td>
                     </tr>);
                 }
             }.bind(this));
@@ -135,13 +159,16 @@ var ChooseProjects = React.createClass({
                                         <th>
                                             <input type="checkbox" checked={this.checkAll('INSERT')} onChange={this.selectAllNew} />
                                             {this.props.i18nLib.t('wizard.choose_projects.import')}
-                                        </th>
+                                        </th>                                        
                                         <th>
                                             {this.props.i18nLib.t('wizard.choose_projects.source_project')}
                                         </th>
                                         <th>
                                             {this.props.i18nLib.t('wizard.choose_projects.destination_project')}
                                         </th>
+                                        <th>
+                                        <input type="checkbox" checked={this.overrideAll('INSERT')} onChange={this.overrideTitleAll} />
+                                        Override Title</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -160,12 +187,16 @@ var ChooseProjects = React.createClass({
                                             <input type="checkbox" checked={this.checkAll('UPDATE')} onChange={this.selectAllExisting} />
                                             {this.props.i18nLib.t('wizard.choose_projects.update')}
                                         </th>
+                                        
                                         <th>
                                             {this.props.i18nLib.t('wizard.choose_projects.source_project')}
                                         </th>
                                         <th>
                                             {this.props.i18nLib.t('wizard.choose_projects.destination_project')}
                                         </th>
+                                        <th>
+                                        <input type="checkbox" checked={this.overrideAll('UPDATE')} onChange={this.overrideTitleAll} />
+                                        Override Title</th>
                                     </tr>
                                 </thead>
                                 <tbody>

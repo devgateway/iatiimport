@@ -8,6 +8,17 @@ public class DocumentMapping {
 	private InternalDocument destinationDocument;
 	private OperationType operation = OperationType.NOOP;
 	private Boolean selected = false;
+	private Boolean overrideTitle = false;
+
+	public Boolean getOverrideTitle() {
+		return overrideTitle;
+	}
+
+
+	public void setOverrideTitle(Boolean overrideTitle) {
+		this.overrideTitle = overrideTitle;
+	}
+
 
 	public InternalDocument getSourceDocument() {
 		return sourceDocument;

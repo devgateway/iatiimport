@@ -39,6 +39,8 @@ import org.xml.sax.SAXException;
 @Scope("session")
 public class IATI105Processor implements ISourceProcessor {
 
+	private static final String ISO_DATE = "yyyy-MM-dd";
+
 	private Log log = LogFactory.getLog(getClass());
 
 	// Global Lists for fields and the filters
@@ -88,16 +90,14 @@ public class IATI105Processor implements ISourceProcessor {
 
 	@Override
 	public void setInput(InputStream input) {
-		if (this.doc == null) {
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-			factory.setValidating(false);
-			factory.setIgnoringElementContentWhitespace(true);
-			try {
-				DocumentBuilder builder = factory.newDocumentBuilder();
-				this.doc = builder.parse(input);
-			} catch (ParserConfigurationException | SAXException | IOException e) {
-				log.error("IOException Parsing Source File: " + e);
-			}
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		factory.setValidating(false);
+		factory.setIgnoringElementContentWhitespace(true);
+		try {
+			DocumentBuilder builder = factory.newDocumentBuilder();
+			this.doc = builder.parse(input);
+		} catch (ParserConfigurationException | SAXException | IOException e) {
+			log.error("IOException Parsing Source File: " + e);
 		}
 	}
 
@@ -345,6 +345,10 @@ public class IATI105Processor implements ISourceProcessor {
 							String localValue = e.getElementsByTagName("value").item(0).getChildNodes().item(0).getNodeValue();
 							// Date
 							String localDate = e.getElementsByTagName("transaction-date").item(0).getChildNodes().item(0).getNodeValue();
+							if(!isValidDate(localDate)) //TODO: Make it defensive
+							{
+								localDate = e.getElementsByTagName("transaction-date").item(0).getAttributes().getNamedItem("iso-date").getNodeValue();
+							}
 							// Receiving Org
 							receivingOrganization = (e.getElementsByTagName("receiver-org").item(0) != null && e.getElementsByTagName("receiver-org").item(0).getChildNodes().getLength() > 0) ? e.getElementsByTagName("receiver-org").item(0).getChildNodes().item(0).getNodeValue() : null;
 
@@ -528,4 +532,13 @@ public class IATI105Processor implements ISourceProcessor {
 		return false;
 	}
 
+	public boolean isValidDate(String dateString) {
+	    SimpleDateFormat df = new SimpleDateFormat(ISO_DATE);
+	    try {
+	        df.parse(dateString);
+	        return true;
+	    } catch (ParseException e) {
+	        return false;
+	    }
+	}
 }

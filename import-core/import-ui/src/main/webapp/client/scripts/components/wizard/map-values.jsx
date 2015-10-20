@@ -70,11 +70,19 @@ var MapValues = React.createClass({
   
   loadMappingTemplate: function(id){	    
 		appActions.loadValueMappingsById(id).then(function(data) {
-			var mappings = this.state.mappings;			 
+			//TODO: refactor
+			var mappings = this.state.mappings;			
 			 $.map(mappings, function(mapping, i) {
 				 var templateMapping = _.find(data.fieldValueMapping, function(v) { return v.sourceField.uniqueFieldName == mapping.sourceField.uniqueFieldName});
-				  if(templateMapping){
-					 mapping.valueIndexMapping = templateMapping.valueIndexMapping; 
+				  if(templateMapping){										 
+					 for(var vmapping in templateMapping.valueIndexMapping ){						 
+						var templateDestination =  _.find(templateMapping.destinationField.possibleValues, function(p){ return p.index == templateMapping.valueIndexMapping[vmapping]});
+						var selectedDestination = _.find(mapping.destinationField.possibleValues, function(v) { return v.value == templateDestination.value});
+						if(selectedDestination){
+							mapping.valueIndexMapping[vmapping] = selectedDestination ? selectedDestination.index : null;
+							
+						}					
+					 }
 				 }
 				 
 			 });

@@ -43,7 +43,9 @@ var UploadFile = React.createClass({
         $el.on("fileuploaded",function(event, data, previewId, index) {
            self.loadData();
            $el.fileinput('clear');
-        })
+        });
+        
+        
     },    
     loadData: function(){  
       this.props.eventHandlers.showLoadingIcon();  
@@ -56,19 +58,39 @@ var UploadFile = React.createClass({
       }.bind(this)); 
     },
     updateFileData: function(data) {
-        this.setState({
-            fileData: data
+    	var $el = $(this.refs.iatiFileInput.getDOMNode());
+        this.setState({fileData: data}, function(){
+        	if(this.state.fileData.length > 0){
+        		$el.fileinput('disable');
+        	}
         });
+    },
+    handleDelete: function(e){   
+    	var $el = $(this.refs.iatiFileInput.getDOMNode());
+    	if(confirm("Are you sure you want to delete " + e.target.getAttribute('data-name') + "?")){
+    		var id = e.target.getAttribute('data-id');
+    		appActions.deleteImport(id).then(function(data) {    	   
+    			this.updateFileData([]);    			
+    			this.forceUpdate();
+    			$el.fileinput('enable');
+    		}.bind(this)); 		
+    	}    	
     },
     render: function() {
         var files = [];
-        if (this.state.fileData && this.state.fileData.length > 0) {        
+        if (this.state.fileData && this.state.fileData.length > 0) {   
+        	
+        var validFiles = _.filter(this.state.fileData, function(file) {  
+        	return file.valid == true
+	    });	
+        	
         $.map(this.state.fileData, function (item, i) {    
             var createdDate = moment(item.createdDate).fromNow();
             var isValidStyle = item.valid ? 'label label-success': 'label label-danger';
             var isValidText = this.props.i18nLib.t('wizard.upload_file.' + (item.valid ? 'valid':'invalid'));
             if(!item.valid) {
-                this.props.eventHandlers.displayError("The file seems to be invalid. Click Next if you want to proceed anyway.");
+            	
+                this.props.eventHandlers.displayError(this.props.i18nLib.t('wizard.upload_file.msg_invalid_file'));
             }
 
 
@@ -82,6 +104,7 @@ var UploadFile = React.createClass({
                     <td>
                         <span className={isValidStyle}>{isValidText}</span>
                     </td>
+                    <td><span data-id={item.id} data-name={item.fileName} className="glyphicon glyphicon-remove" onClick={this.handleDelete}></span></td>
                 </tr>);
             }.bind(this));
         }
@@ -90,7 +113,7 @@ var UploadFile = React.createClass({
                 <div className="panel-heading"><strong>{this.props.i18nLib.t('wizard.steps.upload_files')}</strong></div>
                 <div className="panel-body">
                     {this.props.i18nLib.t('wizard.upload_file.select_file')}
-                    <input className="file" ref="iatiFileInput" type="file"/>
+                    <input className="file" ref="iatiFileInput" type="file"   />
                 </div>
                 <table className="table file-list">
                     <thead>
@@ -104,6 +127,7 @@ var UploadFile = React.createClass({
                             <th>
                                 {this.props.i18nLib.t('wizard.upload_file.valid')}
                             </th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -112,7 +136,7 @@ var UploadFile = React.createClass({
                 </table>
                 <br /><br /><br />
                 <div className="buttons">
-                    <button disabled = {this.state.fileData.length > 0 ? "" : "disabled"} className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.props.eventHandlers.uploadFile}>{this.props.i18nLib.t('wizard.upload_file.next')}</button>
+                    <button disabled = {validFiles && validFiles.length > 0 ? "" : "disabled"} className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.props.eventHandlers.uploadFile}>{this.props.i18nLib.t('wizard.upload_file.next')}</button>
                 </div>
             </div>
             );

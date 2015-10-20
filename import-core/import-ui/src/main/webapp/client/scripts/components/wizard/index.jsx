@@ -94,7 +94,7 @@ var Wizard = React.createClass({
 	},
 
 	mapValues: function(data, direction) {
-		formActions.updateSelectedValues(data).then(function() {
+		formActions.updateSelectedValues.triggerPromise(data).then(function() {
 			if(constants.DIRECTION_NEXT === direction){
 				this.transitionTo('import', this.props.params);
 			}else{

@@ -46,7 +46,8 @@ module.exports = {
 						'next' : 'Next >>',
 						'previous' : '<< Previous',
 						 'msg_file_exists': ' File with same name already exists ',
-						 'msg_error_retrieving_files': 'Error retrieving uploaded files'
+						 'msg_error_retrieving_files': 'Error retrieving uploaded files',
+					     'msg_invalid_file': 'The file seems to be invalid. Please check the file\'s IATI version.'
 					},
 					'filter_data' : {
 						'filter_information': 'Filter Information',
@@ -179,7 +180,8 @@ module.exports = {
 						'next' : 'Suivant >>',
 						'previous' : '<< Previous',
 						 'msg_file_exists': ' File with same name already exists ',
-						 'msg_error_retrieving_files': 'Error retrieving uploaded files'
+						 'msg_error_retrieving_files': 'Error retrieving uploaded files',
+						 'msg_invalid_file': 'The file seems to be invalid. Please check the file\'s IATI version.'
 					},
 					'filter_data' : {
 						'filter_information': 'Filtrer l\'information',

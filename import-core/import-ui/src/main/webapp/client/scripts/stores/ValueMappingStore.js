@@ -16,25 +16,26 @@ var ValueMappingStore = Reflux.createStore({
   handleUpdateSelectedValues: function(data) {
     var self = this;
     $.ajax({
-      headers: { 
-        'Accept': 'application/json',
-        'Content-Type': 'application/json' 
-      },
-      url: '/importer/data/source/field/valuemapping',
-      data: JSON.stringify(data),
-      error: function() {
-        self.trigger({
-          mappingValuesData: []
-        });
-      },
-      dataType: 'json',
-      success: function(data) {
-        self.trigger({
-          mappingValuesData: data
-        });
-      },
-      type: 'POST'
-    });
+    	headers: { 
+    		'Accept': 'application/json',
+    		'Content-Type': 'application/json' 
+    	},
+    	url: '/importer/data/source/field/valuemapping',
+    	data: JSON.stringify(data),
+    	error: function() {    	    	  
+    		formActions.updateSelectedValues.failed({
+    			mappingValuesData: []
+    		});
+
+    	},
+    	dataType: 'json',
+    	success: function(data) {
+    		formActions.updateSelectedValues.completed({
+    			mappingValuesData: data
+    		});    	        
+    	},
+    	type: 'POST'
+    }); 
   },
   handleLoadValueMappingData: function() {
     var self = this;    
