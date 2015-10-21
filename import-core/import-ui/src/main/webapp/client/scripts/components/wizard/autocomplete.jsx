@@ -1,43 +1,43 @@
 var React = require('react');
+var constants = require('./../../utils/constants');
 var AutoComplete = React.createClass({
     componentDidMount: function () {
-     if(this.props.url){
-    	 this.initializeUsingUrl();
+     if(this.props.context == constants.CHOOSE_PROJECTS){
+    	 this.initializeProjectsAutocomplete();
      } else{
-    	 this.initializeUsingArray();
+    	 this.initializeValuesAutocomplete();
      }
     },
-    initializeUsingUrl: function(){
+    initializeProjectsAutocomplete: function(){
+    	  var self = this;
+    	  var language = this.props.language;
     	  var $el = $(this.refs[this.props.refId].getDOMNode());
           var searchEngine = new Bloodhound({
               datumTokenizer: function (d) {
-                  return Bloodhound.tokenizers.whitespace(d[this.props.display]);
+                  return Bloodhound.tokenizers.whitespace(d.multilangFields.title[language]);
               },
               queryTokenizer: Bloodhound.tokenizers.whitespace,
-              remote        : {
-                  url     : this.props.url,
-                  wildcard: '%QUERY'
-              }
+              local: this.props.options
           });
           searchEngine.initialize();
-          var language = this.props.language;
+          
           $el.typeahead(null, {
               name      : this.props.name,
               display: function(v){ return v.multilangFields.title[language];},
               source    : searchEngine.ttAdapter()
           });
           
-          var self = this;
+         
           
           $el.bind('typeahead:selected', function (obj, datum, name) {           
               self.props.onSelect(datum);
           });
 
-          if(this.props.value) {
-              $el.val(this.props.value.title);
+          if(this.props.value) {        	  
+              $el.val(this.props.value.multilangFields.title[this.props.language]);
           }
     },
-    initializeUsingArray: function(){
+    initializeValuesAutocomplete: function(){
     	
     	var $el = $(this.refs[this.props.refId].getDOMNode());
     	var bloodhound = new Bloodhound({

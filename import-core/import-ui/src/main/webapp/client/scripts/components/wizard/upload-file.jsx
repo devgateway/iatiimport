@@ -88,12 +88,9 @@ var UploadFile = React.createClass({
             var createdDate = moment(item.createdDate).fromNow();
             var isValidStyle = item.valid ? 'label label-success': 'label label-danger';
             var isValidText = this.props.i18nLib.t('wizard.upload_file.' + (item.valid ? 'valid':'invalid'));
-            if(!item.valid) {
-            	
+            if(!item.valid) {            	
                 this.props.eventHandlers.displayError(this.props.i18nLib.t('wizard.upload_file.msg_invalid_file'));
             }
-
-
             files.push(<tr key={item.id}>
                     <td>
                         {item.fileName}
