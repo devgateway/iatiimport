@@ -1,6 +1,10 @@
 package org.devgateway.importtool.services.processor.helper;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,6 +19,7 @@ public class DocumentMapper implements IDocumentMapper {
 	private List<DocumentMapping> documentMappings = new ArrayList<DocumentMapping>();
 	private boolean isInitialized = false;
 
+		
 	public ISourceProcessor getSourceProcessor() {
 		return sourceProcessor;
 	}
@@ -76,8 +81,7 @@ public class DocumentMapper implements IDocumentMapper {
 		// Get the document lists and field that will be used for matching and
 		// prepare the list of documents to be updated
 		List<InternalDocument> sourceDocuments = sourceProcessor.getDocuments();
-		List<InternalDocument> destinationDocuments = destinationProcessor.getDocuments(false);
-
+		List<InternalDocument> destinationDocuments = destinationProcessor.getDocuments(false);	
 		for (InternalDocument srcDoc : sourceDocuments) {
 			String sourceIdField = sourceProcessor.getIdField();
 			String destinationIdField = destinationProcessor.getIdField();
@@ -96,10 +100,22 @@ public class DocumentMapper implements IDocumentMapper {
 				addDocumentMapping(srcDoc, null, OperationType.INSERT);
 			}
 		}
-
+        this.applyFilters();
 		this.setInitialized(true);
 	}
-
+    private void applyFilters() throws Exception{
+    	List<InternalDocument> sourceDocuments = sourceProcessor.getDocuments();    	
+    	Iterator<DocumentMapping> mappingsIter = documentMappings.iterator();
+    	while (mappingsIter.hasNext()) {  
+    		String iatiId = mappingsIter.next().getSourceDocument().getStringFields().get("iati-identifier");
+    		Optional<InternalDocument> doc = sourceDocuments.stream().filter(n -> n.getStringFields().get("iati-identifier").equals(iatiId)).findFirst();
+    		if(!doc.isPresent()){
+    			mappingsIter.remove();
+    		}
+    		   	   
+    	}    	
+    	
+    }
 	private void addDocumentMapping(InternalDocument srcDoc, InternalDocument destDoc, OperationType operation) {
 		// Look for an existing src mapping
 		Optional<DocumentMapping> mapping = this.getDocumentMappings().stream().filter(n -> {

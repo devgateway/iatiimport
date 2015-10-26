@@ -249,6 +249,7 @@ public class IATI201Processor implements ISourceProcessor {
 			NodeList fieldNodeList;
 			XPath xPath = XPathFactory.newInstance().newXPath();
 
+			fieldLoop:
 			for (Field field : getFields()) {
 				switch (field.getType()) {
 				case LIST:
@@ -267,8 +268,15 @@ public class IATI201Processor implements ISourceProcessor {
 							Element fieldElement = (Element) fieldNodeList.item(0);
 							codeValue = fieldElement.getAttribute("code");
 						}
-						filterIncluded = includedByFilter(field.getFilters(), codeValue);
+						
+						Field filtersField = filterFieldList.stream().filter(n -> {
+							return field.getFieldName().equals(n.getFieldName());
+						}).findFirst().get();						
+						filterIncluded = includedByFilter(filtersField.getFilters(), codeValue);								
 						document.addStringField(field.getFieldName(), codeValue);
+						if(!filterIncluded){
+							break fieldLoop;
+						}
 					}
 					break;
 				case STRING:

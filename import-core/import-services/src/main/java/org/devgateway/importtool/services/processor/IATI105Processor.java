@@ -244,7 +244,8 @@ public class IATI105Processor implements ISourceProcessor {
 			Boolean filterIncluded = false;
 			NodeList fieldNodeList;
 			XPath xPath = XPathFactory.newInstance().newXPath();
-
+            
+			fieldLoop:
 			for (Field field : getFields()) {
 				switch (field.getType()) {
 				case LIST:
@@ -263,8 +264,16 @@ public class IATI105Processor implements ISourceProcessor {
 							Element fieldElement = (Element) fieldNodeList.item(0);
 							codeValue = fieldElement.getAttribute("code");
 						}
-						filterIncluded = includedByFilter(field.getFilters(), codeValue);
+												
+						Field filtersField = filterFieldList.stream().filter(n -> {
+							return field.getFieldName().equals(n.getFieldName());
+						}).findFirst().get();						
+						filterIncluded = includedByFilter(filtersField.getFilters(), codeValue);								
 						document.addStringField(field.getFieldName(), codeValue);
+						if(!filterIncluded){
+							break fieldLoop;
+						}
+						
 					}
 					break;
 				case STRING:
@@ -344,8 +353,8 @@ public class IATI105Processor implements ISourceProcessor {
 							// Amount
 							String localValue = e.getElementsByTagName("value").item(0).getChildNodes().item(0).getNodeValue();
 							// Date
-							String localDate = e.getElementsByTagName("transaction-date").item(0).getChildNodes().item(0).getNodeValue();
-							if(!isValidDate(localDate)) //TODO: Make it defensive
+							String localDate = (e.getElementsByTagName("transaction-date") != null && e.getElementsByTagName("transaction-date").item(0).getChildNodes().getLength() > 0)  ?  e.getElementsByTagName("transaction-date").item(0).getChildNodes().item(0).getNodeValue() : null;
+							if(localDate != null && !isValidDate(localDate)) //TODO: Make it defensive
 							{
 								localDate = e.getElementsByTagName("transaction-date").item(0).getAttributes().getNamedItem("iso-date").getNodeValue();
 							}
@@ -537,7 +546,7 @@ public class IATI105Processor implements ISourceProcessor {
 	    try {
 	        df.parse(dateString);
 	        return true;
-	    } catch (ParseException e) {
+	    } catch (ParseException e ) {
 	        return false;
 	    }
 	}

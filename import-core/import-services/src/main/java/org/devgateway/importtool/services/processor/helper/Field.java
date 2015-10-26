@@ -71,7 +71,7 @@ public class Field {
 		this.possibleValues = possibleValues;
 	}
 
-	public List<String> getFilters() {
+	public List<String> getFilters() {		
 		return filters;
 	}
 

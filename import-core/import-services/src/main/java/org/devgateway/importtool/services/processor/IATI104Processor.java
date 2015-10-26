@@ -22,6 +22,7 @@ import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.devgateway.importtool.model.Language;
 import org.devgateway.importtool.services.processor.helper.Field;
 import org.devgateway.importtool.services.processor.helper.FieldType;
 import org.devgateway.importtool.services.processor.helper.FieldValue;
@@ -60,6 +61,9 @@ public class IATI104Processor implements ISourceProcessor {
 	public Document getDoc() {
 		return doc;
 	}
+
+	private List<Language> filterLanguages;
+	
 
 	
 
@@ -102,9 +106,9 @@ public class IATI104Processor implements ISourceProcessor {
 	}
 
 	@Override
-	public List<InternalDocument> getDocuments() throws Exception {
+	public List<InternalDocument> getDocuments() throws Exception {		
 		List<InternalDocument> docList = new ArrayList<InternalDocument>();
-		docList = extractDocuments(doc);
+		docList = extractDocuments(doc);		
 		return docList;
 	}
 
@@ -133,9 +137,10 @@ public class IATI104Processor implements ISourceProcessor {
 		Set<String> set = new HashSet<String>();
 		set.addAll(activityLanguageList);
 		set.addAll(narrativeLanguageList);
-		list.addAll(set);
+		list.addAll(set);	
 		return list;
 	}
+		
 
 	@Override
 	public List<Field> getFilterFields() {
@@ -244,11 +249,13 @@ public class IATI104Processor implements ISourceProcessor {
 			Boolean filterIncluded = false;
 			NodeList fieldNodeList;
 			XPath xPath = XPathFactory.newInstance().newXPath();
-
+			
+			fieldLoop:
 			for (Field field : getFields()) {
 				switch (field.getType()) {
 				case LIST:
 					if (field.isMultiple()) {
+						
 						fieldNodeList = element.getElementsByTagName(field.getFieldName());
 						String[] codeValues = new String[fieldNodeList.getLength()];
 						for (int j = 0; j < fieldNodeList.getLength(); j++) {
@@ -262,9 +269,16 @@ public class IATI104Processor implements ISourceProcessor {
 						if (fieldNodeList.getLength() > 0 && fieldNodeList.getLength() == 1) {
 							Element fieldElement = (Element) fieldNodeList.item(0);
 							codeValue = fieldElement.getAttribute("code");
-						}
-						filterIncluded = includedByFilter(field.getFilters(), codeValue);
+							
+						}						
+						Field filtersField = filterFieldList.stream().filter(n -> {
+							return field.getFieldName().equals(n.getFieldName());
+						}).findFirst().get();						
+						filterIncluded = includedByFilter(filtersField.getFilters(), codeValue);								
 						document.addStringField(field.getFieldName(), codeValue);
+						if(!filterIncluded){
+							break fieldLoop;
+						}
 					}
 					break;
 				case STRING:
@@ -277,7 +291,7 @@ public class IATI104Processor implements ISourceProcessor {
 						} else {
 							stringValue = "";
 						}
-					}
+					}					
 					document.addStringField(field.getFieldName(), stringValue);
 					break;
 				case ORGANIZATION:
@@ -388,19 +402,18 @@ public class IATI104Processor implements ISourceProcessor {
 					break;
 				}
 			}
-			if (filterIncluded) {
+			if (filterIncluded) {				
 				list.add(document);
 			}
 		}
-
+		
 		return list;
 	}
 
 	private Boolean includedByFilter(List<String> filters, String codeValue) {
 		if (filters.size() == 0)
-			return true;
-
-		for (String value : filters) {
+			return true;		
+		for (String value : filters) {			
 			if (value.equals(codeValue)) {
 				return true;
 			}
