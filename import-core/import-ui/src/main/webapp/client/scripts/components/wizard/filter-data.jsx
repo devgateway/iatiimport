@@ -87,18 +87,22 @@ var FilterData = React.createClass({
 
 		this.setState( { filterData: this.state.filterData });
 	},
+	handleLanguageToggle: function(language, event){
+		var languages = this.state.languageData;
+		var currentLanguage = _.find(languages, { 'code': language.code });
+		currentLanguage.selected = event.target.checked;
+		this.setState({languageData:languages});		
+	},
 	handleNext: function() {
-		this.props.eventHandlers.filterData(this.state.filterData,constants.DIRECTION_NEXT);
+		this.props.eventHandlers.filterData(this.state.languageData,this.state.filterData,constants.DIRECTION_NEXT);
 	},
 	handlePrevious: function(){
-		this.props.eventHandlers.filterData(this.state.filterData,constants.DIRECTION_PREVIOUS);
+		this.props.eventHandlers.filterData(this.state.languageData,this.state.filterData,constants.DIRECTION_PREVIOUS);
 	},
 	selectAll: function(field, event) {
 		if(event.target.checked) {
 			field.filters = _.pluck(field.possibleValues, 'code');
-		} 
-		else
-		{
+		}else{
 			field.filters = [];
 		}
 		this.setState({
@@ -140,7 +144,7 @@ var FilterData = React.createClass({
             $.map(this.state.languageData, function(language, i) {
                 languages.push(<div className="input-group">
                     <span className="input-group-addon">
-                        <input aria-label="language" type="checkbox" value={language.code}/>
+                        <input aria-label="language" type="checkbox" value={language.code} checked={language.selected} onChange={this.handleLanguageToggle.bind(this, language)}/>
                     </span>
                     <input aria-label="Field1" className="form-control" readOnly type="text" value={language.description}/>
                 </div>);

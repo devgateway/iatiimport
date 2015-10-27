@@ -28,16 +28,14 @@ var FilterStore = Reflux.createStore({
       },
       url: '/importer/data/source/filters',
       data: JSON.stringify(data),
-      error: function() {
-        self.trigger({
-          filterData: []
-        });
+      error: function() {    	  
+    	  formActions.updateFilters.failed();        
       },
       dataType: 'json',
       success: function(data) {
-        self.trigger({
-          filterData: data
-        });
+    	  formActions.updateFilters.completed({
+              filterData: data
+          });        
       },
       type: 'POST'
     });

@@ -61,15 +61,33 @@ var Wizard = React.createClass({
 		this.transitionTo('filter', this.props.params);
 	},
 
-	filterData: function(data, direction) {
-		formActions.updateFilters(data).then(function() { 
-			if(constants.DIRECTION_NEXT === direction){
-				this.transitionTo('projects', this.props.params);
-			}else{
-				this.transitionTo('upload', this.props.params);
-			}			
+	filterData: function(languageData, filterData, direction) {
+		var languagesUpdated = false;
+		var filtersUpdated = false;
+		formActions.updateLanguages.triggerPromise(languageData).then(function() { 
+			languagesUpdated = true;
+			if(languagesUpdated && filtersUpdated){
+				if(constants.DIRECTION_NEXT === direction){
+					this.transitionTo('projects', this.props.params);
+				}else{
+					this.transitionTo('upload', this.props.params);
+				}	
+			}				
+		}.bind(this));
+		
+		formActions.updateFilters.triggerPromise(filterData).then(function() { 
+			filtersUpdated = true;
+			if(languagesUpdated && filtersUpdated){
+				if(constants.DIRECTION_NEXT === direction){
+					this.transitionTo('projects', this.props.params);
+				}else{
+					this.transitionTo('upload', this.props.params);
+				}	
+			}					
 		}.bind(this));
 	},
+	
+	
 
 	chooseProjects: function(data,direction) {
 		formActions.updateSelectedProjects(data).then(function() { 

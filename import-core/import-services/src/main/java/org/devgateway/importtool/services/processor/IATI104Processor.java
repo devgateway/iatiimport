@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.Locale;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -62,8 +63,7 @@ public class IATI104Processor implements ISourceProcessor {
 		return doc;
 	}
 
-	private List<Language> filterLanguages;
-	
+	private List<Language> filterLanguages = new ArrayList<Language>();
 
 	
 
@@ -138,9 +138,26 @@ public class IATI104Processor implements ISourceProcessor {
 		set.addAll(activityLanguageList);
 		set.addAll(narrativeLanguageList);
 		list.addAll(set);	
+		
 		return list;
 	}
-		
+	
+	@Override
+	public List<Language> getFilterLanguages() {
+		if(this.filterLanguages.size() == 0){
+			List<Language> listLanguages = new ArrayList<Language>();
+			this.getLanguages().stream().forEach(lang -> {
+				Locale tmp = new Locale(lang);
+				listLanguages.add(new Language(tmp.getLanguage(), tmp.getDisplayLanguage()));
+			});
+			this.setFilterLanguages(listLanguages);			
+		}
+		return this.filterLanguages;
+	}
+	@Override
+	public void setFilterLanguages(List<Language> filterLanguages) {
+		this.filterLanguages = filterLanguages;
+	}
 
 	@Override
 	public List<Field> getFilterFields() {
@@ -323,26 +340,30 @@ public class IATI104Processor implements ISourceProcessor {
 						}
 					}
 					break;
-				case MULTILANG_STRING:
-					String mlStringValue = "";
-					fieldNodeList = element.getElementsByTagName(field.getFieldName());
-					if (fieldNodeList.getLength() > 0 && fieldNodeList.getLength() == 1) {
-						Element fieldElement = (Element) fieldNodeList.item(0);
-						if (fieldElement.getChildNodes().getLength() == 1) {
-							mlStringValue = fieldElement.getChildNodes().item(0).getNodeValue();
-						} else {
-							mlStringValue = "";
-						}
-					}
-
-					Optional<String> language = this.getLanguages().stream().findFirst();
-					String languageCode = "en"; // Set by default
-					if (language.isPresent()) {
-						languageCode = language.get();
-					}
+				case MULTILANG_STRING:					
+					String defaultLanguage = "en";
 					Map<String, String> mlv = new HashMap<String, String>();
-					mlv.put(languageCode, mlStringValue);
-					document.addMultilangStringField(field.getFieldName(), mlv);
+					fieldNodeList = element.getElementsByTagName(field.getFieldName());
+					for (int k = 0; k < fieldNodeList.getLength(); ++k) {
+						Element fieldElement = (Element) fieldNodeList.item(k);
+						if (fieldElement.getChildNodes().getLength() == 1) {
+							String mlStringValue = fieldElement.getChildNodes().item(0).getNodeValue();
+							Node langAttr = fieldElement.getAttributes().getNamedItem("xml:lang");
+							
+							if(langAttr != null){								
+								String lang = langAttr.getNodeValue();
+								
+								Optional<Language> selectedLanguage = this.getFilterLanguages().stream().filter(language -> lang.equalsIgnoreCase(language.getCode()) && language.getSelected() == true ).findFirst();
+								if(selectedLanguage.isPresent()){									
+									mlv.put(lang, mlStringValue);
+								}								
+							}else{								
+								mlv.put(defaultLanguage, mlStringValue);
+							}						
+							
+						}
+					}					
+					document.addMultilangStringField(field.getFieldName(), mlv);					
 					break;
 				case TRANSACTION:
 					try {

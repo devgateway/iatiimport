@@ -78,6 +78,8 @@ public class DocumentMapper implements IDocumentMapper {
 			throw new Exception("Missing prerequirements to initialize this mapping");
 		}
 
+		this.setDocumentMappings(new ArrayList<DocumentMapping>());
+		
 		// Get the document lists and field that will be used for matching and
 		// prepare the list of documents to be updated
 		List<InternalDocument> sourceDocuments = sourceProcessor.getDocuments();
@@ -100,22 +102,10 @@ public class DocumentMapper implements IDocumentMapper {
 				addDocumentMapping(srcDoc, null, OperationType.INSERT);
 			}
 		}
-        this.applyFilters();
+        
 		this.setInitialized(true);
 	}
-    private void applyFilters() throws Exception{
-    	List<InternalDocument> sourceDocuments = sourceProcessor.getDocuments();    	
-    	Iterator<DocumentMapping> mappingsIter = documentMappings.iterator();
-    	while (mappingsIter.hasNext()) {  
-    		String iatiId = mappingsIter.next().getSourceDocument().getStringFields().get("iati-identifier");
-    		Optional<InternalDocument> doc = sourceDocuments.stream().filter(n -> n.getStringFields().get("iati-identifier").equals(iatiId)).findFirst();
-    		if(!doc.isPresent()){
-    			mappingsIter.remove();
-    		}
-    		   	   
-    	}    	
-    	
-    }
+   
 	private void addDocumentMapping(InternalDocument srcDoc, InternalDocument destDoc, OperationType operation) {
 		// Look for an existing src mapping
 		Optional<DocumentMapping> mapping = this.getDocumentMappings().stream().filter(n -> {
