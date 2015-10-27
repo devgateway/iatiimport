@@ -10,6 +10,6 @@ module.exports = {
   USE_AUTHENTICATION_TOKEN: true,
   DESTINATION_AUTH_TOKEN: undefined,
   DESTINATION_USERNAME: undefined,
-  DEBUG: true,
+  DEBUG: false,
   SESSION_REQUEST_TIMEOUT: 30000
 };
