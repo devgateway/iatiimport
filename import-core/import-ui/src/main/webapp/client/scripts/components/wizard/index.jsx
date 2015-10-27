@@ -194,13 +194,15 @@ var Wizard = React.createClass({
     eventHandlers.navigateBack  = this.navigateBack;
     eventHandlers.goHome = this.goHome;
     
-    var error; 
-    if(Cookies.get("DESTINATION_AUTH_TOKEN") == "undefined"){
-    	error = (<div className="container"><br/><div className="alert alert-danger server-status-message" role="alert" ><span className="glyphicon glyphicon-exclamation-sign error-box" aria-hidden="true"></span><span className="sr-only">Error:</span><span > Session information for the destination system could not be retrieved. Verify if backend services are working correctly.</span> </div></div>);
-    }    
-    if(error){
-    	return error;
+    var error;
+    if(Cookies.get("DESTINATION_AUTH_TOKEN") == "null" || Cookies.get("DESTINATION_AUTH_TOKEN") == "undefined"){
+    	return (<div className="container"><br/><div className="alert alert-danger server-status-message" role="alert" ><span className="glyphicon glyphicon-exclamation-sign error-box" aria-hidden="true"></span><span className="sr-only">Error:</span><span > Session information for the destination system could not be retrieved. Verify if backend services are working correctly.</span> </div></div>);
     }
+    
+    if(Cookies.get("CAN_ADD_ACTIVITY") == "false"){    	
+    	return (<div className="container"><br/><div className="alert alert-danger server-status-message" role="alert" ><span className="glyphicon glyphicon-exclamation-sign error-box" aria-hidden="true"></span><span className="sr-only">Error:</span><span > Access Denied. {Cookies.set("DESTINATION_USERNAME")} does not have permission to import activities into {Cookies.set("WORKSPACE")} workspace.</span> </div></div>);
+    } 
+    
     return (
       <div>
       <div className="container " >     
