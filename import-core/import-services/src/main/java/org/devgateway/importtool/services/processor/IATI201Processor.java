@@ -365,14 +365,12 @@ public class IATI201Processor implements ISourceProcessor {
 								titles.add((Element) fieldNodeList.item(j));
 							}
 						}
-						for (Element titleElement : titles) {
-							log.info("getting narrative ...... ");
+						for (Element titleElement : titles) {							
 							narrativeNodeList = titleElement.getElementsByTagName("narrative");
 							for (int j = 0; j < narrativeNodeList.getLength(); j++) {
 								Element narrativeElement = (Element) narrativeNodeList.item(j);								
 								if (narrativeElement.getChildNodes().getLength() == 1) {
-									mlStringValue = narrativeElement.getChildNodes().item(0).getNodeValue();
-									log.info(mlStringValue);
+									mlStringValue = narrativeElement.getChildNodes().item(0).getNodeValue();									
 									if (!"".equals(narrativeElement.getAttribute("xml:lang"))) {
 										String languageCode = narrativeElement.getAttribute("xml:lang");
 										Optional<Language> selectedLanguage = this.getFilterLanguages().stream().filter(language -> languageCode.equalsIgnoreCase(language.getCode()) && language.getSelected() == true ).findFirst();
