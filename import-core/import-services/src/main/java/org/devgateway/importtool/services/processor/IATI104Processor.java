@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.Set;
 import java.util.Locale;
 
@@ -55,9 +56,12 @@ public class IATI104Processor implements ISourceProcessor {
 	private String PROCESSOR_VERSION = "1.04";
 
 	private String descriptiveName = "IATI 1.04";
-
+    private String defaultLanguage = "";	
+	private String defaultCurrency = "";
+	
 	// XML Document that will hold the entire imported file
 	private Document doc;
+	
 
 	public Document getDoc() {
 		return doc;
@@ -83,7 +87,16 @@ public class IATI104Processor implements ISourceProcessor {
 		mappingNameFile.put("sector", "Sector");
 	}
 
-	public IATI104Processor() {
+	public IATI104Processor(){
+		InputStream propsStream = this.getClass().getResourceAsStream("IATI104/IATI104Processor.properties");
+		Properties properties = new Properties();		
+		try {
+			properties.load(propsStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}		
+		defaultLanguage = properties.getProperty("default_language");	
+		defaultCurrency = properties.getProperty("default_currency");		
 		instantiateStaticFields();
 	}
 
@@ -262,7 +275,9 @@ public class IATI104Processor implements ISourceProcessor {
 		for (int i = 0; i < nodeList.getLength(); i++) {
 			InternalDocument document = new InternalDocument();
 			Element element = (Element) nodeList.item(i);
-			document.addStringField("default-currency", element.getAttribute("default-currency"));
+			String currency = !("".equals(element.getAttribute("default-currency"))) ? element.getAttribute("default-currency") : this.defaultCurrency;			
+			document.addStringField("default-currency", currency);	
+			String defaultLanguageCode = !("".equals(element.getAttribute("xml:lang"))) ? element.getAttribute("xml:lang") : this.defaultLanguage;
 			Boolean filterIncluded = false;
 			NodeList fieldNodeList;
 			XPath xPath = XPathFactory.newInstance().newXPath();
@@ -341,7 +356,6 @@ public class IATI104Processor implements ISourceProcessor {
 					}
 					break;
 				case MULTILANG_STRING:					
-					String defaultLanguage = "en";
 					Map<String, String> mlv = new HashMap<String, String>();
 					fieldNodeList = element.getElementsByTagName(field.getFieldName());
 					for (int k = 0; k < fieldNodeList.getLength(); ++k) {
@@ -351,14 +365,13 @@ public class IATI104Processor implements ISourceProcessor {
 							Node langAttr = fieldElement.getAttributes().getNamedItem("xml:lang");
 							
 							if(langAttr != null){								
-								String lang = langAttr.getNodeValue();
-								
+								String lang = langAttr.getNodeValue();								
 								Optional<Language> selectedLanguage = this.getFilterLanguages().stream().filter(language -> lang.equalsIgnoreCase(language.getCode()) && language.getSelected() == true ).findFirst();
 								if(selectedLanguage.isPresent()){									
 									mlv.put(lang, mlStringValue);
 								}								
 							}else{								
-								mlv.put(defaultLanguage, mlStringValue);
+								mlv.put(defaultLanguageCode, mlStringValue);
 							}						
 							
 						}

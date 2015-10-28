@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -53,12 +54,8 @@ public class IATI201Processor implements ISourceProcessor {
 	private String DEFAULT_ID_FIELD = "iati-identifier";
 	private String DEFAULT_TITLE_FIELD = "title";
 	private String PROCESSOR_VERSION = "2.01";
-	private String DEFAULT_LANGUAGE_CODE = "en";
-
-	public String getDefaultLanguageCode() {
-		return DEFAULT_LANGUAGE_CODE; 
-	}
-
+	private String defaultLanguage = "";
+	private String defaultCurrency = "";
 	
 	private String descriptiveName = "IATI 2.01";
 
@@ -87,7 +84,16 @@ public class IATI201Processor implements ISourceProcessor {
 		mappingNameFile.put("sector", "Sector");
 	}
 
-	public IATI201Processor() {
+	public IATI201Processor(){
+		InputStream propsStream = this.getClass().getResourceAsStream("IATI201/IATI201Processor.properties");
+		Properties properties = new Properties();		
+		try {
+			properties.load(propsStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}		
+		defaultLanguage = properties.getProperty("default_language");
+		defaultCurrency = properties.getProperty("default_currency");
 		instantiateStaticFields();
 	}
 
@@ -271,8 +277,9 @@ public class IATI201Processor implements ISourceProcessor {
 		for (int i = 0; i < nodeList.getLength(); i++) {
 			InternalDocument document = new InternalDocument();
 			Element element = (Element) nodeList.item(i);
-			document.addStringField("default-currency", element.getAttribute("default-currency"));
-			String defaultLanguageCode = !("".equals(element.getAttribute("xml:lang"))) ? element.getAttribute("xml:lang") : this.getDefaultLanguageCode();
+			String currency = !("".equals(element.getAttribute("default-currency"))) ? element.getAttribute("default-currency") : this.defaultCurrency;			
+			document.addStringField("default-currency", currency);
+			String defaultLanguageCode = !("".equals(element.getAttribute("xml:lang"))) ? element.getAttribute("xml:lang") : this.defaultLanguage;
 			Boolean filterIncluded = false;
 			NodeList fieldNodeList;
 			XPath xPath = XPathFactory.newInstance().newXPath();
@@ -356,7 +363,6 @@ public class IATI201Processor implements ISourceProcessor {
 					String mlStringValue = "";
 					NodeList narrativeNodeList;
 					Map<String, String> mlv = new HashMap<String, String>();
-
 					fieldNodeList = element.getElementsByTagName(field.getFieldName());
 					if (fieldNodeList.getLength() > 0) {
 						List<Element> titles = new ArrayList<Element>();

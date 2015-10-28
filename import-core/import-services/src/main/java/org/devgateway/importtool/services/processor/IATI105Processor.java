@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -55,6 +56,8 @@ public class IATI105Processor implements ISourceProcessor {
 	private String PROCESSOR_VERSION = "1.05";
 
 	private String descriptiveName = "IATI 1.05";
+	private String defaultLanguage = "";
+	private String defaultCurrency = "";
 	
 	private List<Language> filterLanguages = new ArrayList<Language>();
 
@@ -84,6 +87,15 @@ public class IATI105Processor implements ISourceProcessor {
 	}
 
 	public IATI105Processor() {
+		InputStream propsStream = this.getClass().getResourceAsStream("IATI105/IATI105Processor.properties");
+		Properties properties = new Properties();		
+		try {
+			properties.load(propsStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}		
+		defaultLanguage = properties.getProperty("default_language");
+		defaultCurrency = properties.getProperty("default_currency");
 		instantiateStaticFields();
 	}
 
@@ -261,7 +273,9 @@ public class IATI105Processor implements ISourceProcessor {
 		for (int i = 0; i < nodeList.getLength(); i++) {
 			InternalDocument document = new InternalDocument();
 			Element element = (Element) nodeList.item(i);
-			document.addStringField("default-currency", element.getAttribute("default-currency"));
+			String currency = !("".equals(element.getAttribute("default-currency"))) ? element.getAttribute("default-currency") : this.defaultCurrency;			
+			document.addStringField("default-currency", currency);	
+			String defaultLanguageCode = !("".equals(element.getAttribute("xml:lang"))) ? element.getAttribute("xml:lang") : this.defaultLanguage;
 			Boolean filterIncluded = false;
 			NodeList fieldNodeList;
 			XPath xPath = XPathFactory.newInstance().newXPath();
@@ -340,7 +354,6 @@ public class IATI105Processor implements ISourceProcessor {
 					}
 					break;
 				case MULTILANG_STRING:
-					String defaultLanguage = "en";
 					Map<String, String> mlv = new HashMap<String, String>();
 					fieldNodeList = element.getElementsByTagName(field.getFieldName());
 					for (int k = 0; k < fieldNodeList.getLength(); ++k) {
@@ -355,7 +368,7 @@ public class IATI105Processor implements ISourceProcessor {
 									mlv.put(lang, mlStringValue);
 								}								
 							}else{								
-								mlv.put(defaultLanguage, mlStringValue);
+								mlv.put(defaultLanguageCode, mlStringValue);
 							}						
 							
 						}
