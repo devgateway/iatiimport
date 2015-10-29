@@ -125,6 +125,8 @@ var ChooseFields = React.createClass({
 		return options
 	}, 
 	checkAll: function() {
+		var mappableFields = _.where(this.state.sourceFieldsData, {mappable: true});
+		return (mappableFields.length == this.state.mappingFieldsData.length);
 	},
 	handleNext: function() {
 		this.props.eventHandlers.chooseFields(this.state.mappingFieldsData, constants.DIRECTION_NEXT);
@@ -133,6 +135,24 @@ var ChooseFields = React.createClass({
 		this.props.eventHandlers.chooseFields(this.state.mappingFieldsData, constants.DIRECTION_PREVIOUS);
 	},
 	selectAll: function(event){
+		var mappings = this.state.mappingFieldsData;
+		if(event.target.checked) {
+			_.each(this.state.sourceFieldsData, function(sourceField){ 			
+				if(_.find(mappings, function(v){ return v.sourceField.uniqueFieldName == sourceField.uniqueFieldName;}) == null && sourceField.mappable){
+					var mappingObject = {
+							sourceField: sourceField,
+							destinationField: null
+					};
+					mappings.push(mappingObject);
+				}
+
+			});
+		}else{
+			mappings = [];
+		}
+		this.setState({
+			mappingFieldsData: mappings
+		}); 
 		this.forceUpdate();
 	},
 	handleToggle: function(item, event) {
@@ -143,9 +163,7 @@ var ChooseFields = React.createClass({
 					destinationField: null
 			}
 			mapping = this.state.mappingFieldsData.concat(mappingObject);
-		}
-		else
-		{
+		}else{
 			mapping =  _.reject(this.state.mappingFieldsData, function(v){ return v.sourceField.uniqueFieldName == item.uniqueFieldName;});
 		}
 
