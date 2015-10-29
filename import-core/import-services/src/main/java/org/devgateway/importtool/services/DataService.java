@@ -28,11 +28,12 @@ public class DataService {
 				fvm.setDestinationField(fieldMapping.getDestinationField());
 				if (fieldMapping.getSourceField().getType() == FieldType.LIST || fieldMapping.getSourceField().getType() == FieldType.ORGANIZATION) {
 					Field source = fieldMapping.getSourceField();
-					source.getPossibleValues().stream().forEach(fieldValue -> {
-						fvm.getValueIndexMapping().put(fieldValue.getIndex(), null);
-					});
+					if(source.getPossibleValues() != null){
+						source.getPossibleValues().stream().forEach(fieldValue -> {
+							fvm.getValueIndexMapping().put(fieldValue.getIndex(), null);
+						});	
+					}					
 				}
-
 				documentMapper.getValueMappingObject().add(fvm);
 			});
 
