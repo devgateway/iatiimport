@@ -25,7 +25,8 @@ var UploadFile = React.createClass({
                 allowedFileExtensions : ['xml'],
                 uploadUrl: appConfig.TOOL_HOST + appConfig.TOOL_REST_PATH + "/upload",
                 dropZoneEnabled: false,
-                maxFileCount: 1
+                maxFileCount: 1,
+                allowedPreviewTypes:'none'
             });
         $el.on('filepreupload', function(event, data, previewId, index, jqXHR) {
                 var alreadyExists = _.find(self.state.fileData, function(v){
