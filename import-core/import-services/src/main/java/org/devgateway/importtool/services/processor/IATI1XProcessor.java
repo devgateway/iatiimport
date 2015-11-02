@@ -38,29 +38,29 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-@Component("IATI104")
+@Component("IATI1XProcessor")
 @Scope("session")
-public class IATI104Processor implements ISourceProcessor {
+public class IATI1XProcessor implements ISourceProcessor {
 
-	private static final String ISO_DATE = "yyyy-MM-dd";
+	protected static final String ISO_DATE = "yyyy-MM-dd";
 
-	private Log log = LogFactory.getLog(getClass());
+	protected Log log = LogFactory.getLog(getClass());
 
 	// Global Lists for fields and the filters
-	private List<Field> fieldList = new ArrayList<Field>();
-	private List<Field> filterFieldList = new ArrayList<Field>();
+	protected List<Field> fieldList = new ArrayList<Field>();
+	protected List<Field> filterFieldList = new ArrayList<Field>();
 
 	// Field names on the source document that hold key information
-	private String DEFAULT_ID_FIELD = "iati-identifier";
-	private String DEFAULT_TITLE_FIELD = "title";
-	private String PROCESSOR_VERSION = "1.04";
+	protected String DEFAULT_ID_FIELD = "iati-identifier";
+	protected String DEFAULT_TITLE_FIELD = "title";
+	protected String PROCESSOR_VERSION = "1.04";
 
-	private String descriptiveName = "IATI 1.04";
-    private String defaultLanguage = "";	
-	private String defaultCurrency = "";
+	protected String descriptiveName = "IATI 1.04";
+	protected String defaultLanguage = "";	
+	protected String defaultCurrency = "";
 	
 	// XML Document that will hold the entire imported file
-	private Document doc;
+	protected Document doc;
 	
 
 	public Document getDoc() {
@@ -87,7 +87,7 @@ public class IATI104Processor implements ISourceProcessor {
 		mappingNameFile.put("sector", "Sector");
 	}
 
-	public IATI104Processor(){
+	public IATI1XProcessor(){
 		InputStream propsStream = this.getClass().getResourceAsStream("IATI104/IATI104Processor.properties");
 		Properties properties = new Properties();		
 		try {

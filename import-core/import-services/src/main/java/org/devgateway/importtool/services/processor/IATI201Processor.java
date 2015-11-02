@@ -414,7 +414,7 @@ public class IATI201Processor implements ISourceProcessor {
 							String localValue = e.getElementsByTagName("value").item(0).getChildNodes().item(0).getNodeValue();
 							// Date
 							String localDate = e.getElementsByTagName("transaction-date").item(0).getChildNodes().item(0).getNodeValue();
-							if (!isValidDate(localDate)) // TODO: Make it
+							if (localDate != null && !isValidDate(localDate)) // TODO: Make it
 															// defensive
 							{
 								localDate = e.getElementsByTagName("transaction-date").item(0).getAttributes().getNamedItem("iso-date").getNodeValue();
