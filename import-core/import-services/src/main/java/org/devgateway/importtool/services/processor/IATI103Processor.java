@@ -40,7 +40,7 @@ import org.xml.sax.SAXException;
 
 @Component("IATI103")
 @Scope("session")
-public class IATI103Processor implements ISourceProcessor {
+public class IATI103Processor  implements ISourceProcessor {
 
 	private static final String ISO_DATE = "yyyy-MM-dd";
 

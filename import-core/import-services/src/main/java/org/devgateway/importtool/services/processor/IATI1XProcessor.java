@@ -38,29 +38,29 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-@Component("IATI1XProcessor")
+@Component("IATI1X")
 @Scope("session")
-public class IATI1XProcessor implements ISourceProcessor {
+public class IATI1XProcessor  implements ISourceProcessor {
 
-	protected static final String ISO_DATE = "yyyy-MM-dd";
+	private static final String ISO_DATE = "yyyy-MM-dd";
 
-	protected Log log = LogFactory.getLog(getClass());
+	private Log log = LogFactory.getLog(getClass());
 
 	// Global Lists for fields and the filters
-	protected List<Field> fieldList = new ArrayList<Field>();
-	protected List<Field> filterFieldList = new ArrayList<Field>();
+	private List<Field> fieldList = new ArrayList<Field>();
+	private List<Field> filterFieldList = new ArrayList<Field>();
 
 	// Field names on the source document that hold key information
-	protected String DEFAULT_ID_FIELD = "iati-identifier";
-	protected String DEFAULT_TITLE_FIELD = "title";
-	protected String PROCESSOR_VERSION = "1.04";
+	private String DEFAULT_ID_FIELD = "iati-identifier";
+	private String DEFAULT_TITLE_FIELD = "title";
+	private String PROCESSOR_VERSION = "1.03";
 
-	protected String descriptiveName = "IATI 1.04";
-	protected String defaultLanguage = "";	
-	protected String defaultCurrency = "";
+	private String descriptiveName = "IATI 1.03";
+    private String defaultLanguage = "";	
+	private String defaultCurrency = "";
 	
 	// XML Document that will hold the entire imported file
-	protected Document doc;
+	private Document doc;
 	
 
 	public Document getDoc() {
@@ -88,7 +88,7 @@ public class IATI1XProcessor implements ISourceProcessor {
 	}
 
 	public IATI1XProcessor(){
-		InputStream propsStream = this.getClass().getResourceAsStream("IATI104/IATI104Processor.properties");
+		InputStream propsStream = this.getClass().getResourceAsStream("IATI103/IATI103Processor.properties");
 		Properties properties = new Properties();		
 		try {
 			properties.load(propsStream);
@@ -392,10 +392,12 @@ public class IATI1XProcessor implements ISourceProcessor {
 							// Amount
 							String localValue = e.getElementsByTagName("value").item(0).getChildNodes().item(0).getNodeValue();
 							// Date
-							String localDate = e.getElementsByTagName("transaction-date").item(0).getChildNodes().item(0).getNodeValue();
-							if (localDate != null && !isValidDate(localDate)) // TODO: Make it  defensive
-							{
-								localDate = e.getElementsByTagName("transaction-date").item(0).getAttributes().getNamedItem("iso-date").getNodeValue();
+							String localDate = "";
+							if(e.getElementsByTagName("transaction-date").item(0) != null ){
+								localDate = e.getElementsByTagName("transaction-date").item(0).getChildNodes().item(0).getNodeValue();
+							}							
+							if (!isValidDate(localDate)){
+								localDate = (e.getElementsByTagName("transaction-date").item(0) != null && e.getElementsByTagName("transaction-date").item(0).getAttributes() != null) ? e.getElementsByTagName("transaction-date").item(0).getAttributes().getNamedItem("iso-date").getNodeValue() : "";
 							}
 							// Receiving Org
 							receivingOrganization = (e.getElementsByTagName("receiver-org").item(0) != null && e.getElementsByTagName("receiver-org").item(0).getChildNodes().getLength() > 0) ? e.getElementsByTagName("receiver-org").item(0).getChildNodes().item(0).getNodeValue() : null;
