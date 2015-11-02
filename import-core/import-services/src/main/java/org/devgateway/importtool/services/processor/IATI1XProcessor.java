@@ -40,36 +40,54 @@ import org.xml.sax.SAXException;
 
 @Component("IATI1X")
 @Scope("session")
-public class IATI1XProcessor  implements ISourceProcessor {
+abstract public class IATI1XProcessor  implements ISourceProcessor {
 
-	private static final String ISO_DATE = "yyyy-MM-dd";
+	protected static final String ISO_DATE = "yyyy-MM-dd";
 
-	private Log log = LogFactory.getLog(getClass());
+	protected Log log = LogFactory.getLog(getClass());
 
 	// Global Lists for fields and the filters
-	private List<Field> fieldList = new ArrayList<Field>();
-	private List<Field> filterFieldList = new ArrayList<Field>();
+	protected List<Field> fieldList = new ArrayList<Field>();
+	protected List<Field> filterFieldList = new ArrayList<Field>();
 
 	// Field names on the source document that hold key information
-	private String DEFAULT_ID_FIELD = "iati-identifier";
-	private String DEFAULT_TITLE_FIELD = "title";
-	private String PROCESSOR_VERSION = "1.03";
+	protected String DEFAULT_ID_FIELD = "iati-identifier";
+	protected String DEFAULT_TITLE_FIELD = "title";
+	protected String PROCESSOR_VERSION = "";
 
-	private String descriptiveName = "IATI 1.03";
-    private String defaultLanguage = "";	
-	private String defaultCurrency = "";
+	protected String descriptiveName = "";
+	protected String defaultLanguage = "";	
+	protected String defaultCurrency = "";
+	protected String codelistPath = "";
+	protected String propertiesFile = "";
+
+	public String getPropertiesFile() {
+		return propertiesFile;
+	}
+
+
+	public void setPropertiesFile(String propertiesFile) {
+		this.propertiesFile = propertiesFile;
+	}
+
+	protected List<Language> filterLanguages = new ArrayList<Language>();
 	
 	// XML Document that will hold the entire imported file
-	private Document doc;
+	protected Document doc;
 	
 
 	public Document getDoc() {
 		return doc;
 	}
 
-	private List<Language> filterLanguages = new ArrayList<Language>();
 
-	
+	public String getCodelistPath() {
+		return codelistPath;
+	}
+
+	public void setCodelistPath(String codelistPath) {
+		this.codelistPath = codelistPath;
+	}
 
 	// Map that holds information about how the field names map to code lists
 	private static Map<String, String> mappingNameFile = new HashMap<String, String>();
@@ -88,7 +106,11 @@ public class IATI1XProcessor  implements ISourceProcessor {
 	}
 
 	public IATI1XProcessor(){
-		InputStream propsStream = this.getClass().getResourceAsStream("IATI103/IATI103Processor.properties");
+		
+	}
+	
+	protected void configureDefaults(){
+		InputStream propsStream = this.getClass().getResourceAsStream(this.getPropertiesFile());
 		Properties properties = new Properties();		
 		try {
 			properties.load(propsStream);
@@ -96,8 +118,7 @@ public class IATI1XProcessor  implements ISourceProcessor {
 			e.printStackTrace();
 		}		
 		defaultLanguage = properties.getProperty("default_language");	
-		defaultCurrency = properties.getProperty("default_currency");		
-		instantiateStaticFields();
+		defaultCurrency = properties.getProperty("default_currency");	
 	}
 
 	@Override
@@ -268,7 +289,7 @@ public class IATI1XProcessor  implements ISourceProcessor {
 
 	private List<InternalDocument> extractDocuments(Document doc) throws Exception {
 		// Extract global values
-
+               
 		NodeList nodeList = doc.getElementsByTagName("iati-activity");
 		List<InternalDocument> list = new ArrayList<InternalDocument>();
 
@@ -474,7 +495,7 @@ public class IATI1XProcessor  implements ISourceProcessor {
 		return list;
 	}
 
-	private void instantiateStaticFields() {
+	protected void instantiateStaticFields() {
 		// Text fields
 		fieldList.add(new Field("IATI Identifier", "iati-identifier", FieldType.STRING, false));
 		fieldList.add(new Field("Title", "title", FieldType.MULTILANG_STRING, false));
