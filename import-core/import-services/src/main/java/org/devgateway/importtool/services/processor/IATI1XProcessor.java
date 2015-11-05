@@ -450,10 +450,34 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 						}
 
 					} catch (XPathExpressionException | ParseException e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
 					break;
+				case CONTACT:					
+					NodeList contactNodes = element.getElementsByTagName(field.getFieldName());
+					if (contactNodes.getLength() > 0) {
+						for (int j = 0; j < contactNodes.getLength(); j++) {													
+							Element contact = (Element) contactNodes.item(j);							
+							String organisation = contact.getElementsByTagName("organisation").item(0) != null ?  contact.getElementsByTagName("organisation").item(0).getTextContent() : "";						    
+							String personName = contact.getElementsByTagName("person-name").item(0) != null ?  contact.getElementsByTagName("person-name").item(0).getTextContent() : "";
+							String jobTitle = contact.getElementsByTagName("job-title").item(0) != null ?  contact.getElementsByTagName("job-title").item(0).getTextContent() : "";
+							String telephone = contact.getElementsByTagName("telephone").item(0) != null ?  contact.getElementsByTagName("telephone").item(0).getTextContent() : "";
+							String email = contact.getElementsByTagName("email").item(0) != null ?  contact.getElementsByTagName("email").item(0).getTextContent() : "";
+							String address = contact.getElementsByTagName("mailing-address").item(0) != null ?  contact.getElementsByTagName("mailing-address").item(0).getTextContent() : "";
+							String website = contact.getElementsByTagName("website").item(0) != null ?  contact.getElementsByTagName("website").item(0).getTextContent() : "";
+							
+							/*Map<String, String> contactFields = new HashMap<String, String>();													
+							contactFields.put("organisation", organisation);
+							contactFields.put("person-name", personName);
+							contactFields.put("job-title", jobTitle);
+							contactFields.put("telephone", telephone);
+							contactFields.put("email", email);
+							contactFields.put("mailing-address", address);
+							contactFields.put("website", website);							
+							document.addContactFields("donor_contact", contactFields);		*/					
+						}
+					}					
+					break;				
 				default:
 					break;
 				}
@@ -580,6 +604,11 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 		Field participatingOrg = new Field("Funding Organization", "participating-org", FieldType.ORGANIZATION, true);
 		participatingOrg.setSubType("Funding");
 		fieldList.add(participatingOrg);
+		
+		//Contact Info
+		Field contact = new Field("Contact Info", "contact-info", FieldType.CONTACT, false);
+		contact.setMultiple(true);
+		fieldList.add(contact);
 	}
 
 	@Override

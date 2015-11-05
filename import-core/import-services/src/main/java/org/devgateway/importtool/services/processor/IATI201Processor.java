@@ -327,14 +327,13 @@ public class IATI201Processor implements ISourceProcessor {
 					}
 					document.addStringField(field.getFieldName(), stringValue);
 					break;
-				case ORGANIZATION:
-
-					fieldNodeList = element.getElementsByTagName(field.getFieldName());
+				case ORGANIZATION:				
+					fieldNodeList = element.getElementsByTagName(field.getFieldName());										
 					if (fieldNodeList.getLength() > 0) {
 						for (int j = 0; j < fieldNodeList.getLength(); j++) {
-							Element fieldElement = (Element) fieldNodeList.item(j);
-							if (fieldElement.getAttribute("role").equals(field.getSubType())) {
-								final String stringOrgValue = fieldElement.getChildNodes().item(j).getNodeValue();
+							Element fieldElement = (Element) fieldNodeList.item(j);							
+							if (fieldElement.getAttribute("role").equals(field.getSubType()) || fieldElement.getAttribute("role").equals(field.getSubTypeCode())) {							
+								final String stringOrgValue = fieldElement.getElementsByTagName("narrative").item(0) != null ? fieldElement.getElementsByTagName("narrative").item(0).getTextContent() : "";
 								Map<String, String> orgFields = new HashMap<String, String>();
 								orgFields.put("value", stringOrgValue);
 								orgFields.put("role", field.getSubType());
@@ -580,6 +579,7 @@ public class IATI201Processor implements ISourceProcessor {
 		// Organization Fields
 		Field participatingOrg = new Field("Funding Organization", "participating-org", FieldType.ORGANIZATION, true);
 		participatingOrg.setSubType("Funding");
+		participatingOrg.setSubTypeCode("1");
 		fieldList.add(participatingOrg);
 	}
 

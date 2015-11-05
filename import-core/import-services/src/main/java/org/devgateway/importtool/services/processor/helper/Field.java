@@ -24,6 +24,7 @@ public class Field {
 	// Refactor to something more reasonable and generic (Make Field an
 	// interface and get types to be implementations of it)
 	private String subType = "";
+	private String subTypeCode = "";
 
 	public Field() {
 	}
@@ -129,6 +130,14 @@ public class Field {
 
 	public void setSubType(String subType) {
 		this.subType = subType;
+	}
+
+	public String getSubTypeCode() {
+		return subTypeCode;
+	}
+
+	public void setSubTypeCode(String subTypeCode) {
+		this.subTypeCode = subTypeCode;
 	}
 
 	public boolean isMultiple() {
