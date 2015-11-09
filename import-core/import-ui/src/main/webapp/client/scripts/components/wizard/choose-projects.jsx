@@ -15,7 +15,7 @@ var ChooseProjects = React.createClass({
         Reflux.ListenerMixin
     ],
     getInitialState: function() {
-       return {projectData: []};
+       return {projectData: [], destinationProjects: []};
     },
     componentWillMount: function () {
      this.props.eventHandlers.updateCurrentStep(constants.CHOOSE_PROJECTS);
@@ -33,9 +33,10 @@ var ChooseProjects = React.createClass({
     		this.props.eventHandlers.hideLoadingIcon();                       
     		this.updateProject(data);                
     	}.bind(this)).catch(function(err) {
-    		this.props.eventHandlers.hideLoadingIcon();        
-    		this.props.eventHandlers.displayError(this.props.i18nLib.t('wizard.choose_projects.msg_error_retrieving_projects'));
+    		this.props.eventHandlers.hideLoadingIcon();    		
+    		this.props.eventHandlers.displayError(this.props.i18nLib.t('wizard.choose_projects.msg_error_select_project'));
     	}.bind(this)); 
+    	this.loadProjects();
     },  
     selectAll: function(){ 
     },
@@ -104,6 +105,18 @@ var ChooseProjects = React.createClass({
     handlePrevious: function(){    	       
     	this.props.eventHandlers.chooseProjects(this.state.projectData, constants.DIRECTION_PREVIOUS);	
 	},
+	loadProjects: function(){
+		var self = this;
+		$.ajax({
+	        url: '/importer/data/destination/project',	       
+	        dataType: 'json',
+	        success: function(result) { 
+	        	self.setState({destinationProjects: result});	 
+	        	self.forceUpdate();
+	        },
+	        type: 'GET'
+	     });
+	},	
     render: function () {  
         var newProjects = [];
         var existingProjects = [];
@@ -119,8 +132,7 @@ var ChooseProjects = React.createClass({
                             {item.sourceDocument.multilangFields.title[language]} 
                         </td>
                         <td>                            
-                            <AutoComplete url="/importer/data/destination/project" display="title" language={language} placeholder="" refId="destSearch" onSelect={this.handleAutocompleteToggle.bind(this, item)} value={item.destinationDocument}/> 
-                            
+                          <AutoComplete context={constants.CHOOSE_PROJECTS} options={this.state.destinationProjects} display="title" language={language} placeholder="" refId="destSearch" onSelect={this.handleAutocompleteToggle.bind(this, item)} value={item.destinationDocument}/>                            
                         </td>
                         <td>
                             <input aria-label="override-title" className="override-title"  type="checkbox" checked={item.overrideTitle} onChange={this.handleOverrideTitle.bind(this, item)} />

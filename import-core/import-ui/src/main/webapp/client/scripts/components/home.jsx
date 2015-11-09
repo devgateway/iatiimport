@@ -6,6 +6,7 @@ var Content = require('./content');
 var Router = require('react-router');
 var RouteHandler = Router.RouteHandler;
 var appActions = require('./../actions');
+var appConfig = require('./../conf');
 var translations = require('../../i18n/translations');
 var systemInfoStore = require('./../stores/SystemInfoStore');
 var Home = React.createClass({
@@ -36,6 +37,11 @@ var Home = React.createClass({
     i18nLib.setLng(language); 
     this.setState ({i18nLib: i18nLib} );           	
   },
+  closeImportTool: function(){
+	  if (confirm("Close Import Tool Window?")) {
+		  window.location.href = appConfig.AMP_DESKTOP_ENDPOINT;
+	  }  
+  },
   render: function() { 
     var content; 
     if(this.state.systemInfo.status == "OK"){
@@ -48,7 +54,7 @@ var Home = React.createClass({
     return (
      <div id="container">    
      <div className="clear">          
-       <Header i18nLib = {this.state.i18nLib} switchLanguage={this.switchLanguage}/>
+       <Header i18nLib = {this.state.i18nLib} switchLanguage={this.switchLanguage} closeImportTool = {this.closeImportTool}/>
         {content}
        <Footer i18nLib = {this.state.i18nLib} />
        </div>

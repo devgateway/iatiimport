@@ -8,8 +8,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -22,6 +24,7 @@ import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.devgateway.importtool.model.Language;
 import org.devgateway.importtool.services.processor.helper.Field;
 import org.devgateway.importtool.services.processor.helper.FieldType;
 import org.devgateway.importtool.services.processor.helper.FieldValue;
@@ -51,9 +54,13 @@ public class IATI201Processor implements ISourceProcessor {
 	private String DEFAULT_ID_FIELD = "iati-identifier";
 	private String DEFAULT_TITLE_FIELD = "title";
 	private String PROCESSOR_VERSION = "2.01";
-
+	private String defaultLanguage = "";
+	private String defaultCurrency = "";
+	
 	private String descriptiveName = "IATI 2.01";
 
+	private List<Language> filterLanguages = new ArrayList<Language>();
+	
 	// XML Document that will hold the entire imported file
 	private Document doc;
 
@@ -77,7 +84,16 @@ public class IATI201Processor implements ISourceProcessor {
 		mappingNameFile.put("sector", "Sector");
 	}
 
-	public IATI201Processor() {
+	public IATI201Processor(){
+		InputStream propsStream = this.getClass().getResourceAsStream("IATI201/IATI201Processor.properties");
+		Properties properties = new Properties();		
+		try {
+			properties.load(propsStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}		
+		defaultLanguage = properties.getProperty("default_language");
+		defaultCurrency = properties.getProperty("default_currency");
 		instantiateStaticFields();
 	}
 
@@ -137,9 +153,27 @@ public class IATI201Processor implements ISourceProcessor {
 		set.addAll(narrativeLanguageList);
 		list.addAll(set);
 		languageList = list;
+				
 		return list;
 	}
 
+	@Override
+	public List<Language> getFilterLanguages() {
+		if(this.filterLanguages.size() == 0){
+			List<Language> listLanguages = new ArrayList<Language>();
+			this.getLanguages().stream().forEach(lang -> {
+				Locale tmp = new Locale(lang);
+				listLanguages.add(new Language(tmp.getLanguage(), tmp.getDisplayLanguage()));
+			});
+			this.setFilterLanguages(listLanguages);			
+		}
+		return this.filterLanguages;
+	}
+	@Override
+	public void setFilterLanguages(List<Language> filterLanguages) {
+		this.filterLanguages = filterLanguages;
+	}
+	
 	@Override
 	public List<Field> getFilterFields() {
 		Document doc = this.doc;
@@ -243,12 +277,14 @@ public class IATI201Processor implements ISourceProcessor {
 		for (int i = 0; i < nodeList.getLength(); i++) {
 			InternalDocument document = new InternalDocument();
 			Element element = (Element) nodeList.item(i);
-			document.addStringField("default-currency", element.getAttribute("default-currency"));
-			String defaultLanguageCode = element.getAttribute("xml:lang");
+			String currency = !("".equals(element.getAttribute("default-currency"))) ? element.getAttribute("default-currency") : this.defaultCurrency;			
+			document.addStringField("default-currency", currency);
+			String defaultLanguageCode = !("".equals(element.getAttribute("xml:lang"))) ? element.getAttribute("xml:lang") : this.defaultLanguage;
 			Boolean filterIncluded = false;
 			NodeList fieldNodeList;
 			XPath xPath = XPathFactory.newInstance().newXPath();
 
+			fieldLoop:
 			for (Field field : getFields()) {
 				switch (field.getType()) {
 				case LIST:
@@ -267,8 +303,15 @@ public class IATI201Processor implements ISourceProcessor {
 							Element fieldElement = (Element) fieldNodeList.item(0);
 							codeValue = fieldElement.getAttribute("code");
 						}
-						filterIncluded = includedByFilter(field.getFilters(), codeValue);
+						
+						Field filtersField = filterFieldList.stream().filter(n -> {
+							return field.getFieldName().equals(n.getFieldName());
+						}).findFirst().get();						
+						filterIncluded = includedByFilter(filtersField.getFilters(), codeValue);								
 						document.addStringField(field.getFieldName(), codeValue);
+						if(!filterIncluded){
+							break fieldLoop;
+						}
 					}
 					break;
 				case STRING:
@@ -284,14 +327,13 @@ public class IATI201Processor implements ISourceProcessor {
 					}
 					document.addStringField(field.getFieldName(), stringValue);
 					break;
-				case ORGANIZATION:
-
-					fieldNodeList = element.getElementsByTagName(field.getFieldName());
+				case ORGANIZATION:				
+					fieldNodeList = element.getElementsByTagName(field.getFieldName());										
 					if (fieldNodeList.getLength() > 0) {
 						for (int j = 0; j < fieldNodeList.getLength(); j++) {
-							Element fieldElement = (Element) fieldNodeList.item(j);
-							if (fieldElement.getAttribute("role").equals(field.getSubType())) {
-								final String stringOrgValue = fieldElement.getChildNodes().item(j).getNodeValue();
+							Element fieldElement = (Element) fieldNodeList.item(j);							
+							if (fieldElement.getAttribute("role").equals(field.getSubType()) || fieldElement.getAttribute("role").equals(field.getSubTypeCode())) {							
+								final String stringOrgValue = fieldElement.getElementsByTagName("narrative").item(0) != null ? fieldElement.getElementsByTagName("narrative").item(0).getTextContent() : "";
 								Map<String, String> orgFields = new HashMap<String, String>();
 								orgFields.put("value", stringOrgValue);
 								orgFields.put("role", field.getSubType());
@@ -320,7 +362,6 @@ public class IATI201Processor implements ISourceProcessor {
 					String mlStringValue = "";
 					NodeList narrativeNodeList;
 					Map<String, String> mlv = new HashMap<String, String>();
-
 					fieldNodeList = element.getElementsByTagName(field.getFieldName());
 					if (fieldNodeList.getLength() > 0) {
 						List<Element> titles = new ArrayList<Element>();
@@ -329,20 +370,27 @@ public class IATI201Processor implements ISourceProcessor {
 								titles.add((Element) fieldNodeList.item(j));
 							}
 						}
-						for (Element titleElement : titles) {
+						for (Element titleElement : titles) {							
 							narrativeNodeList = titleElement.getElementsByTagName("narrative");
 							for (int j = 0; j < narrativeNodeList.getLength(); j++) {
-								Element narrativeElement = (Element) narrativeNodeList.item(j);
-								String languageCode = defaultLanguageCode;
+								Element narrativeElement = (Element) narrativeNodeList.item(j);								
 								if (narrativeElement.getChildNodes().getLength() == 1) {
+									mlStringValue = narrativeElement.getChildNodes().item(0).getNodeValue();									
 									if (!"".equals(narrativeElement.getAttribute("xml:lang"))) {
-										languageCode = narrativeElement.getAttribute("xml:lang");
+										String languageCode = narrativeElement.getAttribute("xml:lang");
+										Optional<Language> selectedLanguage = this.getFilterLanguages().stream().filter(language -> languageCode.equalsIgnoreCase(language.getCode()) && language.getSelected() == true ).findFirst();
+										if(selectedLanguage.isPresent()){									
+											mlv.put(languageCode, mlStringValue);
+										}
+									}else{
+										mlv.put(defaultLanguageCode, mlStringValue);
 									}
-									mlStringValue = narrativeElement.getChildNodes().item(0).getNodeValue();
-								} else {
-									mlStringValue = "";
+									
+								} else {									
+									mlv.put(defaultLanguageCode, mlStringValue);
 								}
-								mlv.put(languageCode, mlStringValue);
+								
+								
 							}
 
 						}
@@ -365,7 +413,7 @@ public class IATI201Processor implements ISourceProcessor {
 							String localValue = e.getElementsByTagName("value").item(0).getChildNodes().item(0).getNodeValue();
 							// Date
 							String localDate = e.getElementsByTagName("transaction-date").item(0).getChildNodes().item(0).getNodeValue();
-							if (!isValidDate(localDate)) // TODO: Make it
+							if (localDate != null && !isValidDate(localDate)) // TODO: Make it
 															// defensive
 							{
 								localDate = e.getElementsByTagName("transaction-date").item(0).getAttributes().getNamedItem("iso-date").getNodeValue();
@@ -531,6 +579,7 @@ public class IATI201Processor implements ISourceProcessor {
 		// Organization Fields
 		Field participatingOrg = new Field("Funding Organization", "participating-org", FieldType.ORGANIZATION, true);
 		participatingOrg.setSubType("Funding");
+		participatingOrg.setSubTypeCode("1");
 		fieldList.add(participatingOrg);
 	}
 

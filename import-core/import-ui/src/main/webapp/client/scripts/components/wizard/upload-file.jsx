@@ -25,7 +25,8 @@ var UploadFile = React.createClass({
                 allowedFileExtensions : ['xml'],
                 uploadUrl: appConfig.TOOL_HOST + appConfig.TOOL_REST_PATH + "/upload",
                 dropZoneEnabled: false,
-                maxFileCount: 1
+                maxFileCount: 1,
+                allowedPreviewTypes:'none'
             });
         $el.on('filepreupload', function(event, data, previewId, index, jqXHR) {
                 var alreadyExists = _.find(self.state.fileData, function(v){
@@ -88,12 +89,9 @@ var UploadFile = React.createClass({
             var createdDate = moment(item.createdDate).fromNow();
             var isValidStyle = item.valid ? 'label label-success': 'label label-danger';
             var isValidText = this.props.i18nLib.t('wizard.upload_file.' + (item.valid ? 'valid':'invalid'));
-            if(!item.valid) {
-            	
+            if(!item.valid) {            	
                 this.props.eventHandlers.displayError(this.props.i18nLib.t('wizard.upload_file.msg_invalid_file'));
             }
-
-
             files.push(<tr key={item.id}>
                     <td>
                         {item.fileName}

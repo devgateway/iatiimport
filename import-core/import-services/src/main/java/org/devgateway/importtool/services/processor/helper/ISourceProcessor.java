@@ -2,6 +2,8 @@ package org.devgateway.importtool.services.processor.helper;
 
 import java.io.InputStream;
 import java.util.List;
+
+import org.devgateway.importtool.model.Language;
 import org.w3c.dom.Document;
 
 public interface ISourceProcessor {
@@ -14,8 +16,11 @@ public interface ISourceProcessor {
 	public List<Field> getFilterFields();
 
 	public void setFilterFields(List<Field> fields);
-
+	
 	public List<String> getLanguages();
+	
+	public List<Language> getFilterLanguages();
+	public void setFilterLanguages(List<Language> filterLanguages);
 
 	public List<InternalDocument> getDocuments() throws Exception;
 

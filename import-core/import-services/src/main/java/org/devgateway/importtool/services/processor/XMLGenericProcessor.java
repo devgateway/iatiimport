@@ -13,6 +13,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.devgateway.importtool.model.Language;
 import org.devgateway.importtool.services.processor.helper.Field;
 import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
 import org.devgateway.importtool.services.processor.helper.InternalDocument;
@@ -164,6 +165,18 @@ public class XMLGenericProcessor implements ISourceProcessor {
 	public Boolean isValidInput() {
 		// TODO Auto-generated method stub
 		return true;
+	}
+
+	@Override
+	public List<Language> getFilterLanguages() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setFilterLanguages(List<Language> filterLanguages) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

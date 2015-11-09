@@ -52,7 +52,7 @@ module.exports = {
 					'filter_data' : {
 						'filter_information': 'Filter Information',
 						'select_filters' : 'Select for each field, which values you would like to include as part of the import process',
-						'language' : 'Language',
+						'language' : 'Language Selection for Text Fields',
 						'next' : 'Next >>',
 						'previous' : '<< Previous',
 						'msg_error_retrieving_languages': 'Error retrieving languages.',

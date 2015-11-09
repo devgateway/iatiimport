@@ -9,6 +9,8 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.model.Language;
 import org.devgateway.importtool.services.DataService;
 import org.devgateway.importtool.services.processor.helper.DocumentMapping;
@@ -35,6 +37,8 @@ class DataController {
 	
 	@Autowired
 	private DataService dataService;
+	
+	private Log log = LogFactory.getLog(getClass());
 
 	@RequestMapping(method = RequestMethod.GET, value = "/source/filters")
 	ResponseEntity<List<Field>> getFilterFields(HttpServletRequest request) {
@@ -61,9 +65,20 @@ class DataController {
 		if (processor == null) {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		return new ResponseEntity<>(dataService.getLanguages(processor), HttpStatus.OK);
+		return new ResponseEntity<>(processor.getFilterLanguages(), HttpStatus.OK);
 	}
 
+	@RequestMapping(method = RequestMethod.POST, value = "/source/languages")
+	ResponseEntity<List<Language>> setFilterLanguages(@RequestBody List<Language> languages, HttpServletRequest request) {		
+		ISourceProcessor processor = (ISourceProcessor) request.getSession().getAttribute(SOURCE_PROCESSOR);
+		if (processor == null) {
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		processor.setFilterLanguages(languages);
+		return new ResponseEntity<>(new ArrayList<Language>(), HttpStatus.OK);
+	}
+	
+	
 	@RequestMapping(method = RequestMethod.GET, value = "/source/field")
 	ResponseEntity<List<Field>> getSourceFields(HttpServletRequest request) {
 		ISourceProcessor processor = (ISourceProcessor) request.getSession().getAttribute(SOURCE_PROCESSOR);

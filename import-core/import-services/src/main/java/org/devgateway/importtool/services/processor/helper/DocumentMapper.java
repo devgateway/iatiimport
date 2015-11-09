@@ -15,6 +15,7 @@ public class DocumentMapper implements IDocumentMapper {
 	private List<DocumentMapping> documentMappings = new ArrayList<DocumentMapping>();
 	private boolean isInitialized = false;
 
+		
 	public ISourceProcessor getSourceProcessor() {
 		return sourceProcessor;
 	}
@@ -73,11 +74,12 @@ public class DocumentMapper implements IDocumentMapper {
 			throw new Exception("Missing prerequirements to initialize this mapping");
 		}
 
+		this.setDocumentMappings(new ArrayList<DocumentMapping>());
+		
 		// Get the document lists and field that will be used for matching and
 		// prepare the list of documents to be updated
 		List<InternalDocument> sourceDocuments = sourceProcessor.getDocuments();
-		List<InternalDocument> destinationDocuments = destinationProcessor.getDocuments(false);
-
+		List<InternalDocument> destinationDocuments = destinationProcessor.getDocuments(false);	
 		for (InternalDocument srcDoc : sourceDocuments) {
 			String sourceIdField = sourceProcessor.getIdField();
 			String destinationIdField = destinationProcessor.getIdField();
@@ -96,10 +98,10 @@ public class DocumentMapper implements IDocumentMapper {
 				addDocumentMapping(srcDoc, null, OperationType.INSERT);
 			}
 		}
-
+        
 		this.setInitialized(true);
 	}
-
+   
 	private void addDocumentMapping(InternalDocument srcDoc, InternalDocument destDoc, OperationType operation) {
 		// Look for an existing src mapping
 		Optional<DocumentMapping> mapping = this.getDocumentMappings().stream().filter(n -> {

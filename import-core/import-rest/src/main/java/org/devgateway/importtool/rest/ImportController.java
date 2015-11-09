@@ -133,14 +133,12 @@ class ImportController {
 
 		documentMapper.setSourceProcessor(srcProcessor);
 		documentMapper.setDestinationProcessor(destProcessor);
-		// if (!documentMapper.isInitialized()) {
 		try {
 			documentMapper.initialize();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		// }
-
+		
 		return new ResponseEntity<>(documentMapper.getDocumentMappings(), HttpStatus.OK);
 	}
 

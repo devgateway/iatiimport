@@ -705,9 +705,12 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		// Organizations
 		Field fundingOrganization = new Field("Funding Organization", "donor_organization", FieldType.ORGANIZATION, true);
 		fundingOrganization.setPossibleValues(getCodeListValues("fundings~donor_organization_id"));
-		if (fieldProps.get("percentage_constraint") != null) {
+		
+		
+		if (fieldProps.get("donor_organization") != null && fieldProps.get("donor_organization").getProperty("percentage_constraint") != null) {
 			fundingOrganization.setPercentage(true);
 		}
+		
 		fieldList.add(fundingOrganization);
 
 		// Transactions
