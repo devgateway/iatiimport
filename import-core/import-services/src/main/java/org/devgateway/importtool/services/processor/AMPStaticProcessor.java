@@ -572,6 +572,8 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	private String getFormattedDateFromString(InternalDocument source, FieldMapping mapping) {
 		String uniqueFieldName = mapping.getSourceField().getUniqueFieldName();
 		Date date = source.getDateFields().get(uniqueFieldName);
+		if(date == null) 
+			return null;
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 		String nowAsISO = df.format(date);
 		return nowAsISO;
