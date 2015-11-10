@@ -28,7 +28,8 @@ var Content = React.createClass({
     appConfig.DESTINATION_USERNAME = this.state.destinationSessionData['user-name'];    
     Cookies.set("DESTINATION_AUTH_TOKEN", this.state.destinationSessionData.token);
     Cookies.set("DESTINATION_USERNAME", this.state.destinationSessionData['user-name']);
-    Cookies.set("CAN_ADD_ACTIVITY", this.state.destinationSessionData['add-activity']);
+    // Added true always for now, the API returns wrong value
+    Cookies.set("CAN_ADD_ACTIVITY", true || this.state.destinationSessionData['add-activity']);
     Cookies.set("WORKSPACE", this.state.destinationSessionData['team']);
     
   },
@@ -51,7 +52,7 @@ var Content = React.createClass({
       );
     }
     
-    if(this.state.destinationSessionData && !this.state.destinationSessionData['add-activity']){
+    if(this.state.destinationSessionData && !(true ||this.state.destinationSessionData['add-activity'])){
     	return (<div className="container"><br/><div className="alert alert-danger server-status-message" role="alert" ><span className="glyphicon glyphicon-exclamation-sign error-box" aria-hidden="true"></span><span className="sr-only">Error:</span><span > Access Denied. {Cookies.set("DESTINATION_USERNAME")} does not have permission to import activities into {Cookies.set("WORKSPACE")} workspace.</span> </div></div>);
     }
 
