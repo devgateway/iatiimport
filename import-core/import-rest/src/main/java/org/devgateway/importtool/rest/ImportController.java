@@ -39,6 +39,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+
 @RestController
 @RequestMapping(value = "/import")
 class ImportController {
@@ -121,6 +122,7 @@ class ImportController {
 		return new ResponseEntity<>(authObject, HttpStatus.OK);
 	}
 
+	
 	@RequestMapping(method = RequestMethod.GET, value = "/projects")
 	ResponseEntity<List<DocumentMapping>> processedProjects(HttpServletRequest request) {
 		ISourceProcessor srcProcessor = (ISourceProcessor) request.getSession().getAttribute(SOURCE_PROCESSOR);

@@ -289,7 +289,7 @@ public class AMPProcessor implements IDestinationProcessor {
 	}
 
 	@Override
-	public ActionResult update(InternalDocument source, InternalDocument destination, List<FieldMapping> fieldMapping, List<FieldValueMapping> valueMapping) {
+	public ActionResult update(InternalDocument source, InternalDocument destination, List<FieldMapping> fieldMapping, List<FieldValueMapping> valueMapping,boolean overrideTitle) {
 		ActionResult result = new ActionResult("1", "UPDATE", "OK", "Project has been updated");
 		log.debug("Update new document in destination system");
 		return result;
