@@ -13,6 +13,16 @@ public class InternalDocument {
 	private Map<String, Map<String, String>> transactionFields = new HashMap<String, Map<String, String>>();
 	private Map<String, Map<String, String>> contactFields = new HashMap<String, Map<String, String>>();
 	private Map<String, Date> dateFields = new HashMap<String, Date>();
+	
+	private boolean allowEdit = false;
+
+	public boolean isAllowEdit() {
+		return allowEdit;
+	}
+
+	public void setAllowEdit(boolean allowEdit) {
+		this.allowEdit = allowEdit;
+	}
 
 	public void addStringField(String fieldName, String value) {
 		getStringFields().put(fieldName, value);

@@ -21,6 +21,7 @@ var ProjectStore = Reflux.createStore({
         'Accept': 'application/json',
         'Content-Type': 'application/json' 
       },
+      async: true,      
       url: '/importer/data/source/project',
       data: JSON.stringify(data),
       error: function() {

@@ -10,7 +10,7 @@ public class DocumentMapping {
 	private Boolean selected = false;
 	private Boolean overrideTitle = false;
 
-	public Boolean getOverrideTitle() {
+	public Boolean isOverrideTitle() {
 		return overrideTitle;
 	}
 

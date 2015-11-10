@@ -288,8 +288,7 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 	}
 
 	private List<InternalDocument> extractDocuments(Document doc) throws Exception {
-		// Extract global values
-               
+		// Extract global values		
 		NodeList nodeList = doc.getElementsByTagName("iati-activity");
 		List<InternalDocument> list = new ArrayList<InternalDocument>();
 
@@ -354,7 +353,7 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 						for (int j = 0; j < fieldNodeList.getLength(); j++) {
 							Element fieldElement = (Element) fieldNodeList.item(j);
 							if (fieldElement.getAttribute("role").equals(field.getSubType())) {
-								final String stringOrgValue = fieldElement.getChildNodes().item(j).getNodeValue();
+								final String stringOrgValue = fieldElement.getTextContent();
 								Map<String, String> orgFields = new HashMap<String, String>();
 								orgFields.put("value", stringOrgValue);
 								orgFields.put("role", field.getSubType());
@@ -446,7 +445,10 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 							String localDate = e.getAttribute("iso-date");
 							String format = "yyyy-MM-dd";
 							SimpleDateFormat sdf = new SimpleDateFormat(format);
-							document.addDateField(field.getUniqueFieldName(), sdf.parse(localDate));
+							if(localDate != null && !localDate.isEmpty()){
+								document.addDateField(field.getUniqueFieldName(), sdf.parse(localDate));
+							}
+							
 						}
 
 					} catch (XPathExpressionException | ParseException e1) {
@@ -485,8 +487,7 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 			if (filterIncluded) {				
 				list.add(document);
 			}
-		}
-		
+		}		
 		return list;
 	}
 

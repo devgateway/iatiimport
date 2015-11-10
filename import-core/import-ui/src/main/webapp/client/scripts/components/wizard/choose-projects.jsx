@@ -138,12 +138,12 @@ var ChooseProjects = React.createClass({
                             <input aria-label="override-title" className="override-title"  type="checkbox" checked={item.overrideTitle} onChange={this.handleOverrideTitle.bind(this, item)} />
                          </td>
                     </tr>);
-                } else {
-                    existingProjects.push(<tr key={i}>
-                        <td>
+                } else {                	
+                    existingProjects.push(<tr key={i} className = {item.destinationDocument.allowEdit ? "" : "warning not-active" } >
+                        <td >
                           <input aria-label="Source" className="source" type="checkbox" checked={item.selected} onChange={this.handleToggle.bind(this, item)} />
                         </td>
-                        <td>
+                        <td>{item.destinationDocument.allowEdit ? "" : " * " }
                             {item.sourceDocument.multilangFields.title[language]}
                         </td>
                         <td>
@@ -215,6 +215,7 @@ var ChooseProjects = React.createClass({
                                     {existingProjects}
                                 </tbody>
                             </table>
+                            <div>Any project marked with * is disabled  because the current logged in user does not have permission to edit it.</div>
                         </div>
                     </div>
                 </div>

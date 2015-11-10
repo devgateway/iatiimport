@@ -103,6 +103,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 					document.addStringField("amp-identifier", identifier);
 					document.addMultilangStringField("title", title);
 					document.addStringField("dateString", dateString);
+					document.setAllowEdit(edit);
 
 					if (onlyEditable) {
 						if (edit)
@@ -164,13 +165,13 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	}
 
 	@Override
-	public ActionResult update(InternalDocument source, InternalDocument destination, List<FieldMapping> fieldMapping, List<FieldValueMapping> valueMapping) {
+	public ActionResult update(InternalDocument source, InternalDocument destination, List<FieldMapping> fieldMapping, List<FieldValueMapping> valueMapping, boolean overrideTitle) {
 		ActionResult result;
 
 		RestTemplate restTemplate = getRestTemplate();
 		try {
 			JsonBean project = getProject(destination.getStringFields().get("id"));
-			updateProject(project, source, fieldMapping, valueMapping);
+			updateProject(project, source, fieldMapping, valueMapping, overrideTitle);
 			log.info(project);
 			JsonBean resultPost = restTemplate.postForObject(baseURL + "/rest/activity/" + destination.getStringFields().get("id"), project, JsonBean.class);
 			Object errorNode = resultPost.get("error");
@@ -206,7 +207,10 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		return result;
 	}
 
-	private void updateProject(JsonBean project, InternalDocument source, List<FieldMapping> fieldMappings, List<FieldValueMapping> valueMappings) throws ValueMappingException {
+	private void updateProject(JsonBean project, InternalDocument source, List<FieldMapping> fieldMappings, List<FieldValueMapping> valueMappings, boolean overrideTitle) throws ValueMappingException {		
+		if(overrideTitle){
+			project.set("project_title", getMultilangString(source, "project_title", "title"));	
+		}	
 		Boolean hasTransactions = false;
 		for (FieldMapping mapping : fieldMappings) {
 			Field sourceField = mapping.getSourceField();

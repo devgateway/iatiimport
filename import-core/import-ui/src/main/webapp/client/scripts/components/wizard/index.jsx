@@ -126,14 +126,19 @@ var Wizard = React.createClass({
     goHome: function(){
         window.location = "#";
     },
-	launchImport: function() {
-        this.showLoadingIcon();
-		$.get('/importer/import/execute')
-        .done(function(result) {
-            this.setState({results: result});
-            this.hideLoadingIcon();
-            $("#modalResults").modal("show");
-        }.bind(this));
+	launchImport: function() {		
+		var self = this;
+		this.showLoadingIcon();
+		$.ajax({
+	    	url: '/importer/import/execute',	    		       
+	        dataType: 'json',
+	        success: function(data) {  
+	        	self.setState({results: data});
+	        	self.hideLoadingIcon();
+	            $("#modalResults").modal("show");      	
+	        },
+	        type: 'GET'
+	     });		
 	},
 	initImportSession: function(sourceProcessor, destinationProcessor) {			
 		this.showLoadingIcon();

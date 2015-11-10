@@ -54,7 +54,7 @@ public class DocumentMapper implements IDocumentMapper {
 			result = this.destinationProcessor.insert(source, this.getFieldMappingObject(), this.getValueMappingObject());
 			break;
 		case UPDATE:
-			result = this.destinationProcessor.update(source, destination, this.getFieldMappingObject(), this.getValueMappingObject());
+			result = this.destinationProcessor.update(source, destination, this.getFieldMappingObject(), this.getValueMappingObject(),doc.isOverrideTitle());
 			break;
 		case NOOP:
 			break;
