@@ -30,12 +30,9 @@ public class Application extends WebMvcAutoConfiguration {
 	}
 
 	@Bean
-    MultipartConfigElement multipartConfigElement() {	    
-        MultipartConfigFactory factory = new MultipartConfigFactory();
-        factory.setMaxFileSize("2Mb");
-        factory.setMaxRequestSize("10Mb");
-        return factory.createMultipartConfig();
-    }
+	MultipartConfigElement multipartConfigElement() {
+		return new MultipartConfigElement("");
+	}
 
 	public class SessionTrackingConfigListener implements
 			ServletContextInitializer {

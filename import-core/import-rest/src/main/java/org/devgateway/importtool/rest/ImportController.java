@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.tomcat.util.http.fileupload.FileUploadBase.FileSizeLimitExceededException;
 import org.devgateway.importtool.dao.FileRepository;
 import org.devgateway.importtool.dao.ProjectRepository;
 import org.devgateway.importtool.model.File;
@@ -22,6 +21,7 @@ import org.devgateway.importtool.model.ImportSummary;
 import org.devgateway.importtool.security.ImportSessionToken;
 import org.devgateway.importtool.services.ImportService;
 import org.devgateway.importtool.services.WorkflowService;
+
 import org.devgateway.importtool.services.processor.helper.DocumentMapper;
 import org.devgateway.importtool.services.processor.helper.IDestinationProcessor;
 import org.devgateway.importtool.services.processor.helper.IDocumentMapper;
@@ -33,7 +33,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -117,11 +116,7 @@ class ImportController  {
 		}
 	}
 
-	@ExceptionHandler(FileSizeLimitExceededException.class)
-	  public String myError(Exception exception) {
-		log.info("Error uploading file. File size limit exceeded.");
-	    return "Error uploading file. File size limit exceeded.";
-	  }
+	
 	
 	 
 	@RequestMapping(method = RequestMethod.POST, value = "/filter")

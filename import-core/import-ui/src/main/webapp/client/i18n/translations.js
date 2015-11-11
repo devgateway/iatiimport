@@ -36,7 +36,7 @@ module.exports = {
 						'review_import' : ' Review and Import'
 					},
 					'upload_file' : {
-						'select_file' : 'Select files to upload (Maximum file size 2MB)',
+						'select_file' : 'Select files to upload',
 						'filename' : 'Filename',
 		                'valid' : 'Valid',
 		                'invalid' : 'Invalid',
@@ -47,6 +47,7 @@ module.exports = {
 						'previous' : '<< Previous',
 						 'msg_file_exists': ' File with same name already exists ',
 						 'msg_error_retrieving_files': 'Error retrieving uploaded files',
+						 'msg_error_upload_failed': 'Error uploading file. Please check that the file size does not exceed 2MB',
 					     'msg_invalid_file': 'The file seems to be invalid. Please check the file\'s IATI version.'
 					},
 					'filter_data' : {
@@ -181,6 +182,7 @@ module.exports = {
 						'previous' : '<< Previous',
 						 'msg_file_exists': ' File with same name already exists ',
 						 'msg_error_retrieving_files': 'Error retrieving uploaded files',
+						 'msg_error_upload_failed': 'Error uploading file. Please check that the file size does not exceed 2MB',
 						 'msg_invalid_file': 'The file seems to be invalid. Please check the file\'s IATI version.'
 					},
 					'filter_data' : {
