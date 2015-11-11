@@ -401,7 +401,7 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 				case TRANSACTION:
 					try {
 						NodeList nodes;
-						nodes = (NodeList) xPath.evaluate("//transaction-type[@code='" + field.getSubType() + "']/parent::*", element, XPathConstants.NODESET);
+						nodes = (NodeList) xPath.evaluate("transaction/transaction-type[@code='" + field.getSubType() + "']/parent::*", element, XPathConstants.NODESET);
 						for (int j = 0; j < nodes.getLength(); ++j) {
 							String reference = "";
 							String receivingOrganization = "";
