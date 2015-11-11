@@ -36,7 +36,7 @@ module.exports = {
 						'review_import' : ' Review and Import'
 					},
 					'upload_file' : {
-						'select_file' : 'Select files to upload',
+						'select_file' : 'Select files to upload (Maximum file size 2MB)',
 						'filename' : 'Filename',
 		                'valid' : 'Valid',
 		                'invalid' : 'Invalid',

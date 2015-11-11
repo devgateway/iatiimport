@@ -27,5 +27,13 @@ public interface IDocumentMapper {
 	void setValueMappingObject(List<FieldValueMapping> valueMappingObject);
 
 	List<ActionResult> execute();
+	
+	
+	void setDocumentMappingStatus(ProcessStatus documentMappingStatus);
+	ProcessStatus getDocumentMappingStatus();
+
+	List<ActionResult> getResults();
+
+	ProcessStatus getExecuteStatus();
 
 }

@@ -29,13 +29,11 @@ var ChooseProjects = React.createClass({
     }, 
     loadData: function(){
     	this.props.eventHandlers.showLoadingIcon();
-    	appActions.loadProjectData.triggerPromise().then(function(data) { 
-    		this.props.eventHandlers.hideLoadingIcon();                       
-    		this.updateProject(data);                
-    	}.bind(this)).catch(function(err) {
-    		this.props.eventHandlers.hideLoadingIcon();    		
-    		this.props.eventHandlers.displayError(this.props.i18nLib.t('wizard.choose_projects.msg_error_select_project'));
-    	}.bind(this)); 
+    	this.initializeMapping();    	
+    	var self = this;
+    	var id = setInterval(function(){
+    		self.loadSourceProjects(id);
+    	}, 3000);    	
     	this.loadProjects();
     },  
     selectAll: function(){ 
@@ -104,6 +102,30 @@ var ChooseProjects = React.createClass({
     },
     handlePrevious: function(){    	       
     	this.props.eventHandlers.chooseProjects(this.state.projectData, constants.DIRECTION_PREVIOUS);	
+	},
+	initializeMapping: function(){
+		 $.ajax({
+		        url: '/importer/import/initialize',        
+		        error: function() {		        	
+		        },
+		        dataType: 'json',
+		        success: function(data) {		        	        	
+		        },
+		        type: 'POST'
+		     }); 	
+	},
+	loadSourceProjects:  function(id){
+		appActions.loadProjectData.triggerPromise().then(function(data) { 
+    		if(data.documentMappingStatus == "COMPLETED"){
+    			clearInterval(id);
+    			this.props.eventHandlers.hideLoadingIcon();                       
+        		this.updateProject(data.documentMappings);
+        		
+    		}    		                
+    	}.bind(this)).catch(function(err) {
+    		this.props.eventHandlers.hideLoadingIcon();    		
+    		this.props.eventHandlers.displayError(this.props.i18nLib.t('wizard.choose_projects.msg_error_select_project'));
+    	}.bind(this)); 
 	},
 	loadProjects: function(){
 		var self = this;
@@ -214,8 +236,7 @@ var ChooseProjects = React.createClass({
                                 <tbody>
                                     {existingProjects}
                                 </tbody>
-                            </table>
-                            <div>Any project marked with * is disabled  because the current logged in user does not have permission to edit it.</div>
+                            </table>                            
                         </div>
                     </div>
                 </div>

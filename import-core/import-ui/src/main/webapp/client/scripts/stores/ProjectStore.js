@@ -12,6 +12,7 @@ var ProjectStore = Reflux.createStore({
 
   init: function() {
     this.listenTo(appActions.loadProjectData, this.handleLoadProjectData);
+    this.listenTo(appActions.initializeMapping, this.handleInitializeMapping);    
     this.listenTo(formActions.updateSelectedProjects, this.handleUpdateSelectedProjects);
   },
   handleUpdateSelectedProjects: function(data) {
@@ -52,8 +53,23 @@ var ProjectStore = Reflux.createStore({
         },
         type: 'GET'
      }); 
-  }
+  },
 
+  handleInitializeMapping: function() {
+	    var self = this;    
+	    $.ajax({
+	        url: '/importer/import/initialize',        
+	        error: function() {        	
+	        	appActions.initializeMapping.failed();
+	        },
+	        dataType: 'json',
+	        success: function(data) {  
+	        	appActions.initializeMapping.completed(data);        	
+	        },
+	        type: 'POST'
+	     }); 
+	  }
+  
 });
 
 module.exports = ProjectStore;

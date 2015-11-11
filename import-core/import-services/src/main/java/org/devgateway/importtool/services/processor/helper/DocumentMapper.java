@@ -14,8 +14,34 @@ public class DocumentMapper implements IDocumentMapper {
 	private List<FieldValueMapping> valueMappingObject = new ArrayList<FieldValueMapping>();
 	private List<DocumentMapping> documentMappings = new ArrayList<DocumentMapping>();
 	private boolean isInitialized = false;
-
+	ProcessStatus documentMappingStatus = ProcessStatus.NOT_STARTED;
+	ProcessStatus executeStatus = ProcessStatus.NOT_STARTED;
+	List<ActionResult> results = new ArrayList<ActionResult>();
 		
+	public List<ActionResult> getResults() {
+		return results;
+	}
+
+	public void setResults(List<ActionResult> results) {
+		this.results = results;
+	}
+
+	public ProcessStatus getExecuteStatus() {
+		return executeStatus;
+	}
+
+	public void setExecuteStatus(ProcessStatus executeStatus) {
+		this.executeStatus = executeStatus;
+	}
+
+	public ProcessStatus getDocumentMappingStatus() {
+		return documentMappingStatus;
+	}
+
+	public void setDocumentMappingStatus(ProcessStatus documentMappingStatus) {
+		this.documentMappingStatus = documentMappingStatus;
+	}
+
 	public ISourceProcessor getSourceProcessor() {
 		return sourceProcessor;
 	}
@@ -35,12 +61,14 @@ public class DocumentMapper implements IDocumentMapper {
 	// Mapping and transformation operations go here
 	@Override
 	public List<ActionResult> execute() {
-		List<ActionResult> results = new ArrayList<ActionResult>();
+		executeStatus = ProcessStatus.IN_PROGRESS;
+		results = new ArrayList<ActionResult>();
 
 		for (DocumentMapping doc : documentMappings) {
 			if (doc.getSelected())
 				results.add(processDocumentMapping(doc));
 		}
+		executeStatus = ProcessStatus.COMPLETED;
 		return results;
 	}
 
@@ -74,6 +102,7 @@ public class DocumentMapper implements IDocumentMapper {
 			throw new Exception("Missing prerequirements to initialize this mapping");
 		}
 
+		documentMappingStatus = ProcessStatus.IN_PROGRESS;
 		this.setDocumentMappings(new ArrayList<DocumentMapping>());
 		
 		// Get the document lists and field that will be used for matching and
@@ -98,7 +127,7 @@ public class DocumentMapper implements IDocumentMapper {
 				addDocumentMapping(srcDoc, null, OperationType.INSERT);
 			}
 		}
-        
+        documentMappingStatus = ProcessStatus.COMPLETED;
 		this.setInitialized(true);
 	}
    

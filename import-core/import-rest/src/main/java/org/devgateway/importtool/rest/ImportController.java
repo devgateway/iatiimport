@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.tomcat.util.http.fileupload.FileUploadBase.FileSizeLimitExceededException;
 import org.devgateway.importtool.dao.FileRepository;
 import org.devgateway.importtool.dao.ProjectRepository;
 import org.devgateway.importtool.model.File;
@@ -21,17 +22,18 @@ import org.devgateway.importtool.model.ImportSummary;
 import org.devgateway.importtool.security.ImportSessionToken;
 import org.devgateway.importtool.services.ImportService;
 import org.devgateway.importtool.services.WorkflowService;
-import org.devgateway.importtool.services.processor.helper.ActionResult;
 import org.devgateway.importtool.services.processor.helper.DocumentMapper;
-import org.devgateway.importtool.services.processor.helper.DocumentMapping;
 import org.devgateway.importtool.services.processor.helper.IDestinationProcessor;
 import org.devgateway.importtool.services.processor.helper.IDocumentMapper;
 import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
+import org.devgateway.importtool.services.response.DocumentMappingResponse;
+import org.devgateway.importtool.services.response.ImportExecuteResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -42,7 +44,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping(value = "/import")
-class ImportController {
+class ImportController  {
 
 	@Autowired
 	private FileRepository repository;
@@ -115,6 +117,13 @@ class ImportController {
 		}
 	}
 
+	@ExceptionHandler(FileSizeLimitExceededException.class)
+	  public String myError(Exception exception) {
+		log.info("Error uploading file. File size limit exceeded.");
+	    return "Error uploading file. File size limit exceeded.";
+	  }
+	
+	 
 	@RequestMapping(method = RequestMethod.POST, value = "/filter")
 	ResponseEntity<ImportSessionToken> filter(@PathVariable String authenticationToken) {
 		ImportSessionToken authObject = new ImportSessionToken(authenticationToken, "", new Date(), "", null);
@@ -122,9 +131,8 @@ class ImportController {
 		return new ResponseEntity<>(authObject, HttpStatus.OK);
 	}
 
-	
-	@RequestMapping(method = RequestMethod.GET, value = "/projects")
-	ResponseEntity<List<DocumentMapping>> processedProjects(HttpServletRequest request) {
+	@RequestMapping(method = RequestMethod.POST, value = "/initialize")
+	void processedProjects(HttpServletRequest request) {
 		ISourceProcessor srcProcessor = (ISourceProcessor) request.getSession().getAttribute(SOURCE_PROCESSOR);
 		IDestinationProcessor destProcessor = (IDestinationProcessor) request.getSession().getAttribute(DESTINATION_PROCESSOR);
 		IDocumentMapper documentMapper = (IDocumentMapper) request.getSession().getAttribute(DOCUMENT_MAPPER);
@@ -132,36 +140,44 @@ class ImportController {
 			documentMapper = new DocumentMapper();
 			request.getSession().setAttribute(DOCUMENT_MAPPER, documentMapper);
 		}
-
+		
 		documentMapper.setSourceProcessor(srcProcessor);
 		documentMapper.setDestinationProcessor(destProcessor);
-		try {
-			documentMapper.initialize();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		importService.initialize(documentMapper);
 		
-		return new ResponseEntity<>(documentMapper.getDocumentMappings(), HttpStatus.OK);
+	}
+	
+	@RequestMapping(method = RequestMethod.GET, value = "/projects")
+	ResponseEntity<DocumentMappingResponse> getProjects(HttpServletRequest request) {		
+		IDocumentMapper documentMapper = (IDocumentMapper) request.getSession().getAttribute(DOCUMENT_MAPPER);	
+		DocumentMappingResponse documentMappingResponse = new DocumentMappingResponse();
+		documentMappingResponse.setDocumentMappingStatus(documentMapper.getDocumentMappingStatus());
+		documentMappingResponse.setDocumentMappings(documentMapper.getDocumentMappings());
+		return new ResponseEntity<>(documentMappingResponse, HttpStatus.OK);		
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/execute")
-	ResponseEntity<List<ActionResult>> execute(HttpServletRequest request) {
+	@RequestMapping(method = RequestMethod.POST, value = "/execute")
+	void execute(HttpServletRequest request) {
 		IDocumentMapper documentMapper = (IDocumentMapper) request.getSession().getAttribute(DOCUMENT_MAPPER);
 		if (documentMapper == null) {
 			documentMapper = new DocumentMapper();
 			request.getSession().setAttribute(DOCUMENT_MAPPER, documentMapper);
-		}
-		List<ActionResult> results = documentMapper.execute();
+		}		
 		Long fileId = (Long)request.getSession().getAttribute(CURRENT_FILE_ID);
-		results.forEach(n -> {
-			importService.insertLog(n, fileId);
-		});
-
-		return new ResponseEntity<>(results, HttpStatus.OK);
+		importService.execute(documentMapper, fileId);		
 	}
 
 	
+	@RequestMapping(method = RequestMethod.GET, value = "/execute/status")
+	ResponseEntity<ImportExecuteResponse> getExecuteStatus(HttpServletRequest request) {
+		IDocumentMapper documentMapper = (IDocumentMapper) request.getSession().getAttribute(DOCUMENT_MAPPER);
+		ImportExecuteResponse importExecuteResponse =  new ImportExecuteResponse();
+		importExecuteResponse.setResults(documentMapper.getResults());
+		importExecuteResponse.setExecuteStatus(documentMapper.getExecuteStatus());	
+		return new ResponseEntity<>(importExecuteResponse, HttpStatus.OK);
+	}
 
+	
 	@Transactional
 	@RequestMapping(method = RequestMethod.DELETE, value = "/delete/{id}")
 	public ResponseEntity<String> delete(@PathVariable Long id, HttpServletRequest request) {

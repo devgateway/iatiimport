@@ -8,6 +8,7 @@ import javax.servlet.SessionCookieConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.WebMvcAutoConfiguration;
+import org.springframework.boot.context.embedded.MultipartConfigFactory;
 import org.springframework.boot.context.embedded.ServletContextInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -29,9 +30,12 @@ public class Application extends WebMvcAutoConfiguration {
 	}
 
 	@Bean
-	MultipartConfigElement multipartConfigElement() {
-		return new MultipartConfigElement("");
-	}
+    MultipartConfigElement multipartConfigElement() {	    
+        MultipartConfigFactory factory = new MultipartConfigFactory();
+        factory.setMaxFileSize("2Mb");
+        factory.setMaxRequestSize("10Mb");
+        return factory.createMultipartConfig();
+    }
 
 	public class SessionTrackingConfigListener implements
 			ServletContextInitializer {

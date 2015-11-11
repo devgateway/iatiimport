@@ -1,5 +1,7 @@
 package org.devgateway.importtool.services;
 
+import static org.devgateway.importtool.services.processor.helper.Constants.CURRENT_FILE_ID;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,8 +29,10 @@ import org.devgateway.importtool.services.processor.helper.IDestinationProcessor
 import org.devgateway.importtool.services.processor.helper.IDocumentMapper;
 import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.multipart.MultipartFile;
-
+@EnableAsync
 @org.springframework.stereotype.Service
 public class ImportService {
 	@Autowired
@@ -135,6 +139,23 @@ public class ImportService {
 			}
 			
 		return processor;
+	}
+	
+	@Async
+	public void initialize(IDocumentMapper documentMapper){
+		try {
+			documentMapper.initialize();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}		
+	}
+	
+	@Async
+	public void execute(IDocumentMapper documentMapper, Long fileId){
+		List<ActionResult> results = documentMapper.execute();		
+		results.forEach(n -> {
+			insertLog(n, fileId);
+		});
 	}
 	
 }

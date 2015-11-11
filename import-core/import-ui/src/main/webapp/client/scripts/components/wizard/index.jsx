@@ -132,13 +132,33 @@ var Wizard = React.createClass({
 		$.ajax({
 	    	url: '/importer/import/execute',	    		       
 	        dataType: 'json',
+	        success: function(data) { 
+	        },
+	        type: 'POST'
+	     });	
+		
+		var self = this;
+		var id = setInterval(function(){
+    		self.checkImportStatus(id);
+    	}, 3000);   
+		
+	},
+	checkImportStatus: function(id){
+		var self = this;
+		$.ajax({
+	    	url: '/importer/import/execute/status',	    		       
+	        dataType: 'json',
 	        success: function(data) {  
-	        	self.setState({results: data});
-	        	self.hideLoadingIcon();
-	            $("#modalResults").modal("show");      	
+	        	if(data.executeStatus == "COMPLETED"){
+	    			clearInterval(id);
+	    			self.setState({results: data.results});
+		        	self.hideLoadingIcon();
+		            $("#modalResults").modal("show"); 
+	        	}
+	        	     	
 	        },
 	        type: 'GET'
-	     });		
+	     });
 	},
 	initImportSession: function(sourceProcessor, destinationProcessor) {			
 		this.showLoadingIcon();
