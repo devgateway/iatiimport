@@ -9,6 +9,8 @@ var appActions = Reflux.createActions([
   'loadDestinationValuesData'
 ]);
 
+
+appActions.initializeMapping = Reflux.createAction({ asyncResult: true });
 appActions.loadProjectData = Reflux.createAction({ asyncResult: true });
 appActions.loadFileData = Reflux.createAction({ asyncResult: true });
 appActions.loadFilterData = Reflux.createAction({ asyncResult: true });
