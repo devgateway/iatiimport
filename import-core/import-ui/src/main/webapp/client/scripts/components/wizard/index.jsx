@@ -149,11 +149,13 @@ var Wizard = React.createClass({
 	    	url: '/importer/import/execute/status',	    		       
 	        dataType: 'json',
 	        success: function(data) {  
-	        	if(data.executeStatus == "COMPLETED"){
+	        	if(data.importStatus.status == "COMPLETED"){
 	    			clearInterval(id);
 	    			self.setState({results: data.results});
 		        	self.hideLoadingIcon();
 		            $("#modalResults").modal("show"); 
+	        	}else{
+	        		console.log(data.importStatus.message);
 	        	}
 	        	     	
 	        },

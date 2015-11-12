@@ -4,19 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.devgateway.importtool.services.processor.helper.DocumentMapping;
-import org.devgateway.importtool.services.processor.helper.ProcessStatus;
+import org.devgateway.importtool.services.processor.helper.Status;
 
 public class DocumentMappingResponse {
 	
-	private ProcessStatus documentMappingStatus;
+	private Status documentMappingStatus;
 	
 	private List<DocumentMapping> documentMappings = new ArrayList<DocumentMapping>();
 
-	public ProcessStatus getDocumentMappingStatus() {
+	public Status getDocumentMappingStatus() {
 		return documentMappingStatus;
 	}
 
-	public void setDocumentMappingStatus(ProcessStatus documentMappingStatus) {
+	public void setDocumentMappingStatus(Status documentMappingStatus) {
 		this.documentMappingStatus = documentMappingStatus;
 	}
 

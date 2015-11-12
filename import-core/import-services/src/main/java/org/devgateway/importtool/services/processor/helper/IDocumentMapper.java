@@ -29,11 +29,14 @@ public interface IDocumentMapper {
 	List<ActionResult> execute();
 	
 	
-	void setDocumentMappingStatus(ProcessStatus documentMappingStatus);
-	ProcessStatus getDocumentMappingStatus();
+	void setDocumentMappingStatus(Status documentMappingStatus);
+	Status getDocumentMappingStatus();
 
 	List<ActionResult> getResults();
 
-	ProcessStatus getExecuteStatus();
+	ActionStatus getImportStatus();
+
+
+	
 
 }

@@ -2,7 +2,7 @@ package org.devgateway.importtool.model;
 
 public class ImportSummary {
 	private Long fileCount;
-	private Integer projectCount;
+	private Long projectCount;
 	private Long filterCount;
 	private Integer fieldMappingCount;
 	private Integer valueMappingCount;
@@ -13,10 +13,10 @@ public class ImportSummary {
 	public void setFileCount(Long fileCount) {
 		this.fileCount = fileCount;
 	}
-	public Integer getProjectCount() {
+	public Long getProjectCount() {
 		return projectCount;
 	}
-	public void setProjectCount(Integer projectCount) {
+	public void setProjectCount(Long projectCount) {
 		this.projectCount = projectCount;
 	}
 	public Long getFilterCount() {

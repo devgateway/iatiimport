@@ -168,7 +168,7 @@ class ImportController  {
 		IDocumentMapper documentMapper = (IDocumentMapper) request.getSession().getAttribute(DOCUMENT_MAPPER);
 		ImportExecuteResponse importExecuteResponse =  new ImportExecuteResponse();
 		importExecuteResponse.setResults(documentMapper.getResults());
-		importExecuteResponse.setExecuteStatus(documentMapper.getExecuteStatus());	
+		importExecuteResponse.setImportStatus(documentMapper.getImportStatus());	
 		return new ResponseEntity<>(importExecuteResponse, HttpStatus.OK);
 	}
 

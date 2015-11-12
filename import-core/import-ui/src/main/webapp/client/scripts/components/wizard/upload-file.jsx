@@ -46,6 +46,10 @@ var UploadFile = React.createClass({
            $el.fileinput('clear');
         });
         
+        $el.on("fileuploaderror",function(event, data, previewId, index) {
+        	//$el.fileinput('clear');
+            //self.props.eventHandlers.displayError(self.props.i18nLib.t('wizard.upload_file.msg_error_upload_failed'));
+         });        
         
     },    
     loadData: function(){  

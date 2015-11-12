@@ -17,5 +17,6 @@ public class Constants {
 	public static final String CLASS_NAME_TAG = "class-name";
 	public static final String DESCRIPTION_TAG = "description";
 	public static final String 	ENABLED_TAG = "enabled";
+	public static final String IMPORT_STATUS_MESSAGE = "Importing %s of %s projects";
 
 }

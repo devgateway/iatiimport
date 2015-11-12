@@ -14,9 +14,18 @@ public class DocumentMapper implements IDocumentMapper {
 	private List<FieldValueMapping> valueMappingObject = new ArrayList<FieldValueMapping>();
 	private List<DocumentMapping> documentMappings = new ArrayList<DocumentMapping>();
 	private boolean isInitialized = false;
-	ProcessStatus documentMappingStatus = ProcessStatus.NOT_STARTED;
-	ProcessStatus executeStatus = ProcessStatus.NOT_STARTED;
-	List<ActionResult> results = new ArrayList<ActionResult>();
+	Status documentMappingStatus = Status.NOT_STARTED;
+	
+	public ActionStatus getImportStatus() {
+		return importStatus;
+	}
+
+	public void setImportStatus(ActionStatus importStatus) {
+		this.importStatus = importStatus;
+	}
+
+	private ActionStatus importStatus;
+	private List<ActionResult> results = new ArrayList<ActionResult>();
 		
 	public List<ActionResult> getResults() {
 		return results;
@@ -26,19 +35,11 @@ public class DocumentMapper implements IDocumentMapper {
 		this.results = results;
 	}
 
-	public ProcessStatus getExecuteStatus() {
-		return executeStatus;
-	}
-
-	public void setExecuteStatus(ProcessStatus executeStatus) {
-		this.executeStatus = executeStatus;
-	}
-
-	public ProcessStatus getDocumentMappingStatus() {
+	public Status getDocumentMappingStatus() {
 		return documentMappingStatus;
 	}
 
-	public void setDocumentMappingStatus(ProcessStatus documentMappingStatus) {
+	public void setDocumentMappingStatus(Status documentMappingStatus) {
 		this.documentMappingStatus = documentMappingStatus;
 	}
 
@@ -60,15 +61,16 @@ public class DocumentMapper implements IDocumentMapper {
 
 	// Mapping and transformation operations go here
 	@Override
-	public List<ActionResult> execute() {
-		executeStatus = ProcessStatus.IN_PROGRESS;
+	public List<ActionResult> execute() {		
+		importStatus  = new ActionStatus(Constants.IMPORT_STATUS_MESSAGE, documentMappings.stream().filter(m -> m.getSelected() == true).count());
+		importStatus.setStatus(Status.IN_PROGRESS);
 		results = new ArrayList<ActionResult>();
-
 		for (DocumentMapping doc : documentMappings) {
 			if (doc.getSelected())
+				importStatus.incrementProcessed();
 				results.add(processDocumentMapping(doc));
 		}
-		executeStatus = ProcessStatus.COMPLETED;
+		importStatus.setStatus(Status.COMPLETED);		
 		return results;
 	}
 
@@ -102,7 +104,7 @@ public class DocumentMapper implements IDocumentMapper {
 			throw new Exception("Missing prerequirements to initialize this mapping");
 		}
 
-		documentMappingStatus = ProcessStatus.IN_PROGRESS;
+		documentMappingStatus = Status.IN_PROGRESS;
 		this.setDocumentMappings(new ArrayList<DocumentMapping>());
 		
 		// Get the document lists and field that will be used for matching and
@@ -127,7 +129,7 @@ public class DocumentMapper implements IDocumentMapper {
 				addDocumentMapping(srcDoc, null, OperationType.INSERT);
 			}
 		}
-        documentMappingStatus = ProcessStatus.COMPLETED;
+        documentMappingStatus = Status.COMPLETED;
 		this.setInitialized(true);
 	}
    

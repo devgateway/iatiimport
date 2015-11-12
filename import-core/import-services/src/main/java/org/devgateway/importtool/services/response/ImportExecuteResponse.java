@@ -4,16 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.devgateway.importtool.services.processor.helper.ActionResult;
-import org.devgateway.importtool.services.processor.helper.ProcessStatus;
+import org.devgateway.importtool.services.processor.helper.ActionStatus;
 
 public class ImportExecuteResponse {
 	
-	ProcessStatus executeStatus = ProcessStatus.NOT_STARTED;
-	public ProcessStatus getExecuteStatus() {
-		return executeStatus;
+	private ActionStatus importStatus;
+	
+	public ActionStatus getImportStatus() {
+		return importStatus;
 	}
-	public void setExecuteStatus(ProcessStatus executeStatus) {
-		this.executeStatus = executeStatus;
+	public void setImportStatus(ActionStatus importStatus) {
+		this.importStatus = importStatus;
 	}
 	public List<ActionResult> getResults() {
 		return results;
