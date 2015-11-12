@@ -28,6 +28,7 @@ import org.devgateway.importtool.services.processor.helper.FieldValueMapping;
 import org.devgateway.importtool.services.processor.helper.IDestinationProcessor;
 import org.devgateway.importtool.services.processor.helper.IDocumentMapper;
 import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
+import org.devgateway.importtool.services.processor.helper.OperationType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -47,7 +48,8 @@ public class ImportService {
 	
 	public ImportSummary getSummary(IDocumentMapper documentMapper, ImportSessionToken importSessionToken, ISourceProcessor processor){
 		ImportSummary importSummmary = new ImportSummary();
-		importSummmary.setProjectCount(documentMapper.getDocumentMappings().size());
+		Long projectCount = documentMapper.getDocumentMappings().stream().filter(m -> m.getSelected() == true).count();
+		importSummmary.setProjectCount(projectCount);
 		importSummmary.setFieldMappingCount(documentMapper.getFieldMappingObject().size());
 
 		if (fileRepository != null || importSessionToken != null) {
