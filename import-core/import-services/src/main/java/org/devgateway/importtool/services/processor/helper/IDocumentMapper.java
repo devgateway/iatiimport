@@ -30,7 +30,7 @@ public interface IDocumentMapper {
 	
 	
 	void setDocumentMappingStatus(Status documentMappingStatus);
-	Status getDocumentMappingStatus();
+	ActionStatus getDocumentMappingStatus();
 
 	List<ActionResult> getResults();
 

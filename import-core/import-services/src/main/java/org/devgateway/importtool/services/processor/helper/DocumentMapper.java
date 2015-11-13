@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+
 public class DocumentMapper implements IDocumentMapper {
 
 	// TODO: Defensively prevent operations if any processor is not defined
@@ -14,8 +15,9 @@ public class DocumentMapper implements IDocumentMapper {
 	private List<FieldValueMapping> valueMappingObject = new ArrayList<FieldValueMapping>();
 	private List<DocumentMapping> documentMappings = new ArrayList<DocumentMapping>();
 	private boolean isInitialized = false;
-	Status documentMappingStatus = Status.NOT_STARTED;
-	
+	private ActionStatus importStatus;
+	private ActionStatus documentMappingStatus;
+		
 	public ActionStatus getImportStatus() {
 		return importStatus;
 	}
@@ -24,7 +26,7 @@ public class DocumentMapper implements IDocumentMapper {
 		this.importStatus = importStatus;
 	}
 
-	private ActionStatus importStatus;
+	
 	private List<ActionResult> results = new ArrayList<ActionResult>();
 		
 	public List<ActionResult> getResults() {
@@ -35,11 +37,11 @@ public class DocumentMapper implements IDocumentMapper {
 		this.results = results;
 	}
 
-	public Status getDocumentMappingStatus() {
+	public ActionStatus getDocumentMappingStatus() {
 		return documentMappingStatus;
 	}
 
-	public void setDocumentMappingStatus(Status documentMappingStatus) {
+	public void setDocumentMappingStatus(ActionStatus documentMappingStatus) {
 		this.documentMappingStatus = documentMappingStatus;
 	}
 
@@ -103,18 +105,27 @@ public class DocumentMapper implements IDocumentMapper {
 		if (sourceProcessor == null || destinationProcessor == null) {
 			throw new Exception("Missing prerequirements to initialize this mapping");
 		}
-
-		documentMappingStatus = Status.IN_PROGRESS;
-		this.setDocumentMappings(new ArrayList<DocumentMapping>());
-		
+				
+		this.setDocumentMappings(new ArrayList<DocumentMapping>());		
 		// Get the document lists and field that will be used for matching and
 		// prepare the list of documents to be updated
+		
+		documentMappingStatus = new ActionStatus("Extracting project %s of %s", 0L);
+		documentMappingStatus.setStatus(Status.IN_PROGRESS);
+		sourceProcessor.setActionStatus(documentMappingStatus);
 		List<InternalDocument> sourceDocuments = sourceProcessor.getDocuments();
-		List<InternalDocument> destinationDocuments = destinationProcessor.getDocuments(false);	
+		
+		documentMappingStatus = new ActionStatus("Fetching destination projects", 0L);
+		documentMappingStatus.setStatus(Status.IN_PROGRESS);		
+		destinationProcessor.setActionStatus(documentMappingStatus);
+		
+		List<InternalDocument> destinationDocuments = destinationProcessor.getDocuments(false);				
+		documentMappingStatus = new ActionStatus("Mapping %s of %s", Long.valueOf(sourceDocuments.size()));
+		documentMappingStatus.setStatus(Status.IN_PROGRESS);				
 		for (InternalDocument srcDoc : sourceDocuments) {
+			documentMappingStatus.incrementProcessed();
 			String sourceIdField = sourceProcessor.getIdField();
 			String destinationIdField = destinationProcessor.getIdField();
-
 			String sourceIdValue = srcDoc.getStringFields().get(sourceIdField);
 			srcDoc.setIdentifier(sourceIdValue);
 			Optional<InternalDocument> optionalDestDoc = destinationDocuments.stream().filter(n -> {
@@ -129,7 +140,8 @@ public class DocumentMapper implements IDocumentMapper {
 				addDocumentMapping(srcDoc, null, OperationType.INSERT);
 			}
 		}
-        documentMappingStatus = Status.COMPLETED;
+		
+	    documentMappingStatus.setStatus(Status.COMPLETED);
 		this.setInitialized(true);
 	}
    
@@ -184,6 +196,12 @@ public class DocumentMapper implements IDocumentMapper {
 	@Override
 	public void setValueMappingObject(List<FieldValueMapping> valueMappingObject) {
 		this.valueMappingObject = valueMappingObject;
+	}
+
+	@Override
+	public void setDocumentMappingStatus(Status documentMappingStatus) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

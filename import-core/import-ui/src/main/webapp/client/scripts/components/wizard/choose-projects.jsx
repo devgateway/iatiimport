@@ -15,7 +15,7 @@ var ChooseProjects = React.createClass({
         Reflux.ListenerMixin
     ],
     getInitialState: function() {
-       return {projectData: [], destinationProjects: []};
+       return {projectData: [], destinationProjects: [], statusMessage: "Fetching projects"};
     },
     componentWillMount: function () {
      this.props.eventHandlers.updateCurrentStep(constants.CHOOSE_PROJECTS);
@@ -116,12 +116,14 @@ var ChooseProjects = React.createClass({
 	},
 	loadSourceProjects:  function(id){
 		appActions.loadProjectData.triggerPromise().then(function(data) { 
-    		if(data.documentMappingStatus == "COMPLETED"){
+    		if(data.documentMappingStatus.status == "COMPLETED"){
     			clearInterval(id);
+    			this.setState({statusMessage: ""});
     			this.props.eventHandlers.hideLoadingIcon();                       
-        		this.updateProject(data.documentMappings);
-        		
-    		}    		                
+        		this.updateProject(data.documentMappings);        		
+    		} else{
+    			this.setState({statusMessage:data.documentMappingStatus.message});
+    		}   		                
     	}.bind(this)).catch(function(err) {
     		this.props.eventHandlers.hideLoadingIcon();    		
     		this.props.eventHandlers.displayError(this.props.i18nLib.t('wizard.choose_projects.msg_error_select_project'));
@@ -142,7 +144,8 @@ var ChooseProjects = React.createClass({
     render: function () {  
         var newProjects = [];
         var existingProjects = [];
-        var language = this.props.i18nLib.lng() || 'en';        
+        var language = this.props.i18nLib.lng() || 'en';         
+        var statusMessage = this.state.statusMessage.length > 0 ? <div className="alert alert-info" role="alert">{this.state.statusMessage}</div> : "";
         if (this.state.projectData) {
            $.map(this.state.projectData, function (item, i) {
                 if (item.operation == 'INSERT') {
@@ -183,7 +186,7 @@ var ChooseProjects = React.createClass({
             <div className="panel panel-default">
                 <div className="panel-heading"><strong>{this.props.i18nLib.t('wizard.choose_projects.choose_projects')}</strong></div>
                 <div className="panel-body">
-                
+                    {statusMessage}
                     <div className="panel panel-success">
                         <div className="panel-heading">{this.props.i18nLib.t('wizard.choose_projects.new_projects')}</div>
                         <div className="panel-body">

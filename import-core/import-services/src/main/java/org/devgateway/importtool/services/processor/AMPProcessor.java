@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.devgateway.importtool.services.processor.helper.ActionStatus;
 import org.devgateway.importtool.services.processor.helper.Field;
 import org.devgateway.importtool.services.processor.helper.FieldMapping;
 import org.devgateway.importtool.services.processor.helper.FieldType;
@@ -315,6 +316,12 @@ public class AMPProcessor implements IDestinationProcessor {
 
 	private void setDocumentsTestEndpoint(String documentsTestEndpoint) {
 		this.documentsTestEndpoint = documentsTestEndpoint;
+	}
+
+	@Override
+	public void setActionStatus(ActionStatus documentMappingStatus) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

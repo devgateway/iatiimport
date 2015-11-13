@@ -19,4 +19,7 @@ public interface IDestinationProcessor {
 
 	public String getTitleField();
 
+	public void setActionStatus(ActionStatus documentMappingStatus);
+	
+
 }

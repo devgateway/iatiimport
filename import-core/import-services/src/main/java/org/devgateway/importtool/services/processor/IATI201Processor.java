@@ -25,6 +25,7 @@ import javax.xml.xpath.XPathFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.model.Language;
+import org.devgateway.importtool.services.processor.helper.ActionStatus;
 import org.devgateway.importtool.services.processor.helper.Field;
 import org.devgateway.importtool.services.processor.helper.FieldType;
 import org.devgateway.importtool.services.processor.helper.FieldValue;
@@ -63,10 +64,24 @@ public class IATI201Processor implements ISourceProcessor {
 	
 	// XML Document that will hold the entire imported file
 	private Document doc;
+	
+	private ActionStatus actionStatus;
+
 
 	public Document getDoc() {
 		return doc;
 	}
+	
+	
+	public ActionStatus getActionStatus() {
+		return actionStatus;
+	}
+
+
+	public void setActionStatus(ActionStatus actionStatus) {
+		this.actionStatus = actionStatus;
+	}
+
 
 	// Map that holds information about how the field names map to code lists
 	private static Map<String, String> mappingNameFile = new HashMap<String, String>();
@@ -273,8 +288,9 @@ public class IATI201Processor implements ISourceProcessor {
 
 		NodeList nodeList = doc.getElementsByTagName("iati-activity");
 		List<InternalDocument> list = new ArrayList<InternalDocument>();
-
+		actionStatus.setTotal(Long.valueOf(nodeList.getLength()));		
 		for (int i = 0; i < nodeList.getLength(); i++) {
+			actionStatus.incrementProcessed();
 			InternalDocument document = new InternalDocument();
 			Element element = (Element) nodeList.item(i);
 			String currency = !("".equals(element.getAttribute("default-currency"))) ? element.getAttribute("default-currency") : this.defaultCurrency;			
@@ -612,4 +628,6 @@ public class IATI201Processor implements ISourceProcessor {
 			return false;
 		}
 	}
+
+	
 }

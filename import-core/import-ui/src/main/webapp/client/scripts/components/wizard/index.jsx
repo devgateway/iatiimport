@@ -15,12 +15,14 @@ var constants = require('./../../utils/constants');
 
 var Wizard = React.createClass({
 	mixins: [Navigation],
+	setIntervalId: null,
 	getInitialState: function() {
 		return {
 			info: {},
 			results: [],
 			currentStep: constants.UPLOAD_FILE,
-			completedSteps: []
+			completedSteps: [],
+			statusMessage: ""
 		};
 	},
 	
@@ -121,6 +123,9 @@ var Wizard = React.createClass({
 		}.bind(this));
 	},
 	navigateBack: function(){
+		if(this.setIntervalId){
+			clearInterval(this.setIntervalId);
+		}		
     	this.transitionTo('mapvalues', this.props.params);
     },
     goHome: function(){
@@ -138,24 +143,25 @@ var Wizard = React.createClass({
 	     });	
 		
 		var self = this;
-		var id = setInterval(function(){
-    		self.checkImportStatus(id);
+		self.setIntervalId = setInterval(function(){
+    		self.checkImportStatus();
     	}, 3000);   
 		
 	},
-	checkImportStatus: function(id){
+	checkImportStatus: function(){
 		var self = this;
 		$.ajax({
 	    	url: '/importer/import/execute/status',	    		       
 	        dataType: 'json',
 	        success: function(data) {  
 	        	if(data.importStatus.status == "COMPLETED"){
-	    			clearInterval(id);
+	    			clearInterval(self.setIntervalId);
 	    			self.setState({results: data.results});
 		        	self.hideLoadingIcon();
-		            $("#modalResults").modal("show"); 
+		            $("#modalResults").modal("show");
+		            self.setState({statusMessage: ""});	
 	        	}else{
-	        		console.log(data.importStatus.message);
+	        		self.setState({statusMessage: data.importStatus.message});	        		
 	        	}
 	        	     	
 	        },
@@ -242,9 +248,9 @@ var Wizard = React.createClass({
        <span className="glyphicon glyphicon-exclamation-sign error-box" aria-hidden="true"></span>
        <span className="sr-only">Error:</span>
          <span ref="message"></span>
-       </div>
+       </div>        
       <div className="loading-icon" ref="loadingIcon"></div>      
-      <RouteHandler eventHandlers={eventHandlers} {...this.props}/>
+      <RouteHandler eventHandlers={eventHandlers} {...this.props} statusMessage = {this.state.statusMessage}/>
       </div>
       </div>
       </div>

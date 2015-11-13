@@ -25,6 +25,7 @@ import javax.xml.xpath.XPathFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.model.Language;
+import org.devgateway.importtool.services.processor.helper.ActionStatus;
 import org.devgateway.importtool.services.processor.helper.Field;
 import org.devgateway.importtool.services.processor.helper.FieldType;
 import org.devgateway.importtool.services.processor.helper.FieldValue;
@@ -60,6 +61,18 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 	protected String defaultCurrency = "";
 	protected String codelistPath = "";
 	protected String propertiesFile = "";
+	
+	protected ActionStatus actionStatus;
+
+	public ActionStatus getActionStatus() {
+		return actionStatus;
+	}
+
+
+	public void setActionStatus(ActionStatus actionStatus) {
+		this.actionStatus = actionStatus;
+	}
+
 
 	public String getPropertiesFile() {
 		return propertiesFile;
@@ -291,8 +304,9 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 		// Extract global values		
 		NodeList nodeList = doc.getElementsByTagName("iati-activity");
 		List<InternalDocument> list = new ArrayList<InternalDocument>();
-
+		actionStatus.setTotal(Long.valueOf(nodeList.getLength()));
 		for (int i = 0; i < nodeList.getLength(); i++) {
+			actionStatus.incrementProcessed();
 			InternalDocument document = new InternalDocument();
 			Element element = (Element) nodeList.item(i);
 			String currency = !("".equals(element.getAttribute("default-currency"))) ? element.getAttribute("default-currency") : this.defaultCurrency;			

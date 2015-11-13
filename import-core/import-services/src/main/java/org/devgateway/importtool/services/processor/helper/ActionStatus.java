@@ -5,6 +5,8 @@ public class ActionStatus {
 	private Status status = Status.NOT_STARTED;
 	private Long total = 0L;
 	private Long processed = 0L;
+	
+
 	private String message = "";
 	public Long getTotal() {
 		return total;
@@ -20,7 +22,13 @@ public class ActionStatus {
 
 	public void incrementProcessed() {
 		++this.processed;
-	}	
+	}
+	
+	public void resetProcessed() {
+		this.processed = 0L;
+	}
+	
+	
 	
 	public ActionStatus(String message, Long total) {
 		this.message = message;

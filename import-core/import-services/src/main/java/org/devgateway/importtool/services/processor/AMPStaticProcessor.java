@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.services.processor.helper.ActionResult;
+import org.devgateway.importtool.services.processor.helper.ActionStatus;
 import org.devgateway.importtool.services.processor.helper.Field;
 import org.devgateway.importtool.services.processor.helper.FieldMapping;
 import org.devgateway.importtool.services.processor.helper.FieldType;
@@ -58,6 +59,18 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 	private List<ClientHttpRequestInterceptor> interceptors = new ArrayList<ClientHttpRequestInterceptor>();
 	private RestTemplate template;
+	
+	protected ActionStatus actionStatus;
+
+	public ActionStatus getActionStatus() {
+		return actionStatus;
+	}
+
+
+	public void setActionStatus(ActionStatus actionStatus) {
+		this.actionStatus = actionStatus;
+	}
+
 
 	public AMPStaticProcessor(String authenticationToken) {
 		// this.properties = initProps();
@@ -77,6 +90,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	@Override
 	// Updated!
 	public List<InternalDocument> getDocuments(Boolean onlyEditable) {
+		actionStatus = new ActionStatus("Fetching destination projects", 0L);
 		List<InternalDocument> list = new ArrayList<InternalDocument>();
 		String result = "";
 

@@ -31,4 +31,10 @@ public interface ISourceProcessor {
 	public Document getDoc();
 
 	public Boolean isValidInput();
+
+	public void setActionStatus(ActionStatus documentMappingStatus);
+
+	public ActionStatus getActionStatus();
+	
+	
 }

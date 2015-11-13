@@ -40,10 +40,12 @@ var ReviewImport = React.createClass({
         }
     },  
     render: function () {
+    	var statusMessage = this.props.statusMessage.length > 0 ? <div className="alert alert-info" role="alert">{this.props.statusMessage}</div> : "";
         return (
             <div className="panel panel-default">
                 <div className="panel-heading"><strong>{this.props.i18nLib.t('wizard.review_import.review_import')}</strong></div>
                 <div className="panel-body">
+                   {statusMessage}
                     <div className="row">
                         <div className="col-sm-3 col-md-3"></div>
                         <div className="col-sm-6 col-md-6">
