@@ -99,6 +99,21 @@ public class IATI201Processor implements ISourceProcessor {
 		mappingNameFile.put("sector", "Sector");
 	}
 
+	//TODO: Extract from codelists
+	private static Map<String, String> transactionTypes = new HashMap<String, String>();
+	static {
+		transactionTypes.put("C", "2");
+		transactionTypes.put("D", "3");
+	}
+	
+	private static Map<String, String> dateTypes = new HashMap<String, String>();
+	static {
+		dateTypes.put("start-planned", "1");
+		dateTypes.put("start-actual", "2");
+		dateTypes.put("end-planned", "3");
+		dateTypes.put("end-actual", "4");
+	}
+		
 	public IATI201Processor(){
 		InputStream propsStream = this.getClass().getResourceAsStream("IATI201/IATI201Processor.properties");
 		Properties properties = new Properties();		
@@ -417,7 +432,7 @@ public class IATI201Processor implements ISourceProcessor {
 				case TRANSACTION:
 					try {
 						NodeList nodes;
-						nodes = (NodeList) xPath.evaluate("//transaction-type[@code='" + field.getSubType() + "']/parent::*", element, XPathConstants.NODESET);
+						nodes = (NodeList) xPath.evaluate("transaction/transaction-type[@code='" + transactionTypes.get(field.getSubType()) + "']/parent::*", element, XPathConstants.NODESET);
 						for (int j = 0; j < nodes.getLength(); ++j) {
 							String reference = "";
 							String receivingOrganization = "";
@@ -428,7 +443,16 @@ public class IATI201Processor implements ISourceProcessor {
 							// Amount
 							String localValue = e.getElementsByTagName("value").item(0).getChildNodes().item(0).getNodeValue();
 							// Date
-							String localDate = e.getElementsByTagName("transaction-date").item(0).getChildNodes().item(0).getNodeValue();
+							NodeList el = e.getElementsByTagName("transaction-date").item(0).getChildNodes();
+							String localDate = "";
+							if(el.getLength() == 0) {
+								localDate = ((Element) el).getAttribute("iso-date");
+							}
+							else
+							{
+								localDate = el.item(0).getNodeValue();
+								
+							}
 							if (localDate != null && !isValidDate(localDate)) // TODO: Make it
 															// defensive
 							{
@@ -443,7 +467,7 @@ public class IATI201Processor implements ISourceProcessor {
 							transactionFields.put("reference", reference);
 							transactionFields.put("value", localValue);
 							transactionFields.put("subtype", field.getSubType());
-
+							
 							document.addTransactionField("transaction" + field.getSubType() + "_" + j, transactionFields);
 						}
 
@@ -454,7 +478,7 @@ public class IATI201Processor implements ISourceProcessor {
 				case DATE:
 					try {
 						NodeList nodes;
-						nodes = (NodeList) xPath.evaluate("//activity-date[@type='" + field.getSubType() + "']", element, XPathConstants.NODESET);
+						nodes = (NodeList) xPath.evaluate("activity-date[@type='" + dateTypes.get(field.getSubType()) + "']", element, XPathConstants.NODESET);
 						for (int j = 0; j < nodes.getLength(); ++j) {
 							Element e = (Element) nodes.item(j);
 							String localDate = e.getAttribute("iso-date");

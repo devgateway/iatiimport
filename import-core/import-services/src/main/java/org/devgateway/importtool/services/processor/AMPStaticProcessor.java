@@ -736,8 +736,8 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		// Transactions
 		// Transaction Fields
 		List<Field> trnDependencies = new ArrayList<Field>();
-		trnDependencies.add(adjustmentType);
-		trnDependencies.add(transactionType);
+		trnDependencies.add(typeOfAssistence);
+		trnDependencies.add(financialInstrument);
 		trnDependencies.add(fundingOrganization);
 
 		Field actualCommitments = new Field("Actual Commitments", "transaction", FieldType.TRANSACTION, true);
