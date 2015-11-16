@@ -1,40 +1,40 @@
 package org.devgateway.importtool.model;
 
 public class ImportSummary {
-	private Long fileCount;
-	private Long projectCount;
-	private Long filterCount;
-	private Integer fieldMappingCount;
-	private Integer valueMappingCount;
+	private long fileCount;
+	private long projectCount;
+	private long filterCount;
+	private int fieldMappingCount;
+	private int valueMappingCount;
 	
-	public Long getFileCount() {
+	public long getFileCount() {
 		return fileCount;
 	}
-	public void setFileCount(Long fileCount) {
+	public void setFileCount(long fileCount) {
 		this.fileCount = fileCount;
 	}
-	public Long getProjectCount() {
+	public long getProjectCount() {
 		return projectCount;
 	}
-	public void setProjectCount(Long projectCount) {
+	public void setProjectCount(long projectCount) {
 		this.projectCount = projectCount;
 	}
-	public Long getFilterCount() {
+	public long getFilterCount() {
 		return filterCount;
 	}
-	public void setFilterCount(Long filterCount) {
+	public void setFilterCount(long filterCount) {
 		this.filterCount = filterCount;
 	}
-	public Integer getFieldMappingCount() {
+	public int getFieldMappingCount() {
 		return fieldMappingCount;
 	}
-	public void setFieldMappingCount(Integer fieldMappingCount) {
+	public void setFieldMappingCount(int fieldMappingCount) {
 		this.fieldMappingCount = fieldMappingCount;
 	}
-	public Integer getValueMappingCount() {
+	public int getValueMappingCount() {
 		return valueMappingCount;
 	}
-	public void setValueMappingCount(Integer valueMappingCount) {
+	public void setValueMappingCount(int valueMappingCount) {
 		this.valueMappingCount = valueMappingCount;
 	}
 	
