@@ -429,7 +429,7 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 							String localDate = "";
 							if(e.getElementsByTagName("transaction-date").item(0) != null && e.getElementsByTagName("transaction-date").item(0).getChildNodes().item(0) != null){
 								localDate = e.getElementsByTagName("transaction-date").item(0).getChildNodes().item(0).getNodeValue();
-							}							
+							}														
 							if (!isValidDate(localDate)){
 								localDate = (e.getElementsByTagName("transaction-date").item(0) != null && e.getElementsByTagName("transaction-date").item(0).getAttributes() != null) ? e.getElementsByTagName("transaction-date").item(0).getAttributes().getNamedItem("iso-date").getNodeValue() : "";
 							}
