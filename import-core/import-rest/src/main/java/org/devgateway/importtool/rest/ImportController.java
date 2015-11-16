@@ -20,8 +20,8 @@ import org.devgateway.importtool.model.File;
 import org.devgateway.importtool.model.ImportSummary;
 import org.devgateway.importtool.security.ImportSessionToken;
 import org.devgateway.importtool.services.ImportService;
+import org.devgateway.importtool.services.MessageService;
 import org.devgateway.importtool.services.WorkflowService;
-
 import org.devgateway.importtool.services.processor.helper.DocumentMapper;
 import org.devgateway.importtool.services.processor.helper.IDestinationProcessor;
 import org.devgateway.importtool.services.processor.helper.IDocumentMapper;
@@ -55,6 +55,9 @@ class ImportController  {
 	
 	@Autowired
 	private ImportService importService;
+	
+	@Autowired
+	MessageService messageService;
 
 	private Log log = LogFactory.getLog(getClass());
 

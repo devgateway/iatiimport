@@ -3,20 +3,20 @@ package org.devgateway.importtool.services.processor.helper;
 
 public class ActionStatus {
 	private Status status = Status.NOT_STARTED;
-	private Long total = 0L;
-	private Long processed = 0L;
+	private long total = 0L;
+	private long processed = 0L;
 	
 
 	private String message = "";
-	public Long getTotal() {
+	public long getTotal() {
 		return total;
 	}
 
-	public void setTotal(Long total) {
+	public void setTotal(long total) {
 		this.total = total;
 	}
 
-	public Long getProcessed() {
+	public long getProcessed() {
 		return processed;
 	}
 
@@ -30,7 +30,7 @@ public class ActionStatus {
 	
 	
 	
-	public ActionStatus(String message, Long total) {
+	public ActionStatus(String message, long total) {
 		this.message = message;
 		this.total = total;
 	}

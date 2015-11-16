@@ -447,9 +447,7 @@ public class IATI201Processor implements ISourceProcessor {
 							String localDate = "";
 							if(el.getLength() == 0) {
 								localDate = ((Element) el).getAttribute("iso-date");
-							}
-							else
-							{
+							}else{
 								localDate = el.item(0).getNodeValue();
 								
 							}

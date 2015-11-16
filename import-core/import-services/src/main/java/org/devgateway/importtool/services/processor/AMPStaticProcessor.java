@@ -60,7 +60,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	private List<ClientHttpRequestInterceptor> interceptors = new ArrayList<ClientHttpRequestInterceptor>();
 	private RestTemplate template;
 	
-	protected ActionStatus actionStatus;
+	private  ActionStatus actionStatus;
 
 	public ActionStatus getActionStatus() {
 		return actionStatus;
