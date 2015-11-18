@@ -25,7 +25,6 @@ class ReportController {
 	private FileRepository fileRepository;
 	@Autowired
 	private ProjectRepository projectRepository;
-//	private Log log = LogFactory.getLog(getClass());
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/previousimports")
 	public ResponseEntity<Page<File>> listFiles(Pageable pageable, HttpServletRequest request) {				

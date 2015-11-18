@@ -21,7 +21,7 @@ var ImportList = React.createClass({
       importListData: [],
       pageSize:10, 
       activePage:1,
-      sort: {field:'id', direction: 'asc'}
+      sort: {field:'createdDate', direction: 'desc'}
     };
   },  
    componentWillMount: function () {
