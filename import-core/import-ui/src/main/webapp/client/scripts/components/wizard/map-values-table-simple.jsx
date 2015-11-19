@@ -17,14 +17,20 @@ var MappingTableSimple = React.createClass({
   },
   render: function() { 
        var rows = [];
-       var options = [];
+       
        var sourceField = this.props.mapping.sourceField;
        var destinationField = this.props.mapping.destinationField;
        var valuesIndex = this.props.mapping.valueIndexMapping;
 
+       var options = [];
        _.map(destinationField.possibleValues, function(destinationValue, i) { 
-           options.push({value:destinationValue.code, label:destinationValue.value});      
+    	   options.push({value:destinationValue.code, label:destinationValue.value});      
        });
+       
+       options = _.sortBy(options, function(item) {
+    	   return item.label.trim();
+    	});
+       
        $.each(valuesIndex, function(key, value) {  
            var sourceValue = _.find(sourceField.possibleValues, function(v){ return v.index == key;});
            var destinationValue = _.find(destinationField.possibleValues, function(v){ return v.index == value;});
