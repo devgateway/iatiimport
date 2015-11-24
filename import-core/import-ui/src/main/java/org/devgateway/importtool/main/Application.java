@@ -19,7 +19,7 @@ import org.springframework.context.annotation.Configuration;
 @EnableAutoConfiguration
 public class Application extends WebMvcAutoConfiguration {
 	public static void main(String[] args) {
-		SpringApplication.run(Application.class);
+		SpringApplication.run(Application.class, args);
 	}
 
 	@Bean
