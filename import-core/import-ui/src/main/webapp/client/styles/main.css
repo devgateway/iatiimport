@@ -427,7 +427,8 @@ tbody.scrollablebody td, thead.scrollablebody th {
 }
 
 .workflow-link{
-	padding: 3px 20px;
+	display: block;
+    padding: 3px 20px;
     clear: both;
     font-weight: normal;
     line-height: 1.42857143;
