@@ -426,4 +426,16 @@ tbody.scrollablebody td, thead.scrollablebody th {
 	text-decoration: underline;
 }
 
+.workflow-link{
+	padding: 3px 20px;
+    clear: both;
+    font-weight: normal;
+    line-height: 1.42857143;
+    white-space: nowrap;
+    font-weight: bold;
+}
 
+
+.workflow-selector li:before {
+	content:"\00BB \0020";	
+}

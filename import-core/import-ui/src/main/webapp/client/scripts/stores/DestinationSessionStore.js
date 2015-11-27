@@ -20,15 +20,11 @@ var DestinationSessionStore = Reflux.createStore({
         url: appConfig.DESTINATION_API_HOST + appConfig.DESTINATION_AUTH_TOKEN_ENDPOINT,
         timeout: appConfig.SESSION_REQUEST_TIMEOUT,
         error: function() {
-          self.trigger({            
-                sessionData: []
-              });
+        	appActions.initDestinationSession.failed();          
         },
         dataType: 'json',
         success: function(data) { 
-          self.trigger({            
-                sessionData: data
-              });
+          appActions.initDestinationSession.completed(data);          
         },
         type: 'GET'
      }); 

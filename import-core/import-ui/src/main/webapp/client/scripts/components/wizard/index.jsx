@@ -6,12 +6,14 @@ var WizardSteps = require('./wizard-steps');
 var ImportReport = require('./import-report');
 var UploadFile = require('./upload-file');
 var appConfig = require('./../../conf');
+var appActions = require('./../../actions');
 var Router = require('react-router');
 var RouteHandler = Router.RouteHandler;
 var Navigation = Router.Navigation;
 var formActions = require('./../../actions/form');
 var Cookies = require('js-cookie');
 var constants = require('./../../utils/constants');
+var destinationSessionStore = require('./../../stores/DestinationSessionStore');
 
 var Wizard = React.createClass({
 	mixins: [Navigation],
@@ -30,12 +32,23 @@ var Wizard = React.createClass({
 		if(this.props.params.src !== nextProps.params.src || this.props.params.dst !== nextProps.params.dst) {
 			this.initImportSession(nextProps.params.src, nextProps.params.dst);
 		}
-	},
-	
+	},	
 	componentDidMount  : function() {
 		var sourceProcessor = this.props.params.src;
 		var destinationProcessor = this.props.params.dst;
-		this.initImportSession(sourceProcessor, destinationProcessor);
+		appActions.initDestinationSession.triggerPromise().then(function(data) {			
+			appConfig.DESTINATION_AUTH_TOKEN = data.token;
+		    appConfig.DESTINATION_USERNAME = data['user-name'];    
+		    Cookies.set("DESTINATION_AUTH_TOKEN", data.token);
+		    Cookies.set("DESTINATION_USERNAME", data['user-name']);
+		    // Added true always for now, the API returns wrong value
+		    Cookies.set("CAN_ADD_ACTIVITY", true || data['add-activity']);
+		    Cookies.set("WORKSPACE", data['team']);
+		    
+			this.initImportSession(sourceProcessor, destinationProcessor); 
+	      }.bind(this)).catch(function(err) {        
+	      }.bind(this)); 
+		
 	},
 	updateCurrentStep : function(step){
 	  var completedSteps = this.state.completedSteps; 
@@ -168,7 +181,7 @@ var Wizard = React.createClass({
 	        type: 'GET'
 	     });
 	},
-	initImportSession: function(sourceProcessor, destinationProcessor) {			
+	initImportSession: function(sourceProcessor, destinationProcessor) {	
 		this.showLoadingIcon();
 		var compiledURL = _.template(appConfig.TOOL_START_ENDPOINT);
 		var url = compiledURL({
