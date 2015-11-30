@@ -41,7 +41,7 @@ var FilterData = React.createClass({
 			this.updateLanguages(data); 
 			this.languageDataLoaded = true;
 			this.hideLoadingIcon();
-		}.bind(this)).catch(function(err) {       
+		}.bind(this))["catch"](function(err) {       
 			this.languageDataLoaded = true;
 			this.hideLoadingIcon(); 
 			this.errorMsg += this.props.i18nLib.t('wizard.filter_data.msg_error_retrieving_languages');
@@ -52,7 +52,7 @@ var FilterData = React.createClass({
 			this.updateFilters(data);
 			this.filterDataLoaded = true; 
 			this.hideLoadingIcon(); 
-		}.bind(this)).catch(function(err) {
+		}.bind(this))["catch"](function(err) {
 			this.filterDataLoaded = true; 
 			this.hideLoadingIcon(); 
 			this.errorMsg += this.props.i18nLib.t('wizard.filter_data.msg_error_retrieving_filters');

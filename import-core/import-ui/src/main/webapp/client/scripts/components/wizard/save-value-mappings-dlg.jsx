@@ -29,7 +29,7 @@ var SaveMappingsDialog = React.createClass({
             this.props.reloadTemplateData();            
             $('#saveMapValues').modal('hide');
         }            
-     }.bind(this)).catch(function(err) {
+     }.bind(this))["catch"](function(err) {
         this.displayError(this.props.i18nLib.t('wizard.save_value_mappings_dlg.msg_error_saving'));        
      }.bind(this));
     },

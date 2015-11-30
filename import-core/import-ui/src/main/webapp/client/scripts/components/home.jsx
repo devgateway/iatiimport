@@ -22,7 +22,7 @@ var Home = React.createClass({
      this.listenTo(systemInfoStore, this.updateSystemInfo); 
      appActions.checkBackendStatus.triggerPromise().then(function(data) {                             
 	    this.updateSystemInfo(data);	    
-      }.bind(this)).catch(function(err) {
+      }.bind(this))["catch"](function(err) {
         this.updateSystemInfo({status:"DOWN"});	
       }.bind(this)); 
   },

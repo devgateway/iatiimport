@@ -44,7 +44,7 @@ var MapValues = React.createClass({
       appActions.loadValueMappingData.triggerPromise().then(function(data) {      
         this.props.eventHandlers.hideLoadingIcon();                       
         this.updateValueMappingStore(data); 
-      }.bind(this)).catch(function(err) {        
+      }.bind(this))["catch"](function(err) {        
         this.props.eventHandlers.displayError(this.props.i18nLib.t('wizard.map_values.msg_error_retrieving_value_mappings'));
       }.bind(this));
       this.loadTemplateData();
@@ -106,7 +106,7 @@ var MapValues = React.createClass({
 	loadTemplateData: function(){
 		appActions.loadValueMappingsTemplateList.triggerPromise().then(function(data) {                              
 			this.updateMappingTemplatesData(data); 
-		}.bind(this)).catch(function(err) { 
+		}.bind(this))["catch"](function(err) { 
 			this.props.eventHandlers.displayError(this.props.i18nLib.t('wizard.map_values.msg_error_loading_templates'));
 		}.bind(this));
   },

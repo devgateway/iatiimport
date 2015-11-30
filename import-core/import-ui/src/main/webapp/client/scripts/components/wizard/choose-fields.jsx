@@ -76,7 +76,7 @@ var ChooseFields = React.createClass({
 			this.updateDestinationFields(data);
 			this.destDataLoaded = true; 
 			this.hideLoadingIcon();
-		}.bind(this)).catch(function(err) {
+		}.bind(this))["catch"](function(err) {
 			this.destDataLoaded = true; 
 			this.hideLoadingIcon();        
 			this.errorMsg += this.props.i18nLib.t('wizard.map_fields.msg_error_retrieving_destination_fields');
@@ -87,7 +87,7 @@ var ChooseFields = React.createClass({
 			this.updateSourceFields(data);
 			this.sourceDataLoaded = true;
 			this.hideLoadingIcon();
-		}.bind(this)).catch(function(err) {
+		}.bind(this))["catch"](function(err) {
 			this.sourceDataLoaded = true;
 			this.hideLoadingIcon();        
 			this.errorMsg += this.props.i18nLib.t('wizard.map_fields.msg_error_retrieving_source_fields');  
@@ -98,7 +98,7 @@ var ChooseFields = React.createClass({
 			this.updateFieldMappingStore(data); 
 			this.mappingDataLoaded = true;
 			this.hideLoadingIcon();
-		}.bind(this)).catch(function(err) {
+		}.bind(this))["catch"](function(err) {
 			this.mappingDataLoaded = true;
 			this.hideLoadingIcon();       
 			this.errorMsg += this.props.i18nLib.t('wizard.map_fields.msg_error_retrieving_mappings');  
@@ -107,7 +107,7 @@ var ChooseFields = React.createClass({
 
 		appActions.loadFieldMappingsTemplateList.triggerPromise().then(function(data) {                              
 			this.updateMappingTemplatesData(data); 
-		}.bind(this)).catch(function(err) {			     
+		}.bind(this))["catch"](function(err) {			     
 			this.errorMsg += this.props.i18nLib.t('wizard.map_fields.msg_error_retrieving_templates');
 			this.displayError();			
 		}.bind(this));
@@ -216,7 +216,7 @@ var ChooseFields = React.createClass({
 	reloadTemplateData: function(){
 		appActions.loadFieldMappingsTemplateList.triggerPromise().then(function(data) {                              
 			this.updateMappingTemplatesData(data); 
-		}.bind(this)).catch(function(err) { 
+		}.bind(this))["catch"](function(err) { 
 			this.errorMsg += this.props.i18nLib.t('wizard.map_fields.msg_error_retrieving_templates');
 			this.displayError();
 		}.bind(this));

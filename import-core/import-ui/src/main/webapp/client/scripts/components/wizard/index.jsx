@@ -46,7 +46,7 @@ var Wizard = React.createClass({
 		    Cookies.set("WORKSPACE", data['team']);
 		    
 			this.initImportSession(sourceProcessor, destinationProcessor); 
-	      }.bind(this)).catch(function(err) {        
+	      }.bind(this))["catch"](function(err) {        
 	      }.bind(this)); 
 		
 	},
@@ -121,7 +121,7 @@ var Wizard = React.createClass({
 			}else{
 				this.transitionTo('projects', this.props.params);
 			}			
-		}.bind(this)).catch(function(err) {
+		}.bind(this))["catch"](function(err) {
 			console.log("Error retrieving values");
 		})
 	},

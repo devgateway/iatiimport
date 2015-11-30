@@ -33,7 +33,7 @@ var WorkflowList = React.createClass({
    loadData: function(){    
      appActions.loadWorkflowData().then(function(data) {                                       
         this.updateWorkflowList(data);                
-      }.bind(this)).catch(function(err) {       
+      }.bind(this))["catch"](function(err) {       
         console.log('Error loading workflows');
      }.bind(this));
   },

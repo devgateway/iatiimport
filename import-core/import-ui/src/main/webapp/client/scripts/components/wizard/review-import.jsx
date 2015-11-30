@@ -25,7 +25,7 @@ var ReviewImport = React.createClass({
 			appActions.loadImportSummary.triggerPromise().then(function(data) {                            
 				this.updateImportSummary(data); 			
 				this.props.eventHandlers.hideLoadingIcon();
-			}.bind(this)).catch(function(err) {       
+			}.bind(this))["catch"](function(err) {       
 				this.hideLoadingIcon(); 
 				this.props.eventHandlers.hideLoadingIcon();        
 	    		this.props.eventHandlers.displayError(this.props.i18nLib.t('wizard.review_import.msg_error_retrieving_summary'));     

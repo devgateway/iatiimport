@@ -37,7 +37,7 @@ var ImportList = React.createClass({
      var params = {size:10, page:this.state.activePage - 1, sort: this.state.sort}
      appActions.loadImportListData(params).then(function(data) {                                       
         this.updateImportList(data);                
-      }.bind(this)).catch(function(err) {       
+      }.bind(this))["catch"](function(err) {       
         console.log('Error loading importList');
      }.bind(this));
   },

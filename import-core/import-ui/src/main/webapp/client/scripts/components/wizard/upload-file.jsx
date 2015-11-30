@@ -57,7 +57,7 @@ var UploadFile = React.createClass({
       appActions.loadFileData.triggerPromise().then(function(data) {      
         this.props.eventHandlers.hideLoadingIcon();                       
         this.updateFileData(data); 
-      }.bind(this)).catch(function(err) {       
+      }.bind(this))["catch"](function(err) {       
         this.props.eventHandlers.hideLoadingIcon(); 
         this.props.eventHandlers.displayError(this.props.i18nLib.t('wizard.upload_file.msg_error_retrieving_files'));
       }.bind(this)); 

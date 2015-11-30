@@ -41,7 +41,7 @@ var PreviousImports = React.createClass({
      var sortParams = {size:10, page:this.state.activePage - 1}  
      appActions.loadImportLog(this.props.params.id,sortParams).then(function(data) {                                      
         this.updateImportLog(data);                
-      }.bind(this)).catch(function(err) {
+      }.bind(this))["catch"](function(err) {
         console.log('Error loading import logs');
      }.bind(this));
   },
