@@ -82,6 +82,12 @@ var AutoComplete = React.createClass({
     	}
 
     },
+    componentDidUpdate: function(prevProps, prevState){
+    	var $el = $(this.refs[this.props.refId].getDOMNode());
+    	if(this.props.value) {
+    		$el.val(this.props.value);
+    	}
+    },
     render: function () {       
         return (
             <div className="autocomplete">
