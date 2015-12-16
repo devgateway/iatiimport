@@ -43,7 +43,7 @@ Returns the list of available fields in a project in the destination system.
 Method: GET
 Suggested REST URL: /fields 
 JSON Result:
-'''json
+```json
 [
 {
 	field_name: "activity_status",
@@ -57,7 +57,8 @@ JSON Result:
 	field_name: "sectors",
 	field_type: "array"
 }
-]'''
+]
+```
 
 ### List of possible values
 Returns the list of possible values for :field_name in form of an array. Leave additional_property_N for future extensions that might be needed.
