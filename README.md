@@ -1,12 +1,12 @@
 # iatiimport
 
 #Overview
-Tool for importing IATI data files into target systems. The target system must provide the endpoints described in the '**Destination System REST Endpoint Requirements**'
+Tool for importing IATI data files into target systems. The target system must provide the endpoints described in the '**Destination System REST Endpoint Requirements**'.
 
 
 
 # Target Audience
- This documentation is for developers who would like to integrate the IATI Import Tool with target systems
+ This documentation is for developers who would like to integrate the IATI Import Tool with target systems.
 
 # Requirements
  - Java 8 or later	
@@ -43,6 +43,7 @@ Returns the list of available fields in a project in the destination system.
 Method: GET
 Suggested REST URL: /fields 
 JSON Result:
+```json
 [
 {
 	field_name: "activity_status",
@@ -56,7 +57,7 @@ JSON Result:
 	field_name: "sectors",
 	field_type: "array"
 }
-]
+]```
 
 ### List of possible values
 Returns the list of possible values for :field_name in form of an array. Leave additional_property_N for future extensions that might be needed.
