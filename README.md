@@ -66,6 +66,8 @@ Returns the list of possible values for :field_name in form of an array. Leave a
 Method: GET
 Suggested REST URL: /fields/:field_name
 JSON Result:
+
+```json
 [
 	{
 		id: 1,
@@ -84,12 +86,14 @@ JSON Result:
 		]
 	}
 ]
-
+```
 ### Raw List of projects
 Returns a list of all projects with a limited set of fields: id, title, date, no aggregations.
 
 Method: GET
 Suggested REST URL: /projects
+
+```json
 [
 	{
 		amp_activity_id: 1,
@@ -111,12 +115,14 @@ Suggested REST URL: /projects
 		created_date: "2001-01-01 12:00:00"
 	},
 ]
+```
 
 ### Complete project information
 Returns the complete JSON of a project
 Method: GET
 Suggested REST URL: /projects/:project_id
 
+```json
 {
 	amp_activity_id: 1,
 	amp_id: "8822220000",
@@ -131,6 +137,7 @@ Suggested REST URL: /projects/:project_id
 	]
 	...
 }
+```
 
 ## Endpoints that commit information
 ### Update project
