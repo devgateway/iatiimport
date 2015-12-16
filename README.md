@@ -174,14 +174,12 @@ Suggested REST URL: /projects
 	...
 }
 
-
+# Building the Tool
+ On the terminal, change directory to import-core. Run 'mvn clean install'. A jar file will be created in import-core/import-ui/target.
+   
+# Installation 
+  We have provided a script for running the jar file in linux. Please check import-core/import-ui/scripts/import-tool.sh. Modify the file to suit your environment
  
-
-- Integration - Import Tool Destination System REST Endpoint Requirements - https://docs.google.com/document/d/1GXlTwcNZ7r6ZUTkic16gZbKO8Lh6EeYGQojonysP2lM/edit#heading=h.oviamd4u33vy	
-- Building the Tool	
-- Installation - script for running jar on linux
-
-- freehold 
 
 
 
