@@ -1,7 +1,7 @@
 # iatiimport
 
 #Overview
-Tool for importing IATI data files into target systems. The target system must provide the endpoints described in the '**Integration section**'
+Tool for importing IATI data files into target systems. The target system must provide the endpoints described in the '**Destination System REST Endpoint Requirements**'
 
 
 
@@ -25,7 +25,7 @@ Tool for importing IATI data files into target systems. The target system must p
   - USE_AUTHENTICATION_TOKEN - used to enable or disable authentication
   - AMP_DESKTOP_ENDPOINT - optional. The url that the tool redirects to when the close button is clicked.
   
-# Import Tool Destination System REST Endpoint Requirements
+# Destination System REST Endpoint Requirements
 
 ## General Information
 
@@ -178,7 +178,7 @@ Suggested REST URL: /projects
  On the terminal, change directory to import-core. Run 'mvn clean install'. A jar file will be created in import-core/import-ui/target.
    
 # Installation 
-  We have provided a script for running the jar file in linux. Please check import-core/import-ui/scripts/import-tool.sh. Modify the file to suit your environment
+  We have provided a script for running the jar file in linux. Please check import-core/import-ui/scripts/import-tool.sh. Modify the file to suit your environment.
  
 
 
