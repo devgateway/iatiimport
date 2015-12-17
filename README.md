@@ -200,8 +200,9 @@ Suggested REST URL: /projects
  
 ## Create jar File
  
-  On the terminal, change directory to import-core. Run 'mvn clean install'. A jar file will be created in import-core/import-ui/target.
-   
+  - On the terminal, change directory to import-core.
+  - Run 'mvn clean install'. A jar file will be created in import-core/import-ui/target.
+      
 # Installation 
   We have provided a script for running the jar file in linux. Please check import-core/import-ui/scripts/import-tool.sh. Modify the file to suit your environment.
  
