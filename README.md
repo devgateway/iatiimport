@@ -98,7 +98,7 @@ Suggested REST URL: /projects
 	{
 		amp_activity_id: 1,
 		amp_id: "8822220000",
-		external_id: “IATI23123123”,
+		external_id: "IATI23123123",
 		title: "Project Title 1",
 		created_date: "2001-01-01 12:00:00"
 	},
@@ -189,8 +189,18 @@ Suggested REST URL: /projects
 }
 ```
 
-# Building the Tool
- On the terminal, change directory to import-core. Run 'mvn clean install'. A jar file will be created in import-core/import-ui/target.
+# Packaging the Tool
+
+ There are two steps involved in packaging the import tool. First, build the UI using grunt. Then create a jar file using maven.
+
+## Build the UI
+ 
+  - On the terminal, change directory to /import-core/import-ui/src/main/webapp.
+  - Run 'grunt build'.
+ 
+## Create jar File
+ 
+  On the terminal, change directory to import-core. Run 'mvn clean install'. A jar file will be created in import-core/import-ui/target.
    
 # Installation 
   We have provided a script for running the jar file in linux. Please check import-core/import-ui/scripts/import-tool.sh. Modify the file to suit your environment.
