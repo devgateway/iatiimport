@@ -1,7 +1,7 @@
 # iatiimport
 
 #Overview
-Tool for importing IATI data files into target systems. The target system must provide the endpoints described in the '**Destination System REST Endpoint Requirements**'.
+Tool for importing IATI data into target systems. The target system must provide the endpoints described in the '**Destination System REST Endpoint Requirements**'.
 
 
 
@@ -67,7 +67,7 @@ Method: GET
 Suggested REST URL: /fields/:field_name
 JSON Result:
 
-```json
+```javascript
 [
 	{
 		id: 1,
@@ -93,7 +93,7 @@ Returns a list of all projects with a limited set of fields: id, title, date, no
 Method: GET
 Suggested REST URL: /projects
 
-```json
+```javascript
 [
 	{
 		amp_activity_id: 1,
@@ -122,7 +122,7 @@ Returns the complete JSON of a project
 Method: GET
 Suggested REST URL: /projects/:project_id
 
-```json
+```javascript
 {
 	amp_activity_id: 1,
 	amp_id: "8822220000",
@@ -147,7 +147,7 @@ Method: POST
 Request Body: JSON
 Suggested REST URL: /projects/:project_id
 
-```json
+```javascript
 {
 	amp_activity_id: 1,
 	amp_id: "8822220000",
@@ -171,7 +171,7 @@ Method: POST
 Request Body: JSON
 Suggested REST URL: /projects
 
-```json
+```javascript
 {
 	amp_activity_id: 1,
 	amp_id: "8822220000",
