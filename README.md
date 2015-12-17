@@ -43,7 +43,7 @@ Returns the list of available fields in a project in the destination system.
 Method: GET
 Suggested REST URL: /fields 
 JSON Result:
-```json
+```javascript
 [
 {
 	field_name: "activity_status",
@@ -146,6 +146,8 @@ Updates an existing project. We send a JSON with the project with fields updated
 Method: POST
 Request Body: JSON
 Suggested REST URL: /projects/:project_id
+
+```json
 {
 	amp_activity_id: 1,
 	amp_id: "8822220000",
@@ -160,6 +162,7 @@ Suggested REST URL: /projects/:project_id
 	]
 	...
 }
+```
 
 ### Insert new project
 Inserts a new project. We send a JSON with the new project with fields updated. The destination system creates the new project based on the JSON.
@@ -167,6 +170,8 @@ Inserts a new project. We send a JSON with the new project with fields updated. 
 Method: POST
 Request Body: JSON
 Suggested REST URL: /projects
+
+```json
 {
 	amp_activity_id: 1,
 	amp_id: "8822220000",
@@ -182,6 +187,7 @@ Suggested REST URL: /projects
 	]
 	...
 }
+```
 
 # Building the Tool
  On the terminal, change directory to import-core. Run 'mvn clean install'. A jar file will be created in import-core/import-ui/target.
