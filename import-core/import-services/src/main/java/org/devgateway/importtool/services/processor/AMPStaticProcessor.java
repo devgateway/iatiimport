@@ -56,8 +56,23 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	// private Properties properties = null;
 
 	private List<Field> fieldList = new ArrayList<Field>();
-
+	
+	
 	private List<ClientHttpRequestInterceptor> interceptors = new ArrayList<ClientHttpRequestInterceptor>();
+	
+	private List<String> destinationFieldsList = new ArrayList<String>(); //fields returned by current AMP installation
+
+	
+
+	public List<String> getDestinationFieldsList() {
+		return destinationFieldsList;
+	}
+
+
+	public void setDestinationFieldsList(List<String> destinationFieldsList) {
+		this.destinationFieldsList = destinationFieldsList;
+	}
+
 	private RestTemplate template;
 	
 	private  ActionStatus actionStatus;
@@ -661,52 +676,86 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	private void instantiateStaticFields() {
 
 		Map<String, Properties> fieldProps = getFieldProps();
+		// Transaction Fields
+        List<Field> trnDependencies = new ArrayList<Field>();
 
 		// Fixed fields
+		
 		fieldList.add(new Field("IATI Identifier", "iati-identifier", FieldType.STRING, false));
-		fieldList.add(new Field("Project Title", "project_title", getFieldType(fieldProps.get("project_title")), false));
+		
+		if(destinationFieldsList.contains("project_title")){
+			fieldList.add(new Field("Project Title", "project_title", getFieldType(fieldProps.get("project_title")), false));
+		}
+		
 
 		// Code Lists
-		Field activityStatus = new Field("Activity Status", "activity_status", FieldType.LIST, true);
-		activityStatus.setPossibleValues(getCodeListValues("activity_status"));
-		activityStatus.setRequired(true);
-		fieldList.add(activityStatus);
-
-		Field typeOfAssistence = new Field("Type of Assistance", "type_of_assistance", FieldType.LIST, true);
-		typeOfAssistence.setPossibleValues(getCodeListValues("fundings~type_of_assistance"));
-		// typeOfAssistence.setPossibleValues(getToA());
-		fieldList.add(typeOfAssistence);
-
-		Field financialInstrument = new Field("Aid Modality", "financing_instrument", FieldType.LIST, true);
-		financialInstrument.setPossibleValues(getCodeListValues("fundings~financing_instrument"));
-		fieldList.add(financialInstrument);
-
-		Field adjustmentType = new Field("Adjustment Type", "adjustment_type", FieldType.LIST, true);
-		adjustmentType.setPossibleValues(getCodeListValues("fundings~funding_details~adjustment_type"));
-		fieldList.add(adjustmentType);
-
-		Field transactionType = new Field("Transaction Type", "transaction_type", FieldType.LIST, false);
-		transactionType.setPossibleValues(getCodeListValues("fundings~funding_details~transaction_type"));
-		fieldList.add(transactionType);
-
-		Field primarySector = new Field("Primary Sector", "primary_sectors", FieldType.LIST, true);
-		primarySector.setPossibleValues(getCodeListValues("primary_sectors~sector_id"));
-		primarySector.setMultiple(true);
-		fieldList.add(primarySector);
-
-		Field secondarySector = new Field("Secondary Sector", "secondary_sectors", FieldType.LIST, true);
-		secondarySector.setPossibleValues(getCodeListValues("secondary_sectors~sector_id"));
-		fieldList.add(secondarySector);
-
-		Field tertiarySector = new Field("Tertiary Sector", "tertiary_sectors", FieldType.LIST, true);
-		tertiarySector.setPossibleValues(getCodeListValues("tertiary_sectors~sector_id"));
-		fieldList.add(tertiarySector);
-
-		// Multi-language strings
-		FieldType ftDescription = getFieldType(fieldProps.get("description"));
-		if(ftDescription != null) {
-			fieldList.add(new Field("Activity Description", "description", ftDescription, true));
+        if(destinationFieldsList.contains("activity_status")){
+        	Field activityStatus = new Field("Activity Status", "activity_status", FieldType.LIST, true);
+    		activityStatus.setPossibleValues(getCodeListValues("activity_status"));
+    		activityStatus.setRequired(true);
+    		fieldList.add(activityStatus);		
 		}
+			
+		
+        if(destinationFieldsList.contains("fundings~type_of_assistance")){
+        	Field typeOfAssistence = new Field("Type of Assistance", "type_of_assistance", FieldType.LIST, true);
+    		typeOfAssistence.setPossibleValues(getCodeListValues("fundings~type_of_assistance"));    		
+    		fieldList.add(typeOfAssistence);	
+    		trnDependencies.add(typeOfAssistence);
+		}
+		
+
+      if(destinationFieldsList.contains("fundings~financing_instrument")){
+    	  Field financialInstrument = new Field("Aid Modality", "financing_instrument", FieldType.LIST, true);
+  		  financialInstrument.setPossibleValues(getCodeListValues("fundings~financing_instrument"));
+  		  fieldList.add(financialInstrument);	
+  		  trnDependencies.add(financialInstrument);
+	   }
+		
+
+        if(destinationFieldsList.contains("fundings~funding_details~adjustment_type")){
+        	Field adjustmentType = new Field("Adjustment Type", "adjustment_type", FieldType.LIST, true);
+    		adjustmentType.setPossibleValues(getCodeListValues("fundings~funding_details~adjustment_type"));
+    		fieldList.add(adjustmentType);	
+		}
+		
+
+       if(destinationFieldsList.contains("fundings~funding_details~transaction_type")){
+	Field transactionType = new Field("Transaction Type", "transaction_type", FieldType.LIST, false);
+	transactionType.setPossibleValues(getCodeListValues("fundings~funding_details~transaction_type"));
+	fieldList.add(transactionType);	
+		}
+		
+        if(destinationFieldsList.contains("primary_sectors~sector_id")){
+        	Field primarySector = new Field("Primary Sector", "primary_sectors", FieldType.LIST, true);
+    		primarySector.setPossibleValues(getCodeListValues("primary_sectors~sector_id"));
+    		primarySector.setMultiple(true);
+    		fieldList.add(primarySector);
+		}
+		
+
+        if(destinationFieldsList.contains("secondary_sectors~sector_id")){
+        	Field secondarySector = new Field("Secondary Sector", "secondary_sectors", FieldType.LIST, true);
+    		secondarySector.setPossibleValues(getCodeListValues("secondary_sectors~sector_id"));
+    		fieldList.add(secondarySector);
+		}
+		
+
+      if(destinationFieldsList.contains("tertiary_sectors~sector_id")){
+    	  Field tertiarySector = new Field("Tertiary Sector", "tertiary_sectors", FieldType.LIST, true);
+  		  tertiarySector.setPossibleValues(getCodeListValues("tertiary_sectors~sector_id"));
+  		  fieldList.add(tertiarySector);
+		}
+		
+
+       if(destinationFieldsList.contains("description")){
+    	// Multi-language strings
+    			FieldType ftDescription = getFieldType(fieldProps.get("description"));
+    			if(ftDescription != null) {
+    				fieldList.add(new Field("Activity Description", "description", ftDescription, true));
+    			}	
+		}
+		
 
 		// Dates
 		if (fieldProps.get("planned_start_date") != null) {
@@ -723,23 +772,17 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		}
 
 		// Organizations
-		Field fundingOrganization = new Field("Funding Organization", "donor_organization", FieldType.ORGANIZATION, true);
-		fundingOrganization.setPossibleValues(getCodeListValues("fundings~donor_organization_id"));
-		
-		
-		if (fieldProps.get("donor_organization") != null && fieldProps.get("donor_organization").getProperty("percentage_constraint") != null) {
-			fundingOrganization.setPercentage(true);
-		}
-		
-		fieldList.add(fundingOrganization);
+         if(destinationFieldsList.contains("fundings~donor_organization_id")){
+        		Field fundingOrganization = new Field("Funding Organization", "donor_organization", FieldType.ORGANIZATION, true);
+        		fundingOrganization.setPossibleValues(getCodeListValues("fundings~donor_organization_id"));
+        		if (fieldProps.get("donor_organization") != null && fieldProps.get("donor_organization").getProperty("percentage_constraint") != null) {
+        			fundingOrganization.setPercentage(true);
+        		}        		
+        		fieldList.add(fundingOrganization);
+        		trnDependencies.add(fundingOrganization);
+		 }		
 
 		// Transactions
-		// Transaction Fields
-		List<Field> trnDependencies = new ArrayList<Field>();
-		trnDependencies.add(typeOfAssistence);
-		trnDependencies.add(financialInstrument);
-		trnDependencies.add(fundingOrganization);
-
 		Field actualCommitments = new Field("Actual Commitments", "transaction", FieldType.TRANSACTION, true);
 		actualCommitments.setSubType("AC");
 		actualCommitments.setDependencies(trnDependencies);
@@ -809,7 +852,10 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 					JsonNode node = mainNode.next();
 					String fieldName = node.get("field_name").asText();
 					String fieldType = node.get("field_type").asText();
-
+					destinationFieldsList.add(fieldName);					
+					addChildrenToDestinationFieldList(node,fieldName);
+					
+					
 					JsonNode translatable = node.get("translatable");
 					JsonNode percentageConstraint = node.get("percentage_constraint");
 					Properties prop = new Properties();
@@ -821,6 +867,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 						prop.setProperty("percentage_constraint", percentageConstraint.asText());
 					}
 					fieldProperties.put(fieldName, prop);
+					
 				}
 			}
 
@@ -830,6 +877,22 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		return fieldProperties;
 	}
 
+	private void addChildrenToDestinationFieldList(JsonNode node, String fieldName){
+		JsonNode children = node.get("children");
+		if(children != null && children.isArray()){
+			Iterator<JsonNode> childFields = children.elements();						
+			while (childFields.hasNext()) {
+				JsonNode child = childFields.next();				
+				String childFieldName = child.get("field_name").asText();
+				String name = fieldName + "~" + childFieldName;
+				destinationFieldsList.add(name);				
+				if(node.get("children") != null){
+					addChildrenToDestinationFieldList(child, name);
+				}
+			}
+		}	
+		
+	}
 	private List<FieldValue> getCodeListValues(String codeListName) {
 		String result = "";
 		List<FieldValue> possibleValues = new ArrayList<FieldValue>();

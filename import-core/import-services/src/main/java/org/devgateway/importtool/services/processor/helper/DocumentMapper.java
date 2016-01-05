@@ -68,9 +68,10 @@ public class DocumentMapper implements IDocumentMapper {
 		importStatus.setStatus(Status.IN_PROGRESS);
 		results = new ArrayList<ActionResult>();
 		for (DocumentMapping doc : documentMappings) {
-			if (doc.getSelected())
+			if (doc.getSelected()) {
 				importStatus.incrementProcessed();
 				results.add(processDocumentMapping(doc));
+			}
 		}
 		importStatus.setStatus(Status.COMPLETED);		
 		return results;
