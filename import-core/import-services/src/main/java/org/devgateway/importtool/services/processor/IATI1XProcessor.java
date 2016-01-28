@@ -217,6 +217,7 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 			NodeList nodeList = doc.getElementsByTagName(field.getFieldName());
 			List<FieldValue> reducedPossibleValues = new ArrayList<FieldValue>();
 			switch (field.getType()) {
+			case RECIPIENT_COUNTRY:
 			case LIST:
 				if (nodeList.getLength() > 0) {
 					for (int i = 0; i < nodeList.getLength(); i++) {
@@ -347,6 +348,34 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 						}
 					}
 					break;
+				case RECIPIENT_COUNTRY:
+					Field filtersField = filterFieldList.stream().filter(n -> {
+						return field.getFieldName().equals(n.getFieldName());
+					}).findFirst().get();				
+					
+					fieldNodeList = element.getElementsByTagName(field.getFieldName());					
+					List<FieldValue> recipients = new ArrayList<FieldValue>();
+					for (int j = 0; j < fieldNodeList.getLength(); j++) {
+						Element fieldElement = (Element) fieldNodeList.item(j);
+						FieldValue recipient = new FieldValue();	
+						String code = fieldElement.getAttribute("code");
+						
+						filterIncluded = includedByFilter(filtersField.getFilters(), code);
+						if(!filterIncluded){
+							break fieldLoop;
+						}
+						
+						recipient.setCode(code);
+						Optional<FieldValue> fieldValue = field.getPossibleValues().stream().filter(f -> f.getCode().equals(code)).findFirst();
+						if(fieldValue.isPresent()){
+							recipient.setValue(fieldValue.get().getValue());
+						}
+						recipient.setPercentage(fieldElement.getAttribute("percentage"));	
+						recipients.add(recipient);							
+						
+					}					
+					document.addRecepientCountryFields(field.getFieldName(), recipients);					
+					break;
 				case STRING:
 					String stringValue = "";
 					fieldNodeList = element.getElementsByTagName(field.getFieldName());
@@ -361,7 +390,6 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 					document.addStringField(field.getFieldName(), stringValue);
 					break;
 				case ORGANIZATION:
-
 					fieldNodeList = element.getElementsByTagName(field.getFieldName());
 					if (fieldNodeList.getLength() > 0) {
 						for (int j = 0; j < fieldNodeList.getLength(); j++) {
@@ -415,7 +443,7 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 				case TRANSACTION:
 					try {
 						NodeList nodes;
-						nodes = (NodeList) xPath.evaluate("transaction/transaction-type[@code='" + field.getSubType() + "']/parent::*", element, XPathConstants.NODESET);
+						nodes = (NodeList) xPath.evaluate("transaction/transaction-type[@code='" + field.getSubType() + "' or @code= '" + field.getSubTypeCode() + "']/parent::*", element, XPathConstants.NODESET);
 						for (int j = 0; j < nodes.getLength(); ++j) {
 							String reference = "";
 							String receivingOrganization = "";
@@ -577,8 +605,10 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 		fieldList.add(policyMarker);
 		filterFieldList.add(policyMarker);
 
-		Field recipientCountry = new Field("Recipient Country", "recipient-country", FieldType.LIST, true);
+		Field recipientCountry = new Field("Recipient Country", "recipient-country", FieldType.RECIPIENT_COUNTRY, true);
 		recipientCountry.setPossibleValues(getCodeListValues("recipient-country"));
+		recipientCountry.setExclusive(true);
+		recipientCountry.setFilterRequired(true);
 		fieldList.add(recipientCountry);
 		filterFieldList.add(recipientCountry);
 
@@ -609,10 +639,12 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 		// Transaction Fields
 		Field commitments = new Field("Commitments", "transaction", FieldType.TRANSACTION, true);
 		commitments.setSubType("C");
+		commitments.setSubTypeCode("2");
 		fieldList.add(commitments);
 
 		Field disbursements = new Field("Disbursements", "transaction", FieldType.TRANSACTION, true);
 		disbursements.setSubType("D");
+		disbursements.setSubTypeCode("3");
 		fieldList.add(disbursements);
 
 		// Organization Fields

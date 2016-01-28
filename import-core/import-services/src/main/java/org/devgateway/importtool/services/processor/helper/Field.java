@@ -19,7 +19,9 @@ public class Field {
 	private List<String> filters = new ArrayList<String>();
 	private List<Field> dependencies = new ArrayList<Field>();
 	private boolean isRequired;
-
+	private boolean isExclusive;
+	
+	private boolean filterRequired;
 	// These types are silly but needed for now.
 	// Refactor to something more reasonable and generic (Make Field an
 	// interface and get types to be implementations of it)
@@ -171,4 +173,22 @@ public class Field {
 	public void setRequired(boolean isRequired) {
 		this.isRequired = isRequired;
 	}
+	
+
+	public boolean isExclusive() {
+		return isExclusive;
+	}
+
+	public void setExclusive(boolean isExclusive) {
+		this.isExclusive = isExclusive;
+	}
+	
+	public boolean isFilterRequired() {
+		return filterRequired;
+	}
+
+	public void setFilterRequired(boolean filterRequired) {
+		this.filterRequired = filterRequired;
+	}
+
 }

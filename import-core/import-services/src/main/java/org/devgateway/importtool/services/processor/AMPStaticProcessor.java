@@ -35,6 +35,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.util.StringUtils;
 
 // TODO: Sort methods, move classes to generic helpers for all processors if possible
 // TODO: Clean up code, find opportunities to reuse methods (example update/insert)
@@ -246,6 +247,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			Field destinationField = mapping.getDestinationField();
 
 			switch (sourceField.getType()) {
+			case RECIPIENT_COUNTRY:
 			case LIST:
 				if (!destinationField.getFieldName().equals("type_of_assistance") && !destinationField.getFieldName().equals("financing_instrument")) {
 					Optional<FieldValueMapping> optValueMapping = valueMappings.stream().filter(n -> {
@@ -257,7 +259,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 						project.set(destinationField.getFieldName(), getCodeFromList(source, optValueMapping.get()));
 					}
 				}
-				break;
+				break;			
 			case MULTILANG_STRING:
 				project.set(destinationField.getFieldName(), getMapFromString(source, destinationField.getFieldName(), mapping));
 				break;
@@ -361,6 +363,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			Field destinationField = mapping.getDestinationField();
 
 			switch (sourceField.getType()) {
+			case RECIPIENT_COUNTRY:
 			case LIST:
 				if (!destinationField.getFieldName().equals("type_of_assistance") && !destinationField.getFieldName().equals("financing_instrument")) {
 					Optional<FieldValueMapping> optValueMapping = valueMappings.stream().filter(n -> {
@@ -433,7 +436,9 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		String currencyCode = source.getStringFields().get("default-currency");
 		String currencyIdString = getCurrencyId(currencyCode);
 		int currencyId = Integer.parseInt(currencyIdString);
-
+		FieldValue recipientCountry = source.getRecepientCountryFields().get("recipient-country").stream().findFirst().get();
+		Double percentage = (StringUtils.isEmpty(recipientCountry.getPercentage())) ?  100.00 : Double.parseDouble(recipientCountry.getPercentage());
+        
 		for (FieldMapping mapping : fieldMappings) {
 			Field sourceField = mapping.getSourceField();
 			Field destinationField = mapping.getDestinationField();
@@ -460,7 +465,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 					fundingDetail.set("adjustment_type", getAdjustmentType(destinationSubType));
 					fundingDetail.set("transaction_date", getTransactionDate(dateString));
 					fundingDetail.set("currency", currencyId);
-					fundingDetail.set("transaction_amount", getTransactionAmount(amount));
+					fundingDetail.set("transaction_amount", getTransactionAmount(amount,percentage));
 					fundingDetails.add(fundingDetail);
 				}
 			}
@@ -509,9 +514,9 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		return currencyValue.getCode();
 	}
 
-	private Object getTransactionAmount(String amount) {
+	private Object getTransactionAmount(String amount, Double percentage) {
 		Double amountValue = Double.parseDouble(amount);
-		return amountValue;
+		return (amountValue * percentage)/100;
 	}
 
 	private int getIdFromList(String fieldValue, String sourceField, List<FieldMapping> fieldMappings, List<FieldValueMapping> valueMappings, Boolean useCode) throws ValueMappingException {

@@ -1,9 +1,11 @@
 package org.devgateway.importtool.model;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+
 import org.springframework.hateoas.Identifiable;
 
 import javax.persistence.*;
+
 import java.io.Serializable;
 
 
@@ -19,12 +21,14 @@ public class Project implements Identifiable<Long>, Serializable {
 	@Column(name = "id", unique = true, nullable = false)
 	private Long id;
 
+	@Lob
 	@Column(name = "title")
 	private String title;
 
 	@Column(name = "status")
 	private String status;
 	
+	@Lob
 	@Column(name = "notes")
 	private String notes;
 	
