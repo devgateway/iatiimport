@@ -358,20 +358,17 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 					for (int j = 0; j < fieldNodeList.getLength(); j++) {
 						Element fieldElement = (Element) fieldNodeList.item(j);
 						FieldValue recipient = new FieldValue();	
-						String code = fieldElement.getAttribute("code");
-						
-						filterIncluded = includedByFilter(filtersField.getFilters(), code);
-						if(!filterIncluded){
-							break fieldLoop;
-						}
-						
-						recipient.setCode(code);
-						Optional<FieldValue> fieldValue = field.getPossibleValues().stream().filter(f -> f.getCode().equals(code)).findFirst();
-						if(fieldValue.isPresent()){
-							recipient.setValue(fieldValue.get().getValue());
-						}
-						recipient.setPercentage(fieldElement.getAttribute("percentage"));	
-						recipients.add(recipient);							
+						String code = fieldElement.getAttribute("code");						
+						boolean includeCountry = includedByFilter(filtersField.getFilters(), code);
+						if(includeCountry){
+							recipient.setCode(code);
+							Optional<FieldValue> fieldValue = field.getPossibleValues().stream().filter(f -> f.getCode().equals(code)).findFirst();
+							if(fieldValue.isPresent()){
+								recipient.setValue(fieldValue.get().getValue());
+							}
+							recipient.setPercentage(fieldElement.getAttribute("percentage"));	
+							recipients.add(recipient);	
+						}								
 						
 					}					
 					document.addRecepientCountryFields(field.getFieldName(), recipients);					
