@@ -2,6 +2,7 @@ package org.devgateway.importtool.services.processor.helper;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class InternalDocument {
@@ -12,8 +13,25 @@ public class InternalDocument {
 	private Map<String, Map<String, String>> organizationFields = new HashMap<String, Map<String, String>>();
 	private Map<String, Map<String, String>> transactionFields = new HashMap<String, Map<String, String>>();
 	private Map<String, Map<String, String>> contactFields = new HashMap<String, Map<String, String>>();
-	private Map<String, Date> dateFields = new HashMap<String, Date>();
+	private Map<String, Date> dateFields = new HashMap<String, Date>();	
+	private Map<String, List<FieldValue>> recepientCountryFields = new HashMap<String, List<FieldValue>>();
 	
+	
+
+
+
+	public Map<String, List<FieldValue>> getRecepientCountryFields() {
+		return recepientCountryFields;
+	}
+
+	public void setRecepientCountryFields(
+			Map<String, List<FieldValue>> recepientCountryFields) {
+		this.recepientCountryFields = recepientCountryFields;
+	}
+
+
+
+
 	private boolean allowEdit = false;
 
 	public boolean isAllowEdit() {
@@ -40,6 +58,8 @@ public class InternalDocument {
 		getTransactionFields().put(fieldName, transaction);
 	}
 
+	
+	
 	public void addContactFields(String fieldName, Map<String, String> contact) {
 		getContactFields().put(fieldName, contact);
 	}
@@ -115,4 +135,10 @@ public class InternalDocument {
 	}
 
 
+	
+
+	public void addRecepientCountryFields(String fieldName, List<FieldValue> value) {
+		this.getRecepientCountryFields().put(fieldName, value);
+	}
+	
 }

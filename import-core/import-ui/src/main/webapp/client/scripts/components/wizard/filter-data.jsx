@@ -87,6 +87,18 @@ var FilterData = React.createClass({
 
 		this.setState( { filterData: this.state.filterData });
 	},
+	handleToggleRadio: function(field, value, event) {        
+		var currentField = _.find(this.state.filterData, { 'fieldName': field.fieldName });		
+		if(event.target.checked) {
+			currentField.filters = [];
+			currentField.filters.push(value.code);
+		}
+		else
+		{
+			currentField.filters = [];
+		}
+		this.setState( { filterData: this.state.filterData });
+	},
 	handleLanguageToggle: function(language, event){
 		var languages = this.state.languageData;
 		var currentLanguage = _.find(languages, { 'code': language.code });
@@ -109,14 +121,35 @@ var FilterData = React.createClass({
 			filterData: this.state.filterData
 		});
 	},
+	isValid: function(){
+	  var requiredFiltersState = [];
+	  if (this.state.filterData) {
+           var requiredFiltersState = $.map(this.state.filterData, function(filter, i) {
+            	if(filter.filterRequired && filter.possibleValues.length > 0){
+            		return filter.filters.length > 0
+            	}
+            }.bind(this));
+      }
+	  return (_.indexOf(requiredFiltersState, false) == -1)
+	},
     render: function() {
         var filters = [];
         if (this.state.filterData) {
             $.map(this.state.filterData, function(filter, i) {
-                var filterValues = [];
+                var filterValues = [];                
                 $.map(filter.possibleValues, function(values, i) {
                     var checkedValue = _.some(filter.filters, function(v){ return v == values.code});
-                    filterValues.push(
+                    if(filter.exclusive){
+                       filterValues.push(
+                            <div className="input-group">
+                            <span className="input-group-addon">
+                                <input aria-label={values.value} name = {filter.fieldName} className="value-select" type="radio" checked={checkedValue} onChange={this.handleToggleRadio.bind(this, filter, values)} />
+                            </span>
+                            <input aria-label="Field1" className="form-control" readOnly type="text" value={values.value}/>
+                            </div>
+                        )
+                    }else{                      
+                       filterValues.push(
                             <div className="input-group">
                             <span className="input-group-addon">
                                 <input aria-label={values.value} className="value-select" type="checkbox" checked={checkedValue} onChange={this.handleToggle.bind(this, filter, values)} />
@@ -124,12 +157,17 @@ var FilterData = React.createClass({
                             <input aria-label="Field1" className="form-control" readOnly type="text" value={values.value}/>
                             </div>
                         )
+                    }                    
                 }.bind(this));
 
                 if(filterValues.length > 0 ) {
+                    var groupSelector = "";
+                    if(!filter.exclusive){
+                       groupSelector = <input type="checkbox" className="group-select" onChange={this.selectAll.bind(this, filter)} />;
+                    }
                     filters.push(
                         <div className="panel panel-warning filter-group">
-                            <div className="panel-heading filter-group-header"><span className="filter-group-title">{filter.displayName}</span> <input type="checkbox" className="group-select" onChange={this.selectAll.bind(this, filter)} /></div>
+                            <div className="panel-heading filter-group-header"><span className="filter-group-title">{filter.displayName} {filter.filterRequired ? "*" : ""}</span>{groupSelector}</div>
                             <div className="panel-body">
                                 {filterValues}
                             </div>
@@ -168,7 +206,7 @@ var FilterData = React.createClass({
                 <div className="buttons">
                     <div className="row">                          
                           <div className="col-md-6"><button className="btn btn-success navbar-btn btn-custom btn-previous" type="button" onClick={this.handlePrevious}>{this.props.i18nLib.t('wizard.filter_data.previous')}</button></div>
-                          <div className="col-md-6"><button className="btn btn-success navbar-btn btn-custom btn-next" type="button" onClick={this.handleNext}>{this.props.i18nLib.t('wizard.filter_data.next')}</button></div>
+                          <div className="col-md-6"><button disabled = { this.isValid() ? "" : "disabled"} className="btn btn-success navbar-btn btn-custom btn-next" type="button" onClick={this.handleNext}>{this.props.i18nLib.t('wizard.filter_data.next')}</button></div>
                      </div>                   
                 </div>
                 </div>

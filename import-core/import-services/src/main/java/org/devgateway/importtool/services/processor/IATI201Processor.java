@@ -215,6 +215,7 @@ public class IATI201Processor implements ISourceProcessor {
 			NodeList nodeList = doc.getElementsByTagName(field.getFieldName());
 			List<FieldValue> reducedPossibleValues = new ArrayList<FieldValue>();
 			switch (field.getType()) {
+			case RECIPIENT_COUNTRY:
 			case LIST:
 				if (nodeList.getLength() > 0) {
 					for (int i = 0; i < nodeList.getLength(); i++) {
@@ -344,6 +345,30 @@ public class IATI201Processor implements ISourceProcessor {
 							break fieldLoop;
 						}
 					}
+					break;
+				case RECIPIENT_COUNTRY:
+					Field filtersField = filterFieldList.stream().filter(n -> {
+						return field.getFieldName().equals(n.getFieldName());
+					}).findFirst().get();				
+					
+					fieldNodeList = element.getElementsByTagName(field.getFieldName());					
+					List<FieldValue> recipients = new ArrayList<FieldValue>();
+					for (int j = 0; j < fieldNodeList.getLength(); j++) {
+						Element fieldElement = (Element) fieldNodeList.item(j);
+						FieldValue recipient = new FieldValue();	
+						String code = fieldElement.getAttribute("code");
+						boolean includeCountry = includedByFilter(filtersField.getFilters(), code);
+						if(includeCountry){
+							recipient.setCode(code);
+							Optional<FieldValue> fieldValue = field.getPossibleValues().stream().filter(f -> f.getCode().equals(code)).findFirst();
+							if(fieldValue.isPresent()){
+								recipient.setValue(fieldValue.get().getValue());
+							}
+							recipient.setPercentage(fieldElement.getAttribute("percentage"));	
+							recipients.add(recipient);	
+						}																										
+					}					
+					document.addRecepientCountryFields(field.getFieldName(), recipients);					
 					break;
 				case STRING:
 					String stringValue = "";
@@ -576,8 +601,10 @@ public class IATI201Processor implements ISourceProcessor {
 		fieldList.add(policyMarker);
 		filterFieldList.add(policyMarker);
 
-		Field recipientCountry = new Field("Recipient Country", "recipient-country", FieldType.LIST, true);
+		Field recipientCountry = new Field("Recipient Country", "recipient-country", FieldType.RECIPIENT_COUNTRY, true);
 		recipientCountry.setPossibleValues(getCodeListValues("recipient-country"));
+		recipientCountry.setExclusive(true);
+		recipientCountry.setFilterRequired(true);
 		fieldList.add(recipientCountry);
 		filterFieldList.add(recipientCountry);
 
