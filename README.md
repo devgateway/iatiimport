@@ -1,10 +1,6 @@
 # IATI Import Tool
 
-#Overview
-Tool for importing IATI data into target systems. 
-
-# Target Audience
- This documentation is for developers who would like to integrate the IATI Import Tool with target systems.
+This tool allows users to import data in IATI format into a target system. The target system must support the endpoints described in the '**Destination System REST Endpoint Requirements**' section in the wiki home page (https://github.com/devgateway/iatiimport/wiki).
 
 # Requirements
  - Java 8 or later	
@@ -46,11 +42,6 @@ java import-ui-0.0.6-SNAPSHOT.jar &
 
 Then go to the initial page of the app: http://localhost:8080/importer/. 
      
-# Installation 
-  We have provided a script for running the jar file in linux. Please check import-core/import-ui/scripts/import-tool.sh. Modify the file to suit your environment.
- 
-
-
 # Copyright
 
 Copyright 2015-2016 Development Gateway
