@@ -1,4 +1,4 @@
-# iatiimport
+# IATI Import Tool
 
 #Overview
 Tool for importing IATI data into target systems. The target system must provide the endpoints described in the '**Destination System REST Endpoint Requirements**'.
