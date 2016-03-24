@@ -298,11 +298,55 @@ public class IATI201Processor implements ISourceProcessor {
 		}
 		return possibleValues;
 	}
+	
+	private NodeList getActivities() throws XPathExpressionException{		
+		XPath xPath = XPathFactory.newInstance().newXPath();
+		final StringBuilder query = new StringBuilder("/iati-activities/iati-activity[");		
+		Field countryField = this.getFields().stream().filter(f -> {
+			return f.getType().equals(FieldType.RECIPIENT_COUNTRY);
+		}).findFirst().get();
+		
+		Field countryFilters = filterFieldList.stream().filter(n -> {
+			return countryField.getFieldName().equals(n.getFieldName());
+		}).findFirst().get();
+		
+		if(countryFilters.getFilters().size() > 0){
+			String selectedCountry  = countryFilters.getFilters().get(0);
+			query.append("recipient-country[@code='"+ selectedCountry +"']");
+		}	
+		
+		
+		this.getFields().forEach(field -> {			
+			if(field.getType().equals(FieldType.LIST)){				
+				Field filter = filterFieldList.stream().filter(n -> {
+					return field.getFieldName().equals(n.getFieldName());
+				}).findFirst().get();
+				
+				if(filter.getFilters().size() > 0){			
+					query.append(" and " + field.getFieldName() + "[");
+					for (int i = 0;i < filter.getFilters().size(); i++) {
+						String value = filter.getFilters().get(i);
+						if(i > 0){
+							query.append(" or ");
+						}
+						query.append("@code='" + value + "'");
+					}					
+					query.append("]");
+				}	
+			}			
+			
+		});		
+		
+		query.append("]");
+		NodeList activities = (NodeList)xPath.compile(query.toString()).evaluate(this.getDoc(), XPathConstants.NODESET);
+		return activities;
+	 }
 
 	private List<InternalDocument> extractDocuments(Document doc) throws Exception {
 		// Extract global values
 
-		NodeList nodeList = doc.getElementsByTagName("iati-activity");
+		XPath xPath = XPathFactory.newInstance().newXPath();		
+		NodeList nodeList = getActivities();
 		List<InternalDocument> list = new ArrayList<InternalDocument>();
 		actionStatus.setTotal(Long.valueOf(nodeList.getLength()));		
 		for (int i = 0; i < nodeList.getLength(); i++) {
@@ -312,11 +356,7 @@ public class IATI201Processor implements ISourceProcessor {
 			String currency = !("".equals(element.getAttribute("default-currency"))) ? element.getAttribute("default-currency") : this.defaultCurrency;			
 			document.addStringField("default-currency", currency);
 			String defaultLanguageCode = !("".equals(element.getAttribute("xml:lang"))) ? element.getAttribute("xml:lang") : this.defaultLanguage;
-			Boolean filterIncluded = false;
-			NodeList fieldNodeList;
-			XPath xPath = XPathFactory.newInstance().newXPath();
-
-			fieldLoop:
+			NodeList fieldNodeList;			
 			for (Field field : getFields()) {
 				switch (field.getType()) {
 				case LIST:
@@ -334,16 +374,8 @@ public class IATI201Processor implements ISourceProcessor {
 						if (fieldNodeList.getLength() > 0 && fieldNodeList.getLength() == 1) {
 							Element fieldElement = (Element) fieldNodeList.item(0);
 							codeValue = fieldElement.getAttribute("code");
-						}
-						
-						Field filtersField = filterFieldList.stream().filter(n -> {
-							return field.getFieldName().equals(n.getFieldName());
-						}).findFirst().get();						
-						filterIncluded = includedByFilter(filtersField.getFilters(), codeValue);								
-						document.addStringField(field.getFieldName(), codeValue);
-						if(!filterIncluded){
-							break fieldLoop;
-						}
+						}											
+						document.addStringField(field.getFieldName(), codeValue);						
 					}
 					break;
 				case RECIPIENT_COUNTRY:
@@ -518,10 +550,8 @@ public class IATI201Processor implements ISourceProcessor {
 				default:
 					break;
 				}
-			}
-			if (filterIncluded) {
-				list.add(document);
-			}
+			}			
+			list.add(document);			
 		}
 
 		return list;

@@ -301,9 +301,54 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 		return possibleValues;
 	}
 
-	private List<InternalDocument> extractDocuments(Document doc) throws Exception {
+	private NodeList getActivities() throws XPathExpressionException{		
+		XPath xPath = XPathFactory.newInstance().newXPath();
+		final StringBuilder query = new StringBuilder("/iati-activities/iati-activity[");		
+		Field countryField = this.getFields().stream().filter(f -> {
+			return f.getType().equals(FieldType.RECIPIENT_COUNTRY);
+		}).findFirst().get();
+		
+		Field countryFilters = filterFieldList.stream().filter(n -> {
+			return countryField.getFieldName().equals(n.getFieldName());
+		}).findFirst().get();
+		
+		if(countryFilters.getFilters().size() > 0){
+			String selectedCountry  = countryFilters.getFilters().get(0);
+			query.append("recipient-country[@code='"+ selectedCountry +"']");
+		}	
+		
+		
+		this.getFields().forEach(field -> {			
+			if(field.getType().equals(FieldType.LIST)){				
+				Field filter = filterFieldList.stream().filter(n -> {
+					return field.getFieldName().equals(n.getFieldName());
+				}).findFirst().get();
+				
+				if(filter.getFilters().size() > 0){			
+					query.append(" and " + field.getFieldName() + "[");
+					for (int i = 0;i < filter.getFilters().size(); i++) {
+						String value = filter.getFilters().get(i);
+						if(i > 0){
+							query.append(" or ");
+						}
+						query.append("@code='" + value + "'");
+					}					
+					query.append("]");
+				}	
+			}			
+			
+		});		
+		
+		query.append("]");
+		NodeList activities = (NodeList)xPath.compile(query.toString()).evaluate(this.getDoc(), XPathConstants.NODESET);
+		return activities;
+	}
+	
+	
+	private List<InternalDocument> extractDocuments(Document doc) throws Exception {		
 		// Extract global values		
-		NodeList nodeList = doc.getElementsByTagName("iati-activity");
+		XPath xPath = XPathFactory.newInstance().newXPath();		
+		NodeList nodeList = getActivities();
 		List<InternalDocument> list = new ArrayList<InternalDocument>();
 		actionStatus.setTotal(Long.valueOf(nodeList.getLength()));
 		for (int i = 0; i < nodeList.getLength(); i++) {
@@ -313,16 +358,11 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 			String currency = !("".equals(element.getAttribute("default-currency"))) ? element.getAttribute("default-currency") : this.defaultCurrency;			
 			document.addStringField("default-currency", currency);	
 			String defaultLanguageCode = !("".equals(element.getAttribute("xml:lang"))) ? element.getAttribute("xml:lang") : this.defaultLanguage;
-			Boolean filterIncluded = false;
-			NodeList fieldNodeList;
-			XPath xPath = XPathFactory.newInstance().newXPath();
-			
-			fieldLoop:
+			NodeList fieldNodeList;			
 			for (Field field : getFields()) {
 				switch (field.getType()) {
 				case LIST:
-					if (field.isMultiple()) {
-						
+					if (field.isMultiple()) {						
 						fieldNodeList = element.getElementsByTagName(field.getFieldName());
 						String[] codeValues = new String[fieldNodeList.getLength()];
 						for (int j = 0; j < fieldNodeList.getLength(); j++) {
@@ -338,27 +378,20 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 							codeValue = fieldElement.getAttribute("code");
 							
 						}						
-						Field filtersField = filterFieldList.stream().filter(n -> {
-							return field.getFieldName().equals(n.getFieldName());
-						}).findFirst().get();						
-						filterIncluded = includedByFilter(filtersField.getFilters(), codeValue);								
-						document.addStringField(field.getFieldName(), codeValue);
-						if(!filterIncluded){
-							break fieldLoop;
-						}
+						document.addStringField(field.getFieldName(), codeValue);						
 					}
 					break;
-				case RECIPIENT_COUNTRY:
+				case RECIPIENT_COUNTRY:	
 					Field filtersField = filterFieldList.stream().filter(n -> {
 						return field.getFieldName().equals(n.getFieldName());
-					}).findFirst().get();				
+					}).findFirst().get();
 					
 					fieldNodeList = element.getElementsByTagName(field.getFieldName());					
 					List<FieldValue> recipients = new ArrayList<FieldValue>();
 					for (int j = 0; j < fieldNodeList.getLength(); j++) {
 						Element fieldElement = (Element) fieldNodeList.item(j);
 						FieldValue recipient = new FieldValue();	
-						String code = fieldElement.getAttribute("code");						
+						String code = fieldElement.getAttribute("code");	
 						boolean includeCountry = includedByFilter(filtersField.getFilters(), code);
 						if(includeCountry){
 							recipient.setCode(code);
@@ -367,9 +400,8 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 								recipient.setValue(fieldValue.get().getValue());
 							}
 							recipient.setPercentage(fieldElement.getAttribute("percentage"));	
-							recipients.add(recipient);	
-						}								
-						
+							recipients.add(recipient);
+						}
 					}					
 					document.addRecepientCountryFields(field.getFieldName(), recipients);					
 					break;
@@ -495,7 +527,7 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 					}
 					break;
 				case CONTACT:					
-					NodeList contactNodes = element.getElementsByTagName(field.getFieldName());
+					/*NodeList contactNodes = element.getElementsByTagName(field.getFieldName());
 					if (contactNodes.getLength() > 0) {
 						for (int j = 0; j < contactNodes.getLength(); j++) {													
 							Element contact = (Element) contactNodes.item(j);							
@@ -507,7 +539,7 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 							String address = contact.getElementsByTagName("mailing-address").item(0) != null ?  contact.getElementsByTagName("mailing-address").item(0).getTextContent() : "";
 							String website = contact.getElementsByTagName("website").item(0) != null ?  contact.getElementsByTagName("website").item(0).getTextContent() : "";
 							
-							/*Map<String, String> contactFields = new HashMap<String, String>();													
+							Map<String, String> contactFields = new HashMap<String, String>();													
 							contactFields.put("organisation", organisation);
 							contactFields.put("person-name", personName);
 							contactFields.put("job-title", jobTitle);
@@ -515,25 +547,24 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 							contactFields.put("email", email);
 							contactFields.put("mailing-address", address);
 							contactFields.put("website", website);							
-							document.addContactFields("donor_contact", contactFields);		*/					
+							document.addContactFields("donor_contact", contactFields);							
 						}
-					}					
+					}	*/				
 					break;				
 				default:
 					break;
 				}
 			}
-			if (filterIncluded) {				
-				list.add(document);
-			}
+			list.add(document);			
 		}		
 		return list;
 	}
-
+	
 	private Boolean includedByFilter(List<String> filters, String codeValue) {
 		if (filters.size() == 0)
-			return true;		
-		for (String value : filters) {			
+			return true;
+
+		for (String value : filters) {
 			if (value.equals(codeValue)) {
 				return true;
 			}
@@ -541,6 +572,7 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 		return false;
 	}
 
+	
 	private List<String> extractLanguage(NodeList elementsByTagName) {
 		List<String> list = new ArrayList<String>();
 		try {
