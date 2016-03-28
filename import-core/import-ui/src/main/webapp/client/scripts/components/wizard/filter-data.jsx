@@ -154,7 +154,7 @@ var FilterData = React.createClass({
                             <span className="input-group-addon">
                                 <input aria-label={values.value} className="value-select" type="checkbox" checked={checkedValue} onChange={this.handleToggle.bind(this, filter, values)} />
                             </span>
-                            <input aria-label="Field1" className="form-control" readOnly type="text" value={values.value}/>
+                            <input aria-label="Field1" className="form-control" readOnly type="text" value={(values.code ? values.code + ' : ' : '' ) +  values.value}/>
                             </div>
                         )
                     }                    
