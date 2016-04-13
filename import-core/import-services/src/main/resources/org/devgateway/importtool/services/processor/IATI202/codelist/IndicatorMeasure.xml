@@ -1,0 +1,14 @@
+<codelist date-last-modified="2015-03-25T12:12:01.289827+00:00" version="" name="IndicatorMeasure" xml:lang="en">
+  <IndicatorMeasure>
+    <code>1</code>
+    <name>Unit</name>
+    <language>en</language>
+    <description>The indicator is measured in units.</description>
+  </IndicatorMeasure>
+  <IndicatorMeasure>
+    <code>2</code>
+    <name>Percentage</name>
+    <language>en</language>
+    <description>The indicator is measured in percentages</description>
+  </IndicatorMeasure>
+</codelist>

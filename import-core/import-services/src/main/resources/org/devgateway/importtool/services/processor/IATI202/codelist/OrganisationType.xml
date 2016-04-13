@@ -1,0 +1,52 @@
+<codelist date-last-modified="2015-03-25T12:12:01.863172+00:00" version="" name="OrganisationType" xml:lang="en">
+  <OrganisationType>
+    <code>10</code>
+    <name>Government</name>
+    <language>en</language>
+  </OrganisationType>
+  <OrganisationType>
+    <code>15</code>
+    <name>Other Public Sector</name>
+    <language>en</language>
+  </OrganisationType>
+  <OrganisationType>
+    <code>21</code>
+    <name>International NGO</name>
+    <language>en</language>
+  </OrganisationType>
+  <OrganisationType>
+    <code>22</code>
+    <name>National NGO</name>
+    <language>en</language>
+  </OrganisationType>
+  <OrganisationType>
+    <code>23</code>
+    <name>Regional NGO</name>
+    <language>en</language>
+  </OrganisationType>
+  <OrganisationType>
+    <code>30</code>
+    <name>Public Private Partnership</name>
+    <language>en</language>
+  </OrganisationType>
+  <OrganisationType>
+    <code>40</code>
+    <name>Multilateral</name>
+    <language>en</language>
+  </OrganisationType>
+  <OrganisationType>
+    <code>60</code>
+    <name>Foundation</name>
+    <language>en</language>
+  </OrganisationType>
+  <OrganisationType>
+    <code>70</code>
+    <name>Private Sector</name>
+    <language>en</language>
+  </OrganisationType>
+  <OrganisationType>
+    <code>80</code>
+    <name>Academic, Training and Research</name>
+    <language>en</language>
+  </OrganisationType>
+</codelist>

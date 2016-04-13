@@ -1,0 +1,8 @@
+<codelist date-last-modified="2015-03-25T12:12:01.997522+00:00" version="" name="IATIOrganisationIdentifier" xml:lang="en">
+  <IATIOrganisationIdentifier>
+    <code>1001</code>
+    <name>The Coca-Cola Export Corporation</name>
+    <language>en</language>
+    <description>Subsidiary of The Coca-Cola Company responsible for marketing and export of soft drinks, bottled water, and other beverages and with links to the various charitable initiatives of The Coca-Cola Company, its subsidiaries and affiliates Coca-Cola charitable foundation. Based in Atlanta Georgia USA</description>
+  </IATIOrganisationIdentifier>
+</codelist>
