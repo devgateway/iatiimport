@@ -351,6 +351,7 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 		NodeList nodeList = getActivities();
 		List<InternalDocument> list = new ArrayList<InternalDocument>();
 		actionStatus.setTotal(Long.valueOf(nodeList.getLength()));
+		this.clearUsedValues();
 		for (int i = 0; i < nodeList.getLength(); i++) {
 			actionStatus.incrementProcessed();
 			InternalDocument document = new InternalDocument();
@@ -367,18 +368,29 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 						String[] codeValues = new String[fieldNodeList.getLength()];
 						for (int j = 0; j < fieldNodeList.getLength(); j++) {
 							Element fieldElement = (Element) fieldNodeList.item(j);
-							codeValues[j] = fieldElement.getAttribute("code");
+							String code = fieldElement.getAttribute("code");
+							codeValues[j] = code;							
+							FieldValue fv  = field.getPossibleValues().stream().filter( n -> {return n.getCode().equals(code);}).findFirst().get();
+							if(fv != null && fv.isSelected() != true){
+								fv.setSelected(true);
+							}
 						}
 						document.addStringMultiField(field.getFieldName(), codeValues);
 					} else {
-						String codeValue = "";
+						
 						fieldNodeList = element.getElementsByTagName(field.getFieldName());
-						if (fieldNodeList.getLength() > 0 && fieldNodeList.getLength() == 1) {
+						if (fieldNodeList.getLength() > 0 && fieldNodeList.getLength() == 1) {							
 							Element fieldElement = (Element) fieldNodeList.item(0);
-							codeValue = fieldElement.getAttribute("code");
-							
+							String codeValue = fieldElement.getAttribute("code");
+							FieldValue fv  = field.getPossibleValues().stream().filter( n -> {
+								return n.getCode().equals(codeValue);
+							}).findFirst().get();
+							if(fv != null && fv.isSelected() != true){
+								fv.setSelected(true);
+							}
+							document.addStringField(field.getFieldName(), codeValue);							
 						}						
-						document.addStringField(field.getFieldName(), codeValue);						
+												
 					}
 					break;
 				case RECIPIENT_COUNTRY:	
@@ -433,12 +445,13 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 								FieldValue fv = new FieldValue();
 								fv.setCode(stringOrgValue);
 								fv.setValue(stringOrgValue);
+								fv.setSelected(true);
 								int index = field.getPossibleValues() == null ? 0 : field.getPossibleValues().size();
 								fv.setIndex(index);
 								if (field.getPossibleValues() == null) {
 									field.setPossibleValues(new ArrayList<FieldValue>());
 								}
-								if(!field.getPossibleValues().stream().anyMatch(n->{ return n.getCode().equals(stringOrgValue);})) {
+								if(!field.getPossibleValues().stream().anyMatch(n->{ return n.getCode().equals(stringOrgValue);})) {									
 									field.getPossibleValues().add(fv);
 								}
 								document.addOrganizationField(field.getFieldName() + "_" + field.getSubType() + "_" + index, orgFields);
@@ -572,6 +585,16 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 		return false;
 	}
 
+	private void clearUsedValues(){
+		for (Field field : getFields()) {
+			if(field.getPossibleValues() != null){
+				for(FieldValue fv : field.getPossibleValues()){
+					fv.setSelected(false);
+				}			
+			   }
+			}			
+		
+	}
 	
 	private List<String> extractLanguage(NodeList elementsByTagName) {
 		List<String> list = new ArrayList<String>();

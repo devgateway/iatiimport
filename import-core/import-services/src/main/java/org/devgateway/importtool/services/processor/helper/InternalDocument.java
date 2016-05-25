@@ -14,11 +14,18 @@ public class InternalDocument {
 	private Map<String, Map<String, String>> transactionFields = new HashMap<String, Map<String, String>>();
 	private Map<String, Map<String, String>> contactFields = new HashMap<String, Map<String, String>>();
 	private Map<String, Date> dateFields = new HashMap<String, Date>();	
-	private Map<String, List<FieldValue>> recepientCountryFields = new HashMap<String, List<FieldValue>>();
-	
+	private Map<String, List<FieldValue>> recepientCountryFields = new HashMap<String, List<FieldValue>>();	
+	private boolean titleDuplicate = false;	
+
 	
 
+	public boolean isTitleDuplicate() {
+		return titleDuplicate;
+	}
 
+	public void setTitleDuplicate(boolean titleDuplicate) {
+		this.titleDuplicate = titleDuplicate;
+	}
 
 	public Map<String, List<FieldValue>> getRecepientCountryFields() {
 		return recepientCountryFields;

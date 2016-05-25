@@ -2,9 +2,11 @@
   "name": "import-ui",
   "version": "0.0.1",
   "dependencies": {
+    "coffee-script": "~1.6.3",
     "cookie": "~0.1.2",
     "director": "~1.2.7",
     "form-serialize": "~0.4.0",
+    "grunt-legacy-util": "^1.0.0",
     "js-cookie": "~2.0.2",
     "keymirror": "~0.1.0",
     "moment": "^2.10.3",
@@ -12,8 +14,8 @@
     "object-assign": "~1.0.0",
     "react": "~0.13.0",
     "react-async": "~2.1.0",
-    "react-router": "~0.13.4",
     "react-bootstrap": "^0.23.7",
+    "react-router": "~0.13.4",
     "reflux": "~0.2.7",
     "superagent": "~0.21.0"
   },

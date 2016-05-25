@@ -14,10 +14,9 @@ var UploadFile = React.createClass({
     getInitialState: function() {
        return {fileData: [], valid : true};
     },
-    componentDidMount: function() {  
+    componentDidMount: function() {        
     	this.props.eventHandlers.updateCurrentStep(constants.UPLOAD_FILE);
-        this.listenTo(fileStore, this.updateFileData);
-        this.loadData();     
+        this.listenTo(fileStore, this.updateFileData);             
         var $el = $(this.refs.iatiFileInput.getDOMNode());
         var self = this;    
         $el.fileinput(

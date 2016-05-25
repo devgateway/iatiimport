@@ -18,6 +18,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.services.processor.helper.ActionResult;
 import org.devgateway.importtool.services.processor.helper.ActionStatus;
+import org.devgateway.importtool.services.processor.helper.DocumentMapping;
 import org.devgateway.importtool.services.processor.helper.Field;
 import org.devgateway.importtool.services.processor.helper.FieldMapping;
 import org.devgateway.importtool.services.processor.helper.FieldType;
@@ -29,12 +30,14 @@ import org.devgateway.importtool.services.processor.helper.JsonBean;
 import org.devgateway.importtool.services.processor.helper.TokenHeaderInterceptor;
 import org.devgateway.importtool.services.processor.helper.ValueMappingException;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.springframework.util.StringUtils;
 
 // TODO: Sort methods, move classes to generic helpers for all processors if possible
@@ -227,8 +230,19 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				HttpServerErrorException ex = (HttpServerErrorException) e;
 				JsonBean resultPost = JsonBean.getJsonBeanFromString(ex.getResponseBodyAsString());
 				Object errorNode = resultPost.get("error");
-				result = new ActionResult("N/A", "ERROR", "ERROR", "REST Exception:" + errorNode);
-			} else {
+				Map<?,?> activity = (Map<?,?>)resultPost.get("activity");				
+				Object projectTitle = (activity != null && activity.get("project_title") != null) ? activity.get("project_title") : "";
+				result = new ActionResult("N/A", "ERROR", "ERROR", "REST Exception:" + projectTitle + " " +  errorNode);
+			} 
+			else if (e.getClass().equals(HttpClientErrorException.class)) {
+				HttpClientErrorException ex = (HttpClientErrorException) e;
+				JsonBean resultPost = JsonBean.getJsonBeanFromString(ex.getResponseBodyAsString());
+				Object errorNode = resultPost.get("error");
+				Map<?,?> activity = (Map<?,?>)resultPost.get("activity");				
+				Object projectTitle = (activity != null && activity.get("project_title") != null) ? activity.get("project_title") : "";
+				result = new ActionResult("N/A", "ERROR", "ERROR", "REST Exception:" + projectTitle + " " +  errorNode);
+			}
+			else {
 				result = new ActionResult("N/A", "ERROR", "ERROR", "REST Exception:" + e.getMessage());
 			}
 		} catch (ValueMappingException e) {
@@ -341,8 +355,19 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				HttpServerErrorException ex = (HttpServerErrorException) e;
 				JsonBean resultPost = JsonBean.getJsonBeanFromString(ex.getResponseBodyAsString());
 				Object errorNode = resultPost.get("error");
-				result = new ActionResult("N/A", "ERROR", "ERROR", "REST Exception:" + errorNode);
-			} else {
+				Map<?,?> activity = (Map<?,?>)resultPost.get("activity");				
+				Object projectTitle = (activity != null && activity.get("project_title") != null) ? activity.get("project_title") : "";
+				result = new ActionResult("N/A", "ERROR", "ERROR", "REST Exception:" + projectTitle + " " +  errorNode);
+			} 
+			else if (e.getClass().equals(HttpClientErrorException.class)) {
+				HttpClientErrorException ex = (HttpClientErrorException) e;
+				JsonBean resultPost = JsonBean.getJsonBeanFromString(ex.getResponseBodyAsString());
+				Object errorNode = resultPost.get("error");
+				Map<?,?> activity = (Map<?,?>)resultPost.get("activity");				
+				Object projectTitle = (activity != null && activity.get("project_title") != null) ? activity.get("project_title") : "";
+				result = new ActionResult("N/A", "ERROR", "ERROR", "REST Exception:" + projectTitle + " " + errorNode);
+			}		
+			else {
 				result = new ActionResult("N/A", "ERROR", "ERROR", "REST Exception:" + e.getMessage());
 			}
 		} catch (ValueMappingException e) {
@@ -351,13 +376,12 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		return result;
 	}
 
+	
 	private JsonBean transformProject(InternalDocument source, List<FieldMapping> fieldMappings, List<FieldValueMapping> valueMappings) throws ValueMappingException {
 		Boolean hasTransactions = false;
 		JsonBean project = new JsonBean();
-
-		project.set("project_code", source.getIdentifier());
+		project.set("project_code", source.getIdentifier());		
 		project.set("project_title", getMultilangString(source, "project_title", "title"));
-
 		for (FieldMapping mapping : fieldMappings) {
 			Field sourceField = mapping.getSourceField();
 			Field destinationField = mapping.getDestinationField();
@@ -430,7 +454,8 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			return fieldValues.values().iterator().next();
 		}
 	}
-
+ 
+	
 	private JsonBean getTransactions(InternalDocument source, List<FieldMapping> fieldMappings, List<FieldValueMapping> valueMappings) throws ValueMappingException {
 		List<JsonBean> fundingDetails = new ArrayList<JsonBean>();
 		String currencyCode = source.getStringFields().get("default-currency");
@@ -930,6 +955,33 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			log.error("Couldn't retrieve values from Endpoint. Exception: " + e.getMessage() + ", URL:" + codeListName);
 		}
 		return possibleValues;
+	}
+	
+	@Override
+	public List<DocumentMapping> preImportProcessing(List<DocumentMapping> documentMappings) {		
+		Map<String, Integer> titleCount = new HashMap<>();
+		for (DocumentMapping doc : documentMappings) {
+			if (doc.getSelected()) {
+				InternalDocument source = doc.getSourceDocument();				
+				modifyDuplicateProjectTitles(source,titleCount);
+			}
+		}		
+		return documentMappings;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void modifyDuplicateProjectTitles(InternalDocument source,Map<String, Integer> titleCount){
+		Map<String,String> titles = source.getMultilangFields().get("title");
+		Iterator<Entry<String, String>> it = titles.entrySet().iterator();
+	    while (it.hasNext()) {
+	        Map.Entry item = (Map.Entry)it.next();
+	        String title = (String) item.getValue();
+	        Integer count = (titleCount.get(title) != null) ? titleCount.get(title) : 0;
+	        titleCount.put(title, ++count);
+	        if(!title.startsWith(source.getIdentifier()) && count > 1){
+	        	item.setValue(source.getIdentifier() + " " + title);
+	        }			        			       					
+	    }			
 	}
 
 }

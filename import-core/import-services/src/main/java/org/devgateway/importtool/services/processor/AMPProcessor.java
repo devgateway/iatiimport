@@ -13,6 +13,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.services.processor.helper.ActionStatus;
+import org.devgateway.importtool.services.processor.helper.DocumentMapping;
 import org.devgateway.importtool.services.processor.helper.Field;
 import org.devgateway.importtool.services.processor.helper.FieldMapping;
 import org.devgateway.importtool.services.processor.helper.FieldType;
@@ -323,5 +324,9 @@ public class AMPProcessor implements IDestinationProcessor {
 		// TODO Auto-generated method stub
 		
 	}
+	public List<DocumentMapping>  preImportProcessing(List<DocumentMapping> documentMappings){
+		return documentMappings;
+	}
+	
 
 }

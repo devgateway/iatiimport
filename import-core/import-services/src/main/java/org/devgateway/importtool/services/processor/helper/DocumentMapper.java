@@ -63,9 +63,11 @@ public class DocumentMapper implements IDocumentMapper {
 
 	// Mapping and transformation operations go here
 	@Override
-	public List<ActionResult> execute() {		
+	public List<ActionResult> execute() {	
+		this.destinationProcessor.preImportProcessing(this.documentMappings);
 		importStatus  = new ActionStatus(Constants.IMPORT_STATUS_MESSAGE, documentMappings.stream().filter(m -> m.getSelected() == true).count());
 		importStatus.setStatus(Status.IN_PROGRESS);
+		
 		results = new ArrayList<ActionResult>();
 		for (DocumentMapping doc : documentMappings) {
 			if (doc.getSelected()) {
