@@ -683,7 +683,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			JsonBean bean = new JsonBean();
 			bean.set(mapping.getSourceField().getFieldName() + "_id", entry.getKey());
 			if (mapping.getSourceField().isPercentage() && entry.getValue() > 0){
-				bean.set(mapping.getSourceField().getFieldName() + "_percentage", 100 / divider);
+				bean.set(mapping.getSourceField().getFieldName() + "_percentage", (double)100 / (double)divider);
 			}
 			beanList.add(bean);
 		}
