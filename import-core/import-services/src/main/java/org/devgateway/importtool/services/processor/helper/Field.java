@@ -13,6 +13,7 @@ public class Field {
 	private Map<String, String> attributes;
 	private List<Field> childFields;
 	private List<FieldValue> possibleValues;
+	private List<FieldValue> usedValues;
 	private boolean isMappable;
 	private boolean isMultiple;
 	private boolean isPercentage;
@@ -189,6 +190,14 @@ public class Field {
 
 	public void setFilterRequired(boolean filterRequired) {
 		this.filterRequired = filterRequired;
+	}
+
+	public List<FieldValue> getUsedValues() {
+		return usedValues;
+	}
+
+	public void setUsedValues(List<FieldValue> usedValues) {
+		this.usedValues = usedValues;
 	}
 
 }

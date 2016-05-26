@@ -26,8 +26,7 @@ var Wizard = React.createClass({
 			completedSteps: [],
 			statusMessage: ""
 		};
-	},
-	
+	},	
 	componentWillReceiveProps: function(nextProps) {
 		if(this.props.params.src !== nextProps.params.src || this.props.params.dst !== nextProps.params.dst) {
 			this.initImportSession(nextProps.params.src, nextProps.params.dst);
@@ -54,7 +53,7 @@ var Wizard = React.createClass({
 	  var completedSteps = this.state.completedSteps; 
 	  completedSteps.push(step);
 	  this.setState({currentStep:step, completedSteps: completedSteps})
-	},
+	},	
 	hideLoadingIcon: function(){ 
 		if(!_.isEmpty(this.state.info)){
 			$(this.refs.loadingIcon.getDOMNode()).hide();
@@ -166,8 +165,9 @@ var Wizard = React.createClass({
 		$.ajax({
 	    	url: '/importer/import/execute/status',	    		       
 	        dataType: 'json',
-	        success: function(data) {  
-	        	if(data.importStatus.status == "COMPLETED"){
+	        success: function(data) { 
+	        if(data.importStatus){
+	          if(data.importStatus.status == "COMPLETED"){
 	    			clearInterval(self.setIntervalId);
 	    			self.setState({results: data.results});
 		        	self.hideLoadingIcon();
@@ -176,8 +176,17 @@ var Wizard = React.createClass({
 	        	}else{
 	        		self.setState({statusMessage: data.importStatus.message});	        		
 	        	}
+	         }else{
+	           clearInterval(self.setIntervalId);
+	           self.hideLoadingIcon();
+	         }        	
 	        	     	
 	        },
+	        error: function (xhr, ajaxOptions, thrownError) {
+	           self.displayError("Server Error");
+	           self.hideLoadingIcon();
+               clearInterval(self.setIntervalId);
+            },
 	        type: 'GET'
 	     });
 	},
@@ -239,7 +248,7 @@ var Wizard = React.createClass({
     eventHandlers.updateCurrentStep = this.updateCurrentStep;
     eventHandlers.navigateBack  = this.navigateBack;
     eventHandlers.goHome = this.goHome;
-    
+        
     var error;
     if(Cookies.get("DESTINATION_AUTH_TOKEN") == "null" || Cookies.get("DESTINATION_AUTH_TOKEN") == "undefined"){
     	return (<div className="container"><br/><div className="alert alert-danger server-status-message" role="alert" ><span className="glyphicon glyphicon-exclamation-sign error-box" aria-hidden="true"></span><span className="sr-only">Error:</span><span > Session information for the destination system could not be retrieved. Verify if backend services are working correctly.</span> </div></div>);

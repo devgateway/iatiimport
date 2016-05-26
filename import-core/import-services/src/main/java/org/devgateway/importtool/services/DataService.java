@@ -30,7 +30,10 @@ public class DataService {
 					Field source = fieldMapping.getSourceField();
 					if(source.getPossibleValues() != null){
 						source.getPossibleValues().stream().forEach(fieldValue -> {
-							fvm.getValueIndexMapping().put(fieldValue.getIndex(), null);
+							if(fieldValue.isSelected()){
+								fvm.getValueIndexMapping().put(fieldValue.getIndex(), null);
+							}
+							
 						});	
 					}					
 				}
@@ -49,7 +52,9 @@ public class DataService {
 					if (fieldMapping.getSourceField().getType() == FieldType.LIST || fieldMapping.getSourceField().getType() == FieldType.ORGANIZATION) {
 						Field source = fieldMapping.getSourceField();
 						source.getPossibleValues().stream().forEach(fieldValue -> {
-							fvm.getValueIndexMapping().put(fieldValue.getIndex(), null);
+							if(fieldValue.isSelected()){
+								fvm.getValueIndexMapping().put(fieldValue.getIndex(), null);
+							}							
 						});
 					}
 					documentMapper.getValueMappingObject().add(fvm);

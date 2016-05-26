@@ -20,6 +20,7 @@ public interface IDestinationProcessor {
 	public String getTitleField();
 
 	public void setActionStatus(ActionStatus documentMappingStatus);
+	public List<DocumentMapping> preImportProcessing(List<DocumentMapping> documentMappings);
 	
 
 }
