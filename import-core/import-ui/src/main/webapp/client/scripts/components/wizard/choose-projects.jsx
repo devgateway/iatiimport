@@ -125,6 +125,7 @@ var ChooseProjects = React.createClass({
     			this.setState({statusMessage:data.documentMappingStatus.message});
     		}   		                
     	}.bind(this))["catch"](function(err) {
+    	    clearInterval(id);
     		this.props.eventHandlers.hideLoadingIcon();    		
     		this.props.eventHandlers.displayError(this.props.i18nLib.t('wizard.choose_projects.msg_error_select_project'));
     	}.bind(this)); 

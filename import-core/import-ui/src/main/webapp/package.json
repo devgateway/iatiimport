@@ -34,7 +34,7 @@
     "grunt-contrib-copy": "~0.7.0",
     "grunt-contrib-cssmin": "~0.10.0",
     "grunt-contrib-htmlmin": "~0.3.0",
-    "grunt-contrib-imagemin": "~0.9.1",
+    "grunt-contrib-imagemin": "^1.0.0",
     "grunt-contrib-jshint": "~0.10.0",
     "grunt-contrib-uglify": "~0.6.0",
     "grunt-contrib-watch": "~0.6.1",
@@ -47,6 +47,7 @@
     "grunt-react": "~0.10.0",
     "grunt-usemin": "2.1.1",
     "grunt-wiredep": "~2.0.0",
+    "imagemin": "^5.2.0",
     "imagemin-pngquant": "~4.0.0",
     "imagemin-svgo": "~4.0.0",
     "include-all": "~0.1.6",
@@ -60,7 +61,8 @@
     "minifyify": "~5.0.0",
     "rimraf": "~2.2.8",
     "time-grunt": "0.2.10",
-    "underscore.string": "~2.3.3"
+    "underscore.string": "~2.3.3",
+    "vinyl-fs": "^2.3.1"
   },
   "scripts": {
     "clean": "rimraf node_modules client/bower_components .tmp dist"
