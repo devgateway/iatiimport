@@ -70,6 +70,7 @@ public class DocumentMapper implements IDocumentMapper {
 		
 		results = new ArrayList<ActionResult>();
 		for (DocumentMapping doc : documentMappings) {
+			doc.setSelected(true);
 			if (doc.getSelected()) {
 				importStatus.incrementProcessed();
 				results.add(processDocumentMapping(doc));

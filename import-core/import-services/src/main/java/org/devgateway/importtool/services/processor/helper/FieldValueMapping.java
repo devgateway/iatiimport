@@ -7,7 +7,8 @@ public class FieldValueMapping {
 	private Field sourceField;
 	private Field destinationField;
 	private Map<Integer, Integer> valueIndexMapping = new HashMap<Integer, Integer>();
-
+	private Map<String, String> valueMapping = new HashMap<String, String>();
+	
 	public Field getSourceField() {
 		return sourceField;
 	}
@@ -31,6 +32,12 @@ public class FieldValueMapping {
 	public void setValueIndexMapping(Map<Integer, Integer> mapping) {
 		this.valueIndexMapping = mapping;
 	}
+	 
+	public Map<String, String> getValueMapping() {
+		return valueMapping;
+	}
 	
-
+	public void setValueMapping(Map<String, String> valueMapping) {
+		this.valueMapping = valueMapping;
+	}	
 }

@@ -13,6 +13,7 @@ public class InternalDocument {
 	private Map<String, Map<String, String>> organizationFields = new HashMap<String, Map<String, String>>();
 	private Map<String, Map<String, String>> transactionFields = new HashMap<String, Map<String, String>>();
 	private Map<String, Map<String, String>> contactFields = new HashMap<String, Map<String, String>>();
+	private Map<String, Map<String, String>> agreementFields = new HashMap<String, Map<String, String>>();
 	private Map<String, Date> dateFields = new HashMap<String, Date>();	
 	private Map<String, List<FieldValue>> recepientCountryFields = new HashMap<String, List<FieldValue>>();	
 	private boolean titleDuplicate = false;	
@@ -65,7 +66,9 @@ public class InternalDocument {
 		getTransactionFields().put(fieldName, transaction);
 	}
 
-	
+	public void addAgrementField(String fieldName, Map<String, String> agreement) {
+		getAgreementFields().put(fieldName, agreement);
+	}	
 	
 	public void addContactFields(String fieldName, Map<String, String> contact) {
 		getContactFields().put(fieldName, contact);
@@ -141,7 +144,14 @@ public class InternalDocument {
 		this.contactFields = contactFields;
 	}
 
-
+	public Map<String, Map<String, String>> getAgreementFields() {
+		return agreementFields;
+	}
+	
+	public void setAgreementFields(Map<String, Map<String, String>> agreementFields) {
+		this.agreementFields = agreementFields;
+	}
+		
 	
 
 	public void addRecepientCountryFields(String fieldName, List<FieldValue> value) {
