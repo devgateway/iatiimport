@@ -127,7 +127,7 @@ class ImportController  {
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/initialize")
-	void processedProjects(HttpServletRequest request) {
+	 ResponseEntity<String> processedProjects(HttpServletRequest request) {
 		ISourceProcessor srcProcessor = (ISourceProcessor) request.getSession().getAttribute(SOURCE_PROCESSOR);
 		IDestinationProcessor destProcessor = (IDestinationProcessor) request.getSession().getAttribute(DESTINATION_PROCESSOR);
 		IDocumentMapper documentMapper = (IDocumentMapper) request.getSession().getAttribute(DOCUMENT_MAPPER);
@@ -138,7 +138,11 @@ class ImportController  {
 		
 		documentMapper.setSourceProcessor(srcProcessor);
 		documentMapper.setDestinationProcessor(destProcessor);
-		importService.initialize(documentMapper);
+		String error = importService.initialize(documentMapper);
+		if(error != null && error.length() > 0 ){
+			return new ResponseEntity<>("{\"error\": \"" + error + "\"}", HttpStatus.OK);
+		}
+		return new ResponseEntity<>("{}", HttpStatus.OK);
 		
 	}
 	

@@ -337,8 +337,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		RestTemplate restTemplate = getRestTemplate();
 		try {
 			JsonBean project = transformProject(source, fieldMapping, valueMapping);
-			log.info(project);
-			// JsonBean resultPost = JsonBean.getJsonBeanFromString("{}");
+			log.info(project);			
 			JsonBean resultPost = restTemplate.postForObject(baseURL + "/rest/activity", project, JsonBean.class);
 			Object errorNode = resultPost.get("error");
 
@@ -354,18 +353,28 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			if (e.getClass().equals(HttpServerErrorException.class)) {
 				HttpServerErrorException ex = (HttpServerErrorException) e;
 				JsonBean resultPost = JsonBean.getJsonBeanFromString(ex.getResponseBodyAsString());
-				Object errorNode = resultPost.get("error");
-				Map<?,?> activity = (Map<?,?>)resultPost.get("activity");				
-				Object projectTitle = (activity != null && activity.get("project_title") != null) ? activity.get("project_title") : "";
-				result = new ActionResult("N/A", "ERROR", "ERROR", "REST Exception:" + projectTitle + " " +  errorNode);
+				if(resultPost != null){
+					Object errorNode = resultPost.get("error");
+					Map<?,?> activity = (Map<?,?>)resultPost.get("activity");				
+					Object projectTitle = (activity != null && activity.get("project_title") != null) ? activity.get("project_title") : "";
+					result = new ActionResult("N/A", "ERROR", "ERROR", "REST Exception:" + projectTitle + " " +  errorNode);
+				}else{
+					result = new ActionResult("N/A", "ERROR", "ERROR", "REST Exception:" + e.getMessage());	
+				}				
+				
 			} 
 			else if (e.getClass().equals(HttpClientErrorException.class)) {
 				HttpClientErrorException ex = (HttpClientErrorException) e;
 				JsonBean resultPost = JsonBean.getJsonBeanFromString(ex.getResponseBodyAsString());
-				Object errorNode = resultPost.get("error");
-				Map<?,?> activity = (Map<?,?>)resultPost.get("activity");				
-				Object projectTitle = (activity != null && activity.get("project_title") != null) ? activity.get("project_title") : "";
-				result = new ActionResult("N/A", "ERROR", "ERROR", "REST Exception:" + projectTitle + " " + errorNode);
+				if(resultPost != null){
+					Object errorNode = resultPost.get("error");
+					Map<?,?> activity = (Map<?,?>)resultPost.get("activity");				
+					Object projectTitle = (activity != null && activity.get("project_title") != null) ? activity.get("project_title") : "";
+					result = new ActionResult("N/A", "ERROR", "ERROR", "REST Exception:" + projectTitle + " " + errorNode);
+				}else{					
+					result = new ActionResult("N/A", "ERROR", "ERROR", "REST Exception:" + e.getMessage());
+				}
+				
 			}		
 			else {
 				result = new ActionResult("N/A", "ERROR", "ERROR", "REST Exception:" + e.getMessage());
@@ -520,9 +529,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		} catch (ValueMappingException e) {
 			log.debug("Dependent field not loaded: default-aid-type");
 		}
-
 		
-		funding.set("source_role", 1);		
 		funding.set("funding_details", fundingDetails);
 		return funding;
 	}

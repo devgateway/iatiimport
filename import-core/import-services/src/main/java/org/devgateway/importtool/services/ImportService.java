@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -140,13 +141,16 @@ public class ImportService {
 		return processor;
 	}
 	
-	@Async
-	public void initialize(IDocumentMapper documentMapper){
+	
+	public String initialize(IDocumentMapper documentMapper){
 		try {
 			documentMapper.initialize();
 		} catch (Exception e) {
-			e.printStackTrace();
-		}		
+			String error = "Error parsing document ";			
+			log.error("Error parsing document " + e.getMessage());	
+			return error;
+		}	
+		return null;
 	}
 	
 	@Async

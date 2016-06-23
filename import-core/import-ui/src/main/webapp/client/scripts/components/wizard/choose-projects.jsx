@@ -17,6 +17,7 @@ var ChooseProjects = React.createClass({
     getInitialState: function() {
        return {projectData: [], destinationProjects: [], statusMessage: "Fetching projects"};
     },
+    initializeFailed:false,
     componentWillMount: function () {
      this.props.eventHandlers.updateCurrentStep(constants.CHOOSE_PROJECTS);
      this.listenTo(projectStore, this.updateProject);             
@@ -28,11 +29,16 @@ var ChooseProjects = React.createClass({
         });
     }, 
     loadData: function(){
+        var id;
     	this.props.eventHandlers.showLoadingIcon();
     	this.initializeMapping();    	
     	var self = this;
-    	var id = setInterval(function(){
-    		self.loadSourceProjects(id);
+    	id = setInterval(function(){
+    	   if(self.initializeFailed){
+    	      clearInterval(id);
+    	   }else{
+    	      self.loadSourceProjects(id);
+    	   }    		
     	}, 3000);    	
     	this.loadProjects();
     },  
@@ -103,16 +109,25 @@ var ChooseProjects = React.createClass({
     handlePrevious: function(){    	       
     	this.props.eventHandlers.chooseProjects(this.state.projectData, constants.DIRECTION_PREVIOUS);	
 	},
-	initializeMapping: function(){
+	initializeMapping: function(){	     
+	     var self = this;
 		 $.ajax({
 		        url: '/importer/import/initialize',        
-		        error: function() {		        	
+		        error: function() {		
+		          self.initializeFailed = true;        	
 		        },
 		        dataType: 'json',
-		        success: function(data) {		        	        	
+		        success: function(data) {
+		         if(data.error){
+		           self.initializeFailed = true;
+		           self.props.eventHandlers.hideLoadingIcon(); 
+		           self.setState({statusMessage: ""});   		
+    		       self.props.eventHandlers.displayError(data.error);
+		         }		          		        	        	
 		        },
 		        type: 'POST'
-		     }); 	
+		     }); 		     
+		    
 	},
 	loadSourceProjects:  function(id){
 		appActions.loadProjectData.triggerPromise().then(function(data) { 
