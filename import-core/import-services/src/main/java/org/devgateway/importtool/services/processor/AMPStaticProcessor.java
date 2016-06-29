@@ -518,7 +518,9 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 		try {
 			String typeOfAssistance = source.getStringFields().get("default-finance-type");
-			funding.set("type_of_assistance", getIdFromList(typeOfAssistance, "default-finance-type", fieldMappings, valueMappings, true));
+			if(typeOfAssistance != null){
+				funding.set("type_of_assistance", getIdFromList(typeOfAssistance, "default-finance-type", fieldMappings, valueMappings, true));
+			}			
 		} catch (ValueMappingException e) {
 			log.debug("Dependent field not loaded: default-finance-type");
 		}

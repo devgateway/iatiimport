@@ -146,8 +146,9 @@ public class ImportService {
 		try {
 			documentMapper.initialize();
 		} catch (Exception e) {
-			String error = "Error parsing document ";			
-			log.error("Error parsing document " + e.getMessage());	
+			e.printStackTrace();
+			String error = "An error occurred while extracting projects from the IATI file. Please check the file format";			
+			log.error("Error parsing document " + e);	
 			return error;
 		}	
 		return null;

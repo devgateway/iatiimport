@@ -242,13 +242,21 @@ public class IATI2XProcessor implements ISourceProcessor {
 			switch (field.getType()) {
 			case RECIPIENT_COUNTRY:
 			case LIST:
-				if (nodeList.getLength() > 0) {
+				if (nodeList.getLength() > 0) {					
 					for (int i = 0; i < nodeList.getLength(); i++) {
 						Element fieldElement = (Element) nodeList.item(i);
-						final String codeValue = fieldElement.getAttribute("code");
+						final String codeValue = fieldElement.getAttribute("code");						
 						Optional<FieldValue> fieldValue = field.getPossibleValues().stream().filter(n -> {
 							return n.getCode().equals(codeValue);
 						}).findFirst();
+						if(!fieldValue.isPresent() && !codeValue.isEmpty()){
+							FieldValue newfv = new FieldValue();
+							final String name = fieldElement.getElementsByTagName("narrative").item(0) != null ? fieldElement.getElementsByTagName("narrative").item(0).getTextContent() : "";
+							newfv.setCode(codeValue);
+							newfv.setValue(name);
+							newfv.setIndex(field.getPossibleValues().size());
+							field.getPossibleValues().add(newfv);
+						}
 						if (fieldValue.isPresent() && !reducedPossibleValues.stream().filter(n -> {
 							return n.getCode().equals(fieldValue.get().getCode());
 						}).findFirst().isPresent()) {
@@ -387,30 +395,39 @@ public class IATI2XProcessor implements ISourceProcessor {
 				switch (field.getType()) {
 				case LIST:
 					if (field.isMultiple()) {
-						fieldNodeList = element.getElementsByTagName(field.getFieldName());
-						String[] codeValues = new String[fieldNodeList.getLength()];
+						fieldNodeList = element.getElementsByTagName(field.getFieldName());						
+						List <String> codes = new ArrayList<String>(); 
 						for (int j = 0; j < fieldNodeList.getLength(); j++) {
 							Element fieldElement = (Element) fieldNodeList.item(j);
-							String code = fieldElement.getAttribute("code");
-							codeValues[j] = code;							
-							FieldValue fv  = field.getPossibleValues().stream().filter( n -> {return n.getCode().equals(code);}).findFirst().get();
-							if(fv != null && fv.isSelected() != true){
-								fv.setSelected(true);
-							}
+							String code = fieldElement.getAttribute("code");								
+							if(!code.isEmpty()){
+								codes.add(code);
+								Optional<FieldValue> foundfv = field.getPossibleValues().stream().filter( n -> {return n.getCode().equals(code);}).findFirst();
+								FieldValue fv  = foundfv.isPresent() ? foundfv.get() : null;
+								if(fv != null && fv.isSelected() != true){
+									fv.setSelected(true);
+								}
+							}				
 						}
-						document.addStringMultiField(field.getFieldName(), codeValues);
+						if(!codes.isEmpty()){
+							String[] codeValues = codes.stream().toArray(String[]::new);						
+							document.addStringMultiField(field.getFieldName(), codeValues);
+						}
 					} else {						
 						fieldNodeList = element.getElementsByTagName(field.getFieldName());
 						if (fieldNodeList.getLength() > 0 && fieldNodeList.getLength() == 1) {							
 							Element fieldElement = (Element) fieldNodeList.item(0);
-							String codeValue = fieldElement.getAttribute("code");
-							FieldValue fv  = field.getPossibleValues().stream().filter( n -> {
-								return n.getCode().equals(codeValue);
-							}).findFirst().get();
-							if(fv != null && fv.isSelected() != true){
-								fv.setSelected(true);
-							}
-							document.addStringField(field.getFieldName(), codeValue);							
+							String codeValue = fieldElement.getAttribute("code");							
+							if(!codeValue.isEmpty()){
+								Optional<FieldValue> foundfv = field.getPossibleValues().stream().filter( n -> {
+									return n.getCode().equals(codeValue);
+								}).findFirst();
+								FieldValue fv  = foundfv.isPresent() ? foundfv.get() : null;
+								if(fv != null && fv.isSelected() != true){
+									fv.setSelected(true);
+								}
+								document.addStringField(field.getFieldName(), codeValue);
+							}														
 						}						
 					}
 					break;
