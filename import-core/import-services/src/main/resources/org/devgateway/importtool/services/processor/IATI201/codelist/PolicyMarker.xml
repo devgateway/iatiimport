@@ -1,47 +1,63 @@
-<codelist date-last-modified="2015-03-25T12:12:01.277038+00:00" version="" name="PolicyMarker" xml:lang="en">
-  <PolicyMarker>
-    <code>1</code>
-    <name>Gender Equality</name>
-    <language>en</language>
-  </PolicyMarker>
-  <PolicyMarker>
-    <code>2</code>
-    <name>Aid to Environment</name>
-    <language>en</language>
-  </PolicyMarker>
-  <PolicyMarker>
-    <code>3</code>
-    <name>Participatory Development/Good Governance</name>
-    <language>en</language>
-  </PolicyMarker>
-  <PolicyMarker>
-    <code>4</code>
-    <name>Trade Development</name>
-    <language>en</language>
-  </PolicyMarker>
-  <PolicyMarker>
-    <code>5</code>
-    <name>Aid Targeting the Objectives of the Convention on Biological Diversity</name>
-    <language>en</language>
-  </PolicyMarker>
-  <PolicyMarker>
-    <code>6</code>
-    <name>Aid Targeting the Objectives of the Framework Convention on Climate Change - Mitigation</name>
-    <language>en</language>
-  </PolicyMarker>
-  <PolicyMarker>
-    <code>7</code>
-    <name>Aid Targeting the Objectives of the Framework Convention on Climate Change - Adaptation</name>
-    <language>en</language>
-  </PolicyMarker>
-  <PolicyMarker>
-    <code>8</code>
-    <name>Aid Targeting the Objectives of the Convention to Combat Desertification</name>
-    <language>en</language>
-  </PolicyMarker>
-  <PolicyMarker>
-    <code>9</code>
-    <name>Reproductive, Maternal, Newborn and Child Health (RMNCH)</name>
-    <language>en</language>
-  </PolicyMarker>
+<codelist name="PolicyMarker" xml:lang="en" complete="1">
+    <metadata>
+        <name>
+            <narrative>Policy Marker</narrative>
+        </name>
+    </metadata>
+    <codelist-items>
+        <codelist-item>
+            <code>1</code>
+            <name>
+                <narrative>Gender Equality</narrative>
+            </name>
+        </codelist-item>
+        <codelist-item>
+            <code>2</code>
+            <name>
+                <narrative>Aid to Environment</narrative>
+            </name>
+        </codelist-item>
+        <codelist-item>
+            <code>3</code>
+            <name>
+                <narrative>Participatory Development/Good Governance</narrative>
+            </name>
+        </codelist-item>
+        <codelist-item>
+            <code>4</code>
+            <name>
+                <narrative>Trade Development</narrative>
+            </name>
+        </codelist-item>
+        <codelist-item>
+            <code>5</code>
+            <name>
+                <narrative>Aid Targeting the Objectives of the Convention on Biological Diversity</narrative>
+            </name>
+        </codelist-item>
+        <codelist-item>
+            <code>6</code>
+            <name>
+                <narrative>Aid Targeting the Objectives of the Framework Convention on Climate Change - Mitigation</narrative>
+            </name>
+        </codelist-item>
+        <codelist-item>
+            <code>7</code>
+            <name>
+                <narrative>Aid Targeting the Objectives of the Framework Convention on Climate Change - Adaptation</narrative>
+            </name>
+        </codelist-item>
+        <codelist-item>
+            <code>8</code>
+            <name>
+                <narrative>Aid Targeting the Objectives of the Convention to Combat Desertification</narrative>
+            </name>
+        </codelist-item>
+        <codelist-item>
+            <code>9</code>
+            <name>
+                <narrative>Reproductive, Maternal, Newborn and Child Health (RMNCH)</narrative>
+            </name>
+        </codelist-item>
+    </codelist-items>
 </codelist>

@@ -1,14 +1,30 @@
-<codelist date-last-modified="2015-03-25T12:12:02.988844+00:00" version="" name="DocumentCategory-category" xml:lang="en">
-  <DocumentCategory-category>
-    <code>A</code>
-    <name>Activity Level</name>
-    <language>en</language>
-    <description>The document is relevant to a specific activity</description>
-  </DocumentCategory-category>
-  <DocumentCategory-category>
-    <code>B</code>
-    <name>Organisation Level</name>
-    <language>en</language>
-    <description>The document is relevant to the organisation as a whole</description>
-  </DocumentCategory-category>
+<codelist name="DocumentCategory-category" xml:lang="en" complete="1">
+    <metadata>
+        <name>
+            <narrative>Document Category (category)</narrative>
+        </name>
+        <description>
+            <narrative>This codelists exists to group the Document Category codelist into categories. It is not used as a codelist in its own right.</narrative>
+        </description>
+    </metadata>
+    <codelist-items>
+        <codelist-item>
+            <code>A</code>
+            <name>
+                <narrative>Activity Level</narrative>
+            </name>
+            <description>
+                <narrative>The document is relevant to a specific activity</narrative>
+            </description>
+        </codelist-item>
+        <codelist-item>
+            <code>B</code>
+            <name>
+                <narrative>Organisation Level</narrative>
+            </name>
+            <description>
+                <narrative>The document is relevant to the organisation as a whole</narrative>
+            </description>
+        </codelist-item>
+    </codelist-items>
 </codelist>

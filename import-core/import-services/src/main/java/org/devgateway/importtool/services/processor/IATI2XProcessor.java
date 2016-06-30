@@ -301,7 +301,7 @@ public class IATI2XProcessor implements ISourceProcessor {
 				factory.setIgnoringElementContentWhitespace(true);
 				DocumentBuilder builder = factory.newDocumentBuilder();
 				Document doc = builder.parse(is);
-				NodeList nodeList = doc.getElementsByTagName(standardFieldName);
+				NodeList nodeList = doc.getElementsByTagName("codelist-item");
 				int index = 0;
 				for (int i = 0; i < nodeList.getLength(); i++) {
 					Node node = nodeList.item(i);
@@ -311,7 +311,9 @@ public class IATI2XProcessor implements ISourceProcessor {
 						String code = codeElement.getChildNodes().item(0).getNodeValue();
 
 						Element nameElement = (Element) element.getElementsByTagName("name").item(0);
-						String name = nameElement.getChildNodes().item(0).getNodeValue();
+						NodeList narrativeNodeList = nameElement.getElementsByTagName("narrative");
+						Element narrativeElement = (Element) narrativeNodeList.item(0);
+						String name = narrativeElement.getChildNodes().item(0).getNodeValue();
 
 						FieldValue fv = new FieldValue();
 						fv.setIndex(index++);
@@ -355,8 +357,11 @@ public class IATI2XProcessor implements ISourceProcessor {
 					return field.getFieldName().equals(n.getFieldName());
 				}).findFirst().get();
 				
-				if(filter.getFilters().size() > 0){			
-					query.append(" and " + field.getFieldName() + "[");
+				if(filter.getFilters().size() > 0){		
+					if(!("/iati-activities/iati-activity[".equals(query.toString()))){					
+						query.append(" and ");	
+					}
+					query.append(field.getFieldName() + "[");
 					for (int i = 0;i < filter.getFilters().size(); i++) {
 						String value = filter.getFilters().get(i);
 						if(i > 0){
@@ -369,8 +374,12 @@ public class IATI2XProcessor implements ISourceProcessor {
 			}			
 			
 		});		
+		if(!("/iati-activities/iati-activity[".equals(query.toString()))){					
+			query.append("]");	
+		}else{
+			query.setLength(query.length() - 1);
+		}
 		
-		query.append("]");
 		NodeList activities = (NodeList)xPath.compile(query.toString()).evaluate(this.getDoc(), XPathConstants.NODESET);
 		return activities;
 	 }
@@ -541,7 +550,7 @@ public class IATI2XProcessor implements ISourceProcessor {
 				case TRANSACTION:
 					try {
 						NodeList nodes;
-						nodes = (NodeList) xPath.evaluate("transaction/transaction-type[@code='" + transactionTypes.get(field.getSubType()) + "']/parent::*", element, XPathConstants.NODESET);
+						nodes = (NodeList) xPath.evaluate("transaction/transaction-type[@code='" + field.getSubType() + "' or @code= '" + field.getSubTypeCode() + "']/parent::*", element, XPathConstants.NODESET);
 						for (int j = 0; j < nodes.getLength(); ++j) {
 							String reference = "";
 							String receivingOrganization = "";
@@ -728,10 +737,12 @@ public class IATI2XProcessor implements ISourceProcessor {
 		// Transaction Fields
 		Field commitments = new Field("Commitments", "transaction", FieldType.TRANSACTION, true);
 		commitments.setSubType("C");
+		commitments.setSubTypeCode("2");
 		fieldList.add(commitments);
 
 		Field disbursements = new Field("Disbursements", "transaction", FieldType.TRANSACTION, true);
 		disbursements.setSubType("D");
+		disbursements.setSubTypeCode("3");
 		fieldList.add(disbursements);
 
 		// Organization Fields

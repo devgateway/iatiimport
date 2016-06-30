@@ -335,7 +335,10 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 				}).findFirst().get();
 				
 				if(filter.getFilters().size() > 0){			
-					query.append(" and " + field.getFieldName() + "[");
+					if(!("/iati-activities/iati-activity[".equals(query.toString()))){					
+						query.append(" and ");	
+					}
+					query.append(field.getFieldName() + "[");
 					for (int i = 0;i < filter.getFilters().size(); i++) {
 						String value = filter.getFilters().get(i);
 						if(i > 0){
@@ -349,7 +352,11 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 			
 		});		
 		
-		query.append("]");
+		if(!("/iati-activities/iati-activity[".equals(query.toString()))){					
+			query.append("]");	
+		}else{
+			query.setLength(query.length() - 1);
+		}
 		NodeList activities = (NodeList)xPath.compile(query.toString()).evaluate(this.getDoc(), XPathConstants.NODESET);
 		return activities;
 	}

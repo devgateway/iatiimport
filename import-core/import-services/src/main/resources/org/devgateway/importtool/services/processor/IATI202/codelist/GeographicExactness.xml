@@ -1,14 +1,30 @@
-<codelist date-last-modified="2015-03-25T12:12:02.110888+00:00" version="" name="GeographicExactness" xml:lang="en">
-  <GeographicExactness>
-    <code>1</code>
-    <name>Exact</name>
-    <language>en</language>
-    <description>The designated geographic location is exact</description>
-  </GeographicExactness>
-  <GeographicExactness>
-    <code>2</code>
-    <name>Approximate</name>
-    <language>en</language>
-    <description>The designated geographic location is approximate</description>
-  </GeographicExactness>
+<codelist name="GeographicExactness" xml:lang="en" complete="1">
+    <metadata>
+        <name>
+            <narrative>Geographic Exactness</narrative>
+        </name>
+        <description>
+            <narrative/>
+        </description>
+    </metadata>
+    <codelist-items>
+        <codelist-item>
+            <code>1</code>
+            <name>
+                <narrative>Exact</narrative>
+            </name>
+            <description>
+                <narrative>The designated geographic location is exact</narrative>
+            </description>
+        </codelist-item>
+        <codelist-item>
+            <code>2</code>
+            <name>
+                <narrative>Approximate</narrative>
+            </name>
+            <description>
+                <narrative>The designated geographic location is approximate</narrative>
+            </description>
+        </codelist-item>
+    </codelist-items>
 </codelist>

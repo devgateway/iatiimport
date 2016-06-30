@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.devgateway.importtool.exceptions.CurrencyNotFoundException;
 import org.devgateway.importtool.services.processor.helper.ActionResult;
 import org.devgateway.importtool.services.processor.helper.ActionStatus;
 import org.devgateway.importtool.services.processor.helper.DocumentMapping;
@@ -247,11 +248,13 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			}
 		} catch (ValueMappingException e) {
 			result = new ActionResult("N/A", "ERROR", "ERROR", "Value Mapping Exception: " + e.getMessage());
+		}catch (CurrencyNotFoundException e) {
+			result = new ActionResult("N/A", "ERROR", "ERROR", "Currency Not Found Exception: " + e.getMessage());
 		}
 		return result;
 	}
 
-	private void updateProject(JsonBean project, InternalDocument source, List<FieldMapping> fieldMappings, List<FieldValueMapping> valueMappings, boolean overrideTitle) throws ValueMappingException {		
+	private void updateProject(JsonBean project, InternalDocument source, List<FieldMapping> fieldMappings, List<FieldValueMapping> valueMappings, boolean overrideTitle) throws ValueMappingException, CurrencyNotFoundException {		
 		if(overrideTitle){
 			project.set("project_title", getMultilangString(source, "project_title", "title"));	
 		}	
@@ -381,12 +384,14 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			}
 		} catch (ValueMappingException e) {
 			result = new ActionResult("N/A", "ERROR", "ERROR", "Value Mapping Exception: " + e.getMessage());
+		}catch (CurrencyNotFoundException e) {
+			result = new ActionResult("N/A", "ERROR", "ERROR", "Currency Not Found Exception: " + e.getMessage());
 		}
 		return result;
 	}
 
 	
-	private JsonBean transformProject(InternalDocument source, List<FieldMapping> fieldMappings, List<FieldValueMapping> valueMappings) throws ValueMappingException {
+	private JsonBean transformProject(InternalDocument source, List<FieldMapping> fieldMappings, List<FieldValueMapping> valueMappings) throws ValueMappingException, CurrencyNotFoundException {
 		Boolean hasTransactions = false;
 		JsonBean project = new JsonBean();
 		project.set("project_code", source.getIdentifier());		
@@ -465,13 +470,21 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	}
  
 	
-	private JsonBean getTransactions(InternalDocument source, List<FieldMapping> fieldMappings, List<FieldValueMapping> valueMappings) throws ValueMappingException {
+	private JsonBean getTransactions(InternalDocument source, List<FieldMapping> fieldMappings, List<FieldValueMapping> valueMappings) throws ValueMappingException, CurrencyNotFoundException {
 		List<JsonBean> fundingDetails = new ArrayList<JsonBean>();
 		String currencyCode = source.getStringFields().get("default-currency");
 		String currencyIdString = getCurrencyId(currencyCode);
+		if(currencyIdString == null){
+			throw new CurrencyNotFoundException("Currency code " + currencyCode + " could not be found in AMP");
+		}
 		int currencyId = Integer.parseInt(currencyIdString);
-		FieldValue recipientCountry = source.getRecepientCountryFields().get("recipient-country").stream().findFirst().get();
-		Double percentage = (StringUtils.isEmpty(recipientCountry.getPercentage())) ?  100.00 : Double.parseDouble(recipientCountry.getPercentage());
+		Optional<FieldValue> optionalRecipientCountry = source.getRecepientCountryFields().get("recipient-country").stream().findFirst();
+		Double percentage = 100.00;
+		if(optionalRecipientCountry.isPresent()){
+			FieldValue recipientCountry = optionalRecipientCountry.get();
+			percentage = (StringUtils.isEmpty(recipientCountry.getPercentage())) ?  100.00 : Double.parseDouble(recipientCountry.getPercentage());
+		}
+		
         
 		for (FieldMapping mapping : fieldMappings) {
 			Field sourceField = mapping.getSourceField();
@@ -512,8 +525,10 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 		if (organizations.size() > 0) {
 			Entry<String, Map<String, String>> organization = organizations.entrySet().stream().findFirst().get();
-			int donorId = getIdFromList(organization.getValue().get("value"), "participating-org", fieldMappings, valueMappings, false);
-			funding.set("donor_organization_id", donorId);
+			if(organization.getValue().get("value") != null){
+				int donorId = getIdFromList(organization.getValue().get("value"), "participating-org", fieldMappings, valueMappings, false);
+				funding.set("donor_organization_id", donorId);	
+			}			
 		}
 
 		try {
@@ -526,8 +541,10 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		}
 
 		try {
-			String financingInstrument = source.getStringFields().get("default-aid-type");
-			funding.set("financing_instrument", getIdFromList(financingInstrument, "default-aid-type", fieldMappings, valueMappings, true));
+			if(source.getStringFields().get("default-aid-type") != null ){
+				String financingInstrument = source.getStringFields().get("default-aid-type");
+				funding.set("financing_instrument", getIdFromList(financingInstrument, "default-aid-type", fieldMappings, valueMappings, true));
+			}			
 		} catch (ValueMappingException e) {
 			log.debug("Dependent field not loaded: default-aid-type");
 		}
@@ -541,11 +558,17 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			return n.getFieldName().equals("currency_code");
 		}).findFirst().get();
 
-		FieldValue currencyValue = currency.getPossibleValues().stream().filter(n -> {
+		Optional<FieldValue> foundCurrency = currency.getPossibleValues().stream().filter(n -> {
 			return n.getValue().equals(currencyCode);
-		}).findFirst().get();
+		}).findFirst();
 
-		return currencyValue.getCode();
+		FieldValue currencyValue;
+		if(foundCurrency.isPresent()){
+			currencyValue = foundCurrency.get();
+			return currencyValue.getCode();
+		}
+		return null;
+		
 	}
 
 	private Object getTransactionAmount(String amount, Double percentage) {
