@@ -549,6 +549,9 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			log.debug("Dependent field not loaded: default-aid-type");
 		}
 		
+		if(destinationFieldsList.contains("fundings~source_role")){
+			  funding.set("source_role", 1);	
+		}
 		funding.set("funding_details", fundingDetails);
 		return funding;
 	}
