@@ -219,7 +219,7 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 			switch (field.getType()) {
 			case RECIPIENT_COUNTRY:
 			case LIST:
-				if (nodeList.getLength() > 0) {
+				if (nodeList.getLength() > 0) {					
 					for (int i = 0; i < nodeList.getLength(); i++) {
 						Element fieldElement = (Element) nodeList.item(i);
 						final String codeValue = fieldElement.getAttribute("code");
@@ -231,9 +231,14 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 							FieldValue newfv = new FieldValue();
 							final String name = fieldElement.getTextContent();
 							newfv.setCode(codeValue);
-							newfv.setValue(name);
+							newfv.setValue(name);							
 							newfv.setIndex(field.getPossibleValues().size());
-							field.getPossibleValues().add(newfv);
+							field.getPossibleValues().add(newfv);							
+							if (!reducedPossibleValues.stream().filter(n -> {
+								return n.getCode().equals(newfv.getCode());
+							}).findFirst().isPresent()) {
+								reducedPossibleValues.add(newfv);
+							}
 						}
 						
 						if (fieldValue.isPresent() && !reducedPossibleValues.stream().filter(n -> {

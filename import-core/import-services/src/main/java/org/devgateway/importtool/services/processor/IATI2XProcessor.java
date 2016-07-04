@@ -256,6 +256,11 @@ public class IATI2XProcessor implements ISourceProcessor {
 							newfv.setValue(name);
 							newfv.setIndex(field.getPossibleValues().size());
 							field.getPossibleValues().add(newfv);
+							if (!reducedPossibleValues.stream().filter(n -> {
+								return n.getCode().equals(newfv.getCode());
+							}).findFirst().isPresent()) {
+								reducedPossibleValues.add(newfv);
+							}
 						}
 						if (fieldValue.isPresent() && !reducedPossibleValues.stream().filter(n -> {
 							return n.getCode().equals(fieldValue.get().getCode());
