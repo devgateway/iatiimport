@@ -227,30 +227,46 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			}
 
 		} catch (RestClientException e) {
+			log.error("Error importing activity " + e);
 			if (e.getClass().equals(HttpServerErrorException.class)) {
 				HttpServerErrorException ex = (HttpServerErrorException) e;
 				JsonBean resultPost = JsonBean.getJsonBeanFromString(ex.getResponseBodyAsString());
-				Object errorNode = resultPost.get("error");
-				Map<?,?> activity = (Map<?,?>)resultPost.get("activity");				
-				Object projectTitle = (activity != null && activity.get("project_title") != null) ? activity.get("project_title") : "";
-				result = new ActionResult("N/A", "ERROR", "ERROR", "REST Exception:" + projectTitle + " " +  errorNode);
+				if(resultPost != null){
+					Object errorNode = resultPost.get("error");
+					Map<?,?> activity = (Map<?,?>)resultPost.get("activity");				
+					Object projectTitle = (activity != null && activity.get("project_title") != null) ? activity.get("project_title") : "";
+					result = new ActionResult("N/A", "ERROR", "ERROR", "REST Exception:" + projectTitle + " " +  errorNode);
+				}else{
+					result = new ActionResult("N/A", "ERROR", "ERROR", "REST Exception:" + e.getMessage());
+				}	
 			} 
 			else if (e.getClass().equals(HttpClientErrorException.class)) {
 				HttpClientErrorException ex = (HttpClientErrorException) e;
 				JsonBean resultPost = JsonBean.getJsonBeanFromString(ex.getResponseBodyAsString());
-				Object errorNode = resultPost.get("error");
-				Map<?,?> activity = (Map<?,?>)resultPost.get("activity");				
-				Object projectTitle = (activity != null && activity.get("project_title") != null) ? activity.get("project_title") : "";
-				result = new ActionResult("N/A", "ERROR", "ERROR", "REST Exception:" + projectTitle + " " +  errorNode);
+				if(resultPost != null){
+					Object errorNode = resultPost.get("error");
+					Map<?,?> activity = (Map<?,?>)resultPost.get("activity");				
+					Object projectTitle = (activity != null && activity.get("project_title") != null) ? activity.get("project_title") : "";
+					result = new ActionResult("N/A", "ERROR", "ERROR", "REST Exception:" + projectTitle + " " +  errorNode);
+				}else{
+					result = new ActionResult("N/A", "ERROR", "ERROR", "REST Exception:" + e.getMessage());
+				}				
 			}
 			else {
 				result = new ActionResult("N/A", "ERROR", "ERROR", "REST Exception:" + e.getMessage());
 			}
+			
 		} catch (ValueMappingException e) {
+			log.error("Error importing activity " + e);
 			result = new ActionResult("N/A", "ERROR", "ERROR", "Value Mapping Exception: " + e.getMessage());
 		}catch (CurrencyNotFoundException e) {
+			log.error("Error importing activity " + e);
 			result = new ActionResult("N/A", "ERROR", "ERROR", "Currency Not Found Exception: " + e.getMessage());
+		}catch(Exception e){
+			log.error("Error importing activity " + e);
+			result = new ActionResult("N/A", "ERROR", "ERROR", "Import failed with an error");
 		}
+		
 		return result;
 	}
 
@@ -353,6 +369,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			}
 
 		} catch (RestClientException e) {
+			log.error("Error importing activity " + e);
 			if (e.getClass().equals(HttpServerErrorException.class)) {
 				HttpServerErrorException ex = (HttpServerErrorException) e;
 				JsonBean resultPost = JsonBean.getJsonBeanFromString(ex.getResponseBodyAsString());
@@ -383,9 +400,14 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				result = new ActionResult("N/A", "ERROR", "ERROR", "REST Exception:" + e.getMessage());
 			}
 		} catch (ValueMappingException e) {
+			log.error("Error importing activity " + e);
 			result = new ActionResult("N/A", "ERROR", "ERROR", "Value Mapping Exception: " + e.getMessage());
 		}catch (CurrencyNotFoundException e) {
+			log.error("Error importing activity " + e);
 			result = new ActionResult("N/A", "ERROR", "ERROR", "Currency Not Found Exception: " + e.getMessage());
+		}catch(Exception e){
+			log.error("Error importing activity " + e);
+			result = new ActionResult("N/A", "ERROR", "ERROR", "Import failed with an error");
 		}
 		return result;
 	}
