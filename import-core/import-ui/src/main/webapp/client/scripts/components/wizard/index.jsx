@@ -204,7 +204,7 @@ var Wizard = React.createClass({
 		var self = this;
 		$.ajax({
 	        url: url,
-	        timeout:appConfig.SESSION_REQUEST_TIMEOUT,
+	        timeout:appConfig.REQUEST_TIMEOUT,
 	        error: function(result) {			
 	        	self.setState({
 					info: {

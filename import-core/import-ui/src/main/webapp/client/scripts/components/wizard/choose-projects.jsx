@@ -4,6 +4,7 @@ var projectStore = require('./../../stores/ProjectStore');
 var reactAsync = require('react-async');
 var Reflux = require('reflux');
 var appActions = require('./../../actions');
+var appConfig = require('./../../conf');
 var Router = require('react-router');
 var Link = Router.Link;
 var AutoComplete = require('./autocomplete');
@@ -112,7 +113,8 @@ var ChooseProjects = React.createClass({
 	initializeMapping: function(){	     
 	     var self = this;
 		 $.ajax({
-		        url: '/importer/import/initialize',        
+		        url: '/importer/import/initialize',
+		        timeout:appConfig.REQUEST_TIMEOUT,        
 		        error: function() {		
 		          self.initializeFailed = true;        	
 		        },

@@ -18,6 +18,7 @@ var WorkflowSelector = React.createClass({
        this.setState({workflowData:data});
     },
     loadData: function(){
+       $.get('/importer/import/wipeall', function(){}); 
     	appActions.loadWorkflowData.triggerPromise().then(function(data) {
     		this.updateWorkflowData(data);
     	}.bind(this));

@@ -58,7 +58,8 @@ var ProjectStore = Reflux.createStore({
   handleInitializeMapping: function() {
 	    var self = this;    
 	    $.ajax({
-	        url: '/importer/import/initialize',        
+	        url: '/importer/import/initialize',
+	        timeout:appConfig.REQUEST_TIMEOUT,
 	        error: function() {        	
 	        	appActions.initializeMapping.failed();
 	        },
