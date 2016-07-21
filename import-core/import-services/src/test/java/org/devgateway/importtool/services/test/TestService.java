@@ -48,7 +48,6 @@ public class TestService {
 
 	@Configuration
 	@EnableAutoConfiguration
-	@Import(ServiceConfiguration.class)
 	static class TestServiceConfiguration {
 	}
 

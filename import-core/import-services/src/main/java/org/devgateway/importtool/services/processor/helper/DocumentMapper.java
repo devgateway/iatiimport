@@ -70,11 +70,8 @@ public class DocumentMapper implements IDocumentMapper {
 		
 		results = new ArrayList<ActionResult>();
 		for (DocumentMapping doc : documentMappings) {
-			doc.setSelected(true);
-			if (doc.getSelected()) {
-				importStatus.incrementProcessed();
-				results.add(processDocumentMapping(doc));
-			}
+			importStatus.incrementProcessed();
+			results.add(processDocumentMapping(doc));
 		}
 		importStatus.setStatus(Status.COMPLETED);		
 		return results;
@@ -85,17 +82,17 @@ public class DocumentMapper implements IDocumentMapper {
 		InternalDocument destination = doc.getDestinationDocument();
 		ActionResult result = null;
 		switch (doc.getOperation()) {
-		case INSERT:
-			// For now, we pass the mapping. Find a better more efficient way.
-			result = this.destinationProcessor.insert(source, this.getFieldMappingObject(), this.getValueMappingObject());
-			break;
-		case UPDATE:
-			result = this.destinationProcessor.update(source, destination, this.getFieldMappingObject(), this.getValueMappingObject(),doc.isOverrideTitle());
-			break;
-		case NOOP:
-			break;
-		default:
-			break;
+			case INSERT:
+				// For now, we pass the mapping. Find a better more efficient way.
+				result = this.destinationProcessor.insert(source, this.getFieldMappingObject(), this.getValueMappingObject());
+				break;
+			case UPDATE:
+				result = this.destinationProcessor.update(source, destination, this.getFieldMappingObject(), this.getValueMappingObject(), doc.isOverrideTitle());
+				break;
+			case NOOP:
+				break;
+			default:
+				break;
 		}
 
 		return result;

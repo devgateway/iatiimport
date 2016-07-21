@@ -10,6 +10,8 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.model.User;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -19,9 +21,6 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.beans.factory.annotation.Value;
 
 
 
@@ -78,13 +77,7 @@ public class ServiceConfiguration {
     PlatformTransactionManager transactionManager( EntityManagerFactory emf) {
         return new JpaTransactionManager(emf);
     }
-   @Bean
-    public DataSource getDataSource() {
-            DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
-            dataSourceBuilder.driverClassName(driverClassName);
-            dataSourceBuilder.url(dataSourceURL);
-            return dataSourceBuilder.build();   
-    }
+   
     Properties getHibernateProperties(){    	
         Properties properties = new Properties();
         properties.setProperty("hibernate.hbm2ddl.auto", ddlAuto);       
