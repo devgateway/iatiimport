@@ -277,7 +277,7 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 	private List<FieldValue> getCodeListValues(String codeListName, Boolean concatenate) {
 		String standardFieldName = mappingNameFile.get(codeListName);
 		List<FieldValue> possibleValues = new ArrayList<FieldValue>();
-		InputStream is = this.getClass().getResourceAsStream("IATI201/codelist/" + standardFieldName + ".xml");
+		InputStream is = this.getClass().getResourceAsStream(this.getCodelistPath() + standardFieldName + ".xml");
 		if (is != null) {
 			try {
 				DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
