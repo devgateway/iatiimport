@@ -37,7 +37,7 @@ mvn clean install
 
 ```
 cd /import-core\import-ui\target
-java import-ui-0.0.6-SNAPSHOT.jar &
+java -jar import-ui-0.0.6-SNAPSHOT.jar &
 ```
 
 Then go to the initial page of the app: http://localhost:8080/importer/. 
