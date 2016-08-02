@@ -496,16 +496,18 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 						if (fieldElement.getChildNodes().getLength() == 1) {
 							String mlStringValue = fieldElement.getChildNodes().item(0).getNodeValue();
 							Node langAttr = fieldElement.getAttributes().getNamedItem("xml:lang");
-							
-							if(langAttr != null){								
-								String lang = langAttr.getNodeValue();								
-								Optional<Language> selectedLanguage = this.getFilterLanguages().stream().filter(language -> lang.equalsIgnoreCase(language.getCode()) && language.getSelected() == true ).findFirst();
-								if(selectedLanguage.isPresent()){									
-									mlv.put(lang, mlStringValue);
-								}								
-							}else{								
-								mlv.put(defaultLanguageCode, mlStringValue);
-							}						
+							if(mlStringValue != null && !("".equals(mlStringValue))){
+								if(langAttr != null){								
+									String lang = langAttr.getNodeValue();								
+									Optional<Language> selectedLanguage = this.getFilterLanguages().stream().filter(language -> lang.equalsIgnoreCase(language.getCode()) && language.getSelected() == true ).findFirst();
+									if(selectedLanguage.isPresent()){									
+										mlv.put(lang, mlStringValue);
+									}								
+								}else{								
+									mlv.put(defaultLanguageCode, mlStringValue);
+								}	
+							}
+												
 							
 						}
 					}					

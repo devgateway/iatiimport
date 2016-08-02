@@ -529,19 +529,23 @@ public class IATI2XProcessor implements ISourceProcessor {
 							for (int j = 0; j < narrativeNodeList.getLength(); j++) {
 								Element narrativeElement = (Element) narrativeNodeList.item(j);								
 								if (narrativeElement.getChildNodes().getLength() == 1) {
-									mlStringValue = narrativeElement.getChildNodes().item(0).getNodeValue();									
-									if (!"".equals(narrativeElement.getAttribute("xml:lang"))) {
-										String languageCode = narrativeElement.getAttribute("xml:lang");
-										Optional<Language> selectedLanguage = this.getFilterLanguages().stream().filter(language -> languageCode.equalsIgnoreCase(language.getCode()) && language.getSelected() == true ).findFirst();
-										if(selectedLanguage.isPresent()){									
-											mlv.put(languageCode, mlStringValue);
+									mlStringValue = narrativeElement.getChildNodes().item(0).getNodeValue();
+									if(mlStringValue != null && !("".equals(mlStringValue))){
+										if (!"".equals(narrativeElement.getAttribute("xml:lang"))) {
+											String languageCode = narrativeElement.getAttribute("xml:lang");
+											Optional<Language> selectedLanguage = this.getFilterLanguages().stream().filter(language -> languageCode.equalsIgnoreCase(language.getCode()) && language.getSelected() == true ).findFirst();
+											if(selectedLanguage.isPresent()){									
+												mlv.put(languageCode, mlStringValue);
+											}
+										}else{											
+											mlv.put(defaultLanguageCode, mlStringValue);																						
 										}
-									}else{
+									}									
+								} else {
+									if(mlStringValue != null && !("".equals(mlStringValue))){
 										mlv.put(defaultLanguageCode, mlStringValue);
 									}
 									
-								} else {									
-									mlv.put(defaultLanguageCode, mlStringValue);
 								}
 								
 								
