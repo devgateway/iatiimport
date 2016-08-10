@@ -28,7 +28,7 @@ var WorkflowSelector = React.createClass({
     	if (this.state.workflowData) {    		
             $.map(this.state.workflowData, function(workflow, i) { 
             	if(workflow.enabled){            		
-            		var link  = <li className="workflow-link"><a  href={"#/wizard/" + workflow.sourceProcessor.name + "/" + workflow.destinationProcessor.name} >{workflow.sourceProcessor.label + " to " +  workflow.destinationProcessor.label}</a></li>;
+            		var link  = <li className="workflow-link"><a  href={"#/wizard/" + workflow.sourceProcessor.name + "/" + workflow.destinationProcessor.name} >{window.i18nLib.t(workflow.translationKey)}</a></li>;
             		links.push(link);	
             	}            	
             }.bind(this));
@@ -37,7 +37,7 @@ var WorkflowSelector = React.createClass({
     	
         return (        		
         		  <div className="jumbotron">
-        		    <h3>Please select the import process:</h3> 
+        		    <h3>{window.i18nLib.t("header.select_import_process")}</h3> 
         		    <ul className="list-unstyled workflow-selector">
         		    {links}
         		    </ul>        		    

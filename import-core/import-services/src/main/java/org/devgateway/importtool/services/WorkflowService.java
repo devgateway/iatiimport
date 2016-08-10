@@ -56,6 +56,7 @@ public class WorkflowService {
 					
 					workflow.setDescription(workflowEl.getElementsByTagName(DESCRIPTION_TAG).item(0).getTextContent());
 					workflow.setEnabled(Boolean.parseBoolean(workflowEl.getElementsByTagName(ENABLED_TAG).item(0).getTextContent()));
+					workflow.setTranslationKey(workflowEl.getElementsByTagName(TRANSLATION_KEY_TAG).item(0).getTextContent());
 					workflows.add(workflow);
 				}
 			} catch (ParserConfigurationException | SAXException | IOException e) {

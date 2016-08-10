@@ -236,7 +236,8 @@ var ChooseProjects = React.createClass({
                                         </th>
                                         <th>
                                         <input type="checkbox" checked={this.overrideAll('INSERT')} onChange={this.overrideTitleAll} />
-                                        Override Title</th>
+                                        {this.props.i18nLib.t('wizard.choose_projects.override_title')}
+                                        </th>                                
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -254,8 +255,7 @@ var ChooseProjects = React.createClass({
                                         <th>
                                             <input type="checkbox" checked={this.checkAll('UPDATE')} onChange={this.selectAllExisting} />
                                             {this.props.i18nLib.t('wizard.choose_projects.update')}
-                                        </th>
-                                        
+                                        </th>                                        
                                         <th>
                                             {this.props.i18nLib.t('wizard.choose_projects.source_project')}
                                         </th>
@@ -264,7 +264,8 @@ var ChooseProjects = React.createClass({
                                         </th>
                                         <th>
                                         <input type="checkbox" checked={this.overrideAll('UPDATE')} onChange={this.overrideTitleAll} />
-                                        Override Title</th>
+                                        {this.props.i18nLib.t('wizard.choose_projects.override_title')}
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>

@@ -47,7 +47,7 @@ import org.springframework.util.StringUtils;
 // TODO: Better error handling to the end user. Friendlier user messages, specially when referencing a missing dependency
 
 public class AMPStaticProcessor implements IDestinationProcessor {
-	private String descriptiveName = "AMP 2.11";
+	private String descriptiveName = "AMP";
 
 	private final String DEFAULT_BASEURL = "http://localhost:8081";
 	private Log log = LogFactory.getLog(getClass());

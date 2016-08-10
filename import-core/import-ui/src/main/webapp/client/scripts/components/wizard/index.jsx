@@ -262,7 +262,7 @@ var Wizard = React.createClass({
       <div>
       <div className="container " >     
       <h2>{this.props.i18nLib.t('wizard.import_process')}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      <small>{this.state.info.sourceProcessorName} to {this.state.info.destinationProcessorName} </small></h2>
+      <small>{this.state.info.sourceProcessorName} {window.i18nLib.t('header.nav.menu.submenu.to')} {this.state.info.destinationProcessorName} </small></h2>
       <div className="row">
       <WizardSteps {...this.props} currentStep = {this.state.currentStep} completedSteps= {this.state.completedSteps} />
       <div className="col-sm-9 col-md-9 main " >

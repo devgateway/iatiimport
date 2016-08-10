@@ -236,13 +236,13 @@ var ChooseFields = React.createClass({
                 var dependenciesMessage = [];
                 _.map(this.state.destinationFieldsData, function(item) {
                         if(item.required) {
-                            requiredMessage.push(<div>Field <strong>{item.displayName}</strong> is required by the destination system.</div>);
+                            requiredMessage.push(<div><strong>{item.displayName}</strong>{this.props.i18nLib.t('wizard.map_fields.msg_required_field',{field:item.displayName})}</div>);
                         }
                         if(item.dependencies.length > 0){
                             var dependencies = _.pluck(item.dependencies, 'displayName').join(", ");
-                            dependenciesMessage.push(<div>Field: <strong>{item.displayName}</strong> has the following dependencies: {dependencies} </div>);
+                            dependenciesMessage.push(<div ><strong>{item.displayName}</strong>{this.props.i18nLib.t('wizard.map_fields.msg_field_has_dependencies',{field:item.displayName, dependencies:dependencies})}</div>);
                         }
-                    });
+                    }.bind(this));
                 if(requiredMessage.length > 0 || dependenciesMessage.length > 0) {
                     infoMessages = <div className="alert alert-info" role="alert">{requiredMessage} {dependenciesMessage}</div>;
                 }

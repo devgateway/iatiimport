@@ -12,6 +12,15 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 public class Workflow implements Serializable {
 	private static final long serialVersionUID = 1L;	
 	private Processor sourceProcessor;
+	private String translationKey;	
+
+	public String getTranslationKey() {
+		return translationKey;
+	}
+
+	public void setTranslationKey(String translationKey) {
+		this.translationKey = translationKey;
+	}
 
 	public Processor getSourceProcessor() {
 		return sourceProcessor;

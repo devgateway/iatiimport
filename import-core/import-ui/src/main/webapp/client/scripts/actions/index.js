@@ -37,5 +37,7 @@ appActions.deleteValueMappingsTemplate   = Reflux.createAction({ asyncResult: tr
 appActions.loadImportSummary  = Reflux.createAction({ asyncResult: true });
 appActions.loadWorkflowData = Reflux.createAction({ asyncResult: true });
 
+appActions.loadSettings = Reflux.createAction({ asyncResult: true });
+
 
 module.exports = appActions;

@@ -1,5 +1,6 @@
 var React = require('react');
 var Reflux = require('reflux');
+var _ = require('lodash/dist/lodash.underscore');
 var Header = require('./layout/header');
 var Footer = require('./layout/footer');
 var Content = require('./content');
@@ -9,28 +10,42 @@ var appActions = require('./../actions');
 var appConfig = require('./../conf');
 var translations = require('../../i18n/translations');
 var systemInfoStore = require('./../stores/SystemInfoStore');
+var settingsStore = require('./../stores/SettingsStore');
 var Home = React.createClass({
    mixins: [Reflux.ListenerMixin],
    getInitialState: function() {                    
          i18n.init({ resStore:translations.resources ,fallbackLng: 'en',load: 'unspecific'});
+         window.i18nLib = i18n;
          return {
              i18nLib: i18n,
              systemInfo:{status:"UNKNOWN"}           
          }
    },
   componentDidMount: function() {
-     this.listenTo(systemInfoStore, this.updateSystemInfo); 
-     appActions.checkBackendStatus.triggerPromise().then(function(data) {                             
+    var self = this;
+    this.listenTo(systemInfoStore, this.updateSystemInfo); 
+    this.listenTo(settingsStore, this.configureLanguage);
+    appActions.loadSettings.triggerPromise().then(function(settings) {     
+    }.bind(this));    
+    appActions.checkBackendStatus.triggerPromise().then(function(data) {                             
 	    this.updateSystemInfo(data);	    
       }.bind(this))["catch"](function(err) {
         this.updateSystemInfo({status:"DOWN"});	
-      }.bind(this)); 
+      }.bind(this));
+      
   },
+  
   updateSystemInfo: function(data){
      this.setState({
         systemInfo: data
      });       
       
+  },
+  configureLanguage: function(settings){
+      var currentLanguage = _.find(settings, { 'id': 'language'});
+	   if(currentLanguage){
+	        this.switchLanguage(currentLanguage.defaultId);
+	   }
   },
   switchLanguage: function(language){      
     var i18nLib = this.state.i18nLib;   
