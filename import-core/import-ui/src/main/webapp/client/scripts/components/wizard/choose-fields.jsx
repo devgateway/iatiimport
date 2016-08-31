@@ -120,7 +120,9 @@ var ChooseFields = React.createClass({
 		$.map(this.state.destinationFieldsData, function(item, i) {
 			if(item.mappable && sourceField.type == item.type){              
 				options.push({value:item.uniqueFieldName, label:item.displayName || item.uniqueFieldName})
-			}              
+			}else if(item.mappable && sourceField.type != item.type && (item.type === "STRING" || item.type === "MULTILANG_STRING") && (sourceField.type === "STRING" || sourceField.type === "MULTILANG_STRING") ){
+		      options.push({value:item.uniqueFieldName, label:item.displayName || item.uniqueFieldName})
+		    }              
 		});
 		return options
 	}, 
