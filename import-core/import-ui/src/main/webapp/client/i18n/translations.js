@@ -77,7 +77,8 @@ module.exports = {
 							'next' : 'Next >>',
 							'previous' : '<< Previous',
 							'msg_error_retrieving_projects' : ' Error retrieving filters.',
-							'msg_error_select_project' : ' Please select at least one project to proceed'
+							'msg_error_select_project' : ' Please select at least one project to proceed',
+						    'msg_project_not_editable':'Projects marked with an * and highlighted are not editable because they are not in the current workspace.'
 						},
 						'map_fields' : {
 							'choose_map_fields' : 'Choose and Map Fields',

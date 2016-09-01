@@ -55,9 +55,10 @@ var ChooseProjects = React.createClass({
         this.selectAll(event.target.checked, 'UPDATE');
     },
     selectAll: function(checked, operation){
-    	_.each(this.state.projectData, function(item){ 
-    		if(item.operation === operation)
-    			item.selected = checked;
+    	_.each(this.state.projectData, function(item){     		 
+    	    if(item.operation === operation && ((operation == 'UPDATE' && item.destinationDocument.allowEdit === true) || operation == 'INSERT')){    		  
+    		    item.selected = checked;    		    
+    		}    			
     	});
     	this.forceUpdate();
     },
@@ -249,6 +250,7 @@ var ChooseProjects = React.createClass({
                     <div className="panel panel-danger">
                         <div className="panel-heading">{this.props.i18nLib.t('wizard.choose_projects.existing_projects')}</div>
                         <div className="panel-body">
+                              <div className="alert alert-info" role="alert">{this.props.i18nLib.t('wizard.choose_projects.msg_project_not_editable')}</div>
                             <table className="table">
                                 <thead>
                                     <tr>
