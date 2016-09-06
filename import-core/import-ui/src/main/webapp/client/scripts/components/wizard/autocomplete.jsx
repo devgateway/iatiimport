@@ -79,12 +79,10 @@ var AutoComplete = React.createClass({
     	});
     	
     	        
-        $el.bind("paste", $.proxy(function(e){  
-           e.preventDefault();          
-            //var pastedData = e.originalEvent.clipboardData.getData('text');
-            //var option = _.find(this.props.options, { 'label':  pastedData});           
-            //$(e.target).trigger('typeahead:selected', option);
-           
+        $el.bind("paste", $.proxy(function(e){                      
+            var pastedData = e.originalEvent.clipboardData.getData('text');            
+            var option = _.find(this.props.options, { 'label':  pastedData});           
+            $(e.target).trigger('typeahead:selected', option);           
         }, this));
 
     	if(this.props.value) {
@@ -93,8 +91,8 @@ var AutoComplete = React.createClass({
 
     },
     componentDidUpdate: function(prevProps, prevState){
-    	var $el = $(this.refs[this.props.refId].getDOMNode());
-    	if(this.props.value) {
+    	var $el = $(this.refs[this.props.refId].getDOMNode());    	
+    	if(this.props.value) {    	    
     		$el.val(this.props.value);
     	}
     },
