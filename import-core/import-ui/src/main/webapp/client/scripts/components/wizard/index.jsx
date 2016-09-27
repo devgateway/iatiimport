@@ -173,8 +173,13 @@ var Wizard = React.createClass({
 		        	self.hideLoadingIcon();
 		            $("#modalResults").modal("show");
 		            self.setState({statusMessage: ""});	
-	        	}else{
-	        		self.setState({statusMessage: data.importStatus.message});	        		
+	        	}else{	        		
+	        	   var message = self.props.i18nLib.t('server_messages.' + data.importStatus.code, data.importStatus);
+		           if(message){
+		             self.setState({statusMessage: message})
+		           }else{
+		             self.setState({statusMessage: data.importStatus.message})
+		           }         		
 	        	}
 	         }else{
 	           clearInterval(self.setIntervalId);

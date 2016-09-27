@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.devgateway.importtool.endpoint.EPMessages;
+
 
 public class DocumentMapper implements IDocumentMapper {
 
@@ -65,7 +67,7 @@ public class DocumentMapper implements IDocumentMapper {
 	@Override
 	public List<ActionResult> execute() {	
 		this.destinationProcessor.preImportProcessing(this.documentMappings);
-		importStatus  = new ActionStatus(Constants.IMPORT_STATUS_MESSAGE, documentMappings.stream().filter(m -> m.getSelected() == true).count());
+		importStatus  = new ActionStatus(EPMessages.IMPORT_STATUS_MESSAGE.getDescription(), documentMappings.stream().filter(m -> m.getSelected() == true).count(),EPMessages.IMPORT_STATUS_MESSAGE.getCode());
 		importStatus.setStatus(Status.IN_PROGRESS);
 		
 		results = new ArrayList<ActionResult>();
@@ -113,17 +115,17 @@ public class DocumentMapper implements IDocumentMapper {
 		// Get the document lists and field that will be used for matching and
 		// prepare the list of documents to be updated
 		
-		documentMappingStatus = new ActionStatus("Extracting project %s of %s", 0L);
+		documentMappingStatus = new ActionStatus(EPMessages.PARSING_IN_PROGRESS.getDescription(), 0L,EPMessages.PARSING_IN_PROGRESS.getCode());
 		documentMappingStatus.setStatus(Status.IN_PROGRESS);
 		sourceProcessor.setActionStatus(documentMappingStatus);
 		List<InternalDocument> sourceDocuments = sourceProcessor.getDocuments();
 		
-		documentMappingStatus = new ActionStatus("Fetching destination projects", 0L);
+		documentMappingStatus = new ActionStatus(EPMessages.FETCHING_DESTINATION_PROJECTS.getDescription(), 0L, EPMessages.FETCHING_DESTINATION_PROJECTS.getCode());
 		documentMappingStatus.setStatus(Status.IN_PROGRESS);		
 		destinationProcessor.setActionStatus(documentMappingStatus);
 		
 		List<InternalDocument> destinationDocuments = destinationProcessor.getDocuments(false);				
-		documentMappingStatus = new ActionStatus("Mapping %s of %s", Long.valueOf(sourceDocuments.size()));
+		documentMappingStatus = new ActionStatus(EPMessages.MAPPING_STATUS_MESSAGE.getDescription(), Long.valueOf(sourceDocuments.size()), EPMessages.MAPPING_STATUS_MESSAGE.getCode());
 		documentMappingStatus.setStatus(Status.IN_PROGRESS);				
 		for (InternalDocument srcDoc : sourceDocuments) {
 			documentMappingStatus.incrementProcessed();

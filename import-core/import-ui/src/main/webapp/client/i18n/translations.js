@@ -155,7 +155,16 @@ module.exports = {
 							'view_import': 'View Import',
 							'delete': 'Delete'		 
 						}
-					}
+					},
+				  'server_messages': {
+					  101: 'Extracting project __processed__ of __total__',
+					  102: 'Fetching destination projects',
+					  103: 'An error occurred while extracting projects from the IATI file. Please check the file format',
+					  104: 'Error uploading file. Check if the initial steps are done.',
+					  105: 'Error uploading file.',
+					  106: 'Importing __processed__ of __total__ projects',
+					  107: 'Mapping __processed__ of __total__'					  
+				  }
 				}
 			},	
 			'fr' : {
@@ -310,7 +319,16 @@ module.exports = {
 							'view_import': ' Visualiser le Téléchargement ',
 							'delete': ' Supprimer '
 						}
-					}
+					},
+					'server_messages': {
+						  101: 'FR Extracting project __processed__ of __total__',
+						  102: 'FR Fetching destination projects',
+						  103: 'FR An error occurred while extracting projects from the IATI file. Please check the file format',
+						  104: 'FR Error uploading file. Check if the initial steps are done.',
+						  105: 'FR Error uploading file.',
+						  106: 'FR Importing __processed__ of __total__ projects',
+						  107: 'FR Mapping __processed__ of __total__'					  
+					  }
 				}		
 			}
 

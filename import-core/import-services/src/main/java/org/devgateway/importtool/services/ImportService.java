@@ -15,6 +15,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.dao.FileRepository;
 import org.devgateway.importtool.dao.ProjectRepository;
+import org.devgateway.importtool.endpoint.EPConstants;
+import org.devgateway.importtool.endpoint.EPMessages;
 import org.devgateway.importtool.model.File;
 import org.devgateway.importtool.model.ImportSummary;
 import org.devgateway.importtool.model.Project;
@@ -27,6 +29,7 @@ import org.devgateway.importtool.services.processor.helper.FieldValueMapping;
 import org.devgateway.importtool.services.processor.helper.IDestinationProcessor;
 import org.devgateway.importtool.services.processor.helper.IDocumentMapper;
 import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
+import org.devgateway.importtool.services.processor.helper.JsonBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -136,8 +139,7 @@ public class ImportService {
 					e.printStackTrace();
 					log.error("Error loading destination processor class: " + optional.get().getDestinationProcessor().getClassName() + " " + e);
 				}
-			}
-			
+			}			
 		return processor;
 	}
 	
@@ -147,9 +149,8 @@ public class ImportService {
 			documentMapper.initialize();
 		} catch (Exception e) {
 			e.printStackTrace();
-			String error = "An error occurred while extracting projects from the IATI file. Please check the file format";			
 			log.error("Error parsing document " + e);	
-			return error;
+			return EPMessages.ERROR_EXCTRACTING_PROJECT.toString();
 		}	
 		return null;
 	}

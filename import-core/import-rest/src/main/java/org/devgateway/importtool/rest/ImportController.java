@@ -8,6 +8,7 @@ import static org.devgateway.importtool.services.processor.helper.Constants.SOUR
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,15 +17,17 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.dao.FileRepository;
 import org.devgateway.importtool.dao.ProjectRepository;
+import org.devgateway.importtool.endpoint.EPConstants;
+import org.devgateway.importtool.endpoint.EPMessages;
 import org.devgateway.importtool.model.File;
 import org.devgateway.importtool.model.ImportSummary;
 import org.devgateway.importtool.security.ImportSessionToken;
 import org.devgateway.importtool.services.ImportService;
-import org.devgateway.importtool.services.WorkflowService;
 import org.devgateway.importtool.services.processor.helper.DocumentMapper;
 import org.devgateway.importtool.services.processor.helper.IDestinationProcessor;
 import org.devgateway.importtool.services.processor.helper.IDocumentMapper;
 import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
+import org.devgateway.importtool.services.processor.helper.JsonBean;
 import org.devgateway.importtool.services.response.DocumentMappingResponse;
 import org.devgateway.importtool.services.response.ImportExecuteResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,9 +52,6 @@ class ImportController  {
 	@Autowired
 	private ProjectRepository projectRepository;
 
-	@Autowired
-	private WorkflowService workflowService;
-	
 	@Autowired
 	private ImportService importService;
 	
@@ -108,16 +108,13 @@ class ImportController  {
 				request.getSession().setAttribute(CURRENT_FILE_ID, uploadedFile.getId());
 				return new ResponseEntity<>("{}", HttpStatus.OK);
 			} catch (Exception e) {
-				e.printStackTrace();
-				return new ResponseEntity<>("{\"error\": \"Error uploading file. Check if the initial steps are done.\"}", HttpStatus.OK);
+				e.printStackTrace();			
+				return new ResponseEntity<>(EPMessages.ERROR_UPLOADING_FILE_CHECK_INITIAL_STEPS.toString(), HttpStatus.OK);
 			}
-		} else {
-			return new ResponseEntity<>("{\"error\": \"Error uploading file.\"}", HttpStatus.OK);
+		} else {				
+			return new ResponseEntity<>(EPMessages.ERROR_UPLOADING_FILE.toString(), HttpStatus.OK);
 		}
-	}
-
-	
-	
+	}	
 	 
 	@RequestMapping(method = RequestMethod.POST, value = "/filter")
 	ResponseEntity<ImportSessionToken> filter(@PathVariable String authenticationToken) {
@@ -140,7 +137,7 @@ class ImportController  {
 		documentMapper.setDestinationProcessor(destProcessor);
 		String error = importService.initialize(documentMapper);
 		if(error != null && error.length() > 0 ){
-			return new ResponseEntity<>("{\"error\": \"" + error + "\"}", HttpStatus.OK);
+			return new ResponseEntity<>(error, HttpStatus.OK);
 		}
 		return new ResponseEntity<>("{}", HttpStatus.OK);
 		
@@ -194,8 +191,6 @@ class ImportController  {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}		
 		return new ResponseEntity<>(importService.getSummary(documentMapper, importSessionToken, processor), HttpStatus.OK);
-	}
-
-	
+	}	
 
 }

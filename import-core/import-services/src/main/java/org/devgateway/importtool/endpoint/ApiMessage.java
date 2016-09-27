@@ -16,5 +16,10 @@ public class ApiMessage {
 	public String getDescription() {
 		return description;
 	}
+	
+	@Override
+	public String toString(){
+		return String.format(EPConstants.MESSAGE_FORMAT, this.getDescription(), this.getDescription(), this.getCode());		
+	}
 
 }

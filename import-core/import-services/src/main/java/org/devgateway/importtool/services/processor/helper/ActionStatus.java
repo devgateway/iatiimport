@@ -5,9 +5,8 @@ public class ActionStatus {
 	private Status status = Status.NOT_STARTED;
 	private long total = 0L;
 	private long processed = 0L;
-	
-
 	private String message = "";
+	private Integer code;
 	public long getTotal() {
 		return total;
 	}
@@ -27,12 +26,18 @@ public class ActionStatus {
 	public void resetProcessed() {
 		this.processed = 0L;
 	}
+		public Integer getCode() {
+		return code;
+	}
+
+	public void setCode(Integer code) {
+		this.code = code;
+	}
 	
-	
-	
-	public ActionStatus(String message, long total) {
+	public ActionStatus(String message, long total, Integer code) {
 		this.message = message;
 		this.total = total;
+		this.code = code;
 	}
 
 	public Status getStatus() {
