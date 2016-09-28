@@ -489,14 +489,20 @@ public class IATI2XProcessor implements ISourceProcessor {
 							Element fieldElement = (Element) fieldNodeList.item(j);							
 							if (fieldElement.getAttribute("role").equals(field.getSubType()) || fieldElement.getAttribute("role").equals(field.getSubTypeCode())) {							
 								final String stringOrgValue = fieldElement.getElementsByTagName("narrative").item(0) != null ? fieldElement.getElementsByTagName("narrative").item(0).getTextContent() : "";
+								final String ref = fieldElement.getAttribute("ref");
 								Map<String, String> orgFields = new HashMap<String, String>();
 								orgFields.put("value", stringOrgValue);
 								orgFields.put("role", field.getSubType());
-								orgFields.put("ref", fieldElement.getAttribute("ref"));
+								orgFields.put("ref", ref);
 								orgFields.put("type", fieldElement.getAttribute("type"));
 								FieldValue fv = new FieldValue();
-								fv.setCode(stringOrgValue);
-								fv.setValue(stringOrgValue);
+								if(stringOrgValue != null && !stringOrgValue.isEmpty() ){
+									fv.setCode(stringOrgValue);
+									fv.setValue(stringOrgValue);	
+								}else{
+									fv.setCode(ref);
+									fv.setValue(ref);
+								}
 								fv.setSelected(true);
 								int index = field.getPossibleValues() == null ? 0 : field.getPossibleValues().size();
 								fv.setIndex(index);

@@ -48,7 +48,7 @@ var MappingTableSimple = React.createClass({
         	  rows.push(<tr key = {key}>
               <td>
                   <div className="table_cell">
-                      {sourceValue.value}
+                      {(sourceValue.value && sourceValue.value.trim().length > 0) ? sourceValue.value :  sourceValue.code}
                   </div>
               </td>
               <td>               	
