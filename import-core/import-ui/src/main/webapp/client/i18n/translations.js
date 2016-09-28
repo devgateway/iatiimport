@@ -321,13 +321,13 @@ module.exports = {
 						}
 					},
 					'server_messages': {
-						  101: 'Extracting project __processed__ of __total__',
-						  102: 'Fetching destination projects',
-						  103: 'An error occurred while extracting projects from the IATI file. Please check the file format',
-						  104: 'Error uploading file. Check if the initial steps are done.',
-						  105: 'Error uploading file.',
-						  106: 'Importing __processed__ of __total__ projects',
-						  107: 'Mapping __processed__ of __total__'					  
+						  101: 'Extraction de __processed__ sur __total___',
+						  102: 'Chargement des projets',
+						  103: "Un erreur s'est produite dans le processus d'extraction des projets IATI. Veuillez vérifier le format du fichier.",
+						  104: "Une erreur s'est produite dans le téléchargement du fichier. Veuillez vérifier les étapes initiales.",
+						  105: "Une erreur s'est produite dans le téléchargement du fichier.",
+						  106: 'Chargement de __processed__ sur __total__ projets',
+						  107: 'Correspondance  __processed__ sur __total__ projets'				  
 					  }
 				}		
 			}
