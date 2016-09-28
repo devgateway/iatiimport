@@ -16,7 +16,7 @@ var ChooseProjects = React.createClass({
         Reflux.ListenerMixin
     ],
     getInitialState: function() {
-       return {projectData: [], destinationProjects: [], statusMessage: "Fetching projects"};
+       return {projectData: [], destinationProjects: [], statusMessage: ""};
     },
     initializeFailed:false,
     componentWillMount: function () {
@@ -124,8 +124,13 @@ var ChooseProjects = React.createClass({
 		         if(data.error){
 		           self.initializeFailed = true;
 		           self.props.eventHandlers.hideLoadingIcon(); 
-		           self.setState({statusMessage: ""});   		
-    		       self.props.eventHandlers.displayError(data.error);
+		           self.setState({statusMessage: ""});	           
+		           var message = self.props.i18nLib.t('server_messages.' + data.code, data);
+		           if(message){
+		             self.props.eventHandlers.displayError(message);
+		           }else{
+		             self.props.eventHandlers.displayError(data.error);
+		           }    		       
 		         }		          		        	        	
 		        },
 		        type: 'POST'
@@ -140,7 +145,12 @@ var ChooseProjects = React.createClass({
     			this.props.eventHandlers.hideLoadingIcon();                       
         		this.updateProject(data.documentMappings);        		
     		} else{
-    			this.setState({statusMessage:data.documentMappingStatus.message});
+    		    var message = this.props.i18nLib.t('server_messages.' + data.documentMappingStatus.code, data.documentMappingStatus);
+    		    if(message){
+    		       this.setState({statusMessage: message});
+    		    }else{
+    		       this.setState({statusMessage:data.documentMappingStatus.message});
+    		    }    			
     		}   		                
     	}.bind(this))["catch"](function(err) {
     	    clearInterval(id);

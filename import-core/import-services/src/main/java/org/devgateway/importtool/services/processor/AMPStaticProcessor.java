@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.devgateway.importtool.endpoint.EPMessages;
 import org.devgateway.importtool.exceptions.CurrencyNotFoundException;
 import org.devgateway.importtool.services.processor.helper.ActionResult;
 import org.devgateway.importtool.services.processor.helper.ActionStatus;
@@ -110,7 +111,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	@Override
 	// Updated!
 	public List<InternalDocument> getDocuments(Boolean onlyEditable) {
-		actionStatus = new ActionStatus("Fetching destination projects", 0L);
+		actionStatus = new ActionStatus(EPMessages.FETCHING_DESTINATION_PROJECTS.getDescription(), 0L, EPMessages.FETCHING_DESTINATION_PROJECTS.getCode());
 		List<InternalDocument> list = new ArrayList<InternalDocument>();
 		String result = "";
 
