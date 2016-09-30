@@ -8,7 +8,7 @@ public interface IDocumentMapper {
 
 	void setDestinationProcessor(IDestinationProcessor destProcessor);
 
-	void initialize() throws Exception;
+	void initialize();
 
 	List<DocumentMapping> getDocumentMappings();
 

@@ -7,6 +7,19 @@ public class ActionStatus {
 	private long processed = 0L;
 	private String message = "";
 	private Integer code;
+	
+	
+	public ActionStatus() {
+	
+	}
+	
+	public ActionStatus(String message, long total, Integer code) {
+		this.message = message;
+		this.total = total;
+		this.code = code;
+	}
+	
+	
 	public long getTotal() {
 		return total;
 	}
@@ -34,11 +47,7 @@ public class ActionStatus {
 		this.code = code;
 	}
 	
-	public ActionStatus(String message, long total, Integer code) {
-		this.message = message;
-		this.total = total;
-		this.code = code;
-	}
+	
 
 	public Status getStatus() {
 		return status;

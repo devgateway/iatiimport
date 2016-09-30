@@ -131,16 +131,11 @@ class ImportController  {
 		if (documentMapper == null) {
 			documentMapper = new DocumentMapper();
 			request.getSession().setAttribute(DOCUMENT_MAPPER, documentMapper);
-		}
-		
+		}		
 		documentMapper.setSourceProcessor(srcProcessor);
 		documentMapper.setDestinationProcessor(destProcessor);
-		String error = importService.initialize(documentMapper);
-		if(error != null && error.length() > 0 ){
-			return new ResponseEntity<>(error, HttpStatus.OK);
-		}
-		return new ResponseEntity<>("{}", HttpStatus.OK);
-		
+		importService.initialize(documentMapper);		
+		return new ResponseEntity<>("{}", HttpStatus.OK);		
 	}
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/projects")

@@ -125,12 +125,8 @@ var ChooseProjects = React.createClass({
 		           self.initializeFailed = true;
 		           self.props.eventHandlers.hideLoadingIcon(); 
 		           self.setState({statusMessage: ""});	           
-		           var message = self.props.i18nLib.t('server_messages.' + data.code, data);
-		           if(message){
-		             self.props.eventHandlers.displayError(message);
-		           }else{
-		             self.props.eventHandlers.displayError(data.error);
-		           }    		       
+		           var message = self.props.i18nLib.t('server_messages.' + data.code, data) || data.error;		           
+		           self.props.eventHandlers.displayError(message);		              		       
 		         }		          		        	        	
 		        },
 		        type: 'POST'
@@ -139,18 +135,21 @@ var ChooseProjects = React.createClass({
 	},
 	loadSourceProjects:  function(id){
 		appActions.loadProjectData.triggerPromise().then(function(data) { 
+		    this.setState({statusMessage: ""});
     		if(data.documentMappingStatus.status == "COMPLETED"){
-    			clearInterval(id);
-    			this.setState({statusMessage: ""});
+    			clearInterval(id);    			
     			this.props.eventHandlers.hideLoadingIcon();                       
         		this.updateProject(data.documentMappings);        		
     		} else{
-    		    var message = this.props.i18nLib.t('server_messages.' + data.documentMappingStatus.code, data.documentMappingStatus);
-    		    if(message){
-    		       this.setState({statusMessage: message});
+    		    var message = this.props.i18nLib.t('server_messages.' + data.documentMappingStatus.code, data.documentMappingStatus) || data.documentMappingStatus.message;
+    		    if(data.documentMappingStatus.status === 'FAILED_WITH_ERROR'){
+    		       clearInterval(id);
+    		       this.initializeFailed = true;    		       
+		           this.props.eventHandlers.hideLoadingIcon();
+		           this.props.eventHandlers.displayError(message);
     		    }else{
-    		       this.setState({statusMessage:data.documentMappingStatus.message});
-    		    }    			
+    		       this.setState({statusMessage: message});    		     
+    		    }    		     			
     		}   		                
     	}.bind(this))["catch"](function(err) {
     	    clearInterval(id);

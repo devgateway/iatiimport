@@ -4,7 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.devgateway.importtool.endpoint.ApiMessage;
 import org.devgateway.importtool.endpoint.EPMessages;
+import org.devgateway.importtool.exceptions.MissingPrerequisitesException;
 
 
 public class DocumentMapper implements IDocumentMapper {
@@ -19,6 +23,7 @@ public class DocumentMapper implements IDocumentMapper {
 	private boolean isInitialized = false;
 	private ActionStatus importStatus;
 	private ActionStatus documentMappingStatus;
+	private Log logger = LogFactory.getLog(getClass());
 		
 	public ActionStatus getImportStatus() {
 		return importStatus;
@@ -106,31 +111,40 @@ public class DocumentMapper implements IDocumentMapper {
 
 	}
 
-	public void initialize() throws Exception {
-		if (sourceProcessor == null || destinationProcessor == null) {
-			throw new Exception("Missing prerequirements to initialize this mapping");
-		}
-				
-		this.setDocumentMappings(new ArrayList<DocumentMapping>());		
-		// Get the document lists and field that will be used for matching and
-		// prepare the list of documents to be updated
-		
-		documentMappingStatus = new ActionStatus(EPMessages.PARSING_IN_PROGRESS.getDescription(), 0L,EPMessages.PARSING_IN_PROGRESS.getCode());
-		documentMappingStatus.setStatus(Status.IN_PROGRESS);
-		sourceProcessor.setActionStatus(documentMappingStatus);
-		List<InternalDocument> sourceDocuments = sourceProcessor.getDocuments();
-		
-		documentMappingStatus = new ActionStatus(EPMessages.FETCHING_DESTINATION_PROJECTS.getDescription(), 0L, EPMessages.FETCHING_DESTINATION_PROJECTS.getCode());
-		documentMappingStatus.setStatus(Status.IN_PROGRESS);		
-		destinationProcessor.setActionStatus(documentMappingStatus);
-		
-		List<InternalDocument> destinationDocuments = destinationProcessor.getDocuments(false);				
-		documentMappingStatus = new ActionStatus(EPMessages.MAPPING_STATUS_MESSAGE.getDescription(), Long.valueOf(sourceDocuments.size()), EPMessages.MAPPING_STATUS_MESSAGE.getCode());
-		documentMappingStatus.setStatus(Status.IN_PROGRESS);				
+	public void initialize(){		
+		try{
+			if (sourceProcessor == null || destinationProcessor == null) {
+				throw new MissingPrerequisitesException("Missing prerequirements to initialize this mapping");
+			}
+			this.setDocumentMappings(new ArrayList<DocumentMapping>());		
+			//parse file			
+			this.updateStatus(EPMessages.PARSING_IN_PROGRESS, Status.IN_PROGRESS);			
+			this.sourceProcessor.setActionStatus(this.documentMappingStatus);
+			List<InternalDocument> sourceDocuments = this.sourceProcessor.getDocuments();
+			
+			//fetch destination system projects			
+			this.updateStatus(EPMessages.FETCHING_DESTINATION_PROJECTS, Status.IN_PROGRESS);
+			this.destinationProcessor.setActionStatus(this.documentMappingStatus);			
+			List<InternalDocument> destinationDocuments = this.destinationProcessor.getDocuments(false);	
+			
+			//map projects
+			this.mapProjects(sourceDocuments, destinationDocuments);
+			this.setInitialized(true);
+		}catch(MissingPrerequisitesException mpex){
+			logger.error("Missing prerequirements to initialize this mapping " + mpex);			
+			this.updateStatus(EPMessages.ERROR_EXCTRACTING_PROJECT, Status.FAILED_WITH_ERROR);			
+		}catch (Exception e) {
+			logger.error("Error parsing document " + e);
+			this.updateStatus(EPMessages.ERROR_EXCTRACTING_PROJECT, Status.FAILED_WITH_ERROR);			
+		}		
+	}
+	
+    private void mapProjects(List<InternalDocument> sourceDocuments, List<InternalDocument> destinationDocuments){    	
+    	this.updateStatus(EPMessages.MAPPING_STATUS_MESSAGE, Status.IN_PROGRESS);		
 		for (InternalDocument srcDoc : sourceDocuments) {
-			documentMappingStatus.incrementProcessed();
-			String sourceIdField = sourceProcessor.getIdField();
-			String destinationIdField = destinationProcessor.getIdField();
+			this.documentMappingStatus.incrementProcessed();
+			String sourceIdField = this.sourceProcessor.getIdField();
+			String destinationIdField = this.destinationProcessor.getIdField();
 			String sourceIdValue = srcDoc.getStringFields().get(sourceIdField);
 			srcDoc.setIdentifier(sourceIdValue);
 			Optional<InternalDocument> optionalDestDoc = destinationDocuments.stream().filter(n -> {
@@ -140,16 +154,23 @@ public class DocumentMapper implements IDocumentMapper {
 				InternalDocument destDoc = optionalDestDoc.get();
 				String destinationIdValue = (String) destDoc.getStringFields().get(destinationIdField);
 				destDoc.setIdentifier(destinationIdValue);
-				addDocumentMapping(srcDoc, destDoc, OperationType.UPDATE);
+				this.addDocumentMapping(srcDoc, destDoc, OperationType.UPDATE);
 			} else {
-				addDocumentMapping(srcDoc, null, OperationType.INSERT);
+				this.addDocumentMapping(srcDoc, null, OperationType.INSERT);
 			}
-		}
-		
-	    documentMappingStatus.setStatus(Status.COMPLETED);
-		this.setInitialized(true);
-	}
-   
+		}		
+	    this.documentMappingStatus.setStatus(Status.COMPLETED);
+    }
+    
+    private void updateStatus(ApiMessage message, Status status){
+    	if(this.documentMappingStatus == null){
+    		this.documentMappingStatus = new ActionStatus();
+    	}
+    	this.documentMappingStatus.setMessage(message.getDescription());
+		this.documentMappingStatus.setCode(message.getCode());
+		this.documentMappingStatus.setTotal(0L);
+		this.documentMappingStatus.setStatus(status);
+    }
 	private void addDocumentMapping(InternalDocument srcDoc, InternalDocument destDoc, OperationType operation) {
 		// Look for an existing src mapping
 		Optional<DocumentMapping> mapping = this.getDocumentMappings().stream().filter(n -> {

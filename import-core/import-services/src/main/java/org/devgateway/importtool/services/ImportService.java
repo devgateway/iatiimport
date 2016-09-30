@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -15,8 +14,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.dao.FileRepository;
 import org.devgateway.importtool.dao.ProjectRepository;
-import org.devgateway.importtool.endpoint.EPConstants;
-import org.devgateway.importtool.endpoint.EPMessages;
 import org.devgateway.importtool.model.File;
 import org.devgateway.importtool.model.ImportSummary;
 import org.devgateway.importtool.model.Project;
@@ -29,7 +26,6 @@ import org.devgateway.importtool.services.processor.helper.FieldValueMapping;
 import org.devgateway.importtool.services.processor.helper.IDestinationProcessor;
 import org.devgateway.importtool.services.processor.helper.IDocumentMapper;
 import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
-import org.devgateway.importtool.services.processor.helper.JsonBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -143,16 +139,9 @@ public class ImportService {
 		return processor;
 	}
 	
-	
-	public String initialize(IDocumentMapper documentMapper){
-		try {
-			documentMapper.initialize();
-		} catch (Exception e) {
-			e.printStackTrace();
-			log.error("Error parsing document " + e);	
-			return EPMessages.ERROR_EXCTRACTING_PROJECT.toString();
-		}	
-		return null;
+	@Async
+	public void initialize(IDocumentMapper documentMapper){		
+		documentMapper.initialize();		
 	}
 	
 	@Async
