@@ -440,3 +440,12 @@ tbody.scrollablebody td, thead.scrollablebody th {
 .workflow-selector li:before {
 	content:"\00BB \0020";	
 }
+
+.wizard-container{
+	width:95%;
+	margin:auto;
+}
+
+.id-column-width{
+	width:20%;
+}

@@ -188,12 +188,15 @@ var ChooseProjects = React.createClass({
         var language = this.props.i18nLib.lng() || 'en';         
         var statusMessage = this.state.statusMessage.length > 0 ? <div className="alert alert-info" role="alert">{this.state.statusMessage}</div> : "";
         if (this.state.projectData) {
-           $.map(this.state.projectData, function (item, i) {
+           $.map(this.state.projectData, function (item, i) {              
                 if (item.operation == 'INSERT') {
                     newProjects.push(<tr key={i}>
                         <td>
                            <input aria-label="Source" className="source"  type="checkbox" checked={item.selected} onChange={this.handleToggle.bind(this, item)} />
-                        </td>                        
+                        </td>                         
+                        <td>
+                        {item.sourceDocument.identifier}
+                        </td>                      
                         <td>
                             {this.getTitle(item.sourceDocument.multilangFields, language)} 
                         </td>
@@ -208,6 +211,9 @@ var ChooseProjects = React.createClass({
                     existingProjects.push(<tr key={i} className = {item.destinationDocument.allowEdit ? "" : "warning not-active" } >
                         <td >
                           <input aria-label="Source" className="source" type="checkbox" checked={item.selected} onChange={this.handleToggle.bind(this, item)} />
+                        </td>
+                        <td>
+                        {item.sourceDocument.identifier}
                         </td>
                         <td>{item.destinationDocument.allowEdit ? "" : " * " }
                             {this.getTitle(item.sourceDocument.multilangFields, language)}
@@ -237,7 +243,10 @@ var ChooseProjects = React.createClass({
                                         <th>
                                             <input type="checkbox" checked={this.checkAll('INSERT')} onChange={this.selectAllNew} />
                                             {this.props.i18nLib.t('wizard.choose_projects.import')}
-                                        </th>                                        
+                                        </th>  
+                                         <th className="id-column-width">
+                                            {this.props.i18nLib.t('wizard.choose_projects.iati_id')}  
+                                        </th>                                      
                                         <th>
                                             {this.props.i18nLib.t('wizard.choose_projects.source_project')}
                                         </th>
@@ -266,7 +275,10 @@ var ChooseProjects = React.createClass({
                                         <th>
                                             <input type="checkbox" checked={this.checkAll('UPDATE')} onChange={this.selectAllExisting} />
                                             {this.props.i18nLib.t('wizard.choose_projects.update')}
-                                        </th>                                        
+                                        </th> 
+                                         <th className="id-column-width">
+                                            {this.props.i18nLib.t('wizard.choose_projects.iati_id')}                                            
+                                        </th>                                       
                                         <th>
                                             {this.props.i18nLib.t('wizard.choose_projects.source_project')}
                                         </th>

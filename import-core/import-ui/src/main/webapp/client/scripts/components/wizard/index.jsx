@@ -265,12 +265,12 @@ var Wizard = React.createClass({
     
     return (
       <div>
-      <div className="container " >     
+      <div className="wizard-container" >     
       <h2>{this.props.i18nLib.t('wizard.import_process')}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       <small>{this.state.info.sourceProcessorName} {window.i18nLib.t('header.nav.menu.submenu.to')} {this.state.info.destinationProcessorName} </small></h2>
       <div className="row">
       <WizardSteps {...this.props} currentStep = {this.state.currentStep} completedSteps= {this.state.completedSteps} />
-      <div className="col-sm-9 col-md-9 main " >
+      <div className="col-sm-10 col-md-10 main " >
       <div className="alert alert-danger message-box" role="alert" ref="messageBox">
        <span className="glyphicon glyphicon-exclamation-sign error-box" aria-hidden="true"></span>
        <span className="sr-only">Error:</span>
