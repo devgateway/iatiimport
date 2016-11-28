@@ -1,47 +1,84 @@
-<codelist date-last-modified="2015-03-25T12:12:02.995125+00:00" version="" name="AidType-category" xml:lang="en">
-  <AidType-category>
-    <code>A</code>
-    <name>Budget support</name>
-    <language>en</language>
-    <description>For contributions under this category, the donor relinquishes the exclusive control of its funds by sharing the responsibility with the recipient.</description>
-  </AidType-category>
-  <AidType-category>
-    <code>B</code>
-    <name>Core contributions and pooled programmes and funds</name>
-    <language>en</language>
-    <description>For contributions under this category, the donor relinquishes the exclusive control of its funds by sharing the responsibility with other stakeholders (other donors, NGOs, multilateral institutions, Public Private Partnerships). The category covers both core contributions (B01 and B02), and pooled contributions with a specific earmarking (B03 and B04).</description>
-  </AidType-category>
-  <AidType-category>
-    <code>C</code>
-    <name>Project-type interventions</name>
-    <language>en</language>
-    <description>N.B. Within this category, members able to do so are requested to report the aggregate amount used for financing donor experts/consultants on Table DAC1. Where the activity consists solely of experts' costs, report under category D.</description>
-  </AidType-category>
-  <AidType-category>
-    <code>D</code>
-    <name>Experts and other technical assistance</name>
-    <language>en</language>
-    <description>This category covers the provision, outside projects as described in category C, of know- how in the form of personnel, training and research.</description>
-  </AidType-category>
-  <AidType-category>
-    <code>E</code>
-    <name>Scholarships and student costs in donor countries</name>
-    <language>en</language>
-  </AidType-category>
-  <AidType-category>
-    <code>F</code>
-    <name>Debt relief</name>
-    <language>en</language>
-  </AidType-category>
-  <AidType-category>
-    <code>G</code>
-    <name>Administrative costs not included elsewhere</name>
-    <language>en</language>
-  </AidType-category>
-  <AidType-category>
-    <code>H</code>
-    <name>Other in-donor expenditures</name>
-    <language>en</language>
-    <description>Groups a number of contributions that do not give rise to a cross-border flow.</description>
-  </AidType-category>
+<codelist name="AidType-category" xml:lang="en" complete="1">
+    <metadata>
+        <name>
+            <narrative>Aid Type (category)</narrative>
+        </name>
+        <description>
+            <narrative>This codelists exists to group the Aid Type codelist into categories. It is not used as a codelist in its own right.</narrative>
+        </description>
+    </metadata>
+    <codelist-items>
+        <codelist-item>
+            <code>A</code>
+            <name>
+                <narrative>Budget support</narrative>
+            </name>
+            <description>
+                <narrative>For contributions under this category, the donor relinquishes the exclusive control of its funds by sharing the responsibility with the recipient.</narrative>
+            </description>
+        </codelist-item>
+        <codelist-item>
+            <code>B</code>
+            <name>
+                <narrative>Core contributions and pooled programmes and funds</narrative>
+            </name>
+            <description>
+                <narrative>For contributions under this category, the donor relinquishes the exclusive control of its funds by sharing the responsibility with other stakeholders (other donors, NGOs, multilateral institutions, Public Private Partnerships). The category covers both core contributions (B01 and B02), and pooled contributions with a specific earmarking (B03 and B04).</narrative>
+            </description>
+        </codelist-item>
+        <codelist-item>
+            <code>C</code>
+            <name>
+                <narrative>Project-type interventions</narrative>
+            </name>
+            <description>
+                <narrative>N.B. Within this category, members able to do so are requested to report the aggregate amount used for financing donor experts/consultants on Table DAC11. Where the activity consists solely of experts’ costs, report under category D. A project is a set of inputs, activities and outputs, agreed with the partner country*, to reach specific objectives/outcomes within a defined time frame, with a defined budget and a defined geographical area. Projects can vary significantly in terms of objectives, complexity, amounts involved and duration. There are smaller projects that might involve modest financial resources and last only a few months, whereas large projects might involve more significant amounts, entail successive phases and last for many years. A large project with a number of different components is sometimes referred to as a programme, but should nevertheless be recorded here.</narrative>
+            </description>
+        </codelist-item>
+        <codelist-item>
+            <code>D</code>
+            <name>
+                <narrative>Experts and other technical assistance</narrative>
+            </name>
+            <description>
+                <narrative>This category covers the provision, outside projects as described in category C, of know-how in the form of personnel, training and research.</narrative>
+            </description>
+        </codelist-item>
+        <codelist-item>
+            <code>E</code>
+            <name>
+                <narrative>Scholarships and student costs in donor countries</narrative>
+            </name>
+            <description>
+                <narrative/>
+            </description>
+        </codelist-item>
+        <codelist-item>
+            <code>F</code>
+            <name>
+                <narrative>Debt relief</narrative>
+            </name>
+            <description>
+                <narrative/>
+            </description>
+        </codelist-item>
+        <codelist-item>
+            <code>G</code>
+            <name>
+                <narrative>Administrative costs not included elsewhere</narrative>
+            </name>
+            <description>
+                <narrative/>
+            </description>
+        </codelist-item>
+        <codelist-item>
+            <code>H</code>
+            <name>
+                <narrative>Other in-donor expenditures</narrative>
+            </name>
+            <description>
+                <narrative>Groups a number of contributions that do not give rise to a cross-border flow.</narrative>
+            </description>
+        </codelist-item>
+    </codelist-items>
 </codelist>

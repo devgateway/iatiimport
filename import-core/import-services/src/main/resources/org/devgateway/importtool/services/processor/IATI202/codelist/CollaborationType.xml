@@ -1,39 +1,73 @@
-<codelist date-last-modified="2015-03-25T12:12:01.877898+00:00" version="" name="CollaborationType" xml:lang="en">
-  <CollaborationType>
-    <code>1</code>
-    <name>Bilateral</name>
-    <language>en</language>
-    <description>Bilateral transactions are those undertaken by a donor, excluding core contributions to other organisations (codes 2 and 3 below). It includes transactions channelled through other organisations.</description>
-  </CollaborationType>
-  <CollaborationType>
-    <code>2</code>
-    <name>Multilateral</name>
-    <language>en</language>
-    <description>Multilateral contributions are those made to a recipient institution which: 
+<codelist name="CollaborationType" xml:lang="en" complete="1">
+    <metadata>
+        <name>
+            <narrative>Collaboration Type</narrative>
+        </name>
+        <url>http://www.oecd.org/dac/stats/dacandcrscodelists.htm</url>
+    </metadata>
+    <codelist-items>
+        <codelist-item>
+            <code>1</code>
+            <name>
+                <narrative>Bilateral</narrative>
+                <narrative xml:lang="fr">Bilatéral</narrative>
+            </name>
+            <description>
+                <narrative>Bilateral transactions are those undertaken by a donor, excluding core contributions to other organisations (codes 2 and 3 below). It includes transactions channelled through other organisations.</narrative>
+            </description>
+        </codelist-item>
+        <codelist-item>
+            <code>2</code>
+            <name>
+                <narrative>Multilateral</narrative>
+                <narrative xml:lang="fr">Multilatéral</narrative>
+            </name>
+            <description>
+                <narrative>Multilateral contributions are those made to a recipient institution which: 
     i. conducts all or part of its activities in favour of development; 
     ii. is an international agency, institution or organisation whose members are governments, or a fund managed autonomously by such an agency; and 
-    iii. pools contributions so that they lose their identity and become an integral part of its financial assets.</description>
-  </CollaborationType>
-  <CollaborationType>
-    <code>3</code>
-    <name>Bilateral, core contributions to NGOs and other private bodies / PPPs</name>
-    <language>en</language>
-    <description>Bilateral funds paid over to national and international non-governmental organisations (NGOs), Public Private Partnerships (PPPs), or other private bodies for use at their discretion.</description>
-  </CollaborationType>
-  <CollaborationType>
-    <code>4</code>
-    <name>Multilateral outflows</name>
-    <language>en</language>
-    <description>Aid activities financed from the multilateral institutions' regular budgets.</description>
-  </CollaborationType>
-  <CollaborationType>
-    <code>6</code>
-    <name>Private sector outflow</name>
-    <language>en</language>
-  </CollaborationType>
-  <CollaborationType>
-    <code>7</code>
-    <name>Bilateral, ex-post reporting on NGOs' activities funded through core contributions</name>
-    <language>en</language>
-  </CollaborationType>
+    iii. pools contributions so that they lose their identity and become an integral part of its financial assets.</narrative>
+            </description>
+        </codelist-item>
+        <codelist-item>
+            <code>3</code>
+            <name>
+                <narrative>Bilateral, core contributions to NGOs and other private bodies / PPPs</narrative>
+                <narrative xml:lang="fr">Contributions bilatérales au budget général d'organisations non gouvernementales, d'autres organisations de la société civile, de partenariats publics-privés et d'instituts de recherches</narrative>
+            </name>
+            <description>
+                <narrative>Bilateral funds paid over to national and international non-governmental organisations (NGOs), Public Private Partnerships (PPPs), or other private bodies for use at their discretion.</narrative>
+            </description>
+        </codelist-item>
+        <codelist-item>
+            <code>4</code>
+            <name>
+                <narrative>Multilateral outflows</narrative>
+                <narrative xml:lang="fr">apports des agences multilatérales</narrative>
+            </name>
+            <description>
+                <narrative>Aid activities financed from the multilateral institutions' regular budgets.</narrative>
+            </description>
+        </codelist-item>
+        <codelist-item>
+            <code>6</code>
+            <name>
+                <narrative>Private sector outflow</narrative>
+                <narrative xml:lang="fr">apports du secteur privé</narrative>
+            </name>
+            <description>
+                <narrative/>
+            </description>
+        </codelist-item>
+        <codelist-item>
+            <code>7</code>
+            <name>
+                <narrative>Bilateral, ex-post reporting on NGOs' activities funded through core contributions</narrative>
+                <narrative xml:lang="fr">Contributions bilatérales, notification ex post des activités des ONG financées par des contributions des donneurs au budget général de l'ONG.</narrative>
+            </name>
+            <description>
+                <narrative/>
+            </description>
+        </codelist-item>
+    </codelist-items>
 </codelist>

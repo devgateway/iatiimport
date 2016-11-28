@@ -1,14 +1,30 @@
-<codelist date-last-modified="2015-03-25T12:12:01.289827+00:00" version="" name="IndicatorMeasure" xml:lang="en">
-  <IndicatorMeasure>
-    <code>1</code>
-    <name>Unit</name>
-    <language>en</language>
-    <description>The indicator is measured in units.</description>
-  </IndicatorMeasure>
-  <IndicatorMeasure>
-    <code>2</code>
-    <name>Percentage</name>
-    <language>en</language>
-    <description>The indicator is measured in percentages</description>
-  </IndicatorMeasure>
+<codelist name="IndicatorMeasure" xml:lang="en" complete="1">
+    <metadata>
+        <name>
+            <narrative>Indicator Measure</narrative>
+        </name>
+        <description>
+            <narrative>To specify the language of titles, descriptions and documents</narrative>
+        </description>
+    </metadata>
+    <codelist-items>
+        <codelist-item>
+            <code>1</code>
+            <name>
+                <narrative>Unit</narrative>
+            </name>
+            <description>
+                <narrative>The indicator is measured in units.</narrative>
+            </description>
+        </codelist-item>
+        <codelist-item>
+            <code>2</code>
+            <name>
+                <narrative>Percentage</narrative>
+            </name>
+            <description>
+                <narrative>The indicator is measured in percentages</narrative>
+            </description>
+        </codelist-item>
+    </codelist-items>
 </codelist>

@@ -1,351 +1,321 @@
-<codelist date-last-modified="2015-03-25T12:12:02.303238+00:00" version="" name="FinanceType" xml:lang="en">
-  <FinanceType>
-    <code>110</code>
-    <name>Aid grant excluding debt reorganisation</name>
-    <language>en</language>
-    <category>100</category>
-    <category-name>GRANT</category-name>
-    <category-description>Transfers in cash or in kind for which no legal debt is incurred by the recipient.</category-description>
-  </FinanceType>
-  <FinanceType>
-    <code>111</code>
-    <name>Subsidies to national private investors</name>
-    <language>en</language>
-    <category>100</category>
-    <category-name>GRANT</category-name>
-    <category-description>Transfers in cash or in kind for which no legal debt is incurred by the recipient.</category-description>
-  </FinanceType>
-  <FinanceType>
-    <code>210</code>
-    <name>Interest subsidy grant in AF</name>
-    <language>en</language>
-    <category>200</category>
-    <category-name>INTEREST SUBSIDY</category-name>
-    <category-description>Subsidies to soften the terms of private export credits, or loans or credits by the banking sector.</category-description>
-  </FinanceType>
-  <FinanceType>
-    <code>211</code>
-    <name>Interest subsidy to national private exporters</name>
-    <language>en</language>
-    <category>200</category>
-    <category-name>INTEREST SUBSIDY</category-name>
-    <category-description>Subsidies to soften the terms of private export credits, or loans or credits by the banking sector.</category-description>
-  </FinanceType>
-  <FinanceType>
-    <code>310</code>
-    <name>Deposit basis</name>
-    <language>en</language>
-    <category>300</category>
-    <category-name>CAPITAL SUBSCRIPTION</category-name>
-    <category-description>Payments to multilateral agencies in the form of notes and similar instruments, unconditionally cashable at sight by the recipient institutions.</category-description>
-  </FinanceType>
-  <FinanceType>
-    <code>311</code>
-    <name>Encashment basis</name>
-    <language>en</language>
-    <category>300</category>
-    <category-name>CAPITAL SUBSCRIPTION</category-name>
-    <category-description>Payments to multilateral agencies in the form of notes and similar instruments, unconditionally cashable at sight by the recipient institutions.</category-description>
-  </FinanceType>
-  <FinanceType>
-    <code>410</code>
-    <name>Aid loan excluding debt reorganisation</name>
-    <language>en</language>
-    <category>400</category>
-    <category-name>LOAN</category-name>
-    <category-description>Transfers in cash or in kind for which the recipient incurs legal debt.</category-description>
-  </FinanceType>
-  <FinanceType>
-    <code>411</code>
-    <name>Investment-related loan to developing countries</name>
-    <language>en</language>
-    <category>400</category>
-    <category-name>LOAN</category-name>
-    <category-description>Transfers in cash or in kind for which the recipient incurs legal debt.</category-description>
-  </FinanceType>
-  <FinanceType>
-    <code>412</code>
-    <name>Loan in a joint venture with the recipient</name>
-    <language>en</language>
-    <category>400</category>
-    <category-name>LOAN</category-name>
-    <category-description>Transfers in cash or in kind for which the recipient incurs legal debt.</category-description>
-  </FinanceType>
-  <FinanceType>
-    <code>413</code>
-    <name>Loan to national private investor</name>
-    <language>en</language>
-    <category>400</category>
-    <category-name>LOAN</category-name>
-    <category-description>Transfers in cash or in kind for which the recipient incurs legal debt.</category-description>
-  </FinanceType>
-  <FinanceType>
-    <code>414</code>
-    <name>Loan to national private exporter</name>
-    <language>en</language>
-    <category>400</category>
-    <category-name>LOAN</category-name>
-    <category-description>Transfers in cash or in kind for which the recipient incurs legal debt.</category-description>
-  </FinanceType>
-  <FinanceType>
-    <code>451</code>
-    <name>Non-banks guaranteed export credits</name>
-    <language>en</language>
-    <category>450</category>
-    <category-name>EXPORT CREDIT</category-name>
-    <category-description>Official or private loans which are primarily export-facilitating in purpose. They are usually tied to a specific export from the extending country and not represented by a negotiable instrument.</category-description>
-  </FinanceType>
-  <FinanceType>
-    <code>452</code>
-    <name>Non-banks non-guaranteed portions of guaranteed export credits</name>
-    <language>en</language>
-    <category>450</category>
-    <category-name>EXPORT CREDIT</category-name>
-    <category-description>Official or private loans which are primarily export-facilitating in purpose. They are usually tied to a specific export from the extending country and not represented by a negotiable instrument.</category-description>
-  </FinanceType>
-  <FinanceType>
-    <code>453</code>
-    <name>Bank export credits</name>
-    <language>en</language>
-    <category>450</category>
-    <category-name>EXPORT CREDIT</category-name>
-    <category-description>Official or private loans which are primarily export-facilitating in purpose. They are usually tied to a specific export from the extending country and not represented by a negotiable instrument.</category-description>
-  </FinanceType>
-  <FinanceType>
-    <code>510</code>
-    <name>Acquisition of equity as part of a joint venture with the recipient</name>
-    <language>en</language>
-    <category>500</category>
-    <category-name>EQUITY</category-name>
-    <category-description>Investment in a country on the DAC List of ODA Recipients that is not made to acquire a lasting interest in an enterprise.</category-description>
-  </FinanceType>
-  <FinanceType>
-    <code>511</code>
-    <name>Acquisition of equity not part of joint venture in developing countries</name>
-    <language>en</language>
-    <category>500</category>
-    <category-name>EQUITY</category-name>
-    <category-description>Investment in a country on the DAC List of ODA Recipients that is not made to acquire a lasting interest in an enterprise.</category-description>
-  </FinanceType>
-  <FinanceType>
-    <code>512</code>
-    <name>Other acquisition of equity. Investment in a country on the DAC List of ODA Recipients that is not made to acquire a lasting interest in an enterprise.</name>
-    <language>en</language>
-    <category>500</category>
-    <category-name>EQUITY</category-name>
-    <category-description>Investment in a country on the DAC List of ODA Recipients that is not made to acquire a lasting interest in an enterprise.</category-description>
-  </FinanceType>
-  <FinanceType>
-    <code>610</code>
-    <name>Debt forgiveness: ODA claims (P)</name>
-    <language>en</language>
-    <category>600</category>
-    <category-name>DEBT RELIEF</category-name>
-    <category-description>Debt cancellations, debt conversions, debt rescheduling within or outside the framework of the Paris Club.</category-description>
-  </FinanceType>
-  <FinanceType>
-    <code>611</code>
-    <name>Debt forgiveness: ODA claims (I)</name>
-    <language>en</language>
-    <category>600</category>
-    <category-name>DEBT RELIEF</category-name>
-    <category-description>Debt cancellations, debt conversions, debt rescheduling within or outside the framework of the Paris Club.</category-description>
-  </FinanceType>
-  <FinanceType>
-    <code>612</code>
-    <name>Debt forgiveness: OOF claims (P)</name>
-    <language>en</language>
-    <category>600</category>
-    <category-name>DEBT RELIEF</category-name>
-    <category-description>Debt cancellations, debt conversions, debt rescheduling within or outside the framework of the Paris Club.</category-description>
-  </FinanceType>
-  <FinanceType>
-    <code>613</code>
-    <name>Debt forgiveness: OOF claims (I)</name>
-    <language>en</language>
-    <category>600</category>
-    <category-name>DEBT RELIEF</category-name>
-    <category-description>Debt cancellations, debt conversions, debt rescheduling within or outside the framework of the Paris Club.</category-description>
-  </FinanceType>
-  <FinanceType>
-    <code>614</code>
-    <name>Debt forgiveness: Private claims (P)</name>
-    <language>en</language>
-    <category>600</category>
-    <category-name>DEBT RELIEF</category-name>
-    <category-description>Debt cancellations, debt conversions, debt rescheduling within or outside the framework of the Paris Club.</category-description>
-  </FinanceType>
-  <FinanceType>
-    <code>615</code>
-    <name>Debt forgiveness: Private claims (I)</name>
-    <language>en</language>
-    <category>600</category>
-    <category-name>DEBT RELIEF</category-name>
-    <category-description>Debt cancellations, debt conversions, debt rescheduling within or outside the framework of the Paris Club.</category-description>
-  </FinanceType>
-  <FinanceType>
-    <code>616</code>
-    <name>Debt forgiveness: OOF claims (DSR)</name>
-    <language>en</language>
-    <category>600</category>
-    <category-name>DEBT RELIEF</category-name>
-    <category-description>Debt cancellations, debt conversions, debt rescheduling within or outside the framework of the Paris Club.</category-description>
-  </FinanceType>
-  <FinanceType>
-    <code>617</code>
-    <name>Debt forgiveness: Private claims (DSR)</name>
-    <language>en</language>
-    <category>600</category>
-    <category-name>DEBT RELIEF</category-name>
-    <category-description>Debt cancellations, debt conversions, debt rescheduling within or outside the framework of the Paris Club.</category-description>
-  </FinanceType>
-  <FinanceType>
-    <code>618</code>
-    <name>Debt forgiveness: Other</name>
-    <language>en</language>
-    <category>600</category>
-    <category-name>DEBT RELIEF</category-name>
-    <category-description>Debt cancellations, debt conversions, debt rescheduling within or outside the framework of the Paris Club.</category-description>
-  </FinanceType>
-  <FinanceType>
-    <code>620</code>
-    <name>Debt rescheduling: ODA claims (P)</name>
-    <language>en</language>
-    <category>600</category>
-    <category-name>DEBT RELIEF</category-name>
-    <category-description>Debt cancellations, debt conversions, debt rescheduling within or outside the framework of the Paris Club.</category-description>
-  </FinanceType>
-  <FinanceType>
-    <code>621</code>
-    <name>Debt rescheduling: ODA claims (I)</name>
-    <language>en</language>
-    <category>600</category>
-    <category-name>DEBT RELIEF</category-name>
-    <category-description>Debt cancellations, debt conversions, debt rescheduling within or outside the framework of the Paris Club.</category-description>
-  </FinanceType>
-  <FinanceType>
-    <code>622</code>
-    <name>Debt rescheduling: OOF claims (P)</name>
-    <language>en</language>
-    <category>600</category>
-    <category-name>DEBT RELIEF</category-name>
-    <category-description>Debt cancellations, debt conversions, debt rescheduling within or outside the framework of the Paris Club.</category-description>
-  </FinanceType>
-  <FinanceType>
-    <code>623</code>
-    <name>Debt rescheduling: OOF claims (I)</name>
-    <language>en</language>
-    <category>600</category>
-    <category-name>DEBT RELIEF</category-name>
-    <category-description>Debt cancellations, debt conversions, debt rescheduling within or outside the framework of the Paris Club.</category-description>
-  </FinanceType>
-  <FinanceType>
-    <code>624</code>
-    <name>Debt rescheduling: Private claims (P)</name>
-    <language>en</language>
-    <category>600</category>
-    <category-name>DEBT RELIEF</category-name>
-    <category-description>Debt cancellations, debt conversions, debt rescheduling within or outside the framework of the Paris Club.</category-description>
-  </FinanceType>
-  <FinanceType>
-    <code>625</code>
-    <name>Debt rescheduling: Private claims (I)</name>
-    <language>en</language>
-    <category>600</category>
-    <category-name>DEBT RELIEF</category-name>
-    <category-description>Debt cancellations, debt conversions, debt rescheduling within or outside the framework of the Paris Club.</category-description>
-  </FinanceType>
-  <FinanceType>
-    <code>626</code>
-    <name>Debt rescheduling: OOF claims (DSR)</name>
-    <language>en</language>
-    <category>600</category>
-    <category-name>DEBT RELIEF</category-name>
-    <category-description>Debt cancellations, debt conversions, debt rescheduling within or outside the framework of the Paris Club.</category-description>
-  </FinanceType>
-  <FinanceType>
-    <code>627</code>
-    <name>Debt rescheduling: Private claims (DSR)</name>
-    <language>en</language>
-    <category>600</category>
-    <category-name>DEBT RELIEF</category-name>
-    <category-description>Debt cancellations, debt conversions, debt rescheduling within or outside the framework of the Paris Club.</category-description>
-  </FinanceType>
-  <FinanceType>
-    <code>630</code>
-    <name>Debt rescheduling: OOF claim (DSR - original loan principal)</name>
-    <language>en</language>
-    <category>600</category>
-    <category-name>DEBT RELIEF</category-name>
-    <category-description>Debt cancellations, debt conversions, debt rescheduling within or outside the framework of the Paris Club.</category-description>
-  </FinanceType>
-  <FinanceType>
-    <code>631</code>
-    <name>Debt rescheduling: OOF claim (DSR - original loan interest)</name>
-    <language>en</language>
-    <category>600</category>
-    <category-name>DEBT RELIEF</category-name>
-    <category-description>Debt cancellations, debt conversions, debt rescheduling within or outside the framework of the Paris Club.</category-description>
-  </FinanceType>
-  <FinanceType>
-    <code>632</code>
-    <name>Debt rescheduling: Private claim (DSR - original loan principal)</name>
-    <language>en</language>
-    <category>600</category>
-    <category-name>DEBT RELIEF</category-name>
-    <category-description>Debt cancellations, debt conversions, debt rescheduling within or outside the framework of the Paris Club.</category-description>
-  </FinanceType>
-  <FinanceType>
-    <code>710</code>
-    <name>Foreign direct investment</name>
-    <language>en</language>
-    <category>700</category>
-    <category-name>INVESTMENT</category-name>
-    <category-description>Investment made by a private entity resident in a reporting country to acquire or add to a lasting interest(1) in an enterprise in a country on the DAC List of ODA Recipients.</category-description>
-  </FinanceType>
-  <FinanceType>
-    <code>711</code>
-    <name>Other foreign direct investment, including reinvested earnings</name>
-    <language>en</language>
-    <category>700</category>
-    <category-name>INVESTMENT</category-name>
-    <category-description>Investment made by a private entity resident in a reporting country to acquire or add to a lasting interest(1) in an enterprise in a country on the DAC List of ODA Recipients.</category-description>
-  </FinanceType>
-  <FinanceType>
-    <code>810</code>
-    <name>Bank bonds</name>
-    <language>en</language>
-    <category>800</category>
-    <category-name>BONDS</category-name>
-    <category-description>Acquisition of bonds issued by developing countries.</category-description>
-  </FinanceType>
-  <FinanceType>
-    <code>811</code>
-    <name>Non-bank bonds</name>
-    <language>en</language>
-    <category>800</category>
-    <category-name>BONDS</category-name>
-    <category-description>Acquisition of bonds issued by developing countries.</category-description>
-  </FinanceType>
-  <FinanceType>
-    <code>910</code>
-    <name>Other bank securities/claims</name>
-    <language>en</language>
-    <category>900</category>
-    <category-name>OTHER SECURITIES/CLAIMS</category-name>
-  </FinanceType>
-  <FinanceType>
-    <code>911</code>
-    <name>Other non-bank securities/claims</name>
-    <language>en</language>
-    <category>900</category>
-    <category-name>OTHER SECURITIES/CLAIMS</category-name>
-  </FinanceType>
-  <FinanceType>
-    <code>912</code>
-    <name>Securities and other instruments issued by multilateral agencies</name>
-    <language>en</language>
-    <category>900</category>
-    <category-name>OTHER SECURITIES/CLAIMS</category-name>
-  </FinanceType>
+<codelist name="FinanceType" xml:lang="en" category-codelist="FinanceType-category" complete="1">
+    <metadata>
+        <name>
+            <narrative>Finance Type</narrative>
+        </name>
+        <description>
+            <narrative>DAC/CRS transaction classification used to distinguish financial instruments,  e.g. grants or loans.</narrative>
+        </description>
+        <url>http://www.oecd.org/dac/stats/dacandcrscodelists.htm</url>
+    </metadata>
+    <codelist-items>
+        <codelist-item>
+            <code>110</code>
+            <name>
+                <narrative>Aid grant excluding debt reorganisation</narrative>
+            </name>
+            <category>100</category>
+        </codelist-item>
+        <codelist-item>
+            <code>111</code>
+            <name>
+                <narrative>Subsidies to national private investors</narrative>
+            </name>
+            <category>100</category>
+        </codelist-item>
+        <codelist-item>
+            <code>210</code>
+            <name>
+                <narrative>Interest subsidy grant in AF</narrative>
+            </name>
+            <category>200</category>
+        </codelist-item>
+        <codelist-item>
+            <code>211</code>
+            <name>
+                <narrative>Interest subsidy to national private exporters</narrative>
+            </name>
+            <category>200</category>
+        </codelist-item>
+        <codelist-item>
+            <code>310</code>
+            <name>
+                <narrative>Deposit basis</narrative>
+            </name>
+            <category>300</category>
+        </codelist-item>
+        <codelist-item>
+            <code>311</code>
+            <name>
+                <narrative>Encashment basis</narrative>
+            </name>
+            <category>300</category>
+        </codelist-item>
+        <codelist-item>
+            <code>410</code>
+            <name>
+                <narrative>Aid loan excluding debt reorganisation</narrative>
+            </name>
+            <category>400</category>
+        </codelist-item>
+        <codelist-item>
+            <code>411</code>
+            <name>
+                <narrative>Investment-related loan to developing countries</narrative>
+            </name>
+            <category>400</category>
+        </codelist-item>
+        <codelist-item>
+            <code>412</code>
+            <name>
+                <narrative>Loan in a joint venture with the recipient</narrative>
+            </name>
+            <category>400</category>
+        </codelist-item>
+        <codelist-item>
+            <code>413</code>
+            <name>
+                <narrative>Loan to national private investor</narrative>
+            </name>
+            <category>400</category>
+        </codelist-item>
+        <codelist-item>
+            <code>414</code>
+            <name>
+                <narrative>Loan to national private exporter</narrative>
+            </name>
+            <category>400</category>
+        </codelist-item>
+        <codelist-item>
+            <code>451</code>
+            <name>
+                <narrative>Non-banks guaranteed export credits</narrative>
+            </name>
+            <category>450</category>
+        </codelist-item>
+        <codelist-item>
+            <code>452</code>
+            <name>
+                <narrative>Non-banks non-guaranteed portions of guaranteed export credits</narrative>
+            </name>
+            <category>450</category>
+        </codelist-item>
+        <codelist-item>
+            <code>453</code>
+            <name>
+                <narrative>Bank export credits</narrative>
+            </name>
+            <category>450</category>
+        </codelist-item>
+        <codelist-item>
+            <code>510</code>
+            <name>
+                <narrative>Acquisition of equity as part of a joint venture with the recipient</narrative>
+            </name>
+            <category>500</category>
+        </codelist-item>
+        <codelist-item>
+            <code>511</code>
+            <name>
+                <narrative>Acquisition of equity not part of joint venture in developing countries</narrative>
+            </name>
+            <category>500</category>
+        </codelist-item>
+        <codelist-item>
+            <code>512</code>
+            <name>
+                <narrative>Other acquisition of equity</narrative>
+            </name>
+            <category>500</category>
+        </codelist-item>
+        <codelist-item>
+            <code>610</code>
+            <name>
+                <narrative>Debt forgiveness: ODA claims (P)</narrative>
+            </name>
+            <category>600</category>
+        </codelist-item>
+        <codelist-item>
+            <code>611</code>
+            <name>
+                <narrative>Debt forgiveness: ODA claims (I)</narrative>
+            </name>
+            <category>600</category>
+        </codelist-item>
+        <codelist-item>
+            <code>612</code>
+            <name>
+                <narrative>Debt forgiveness: OOF claims (P)</narrative>
+            </name>
+            <category>600</category>
+        </codelist-item>
+        <codelist-item>
+            <code>613</code>
+            <name>
+                <narrative>Debt forgiveness: OOF claims (I)</narrative>
+            </name>
+            <category>600</category>
+        </codelist-item>
+        <codelist-item>
+            <code>614</code>
+            <name>
+                <narrative>Debt forgiveness: Private claims (P)</narrative>
+            </name>
+            <category>600</category>
+        </codelist-item>
+        <codelist-item>
+            <code>615</code>
+            <name>
+                <narrative>Debt forgiveness: Private claims (I)</narrative>
+            </name>
+            <category>600</category>
+        </codelist-item>
+        <codelist-item>
+            <code>616</code>
+            <name>
+                <narrative>Debt forgiveness: OOF claims (DSR)</narrative>
+            </name>
+            <category>600</category>
+        </codelist-item>
+        <codelist-item>
+            <code>617</code>
+            <name>
+                <narrative>Debt forgiveness: Private claims (DSR)</narrative>
+            </name>
+            <category>600</category>
+        </codelist-item>
+        <codelist-item>
+            <code>618</code>
+            <name>
+                <narrative>Debt forgiveness: Other</narrative>
+            </name>
+            <category>600</category>
+        </codelist-item>
+        <codelist-item>
+            <code>620</code>
+            <name>
+                <narrative>Debt rescheduling: ODA claims (P)</narrative>
+            </name>
+            <category>600</category>
+        </codelist-item>
+        <codelist-item>
+            <code>621</code>
+            <name>
+                <narrative>Debt rescheduling: ODA claims (I)</narrative>
+            </name>
+            <category>600</category>
+        </codelist-item>
+        <codelist-item>
+            <code>622</code>
+            <name>
+                <narrative>Debt rescheduling: OOF claims (P)</narrative>
+            </name>
+            <category>600</category>
+        </codelist-item>
+        <codelist-item>
+            <code>623</code>
+            <name>
+                <narrative>Debt rescheduling: OOF claims (I)</narrative>
+            </name>
+            <category>600</category>
+        </codelist-item>
+        <codelist-item>
+            <code>624</code>
+            <name>
+                <narrative>Debt rescheduling: Private claims (P)</narrative>
+            </name>
+            <category>600</category>
+        </codelist-item>
+        <codelist-item>
+            <code>625</code>
+            <name>
+                <narrative>Debt rescheduling: Private claims (I)</narrative>
+            </name>
+            <category>600</category>
+        </codelist-item>
+        <codelist-item>
+            <code>626</code>
+            <name>
+                <narrative>Debt rescheduling: OOF claims (DSR)</narrative>
+            </name>
+            <category>600</category>
+        </codelist-item>
+        <codelist-item>
+            <code>627</code>
+            <name>
+                <narrative>Debt rescheduling: Private claims (DSR)</narrative>
+            </name>
+            <category>600</category>
+        </codelist-item>
+        <codelist-item>
+            <code>630</code>
+            <name>
+                <narrative>Debt rescheduling: OOF claim (DSR - original loan principal)</narrative>
+            </name>
+            <category>600</category>
+        </codelist-item>
+        <codelist-item>
+            <code>631</code>
+            <name>
+                <narrative>Debt rescheduling: OOF claim (DSR - original loan interest)</narrative>
+            </name>
+            <category>600</category>
+        </codelist-item>
+        <codelist-item>
+            <code>632</code>
+            <name>
+                <narrative>Debt rescheduling: Private claim (DSR - original loan principal)</narrative>
+            </name>
+            <category>600</category>
+        </codelist-item>
+        <codelist-item>
+            <code>710</code>
+            <name>
+                <narrative>Foreign direct investment</narrative>
+            </name>
+            <category>700</category>
+        </codelist-item>
+        <codelist-item>
+            <code>711</code>
+            <name>
+                <narrative>Other foreign direct investment, including reinvested earnings</narrative>
+            </name>
+            <category>700</category>
+        </codelist-item>
+        <codelist-item>
+            <code>810</code>
+            <name>
+                <narrative>Bank bonds</narrative>
+            </name>
+            <category>800</category>
+        </codelist-item>
+        <codelist-item>
+            <code>811</code>
+            <name>
+                <narrative>Non-bank bonds</narrative>
+            </name>
+            <category>800</category>
+        </codelist-item>
+        <codelist-item>
+            <code>910</code>
+            <name>
+                <narrative>Other bank securities/claims</narrative>
+            </name>
+            <category>900</category>
+        </codelist-item>
+        <codelist-item>
+            <code>911</code>
+            <name>
+                <narrative>Other non-bank securities/claims</narrative>
+            </name>
+            <category>900</category>
+        </codelist-item>
+        <codelist-item>
+            <code>912</code>
+            <name>
+                <narrative>Securities and other instruments issued by multilateral agencies</narrative>
+            </name>
+            <category>900</category>
+        </codelist-item>
+    </codelist-items>
 </codelist>

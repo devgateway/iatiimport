@@ -1,14 +1,27 @@
-<codelist date-last-modified="2015-03-25T12:12:01.870872+00:00" version="" name="PolicyMarkerVocabulary" xml:lang="en">
-  <PolicyMarkerVocabulary>
-    <code>1</code>
-    <name>OECD DAC CRS</name>
-    <language>en</language>
-    <description>The policy marker is an OECD DAC CRS policy marker, Reported in columns 20-23, 28-31 and 54 of CRS++ reporting format.</description>
-  </PolicyMarkerVocabulary>
-  <PolicyMarkerVocabulary>
-    <code>99</code>
-    <name>Reporting Organisation</name>
-    <language>en</language>
-    <description>The policy marker is one that is defined and tracked by the reporting organisation</description>
-  </PolicyMarkerVocabulary>
+<codelist name="PolicyMarkerVocabulary" xml:lang="en" complete="1">
+    <metadata>
+        <name>
+            <narrative>Policy Marker Vocabulary</narrative>
+        </name>
+    </metadata>
+    <codelist-items>
+        <codelist-item>
+            <code>1</code>
+            <name>
+                <narrative>OECD DAC CRS</narrative>
+            </name>
+            <description>
+                <narrative>The policy marker is an OECD DAC CRS policy marker, Reported in columns 20-23, 28-31 and 54 of CRS++ reporting format.</narrative>
+            </description>
+        </codelist-item>
+        <codelist-item>
+            <code>99</code>
+            <name>
+                <narrative>Reporting Organisation</narrative>
+            </name>
+            <description>
+                <narrative>The policy marker is one that is defined and tracked by the reporting organisation</narrative>
+            </description>
+        </codelist-item>
+    </codelist-items>
 </codelist>

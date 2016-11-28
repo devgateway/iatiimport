@@ -242,13 +242,26 @@ public class IATI2XProcessor implements ISourceProcessor {
 			switch (field.getType()) {
 			case RECIPIENT_COUNTRY:
 			case LIST:
-				if (nodeList.getLength() > 0) {
+				if (nodeList.getLength() > 0) {					
 					for (int i = 0; i < nodeList.getLength(); i++) {
 						Element fieldElement = (Element) nodeList.item(i);
-						final String codeValue = fieldElement.getAttribute("code");
+						final String codeValue = fieldElement.getAttribute("code");						
 						Optional<FieldValue> fieldValue = field.getPossibleValues().stream().filter(n -> {
 							return n.getCode().equals(codeValue);
 						}).findFirst();
+						if(!fieldValue.isPresent() && !codeValue.isEmpty()){
+							FieldValue newfv = new FieldValue();
+							final String name = fieldElement.getElementsByTagName("narrative").item(0) != null ? fieldElement.getElementsByTagName("narrative").item(0).getTextContent() : "";
+							newfv.setCode(codeValue);
+							newfv.setValue(name);
+							newfv.setIndex(field.getPossibleValues().size());
+							field.getPossibleValues().add(newfv);
+							if (!reducedPossibleValues.stream().filter(n -> {
+								return n.getCode().equals(newfv.getCode());
+							}).findFirst().isPresent()) {
+								reducedPossibleValues.add(newfv);
+							}
+						}
 						if (fieldValue.isPresent() && !reducedPossibleValues.stream().filter(n -> {
 							return n.getCode().equals(fieldValue.get().getCode());
 						}).findFirst().isPresent()) {
@@ -293,7 +306,7 @@ public class IATI2XProcessor implements ISourceProcessor {
 				factory.setIgnoringElementContentWhitespace(true);
 				DocumentBuilder builder = factory.newDocumentBuilder();
 				Document doc = builder.parse(is);
-				NodeList nodeList = doc.getElementsByTagName(standardFieldName);
+				NodeList nodeList = doc.getElementsByTagName("codelist-item");
 				int index = 0;
 				for (int i = 0; i < nodeList.getLength(); i++) {
 					Node node = nodeList.item(i);
@@ -303,7 +316,9 @@ public class IATI2XProcessor implements ISourceProcessor {
 						String code = codeElement.getChildNodes().item(0).getNodeValue();
 
 						Element nameElement = (Element) element.getElementsByTagName("name").item(0);
-						String name = nameElement.getChildNodes().item(0).getNodeValue();
+						NodeList narrativeNodeList = nameElement.getElementsByTagName("narrative");
+						Element narrativeElement = (Element) narrativeNodeList.item(0);
+						String name = narrativeElement.getChildNodes().item(0).getNodeValue();
 
 						FieldValue fv = new FieldValue();
 						fv.setIndex(index++);
@@ -347,8 +362,11 @@ public class IATI2XProcessor implements ISourceProcessor {
 					return field.getFieldName().equals(n.getFieldName());
 				}).findFirst().get();
 				
-				if(filter.getFilters().size() > 0){			
-					query.append(" and " + field.getFieldName() + "[");
+				if(filter.getFilters().size() > 0){		
+					if(!("/iati-activities/iati-activity[".equals(query.toString()))){					
+						query.append(" and ");	
+					}
+					query.append(field.getFieldName() + "[");
 					for (int i = 0;i < filter.getFilters().size(); i++) {
 						String value = filter.getFilters().get(i);
 						if(i > 0){
@@ -361,8 +379,12 @@ public class IATI2XProcessor implements ISourceProcessor {
 			}			
 			
 		});		
+		if(!("/iati-activities/iati-activity[".equals(query.toString()))){					
+			query.append("]");	
+		}else{
+			query.setLength(query.length() - 1);
+		}
 		
-		query.append("]");
 		NodeList activities = (NodeList)xPath.compile(query.toString()).evaluate(this.getDoc(), XPathConstants.NODESET);
 		return activities;
 	 }
@@ -387,30 +409,39 @@ public class IATI2XProcessor implements ISourceProcessor {
 				switch (field.getType()) {
 				case LIST:
 					if (field.isMultiple()) {
-						fieldNodeList = element.getElementsByTagName(field.getFieldName());
-						String[] codeValues = new String[fieldNodeList.getLength()];
+						fieldNodeList = element.getElementsByTagName(field.getFieldName());						
+						List <String> codes = new ArrayList<String>(); 
 						for (int j = 0; j < fieldNodeList.getLength(); j++) {
 							Element fieldElement = (Element) fieldNodeList.item(j);
-							String code = fieldElement.getAttribute("code");
-							codeValues[j] = code;							
-							FieldValue fv  = field.getPossibleValues().stream().filter( n -> {return n.getCode().equals(code);}).findFirst().get();
-							if(fv != null && fv.isSelected() != true){
-								fv.setSelected(true);
-							}
+							String code = fieldElement.getAttribute("code");								
+							if(!code.isEmpty()){
+								codes.add(code);
+								Optional<FieldValue> foundfv = field.getPossibleValues().stream().filter( n -> {return n.getCode().equals(code);}).findFirst();
+								FieldValue fv  = foundfv.isPresent() ? foundfv.get() : null;
+								if(fv != null && fv.isSelected() != true){
+									fv.setSelected(true);
+								}
+							}				
 						}
-						document.addStringMultiField(field.getFieldName(), codeValues);
+						if(!codes.isEmpty()){
+							String[] codeValues = codes.stream().toArray(String[]::new);						
+							document.addStringMultiField(field.getFieldName(), codeValues);
+						}
 					} else {						
 						fieldNodeList = element.getElementsByTagName(field.getFieldName());
 						if (fieldNodeList.getLength() > 0 && fieldNodeList.getLength() == 1) {							
 							Element fieldElement = (Element) fieldNodeList.item(0);
-							String codeValue = fieldElement.getAttribute("code");
-							FieldValue fv  = field.getPossibleValues().stream().filter( n -> {
-								return n.getCode().equals(codeValue);
-							}).findFirst().get();
-							if(fv != null && fv.isSelected() != true){
-								fv.setSelected(true);
-							}
-							document.addStringField(field.getFieldName(), codeValue);							
+							String codeValue = fieldElement.getAttribute("code");							
+							if(!codeValue.isEmpty()){
+								Optional<FieldValue> foundfv = field.getPossibleValues().stream().filter( n -> {
+									return n.getCode().equals(codeValue);
+								}).findFirst();
+								FieldValue fv  = foundfv.isPresent() ? foundfv.get() : null;
+								if(fv != null && fv.isSelected() != true){
+									fv.setSelected(true);
+								}
+								document.addStringField(field.getFieldName(), codeValue);
+							}														
 						}						
 					}
 					break;
@@ -498,19 +529,23 @@ public class IATI2XProcessor implements ISourceProcessor {
 							for (int j = 0; j < narrativeNodeList.getLength(); j++) {
 								Element narrativeElement = (Element) narrativeNodeList.item(j);								
 								if (narrativeElement.getChildNodes().getLength() == 1) {
-									mlStringValue = narrativeElement.getChildNodes().item(0).getNodeValue();									
-									if (!"".equals(narrativeElement.getAttribute("xml:lang"))) {
-										String languageCode = narrativeElement.getAttribute("xml:lang");
-										Optional<Language> selectedLanguage = this.getFilterLanguages().stream().filter(language -> languageCode.equalsIgnoreCase(language.getCode()) && language.getSelected() == true ).findFirst();
-										if(selectedLanguage.isPresent()){									
-											mlv.put(languageCode, mlStringValue);
+									mlStringValue = narrativeElement.getChildNodes().item(0).getNodeValue();
+									if(mlStringValue != null && !("".equals(mlStringValue))){
+										if (!"".equals(narrativeElement.getAttribute("xml:lang"))) {
+											String languageCode = narrativeElement.getAttribute("xml:lang");
+											Optional<Language> selectedLanguage = this.getFilterLanguages().stream().filter(language -> languageCode.equalsIgnoreCase(language.getCode()) && language.getSelected() == true ).findFirst();
+											if(selectedLanguage.isPresent()){									
+												mlv.put(languageCode, mlStringValue);
+											}
+										}else{											
+											mlv.put(defaultLanguageCode, mlStringValue);																						
 										}
-									}else{
+									}									
+								} else {
+									if(mlStringValue != null && !("".equals(mlStringValue))){
 										mlv.put(defaultLanguageCode, mlStringValue);
 									}
 									
-								} else {									
-									mlv.put(defaultLanguageCode, mlStringValue);
 								}
 								
 								
@@ -524,7 +559,7 @@ public class IATI2XProcessor implements ISourceProcessor {
 				case TRANSACTION:
 					try {
 						NodeList nodes;
-						nodes = (NodeList) xPath.evaluate("transaction/transaction-type[@code='" + transactionTypes.get(field.getSubType()) + "']/parent::*", element, XPathConstants.NODESET);
+						nodes = (NodeList) xPath.evaluate("transaction/transaction-type[@code='" + field.getSubType() + "' or @code= '" + field.getSubTypeCode() + "']/parent::*", element, XPathConstants.NODESET);
 						for (int j = 0; j < nodes.getLength(); ++j) {
 							String reference = "";
 							String receivingOrganization = "";
@@ -711,10 +746,12 @@ public class IATI2XProcessor implements ISourceProcessor {
 		// Transaction Fields
 		Field commitments = new Field("Commitments", "transaction", FieldType.TRANSACTION, true);
 		commitments.setSubType("C");
+		commitments.setSubTypeCode("2");
 		fieldList.add(commitments);
 
 		Field disbursements = new Field("Disbursements", "transaction", FieldType.TRANSACTION, true);
 		disbursements.setSubType("D");
+		disbursements.setSubTypeCode("3");
 		fieldList.add(disbursements);
 
 		// Organization Fields

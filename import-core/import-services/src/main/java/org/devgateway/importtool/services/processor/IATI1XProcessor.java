@@ -219,13 +219,28 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 			switch (field.getType()) {
 			case RECIPIENT_COUNTRY:
 			case LIST:
-				if (nodeList.getLength() > 0) {
+				if (nodeList.getLength() > 0) {					
 					for (int i = 0; i < nodeList.getLength(); i++) {
 						Element fieldElement = (Element) nodeList.item(i);
 						final String codeValue = fieldElement.getAttribute("code");
 						Optional<FieldValue> fieldValue = field.getPossibleValues().stream().filter(n -> {
 							return n.getCode().equals(codeValue);
 						}).findFirst();
+						
+						if(!fieldValue.isPresent() && !codeValue.isEmpty()){
+							FieldValue newfv = new FieldValue();
+							final String name = fieldElement.getTextContent();
+							newfv.setCode(codeValue);
+							newfv.setValue(name);							
+							newfv.setIndex(field.getPossibleValues().size());
+							field.getPossibleValues().add(newfv);							
+							if (!reducedPossibleValues.stream().filter(n -> {
+								return n.getCode().equals(newfv.getCode());
+							}).findFirst().isPresent()) {
+								reducedPossibleValues.add(newfv);
+							}
+						}
+						
 						if (fieldValue.isPresent() && !reducedPossibleValues.stream().filter(n -> {
 							return n.getCode().equals(fieldValue.get().getCode());
 						}).findFirst().isPresent()) {
@@ -262,7 +277,7 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 	private List<FieldValue> getCodeListValues(String codeListName, Boolean concatenate) {
 		String standardFieldName = mappingNameFile.get(codeListName);
 		List<FieldValue> possibleValues = new ArrayList<FieldValue>();
-		InputStream is = this.getClass().getResourceAsStream("IATI201/codelist/" + standardFieldName + ".xml");
+		InputStream is = this.getClass().getResourceAsStream(this.getCodelistPath() + standardFieldName + ".xml");
 		if (is != null) {
 			try {
 				DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -325,7 +340,10 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 				}).findFirst().get();
 				
 				if(filter.getFilters().size() > 0){			
-					query.append(" and " + field.getFieldName() + "[");
+					if(!("/iati-activities/iati-activity[".equals(query.toString()))){					
+						query.append(" and ");	
+					}
+					query.append(field.getFieldName() + "[");
 					for (int i = 0;i < filter.getFilters().size(); i++) {
 						String value = filter.getFilters().get(i);
 						if(i > 0){
@@ -339,7 +357,11 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 			
 		});		
 		
-		query.append("]");
+		if(!("/iati-activities/iati-activity[".equals(query.toString()))){					
+			query.append("]");	
+		}else{
+			query.setLength(query.length() - 1);
+		}
 		NodeList activities = (NodeList)xPath.compile(query.toString()).evaluate(this.getDoc(), XPathConstants.NODESET);
 		return activities;
 	}
@@ -363,35 +385,42 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 			for (Field field : getFields()) {
 				switch (field.getType()) {
 				case LIST:
-					if (field.isMultiple()) {						
-						fieldNodeList = element.getElementsByTagName(field.getFieldName());
-						String[] codeValues = new String[fieldNodeList.getLength()];
+					if (field.isMultiple()) {
+						fieldNodeList = element.getElementsByTagName(field.getFieldName());						
+						List <String> codes = new ArrayList<String>(); 
 						for (int j = 0; j < fieldNodeList.getLength(); j++) {
 							Element fieldElement = (Element) fieldNodeList.item(j);
-							String code = fieldElement.getAttribute("code");
-							codeValues[j] = code;							
-							FieldValue fv  = field.getPossibleValues().stream().filter( n -> {return n.getCode().equals(code);}).findFirst().get();
-							if(fv != null && fv.isSelected() != true){
-								fv.setSelected(true);
-							}
+							String code = fieldElement.getAttribute("code");								
+							if(!code.isEmpty()){
+								codes.add(code);
+								Optional<FieldValue> foundfv = field.getPossibleValues().stream().filter( n -> {return n.getCode().equals(code);}).findFirst();
+								FieldValue fv  = foundfv.isPresent() ? foundfv.get() : null;
+								if(fv != null && fv.isSelected() != true){
+									fv.setSelected(true);
+								}
+							}				
 						}
-						document.addStringMultiField(field.getFieldName(), codeValues);
-					} else {
-						
+						if(!codes.isEmpty()){
+							String[] codeValues = codes.stream().toArray(String[]::new);						
+							document.addStringMultiField(field.getFieldName(), codeValues);
+						}
+					} else {						
 						fieldNodeList = element.getElementsByTagName(field.getFieldName());
 						if (fieldNodeList.getLength() > 0 && fieldNodeList.getLength() == 1) {							
 							Element fieldElement = (Element) fieldNodeList.item(0);
-							String codeValue = fieldElement.getAttribute("code");
-							FieldValue fv  = field.getPossibleValues().stream().filter( n -> {
-								return n.getCode().equals(codeValue);
-							}).findFirst().get();
-							if(fv != null && fv.isSelected() != true){
-								fv.setSelected(true);
-							}
-							document.addStringField(field.getFieldName(), codeValue);							
+							String codeValue = fieldElement.getAttribute("code");							
+							if(!codeValue.isEmpty()){
+								Optional<FieldValue> foundfv = field.getPossibleValues().stream().filter( n -> {
+									return n.getCode().equals(codeValue);
+								}).findFirst();
+								FieldValue fv  = foundfv.isPresent() ? foundfv.get() : null;
+								if(fv != null && fv.isSelected() != true){
+									fv.setSelected(true);
+								}
+								document.addStringField(field.getFieldName(), codeValue);
+							}														
 						}						
-												
-					}
+					}					
 					break;
 				case RECIPIENT_COUNTRY:	
 					Field filtersField = filterFieldList.stream().filter(n -> {
@@ -467,16 +496,18 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 						if (fieldElement.getChildNodes().getLength() == 1) {
 							String mlStringValue = fieldElement.getChildNodes().item(0).getNodeValue();
 							Node langAttr = fieldElement.getAttributes().getNamedItem("xml:lang");
-							
-							if(langAttr != null){								
-								String lang = langAttr.getNodeValue();								
-								Optional<Language> selectedLanguage = this.getFilterLanguages().stream().filter(language -> lang.equalsIgnoreCase(language.getCode()) && language.getSelected() == true ).findFirst();
-								if(selectedLanguage.isPresent()){									
-									mlv.put(lang, mlStringValue);
-								}								
-							}else{								
-								mlv.put(defaultLanguageCode, mlStringValue);
-							}						
+							if(mlStringValue != null && !("".equals(mlStringValue))){
+								if(langAttr != null){								
+									String lang = langAttr.getNodeValue();								
+									Optional<Language> selectedLanguage = this.getFilterLanguages().stream().filter(language -> lang.equalsIgnoreCase(language.getCode()) && language.getSelected() == true ).findFirst();
+									if(selectedLanguage.isPresent()){									
+										mlv.put(lang, mlStringValue);
+									}								
+								}else{								
+									mlv.put(defaultLanguageCode, mlStringValue);
+								}	
+							}
+												
 							
 						}
 					}					

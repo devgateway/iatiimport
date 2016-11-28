@@ -1,3 +1,4 @@
+var _ = require('lodash/dist/lodash.underscore');
 var React = require('react');
 var constants = require('./../../utils/constants');
 var AutoComplete = React.createClass({
@@ -73,9 +74,18 @@ var AutoComplete = React.createClass({
 
     	var self = this;
     	
-    	$el.bind('typeahead:selected', function (obj, datum, name) {           
+    	$el.bind('typeahead:selected', function (obj, datum, name) {    	             
     		self.props.handleChange(self.props.data, datum.value);
     	});
+    	
+    	        
+        $el.bind("paste", $.proxy(function(e){  
+           e.preventDefault();          
+            //var pastedData = e.originalEvent.clipboardData.getData('text');
+            //var option = _.find(this.props.options, { 'label':  pastedData});           
+            //$(e.target).trigger('typeahead:selected', option);
+           
+        }, this));
 
     	if(this.props.value) {
     		$el.val(this.props.value);

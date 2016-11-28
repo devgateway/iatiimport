@@ -1,26 +1,45 @@
-<codelist date-last-modified="2015-03-25T12:12:02.992784+00:00" version="" name="ContactType" xml:lang="en">
-  <ContactType>
-    <code>1</code>
-    <name>General Enquiries</name>
-    <language>en</language>
-    <description>General Enquiries</description>
-  </ContactType>
-  <ContactType>
-    <code>2</code>
-    <name>Project Management</name>
-    <language>en</language>
-    <description>Project Management</description>
-  </ContactType>
-  <ContactType>
-    <code>3</code>
-    <name>Financial Management</name>
-    <language>en</language>
-    <description>Financial Management</description>
-  </ContactType>
-  <ContactType>
-    <code>4</code>
-    <name>Communications</name>
-    <language>en</language>
-    <description>Communications</description>
-  </ContactType>
+<codelist name="ContactType" xml:lang="en" complete="1">
+    <metadata>
+        <name>
+            <narrative>Contact Type</narrative>
+        </name>
+    </metadata>
+    <codelist-items>
+        <codelist-item>
+            <code>1</code>
+            <name>
+                <narrative>General Enquiries</narrative>
+            </name>
+            <description>
+                <narrative>General Enquiries</narrative>
+            </description>
+        </codelist-item>
+        <codelist-item>
+            <code>2</code>
+            <name>
+                <narrative>Project Management</narrative>
+            </name>
+            <description>
+                <narrative>Project Management</narrative>
+            </description>
+        </codelist-item>
+        <codelist-item>
+            <code>3</code>
+            <name>
+                <narrative>Financial Management</narrative>
+            </name>
+            <description>
+                <narrative>Financial Management</narrative>
+            </description>
+        </codelist-item>
+        <codelist-item>
+            <code>4</code>
+            <name>
+                <narrative>Communications</narrative>
+            </name>
+            <description>
+                <narrative>Communications</narrative>
+            </description>
+        </codelist-item>
+    </codelist-items>
 </codelist>
