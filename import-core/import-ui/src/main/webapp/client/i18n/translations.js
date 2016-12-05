@@ -246,7 +246,8 @@ module.exports = {
 							'next' : ' Suivant >> ',
 							'previous' : ' << Précédent ',
 							'msg_error_retrieving_projects' : ' Erreur dans la recherche des Filtres.',
-							'msg_error_select_project' : ' Veuillez sélectionner au moins un projet pour continuer '
+							'msg_error_select_project' : ' Veuillez sélectionner au moins un projet pour continuer ',
+							'msg_project_not_editable': 'Les projets ayant un * rouge ne peuvent pas être modifiés parce qu’ils ne sont pas inscrits dans cet espace de travail'
 						},
 						'map_fields' : {
 							'choose_map_fields' : 'Choisir et faire correspondre les champs',
