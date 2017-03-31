@@ -24,6 +24,7 @@ module.exports = {
 									'previous_imports' : 'Previous Imports',
 									'en' : 'English ',
 									'fr' : 'French ',
+									 'es': 'Spanish',
 									'workflow_list' : 'Workflow List'
 
 								}
@@ -168,6 +169,175 @@ module.exports = {
 				  }
 				}
 			},	
+			'es' : {
+				translation : {
+					'header' : {
+						'import_tool' : 'Herramienta de Importación',
+						'select_import_process': 'Por favor seleccione el proceso de importación:',
+						'nav' : {
+							'menu' : {
+								'home' : ' Página principal ',
+								'import_process' : ' Proceso de importación ',
+								'reports' : ' Reportes ',
+								'close' : ' Cerrar ',
+								'language_selector' : ' Idioma',
+								'submenu' : {
+									'iati101': 'IATI 1.01 hacia AMP',
+									'iati103' : 'IATI 1.03 hacia AMP',
+									'iati104' : 'IATI 1.04 hacia AMP',
+									'iati105' : 'IATI 1.05 hacia AMP',
+									'iati201' : 'IATI 2.01 hacia AMP',
+									'iati202' : 'IATI 2.02 hacia AMP',
+									'to':'hacia',
+									'logs' : 'Registro',
+									'previous_imports' : 'Importaciones Previas',
+									'en' : 'Inglés ',
+									'fr' : 'Francés ',
+									'es':'Spanish ',
+									'workflow_list' : 'Lista de Flujos de Trabajo'
+
+								}
+							}
+						}
+					},
+					'wizard' : {
+						'import_process' : 'Proceso de Importación',
+						'steps' : {
+							'upload_files' : ' Cargar Archivo(s)',
+							'filter_data' : ' Filtrar Datos',
+							'choose_projects' : ' Seleccionar Proyectos',
+							'choose_fields' : ' Seleccionar Campos',
+							'map_values' : ' Mapeo de Valores',
+							'review_import' : 'Verificar e Importar'
+						},
+						'upload_file' : {
+							'select_file' : 'Seleccionar archivos a cargar',
+							'filename' : 'Nombre del Archivo',
+							'valid' : 'Valido',
+							'invalid' : 'Inválido',
+							'upload_date' : 'Fecha y Hora',
+							'action' : 'Acción',
+							'view' : 'Ver',
+							'next' : 'Siguiente >>',
+							'previous' : '<< Anterior',
+							'msg_file_exists' : ' Un archivo con el mismo nombre ya existe',
+							'msg_error_retrieving_files' : 'Error al recuperar archivos cargados',
+							'msg_error_upload_failed' : 'Error al cargar el archivo. Compruebe que el tamaño del archivo no excede 2 MB',
+							'msg_invalid_file' : 'El archivo parece ser invalido. Por favor verifique la versión IATI del archivo the file.'
+						},
+						'filter_data' : {
+							'filter_information' : 'Información de Filtros',
+							'select_filters' : 'Seleccione para cada campo los valores que desea incluir como parte del proceso de importación',
+							'language' : 'Selección de Idioma para los Campos de Texto',
+							'next' : 'Siguiente >>',
+							'previous' : '<< Anterior',
+							'msg_error_retrieving_languages' : 'Error al recuperar los idiomas.',
+							'msg_error_retrieving_filters' : ' Error al recuperar los filtros.'
+
+						},
+						'choose_projects' : {
+							'choose_projects' : 'Seleccionar Proyectos',
+							'new_projects' : 'Proyectos Nuevos',
+							'existing_projects' : 'Proyectos existentes',
+							'import' : 'Importar',
+							'source_project' : 'Proyecto Fuente',
+							'iati_id': 'ID de IATI',
+							'destination_project' : 'Proyecto de Destino',
+							'override_title': 'Invalidar el Título',
+							'update' : 'Actualizar',
+							'next' : 'Siguiente >>',
+							'previous' : '<< Anterior',
+							'msg_error_retrieving_projects' : ' Error al recuperar los filtros.',
+							'msg_error_select_project' : ' Favor seleccionar al menos un proyecto para continuar',
+						    'msg_project_not_editable':'Los proyectos marcador por un * y resaltados no pueden ser editados puesto que no encuentran en el espacio de trabajo actual.'
+						},
+						'map_fields' : {
+							'choose_map_fields' : 'Seleccionar y mapear los campos',
+							'import_update' : 'Importar/Actualizar',
+							'source_field' : 'Campo de origen',
+							'destination_field' : 'Campo de destino',
+							'next' : 'Siguiente >>',
+							'save' : 'Guardar',
+							'load_existing_template' : 'Cargar plantilla existente',
+							'usual_field_mapping' : 'Mapeo de campo habitual',
+							'other_field_mapping' : 'Otro Mapeo de Campo',
+							'previous' : '<< Anterior',
+							'multilang_string' : 'Campos con idiomas multiples',
+							'string' : 'Camps de Cadenas',
+							'list' : 'Lista de Campos',
+							'date' : 'Campos de Fecha',
+							'transaction' : 'Campos de Transacciones',
+							'organization' : 'Campos de Orgarnizaciones',
+							'msg_error_retrieving_destination_fields' : ' Error al recuperar los campos de destino.',
+							'msg_error_retrieving_source_fields' : ' Error al recuperar los campos de origen.',
+							'msg_error_retrieving_mappings' : ' Error al recuperar el mapeo de los campos.',
+							'msg_error_retrieving_templates' : ' Error al recuperar la plantilla de mapeo',
+							'msg_required_field':' es requerido por el sistema de destino.',
+							'msg_field_has_dependencies': ' tiene las siguientes dependencias: __dependencies__ '
+
+						},
+						'map_values' : {
+							'map_field_values' : 'Mapear los Campos de Valores',
+							'empty_list' : 'No hay campos que puedan ser mapeados',
+							'save' : 'Guardar',
+							'update' : 'Actualizar',
+							'next' : 'Siguiente >>',
+							'source_value' : 'Valor de Origen',
+							'destination_value' : 'Valor de Destino',
+							'previous' : '<< Anterior',
+							'msg_error_retrieving_value_mappings' : ' Error al recuperar valores de mapeo',
+							'msg_error_loading_templates' : ' Error al cargan las plantillas de mapeo'
+						},
+						'save_field_mappings_dlg' : {
+							'msg_error_saving' : 'Error al guardar la plantilla',
+							'title' : 'Guardar el Mapeo de los Campos',
+							'close' : 'cerrar',
+							'save_mapping' : 'Guardar Mapeo'
+
+						},
+						'save_value_mappings_dlg' : {
+							'msg_error_saving' : 'Error al guardar la plantilla',
+							'title' : 'Guardar los Valores de Mapeo',
+							'close' : 'cerrar',
+							'save_mapping' : 'Guardar Mapeo'
+						},
+						'review_import' : {
+							'review_import' : 'Revisar e Importar',
+							'files_uploaded' : '__fileCount__ Archivo(s) Cargado(s)',
+							'data_filtered' : '__filterCount__ Filtro(s) Aplicado(s)',
+							'projects_selected' : ' __projectCount__ Proyecto(s) Seleccionado(s)',
+							'fields_selected' : '__fieldMappingCount__ Campo(s) Seleccionado(s)',
+							'values_mapped' : '__valueMappingCount__ Valore(s) Mapeado(s)',
+							'proceed_import' : 'Proceder con la Importación',
+							'close' : 'Cerrar ',
+							'restart' : 'Reiniciar',
+							'previous' : '<< Anterior',
+							'question' : 'Está seguro de reiniciar el proceso?'
+						},
+						'mappings_dropdown' : {
+							'confirm_delete' : 'Está seguro de eliminar  __templateName__ ?'
+						},
+						'previous_imports_list' :{
+							'id':'ID',
+							'previous_imports': 'Importaciones Previas',
+							'file_name':'Nombre del Archivo',
+							'upload_date': 'Fecha de Carga',
+							'action': 'Acción',
+							'view_import': 'Ver Importación',
+							'delete': 'Eliminar'		 
+						}
+					},
+				  'server_messages': {
+					  101: 'Extrayendo proyectos __processed__ of __total__',
+					  102: 'Obteniendo proyectos de destino',
+					  103: 'Se produjo un error al extraer proyectos del archivo IATI. Favor revisar el formato del archivo',
+					  104: 'Error al cargar el archivo. Verificar que los primeros pasos hayan sido completados.',
+					  105: 'Error al cargar el archivo.',
+					  106: 'Importing __processed__ of __total__ projects',
+					  107: 'Mapping __processed__ of __total__'					  
+				  }
+				}
+			},		
 			'fr' : {
 				translation : {
 					'header' : {
@@ -192,6 +362,7 @@ module.exports = {
 									'previous_imports' : 'Téléchargements Précédents',
 									'en' : 'English ',
 									'fr' : 'Français ',
+									'es': 'Spanish',
 									'workflow_list' : 'Flux de téléchargement'
 
 								}
