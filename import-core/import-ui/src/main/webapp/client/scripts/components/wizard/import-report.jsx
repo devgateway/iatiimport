@@ -35,23 +35,23 @@ var ImportReport = React.createClass({
     <div className="modal-content">
       <div className="modal-header">
         <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 className="modal-title" id="myModalLabel">Import Process</h4>
+        <h4 className="modal-title" id="myModalLabel">{this.props.i18nLib.t('wizard.import_report.import_process')}</h4>
       </div>
       <div className="modal-body">
         <table className="table scrollablebody">
             <thead>
                 <tr>
                     <th>
-                        Project Id
+                        {this.props.i18nLib.t('wizard.import_report.project_id')}
                     </th>
                     <th>
-                        Operation
+                        {this.props.i18nLib.t('wizard.import_report.operation')}
                     </th>
                     <th>
-                        Status
+                        {this.props.i18nLib.t('wizard.import_report.status')}
                     </th>
                     <th>
-                        Message/Title
+                        {this.props.i18nLib.t('wizard.import_report.message')}
                     </th>
                 </tr>
             </thead>
@@ -62,7 +62,7 @@ var ImportReport = React.createClass({
         
       </div>
       <div className="modal-footer">
-        <button type="button" className="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" className="btn btn-default" data-dismiss="modal">{this.props.i18nLib.t('wizard.import_report.close')}</button>
       </div>
     </div>
   </div>

@@ -41,7 +41,7 @@ var MappingTableSimple = React.createClass({
            if(destinationField.possibleValues.length > 50){
         	   selector = <AutoComplete display="value"  options= {options} placeholder="" refId={"value" + key} data={{sourceFieldName:sourceField.uniqueFieldName, sourceIndexValue:key}} handleChange = {this.props.handleUpdates} value={ destinationValue ? destinationValue.value : "" }/>
            }else{
-        	   selector = <CustomSelect initialOption={destValue} options={options} value="value" label="label" data={{sourceFieldName:sourceField.uniqueFieldName, sourceIndexValue:key}} handleChange = {this.props.handleUpdates}/>
+        	   selector = <CustomSelect initialOption={destValue} options={options} value="value" label="label" data={{sourceFieldName:sourceField.uniqueFieldName, sourceIndexValue:key}} handleChange = {this.props.handleUpdates} {...this.props} />
            }
            
           if(sourceValue){

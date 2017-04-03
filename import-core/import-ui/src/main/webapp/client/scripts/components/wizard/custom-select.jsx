@@ -17,7 +17,7 @@ var CustomSelect = React.createClass({
         }.bind(this));
         return(           
                <select className="form-control" onChange={this.change} value={this.props.initialOption} disabled = {this.props.disabled}>
-                 <option value="" >Select</option>
+                 <option value="" >{this.props.i18nLib.t('wizard.select')}</option>
                  {optionNodes}
                </select>          
         );
