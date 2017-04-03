@@ -53,7 +53,7 @@ var Home = React.createClass({
     this.setState ({i18nLib: i18nLib} );           	
   },
   closeImportTool: function(){
-	  if (confirm("Close Import Tool Window?")) {
+	  if (confirm(this.state.i18nLib.t('header.close_window'))) {
 		  window.location.href = appConfig.AMP_DESKTOP_ENDPOINT;
 	  }  
   },

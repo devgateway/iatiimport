@@ -60,21 +60,21 @@ var WorkflowList = React.createClass({
       
     return (
      <div className="container " >
-      <h2>Workflows</h2>      
+      <h2>{window.i18nLib.t('workflows.title')}</h2>      
          <table className="table file-list">
                     <thead>
                         <tr>
                            <th>
-                                 Source Processor
+                                 {window.i18nLib.t('workflows.source')}
                             </th>
                             <th>
-                                 Destination Processor
+                                 {window.i18nLib.t('workflows.destination')}
                             </th>
                             <th>
-                               Description
+                               {window.i18nLib.t('workflows.description')}
                             </th>
                             <th>
-                                Enabled
+                                {window.i18nLib.t('workflows.enabled')}
                             </th>
                         </tr>
                     </thead>

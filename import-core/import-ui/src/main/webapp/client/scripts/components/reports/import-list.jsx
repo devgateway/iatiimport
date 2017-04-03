@@ -85,8 +85,8 @@ var ImportList = React.createClass({
                         {createdDate}
                     </td>
                     <td>
-                       <Link to="importlog" params={{id:item.id}}  >View Import	</Link><span> | </span> 
-                       <span  className = "fake-link" data-id={item.id}data-name={item.fileName} onClick={this.handleDelete}>Delete</span>
+                       <Link to="importlog" params={{id:item.id}}  >{window.i18nLib.t('previous_imports.view_import')}	</Link><span> | </span> 
+                       <span  className = "fake-link" data-id={item.id}data-name={item.fileName} onClick={this.handleDelete}>{window.i18nLib.t('previous_imports.delete')}</span>
                     </td>
                 </tr>);
             }.bind(this));
@@ -94,7 +94,7 @@ var ImportList = React.createClass({
       
     return (
      <div className="container " >
-      <h2>Previous Imports</h2>      
+      <h2>{window.i18nLib.t('previous_imports.title')}</h2>      
          <table className="table file-list">
                     <thead>
                         <tr>
@@ -103,15 +103,15 @@ var ImportList = React.createClass({
                                  <i className="fa fa-fw fa-sort" data-field="id" onClick={this.onSort}></i>
                             </th>
                             <th>
-                                 File Name
+                                 {window.i18nLib.t('previous_imports.file_name')}
                                  <i className="fa fa-fw fa-sort" data-field="fileName" onClick={this.onSort}></i>
                             </th>
                             <th>
-                                Upload Date
+                                {window.i18nLib.t('previous_imports.upload_date')}
                                 <i className="fa fa-fw fa-sort" data-field="createdDate" onClick={this.onSort}></i>
                             </th>
                             <th>
-                                Action
+                                {window.i18nLib.t('previous_imports.action')}
                             </th>
                         </tr>
                     </thead>

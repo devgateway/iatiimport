@@ -69,6 +69,14 @@
                 "enabled": true,
                 "type":"language-selector-item",
                 "url": "#/wizard/IATI201/AMP"
+            },
+            {
+                "i18n-key":"header.nav.menu.submenu.es",
+                "name": "es",
+                "label": "es",
+                "enabled": true,
+                "type":"language-selector-item",
+                "url": "#/wizard/IATI201/AMP"
             }
         ]
     }

@@ -129,7 +129,7 @@ var UploadFile = React.createClass({
                             <th>
                                 {this.props.i18nLib.t('wizard.upload_file.valid')}
                             </th>
-                            <th>Action</th>
+                            <th>{this.props.i18nLib.t('wizard.upload_file.action')}</th>
                         </tr>
                     </thead>
                     <tbody>
