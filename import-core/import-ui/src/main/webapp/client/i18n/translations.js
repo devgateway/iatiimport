@@ -5,6 +5,7 @@ module.exports = {
 					'header' : {
 						'import_tool' : 'Import Tool',
 						'select_import_process': 'Please select the import process:',
+						'close_window': 'Close Import Tool Window?',
 						'nav' : {
 							'menu' : {
 								'home' : ' Home ',
@@ -156,6 +157,15 @@ module.exports = {
 							'action': 'Action',
 							'view_import': 'View Import',
 							'delete': 'Delete'		 
+						},
+						'select': 'Select',
+						'import_report':{
+							'import_process': 'Import Process',
+							'project_id': 'Project Id',
+							'operation': 'Operation',
+							'status': 'Status',
+							'message': 'Message/Project Title',
+							'close': 'Close'
 						}
 					},
 				  'server_messages': {
@@ -166,7 +176,22 @@ module.exports = {
 					  105: 'Error uploading file.',
 					  106: 'Importing __processed__ of __total__ projects',
 					  107: 'Mapping __processed__ of __total__'					  
-				  }
+				  },
+				  'previous_imports' : {
+					   'title': 'Previous Imports',
+					   'file_name': 'File Name',
+					   'upload_date': 'Upload Date',
+					   'action': 'Action',
+					   'view_import': 'View Import',
+					   'delete': 'Delete'
+					},
+					'workflows':{
+						'title':'Workflows',
+						'source': 'Source Processor',
+						'destination': 'Destination Processor',
+						'description': 'Description',
+						'enabled': 'Enabled'
+					}
 				}
 			},	
 			'es' : {
@@ -174,6 +199,7 @@ module.exports = {
 					'header' : {
 						'import_tool' : 'Herramienta de Importación',
 						'select_import_process': 'Por favor seleccione el proceso de importación:',
+						'close_window': 'Cerrar ventana de importación?',
 						'nav' : {
 							'menu' : {
 								'home' : ' Página principal ',
@@ -325,6 +351,15 @@ module.exports = {
 							'action': 'Acción',
 							'view_import': 'Ver Importación',
 							'delete': 'Eliminar'		 
+						},
+					    'select': 'Seleccionar',						
+						'import_report':{
+							'import_process': 'Proceso de Importación',
+							'project_id': 'ID Proyecto',
+							'operation': 'Operación',
+							'status': 'Estado',
+							'message': 'Mensaje / Nombre del Proyecto',
+							'close': 'Cerrar'
 						}
 					},
 				  'server_messages': {
@@ -333,9 +368,24 @@ module.exports = {
 					  103: 'Se produjo un error al extraer proyectos del archivo IATI. Favor revisar el formato del archivo',
 					  104: 'Error al cargar el archivo. Verificar que los primeros pasos hayan sido completados.',
 					  105: 'Error al cargar el archivo.',
-					  106: 'Importing __processed__ of __total__ projects',
+					  106: 'Importando __processed__ proyecto de __total__',
 					  107: 'Mapping __processed__ of __total__'					  
-				  }
+				  },
+				  'previous_imports' : {
+					   'title': 'Importaciones previas',
+					   'file_name': 'Nombre del archivo',
+					   'upload_date': 'Fecha de importación',
+					   'action': 'Acción',
+					   'view_import': 'Ver importación',
+					   'delete': 'Eliminar'
+					},
+					'workflows':{
+						'title':'Flujos de importación',
+						'source': 'Procesador de la fuente',
+						'destination': 'Procesador de destino',
+						'description': 'Descripción',
+						'enabled': 'Habilitado'
+					}
 				}
 			},		
 			'fr' : {
@@ -343,6 +393,7 @@ module.exports = {
 					'header' : {
 						'import_tool' : 'Outil Import',
 						'select_import_process' : 'Veuillez sélectionner le processus d’import des données:',
+						'close_window': 'Close Import Tool Window?',
 						'nav' : {
 							'menu' : {
 								'home' : ' Accueil ',
@@ -491,7 +542,16 @@ module.exports = {
 							'action': ' Action ',
 							'view_import': ' Visualiser le Téléchargement ',
 							'delete': ' Supprimer '
-						}
+						},
+						'select': 'Select',
+						'import_report':{
+							'import_process': 'Import Process',
+							'project_id': 'Project Id',
+							'operation': 'Operation',
+							'status': 'Status',
+							'message': 'Message/Project Title',
+							'close': 'Close'
+						},
 					},
 					'server_messages': {
 						  101: 'Extraction de __processed__ sur __total___',
@@ -501,7 +561,22 @@ module.exports = {
 						  105: "Une erreur s'est produite dans le téléchargement du fichier.",
 						  106: 'Chargement de __processed__ sur __total__ projets',
 						  107: 'Correspondance  __processed__ sur __total__ projets'				  
-					  }
+					  },
+					  'previous_imports' : {
+						   'title': 'Previous Imports',
+						   'file_name': 'File Name',
+						   'upload_date': 'Upload Date',
+						   'action': 'Action',
+						   'view_import': 'View Import',
+						   'delete': 'Delete'
+						},
+						'workflows':{
+							'title':'Workflows',
+							'source': 'Source Processor',
+							'destination': 'Destination Processor',
+							'description': 'Description',
+							'enabled': 'Enabled'
+						}
 				}		
 			}
 

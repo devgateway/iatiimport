@@ -45,7 +45,7 @@ var MappingTable = React.createClass({
 				                        </div>
 				                    </td>
 				                    <td>
-				                     <CustomSelect options={options} value="value" label="label" data={{sourceValue:sourceValue.value, sourceFieldName: this.props.sourceFieldName, destinationFieldName:this.props.destinationFieldName}} handleChange = {this.props.updateValueMappings}/>
+				                     <CustomSelect options={options} value="value" label="label" data={{sourceValue:sourceValue.value, sourceFieldName: this.props.sourceFieldName, destinationFieldName:this.props.destinationFieldName}} handleChange = {this.props.updateValueMappings} {...this.props}/>
 				                    </td>
 				                </tr>);                                         
 	            }.bind(this));

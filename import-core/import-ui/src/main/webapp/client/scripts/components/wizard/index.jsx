@@ -281,7 +281,7 @@ var Wizard = React.createClass({
       </div>
       </div>
       </div>
-      <ImportReport results={this.state.results} />
+      <ImportReport results={this.state.results} {...this.props} />
       </div>
       );
   }
