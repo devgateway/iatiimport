@@ -12,7 +12,7 @@
 	<parent>
 		<groupId>org.devgateway.importtool</groupId>
 		<artifactId>importtool</artifactId>
-		<version>0.0.11-PRE-SNAPSHOT</version>
+		<version>import-ui-0.0.11-SNAPSHOT</version>
 	</parent>
 
 	<dependencies>
