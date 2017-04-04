@@ -344,7 +344,7 @@ tbody.scrollablebody td, thead.scrollablebody th {
   height:40px;
 }
 .btn-custom{
-  width:150px;
+  min-width:150px;
 }
 
 #language-selector{
