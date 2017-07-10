@@ -50,13 +50,19 @@ import org.springframework.util.StringUtils;
 public class AMPStaticProcessor implements IDestinationProcessor {
 	private String descriptiveName = "AMP";
 
-	private final String DEFAULT_BASEURL = "http://localhost:8081";
+	static final String BASEURL_PROPERTY = "AMPStaticProcessor.baseURL";
+	static final String BASEURL_DEFAULT_VALUE = "http://localhost:8081";
+	
+	static final String AMP_IATI_ID_FIELD_PROPERTY = "AMPStaticProcessor.ampIatiIdField";
+	static final String AMP_IATI_ID_FIELD_DEFAULT_VALUE = "project_code";
+	
 	private Log log = LogFactory.getLog(getClass());
 
 	// AMP Configuration Details
 	private String DEFAULT_ID_FIELD = "amp-identifier";
 	private String DEFAULT_TITLE_FIELD = "project_title";
 	private String baseURL;
+	private String ampIatiIdField;
 	private String fieldsEndpoint = "/rest/activity/fields";
 	private String documentsEndpoint = "/rest/activity/projects";
 	// private Properties properties = null;
@@ -96,10 +102,17 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	public AMPStaticProcessor(String authenticationToken) {
 		// this.properties = initProps();
 		this.setAuthenticationToken(authenticationToken);
-		this.baseURL = System.getProperty("AMPStaticProcessor.baseURL");
-		if (this.baseURL == null) {
-			this.baseURL = DEFAULT_BASEURL;
+		
+		baseURL = System.getProperty(BASEURL_PROPERTY);
+		if (StringUtils.isEmpty(baseURL)) {
+			this.baseURL = BASEURL_DEFAULT_VALUE;
 		}
+		
+		ampIatiIdField = System.getProperty(AMP_IATI_ID_FIELD_PROPERTY);
+		if (StringUtils.isEmpty(ampIatiIdField)) {
+			ampIatiIdField = AMP_IATI_ID_FIELD_DEFAULT_VALUE;
+		}
+		
 		instantiateStaticFields();
 	}
 
@@ -417,7 +430,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	private JsonBean transformProject(InternalDocument source, List<FieldMapping> fieldMappings, List<FieldValueMapping> valueMappings) throws ValueMappingException, CurrencyNotFoundException {
 		Boolean hasTransactions = false;
 		JsonBean project = new JsonBean();
-		project.set("project_code", source.getIdentifier());		
+		project.set(ampIatiIdField, source.getIdentifier());		
 		project.set("project_title", getMultilangString(source, "project_title", "title"));
 		for (FieldMapping mapping : fieldMappings) {
 			Field sourceField = mapping.getSourceField();
