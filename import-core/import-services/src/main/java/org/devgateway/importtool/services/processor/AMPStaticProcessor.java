@@ -140,7 +140,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 					String id = node.get("internal_id").asText();
 					String internalId = node.get("amp_id").asText();
-					String identifier = node.get("project_code").asText();
+					String identifier = node.get(ampIatiIdField).asText();
 					Map<String, String> title = extractMultilanguageText(node.get("project_title"));
 					String dateString = node.get("creation_date").asText();
 
