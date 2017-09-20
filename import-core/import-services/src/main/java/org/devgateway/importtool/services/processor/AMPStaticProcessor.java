@@ -48,6 +48,7 @@ import org.springframework.util.StringUtils;
 // TODO: Better error handling to the end user. Friendlier user messages, specially when referencing a missing dependency
 
 public class AMPStaticProcessor implements IDestinationProcessor {
+	private static final String DEFAULT_LANGUAGE = "en";
 	private String descriptiveName = "AMP";
 
 	static final String BASEURL_PROPERTY = "AMPStaticProcessor.baseURL";
@@ -136,19 +137,22 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			jsonNode = mapper.readTree(result);
 			if (jsonNode.isArray()) {
 				jsonNode.forEach((JsonNode node) -> {
+					InternalDocument document = new InternalDocument();
+
 					Boolean edit = node.get("edit").asBoolean();
 
 					String id = node.get("internal_id").asText();
 					String internalId = node.get("amp_id").asText();
-					String identifier = node.get(ampIatiIdField).asText();
+					// Needs to be checked, since it's configurable it might not have a value
+					if(node.get(ampIatiIdField) != null) {
+						document.setIdentifier(node.get(ampIatiIdField).asText());
+						document.addStringField(ampIatiIdField, node.get(ampIatiIdField).asText());
+					}
 					Map<String, String> title = extractMultilanguageText(node.get("project_title"));
 					String dateString = node.get("creation_date").asText();
 
-					InternalDocument document = new InternalDocument();
-					document.setIdentifier(identifier);
 					document.addStringField("id", id);
 					document.addStringField("internalId", internalId);
-					document.addStringField("amp-identifier", identifier);
 					document.addMultilangStringField("title", title);
 					document.addStringField("dateString", dateString);
 					document.setAllowEdit(edit);
@@ -175,6 +179,9 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			Entry<String, JsonNode> entry = it.next();
 			languages.put(entry.getKey(), entry.getValue().asText());
 		}
+		if (languages.size() == 0) {
+			languages.put(DEFAULT_LANGUAGE, jsonNode.asText());
+		}
 		return languages;
 	}
 
@@ -187,7 +194,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 	@Override
 	public String getIdField() {
-		return DEFAULT_ID_FIELD;
+		return ampIatiIdField;
 	}
 
 	@Override
@@ -287,7 +294,9 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	private void updateProject(JsonBean project, InternalDocument source, List<FieldMapping> fieldMappings, List<FieldValueMapping> valueMappings, boolean overrideTitle) throws ValueMappingException, CurrencyNotFoundException {		
 		if(overrideTitle){
 			project.set("project_title", getMultilangString(source, "project_title", "title"));	
-		}	
+		}
+		project.set(ampIatiIdField, source.getIdentifier());		
+
 		Boolean hasTransactions = false;
 		for (FieldMapping mapping : fieldMappings) {
 			Field sourceField = mapping.getSourceField();
@@ -501,7 +510,13 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		if (field.getType() == FieldType.MULTILANG_STRING) {
 			return source.getMultilangFields().get(sourceFieldName);
 		} else {
-			return fieldValues.values().iterator().next();
+			if(fieldValues.size() > 0) {
+				return fieldValues.values().iterator().next();
+			}
+			else
+			{
+				return "";
+			}
 		}
 	}
  

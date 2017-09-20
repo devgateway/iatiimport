@@ -90,18 +90,13 @@ public class DocumentMapper implements IDocumentMapper {
 		InternalDocument source = doc.getSourceDocument();
 		InternalDocument destination = doc.getDestinationDocument();
 		ActionResult result = null;
-		switch (doc.getOperation()) {
-		case INSERT:
-			// For now, we pass the mapping. Find a better more efficient way.
-			result = this.destinationProcessor.insert(source, this.getFieldMappingObject(), this.getValueMappingObject());
-			break;
-		case UPDATE:
-			result = this.destinationProcessor.update(source, destination, this.getFieldMappingObject(), this.getValueMappingObject(),doc.isOverrideTitle());
-			break;
-		case NOOP:
-			break;
-		default:
-			break;
+
+		if (source != null && destination != null) { // If we have both a source document and a destination, then it is an update.
+			result = this.destinationProcessor.update(source, destination, this.getFieldMappingObject(),
+					this.getValueMappingObject(), doc.isOverrideTitle());
+		} else { //Otherwise, it's a new project
+			result = this.destinationProcessor.insert(source, this.getFieldMappingObject(),
+					this.getValueMappingObject());
 		}
 
 		return result;
@@ -147,7 +142,8 @@ public class DocumentMapper implements IDocumentMapper {
 			String destinationIdField = this.destinationProcessor.getIdField();
 			String sourceIdValue = srcDoc.getStringFields().get(sourceIdField);
 			srcDoc.setIdentifier(sourceIdValue);
-			Optional<InternalDocument> optionalDestDoc = destinationDocuments.stream().filter(n -> {
+			Optional<InternalDocument> optionalDestDoc = destinationDocuments.stream().
+					filter(n -> {
 				return sourceIdValue.equals(n.getStringFields().get(destinationIdField));
 			}).findFirst();
 			if (optionalDestDoc.isPresent()) {
