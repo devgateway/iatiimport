@@ -95,7 +95,13 @@ var AutoComplete = React.createClass({
     componentDidUpdate: function(prevProps, prevState){
     	var $el = $(this.refs[this.props.refId].getDOMNode());
     	if(this.props.value) {
-    		$el.val(this.props.value);
+        if(this.props.context == constants.CHOOSE_PROJECTS) {
+          $el.val(this.props.value.multilangFields.title[this.props.language]);
+        }
+        else
+        {
+          $el.val(this.props.value);
+        }
     	}
     },
     render: function () {       

@@ -200,8 +200,9 @@ var ChooseProjects = React.createClass({
                         <td>
                             {this.getTitle(item.sourceDocument.multilangFields, language)} 
                         </td>
-                        <td>                            
-                          <AutoComplete context={constants.CHOOSE_PROJECTS} options={this.state.destinationProjects} display="title" language={language} placeholder="" refId="destSearch" onSelect={this.handleAutocompleteToggle.bind(this, item)} value={item.destinationDocument}/>                            
+                        <td>
+                          <AutoComplete context={constants.CHOOSE_PROJECTS} options={this.state.destinationProjects} display="title" language={language} placeholder="" refId="destSearch" onSelect={this.handleAutocompleteToggle.bind(this, item)} value={item.destinationDocument}/>
+                          <i>{this.state.destinationProjects.length} documents in the destination system </i>
                         </td>
                         <td>
                             <input aria-label="override-title" className="override-title"  type="checkbox" checked={item.overrideTitle} onChange={this.handleOverrideTitle.bind(this, item)} />
