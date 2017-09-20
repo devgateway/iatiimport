@@ -811,6 +811,14 @@ public class AMPStaticProcessor implements IDestinationProcessor {
     		activityStatus.setRequired(true);
     		fieldList.add(activityStatus);		
 		}
+        if(destinationFieldsList.contains("a.c._chapter")){
+        	Field activityStatus = new Field("AC Chapter", "a.c._chapter", FieldType.LIST, true);
+    		activityStatus.setPossibleValues(getCodeListValues("a.c._chapter"));
+    		activityStatus.setRequired(true);
+    		fieldList.add(activityStatus);		
+		}
+        
+        
 			
 		
         if(destinationFieldsList.contains("fundings~type_of_assistance")){
@@ -874,19 +882,42 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		
 
 		// Dates
-		if (fieldProps.get("planned_start_date") != null) {
-			fieldList.add(new Field("Planned Start Date", "planned_start_date", FieldType.DATE, true));
-		}
 		if (fieldProps.get("actual_start_date") != null) {
 			fieldList.add(new Field("Actual Start Date", "actual_start_date", FieldType.DATE, true));
-		}
-		if (fieldProps.get("original_completion_date") != null) {
-			fieldList.add(new Field("Original Completion Date", "original_completion_date", FieldType.DATE, true));
 		}
 		if (fieldProps.get("actual_completion_date") != null) {
 			fieldList.add(new Field("Actual Completion Date", "actual_completion_date", FieldType.DATE, true));
 		}
+		if (fieldProps.get("actual_approval_date") != null) {
+			fieldList.add(new Field("Actual Approval Date", "actual_approval_date", FieldType.DATE, true));
+		}
 
+		if (fieldProps.get("proposed_start_date") != null) {
+			fieldList.add(new Field("Proposed Start Date", "proposed_start_date", FieldType.DATE, true));
+		}
+		if (fieldProps.get("proposed_approval_date") != null) {
+			fieldList.add(new Field("Proposed Approval Date", "proposed_approval_date", FieldType.DATE, true));
+		}
+		if (fieldProps.get("proposed_completion_date") != null) {
+			fieldList.add(new Field("Proposed Completion Date", "proposed_completion_date", FieldType.DATE, true));
+		}
+
+		if (fieldProps.get("planned_start_date") != null) {
+			fieldList.add(new Field("Planned Start Date", "planned_start_date", FieldType.DATE, true));
+		}
+		if (fieldProps.get("original_completion_date") != null) {
+			fieldList.add(new Field("Original Completion Date", "original_completion_date", FieldType.DATE, true));
+		}
+
+		
+		
+
+		
+		
+		
+
+		
+		
 		// Organizations
          if(destinationFieldsList.contains("fundings~donor_organization_id")){
         		Field fundingOrganization = new Field("Funding Organization", "donor_organization", FieldType.ORGANIZATION, true);
