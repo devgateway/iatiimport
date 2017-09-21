@@ -124,14 +124,18 @@ module.exports = {
 							'msg_error_saving' : 'Error saving template',
 							'title' : 'Save Field Mappings',
 							'close' : 'close',
-							'save_mapping' : 'Save Mapping'
+							'save_mapping' : 'Save Mapping',
+							'save_as_copy' : 'Save as Copy',
+							'mapping_exists' : 'Mapping name already exists'
 
 						},
 						'save_value_mappings_dlg' : {
 							'msg_error_saving' : 'Error saving template',
 							'title' : 'Save Value Mappings',
 							'close' : 'close',
-							'save_mapping' : 'Save Mapping'
+							'save_mapping' : 'Save Mapping',
+							'save_as_copy' : 'Save as Copy',
+							'mapping_exists' : 'Mapping name already exists'
 						},
 						'review_import' : {
 							'review_import' : 'Review and Import',
@@ -156,7 +160,7 @@ module.exports = {
 							'upload_date': 'Upload Date',
 							'action': 'Action',
 							'view_import': 'View Import',
-							'delete': 'Delete'		 
+							'delete': 'Delete'
 						},
 						'select': 'Select',
 						'import_report':{
@@ -175,7 +179,7 @@ module.exports = {
 					  104: 'Error uploading file. Check if the initial steps are done.',
 					  105: 'Error uploading file.',
 					  106: 'Importing __processed__ of __total__ projects',
-					  107: 'Mapping __processed__ of __total__'					  
+					  107: 'Mapping __processed__ of __total__'
 				  },
 				  'previous_imports' : {
 					   'title': 'Previous Imports',
@@ -193,7 +197,7 @@ module.exports = {
 						'enabled': 'Enabled'
 					}
 				}
-			},	
+			},
 			'es' : {
 				translation : {
 					'header' : {
@@ -318,14 +322,17 @@ module.exports = {
 							'msg_error_saving' : 'Error al guardar la plantilla',
 							'title' : 'Guardar el Mapeo de los Campos',
 							'close' : 'cerrar',
-							'save_mapping' : 'Guardar Mapeo'
-
+							'save_mapping' : 'Guardar Mapeo',
+							'save_as_copy' : 'Save as Copy',
+							'mapping_exists' : 'Mapeo existente'
 						},
 						'save_value_mappings_dlg' : {
 							'msg_error_saving' : 'Error al guardar la plantilla',
 							'title' : 'Guardar los Valores de Mapeo',
 							'close' : 'cerrar',
-							'save_mapping' : 'Guardar Mapeo'
+							'save_mapping' : 'Guardar Mapeo',
+							'save_as_copy' : 'Save as Copy',
+							'mapping_exists' : 'Mapeo existente'
 						},
 						'review_import' : {
 							'review_import' : 'Revisar e Importar',
@@ -350,9 +357,9 @@ module.exports = {
 							'upload_date': 'Fecha de Carga',
 							'action': 'Acción',
 							'view_import': 'Ver Importación',
-							'delete': 'Eliminar'		 
+							'delete': 'Eliminar'
 						},
-					    'select': 'Seleccionar',						
+					    'select': 'Seleccionar',
 						'import_report':{
 							'import_process': 'Proceso de Importación',
 							'project_id': 'ID Proyecto',
@@ -369,7 +376,7 @@ module.exports = {
 					  104: 'Error al cargar el archivo. Verificar que los primeros pasos hayan sido completados.',
 					  105: 'Error al cargar el archivo.',
 					  106: 'Importando __processed__ proyecto de __total__',
-					  107: 'Mapping __processed__ of __total__'					  
+					  107: 'Mapping __processed__ of __total__'
 				  },
 				  'previous_imports' : {
 					   'title': 'Importaciones previas',
@@ -387,7 +394,7 @@ module.exports = {
 						'enabled': 'Habilitado'
 					}
 				}
-			},		
+			},
 			'fr' : {
 				translation : {
 					'header' : {
@@ -510,13 +517,18 @@ module.exports = {
 							'msg_error_saving' : ' Erreur dans la sauvegarde du modèle ',
 							'title' : ' Enregistrer la correspondance des champs ',
 							'close' : ' Fermer ',
-							'save_mapping' : ' Enregistrer la correspondance '
+							'save_mapping' : ' Enregistrer la correspondance ',
+							'save_as_copy' : 'Sauvegarder copie',
+							'mapping_exists' : 'Existe déjà'
+
 						},
 						'save_value_mappings_dlg' : {
 							'msg_error_saving' : ' Erreur dans la sauvegarde du modèles ',
 							'title' : ' Enregistrer la correspondence des valeurs ',
 							'close' : ' Fermer ',
-							'save_mapping' : ' Enregistrer la correspondance '
+							'save_mapping' : ' Enregistrer la correspondance ',
+							'save_as_copy' : 'Sauvegarder copie',
+							'mapping_exists' : 'Existe déjà'
 						},
 						'review_import' : {
 							'review_import' : ' Revoir et Télécharger ',
@@ -560,7 +572,7 @@ module.exports = {
 						  104: "Une erreur s'est produite dans le téléchargement du fichier. Veuillez vérifier les étapes initiales.",
 						  105: "Une erreur s'est produite dans le téléchargement du fichier.",
 						  106: 'Chargement de __processed__ sur __total__ projets',
-						  107: 'Correspondance  __processed__ sur __total__ projets'				  
+						  107: 'Correspondance  __processed__ sur __total__ projets'
 					  },
 					  'previous_imports' : {
 						   'title': 'Previous Imports',
@@ -577,7 +589,7 @@ module.exports = {
 							'description': 'Description',
 							'enabled': 'Enabled'
 						}
-				}		
+				}
 			}
 
 		}

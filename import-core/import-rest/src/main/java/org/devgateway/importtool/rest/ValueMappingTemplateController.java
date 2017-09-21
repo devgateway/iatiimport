@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.dao.ValueMappingTemplateRepository;
+import org.devgateway.importtool.model.FieldMappingTemplate;
 import org.devgateway.importtool.model.ValueMappingTemplate;
 import org.devgateway.importtool.services.processor.helper.FieldValueMapping;
 import org.devgateway.importtool.services.request.ValueMappingTemplateRequest;
@@ -37,7 +38,17 @@ class ValueMappingTemplateController {
 	
 	@RequestMapping(method = RequestMethod.POST, value = "/save")
 	public ResponseEntity<String> save(@RequestBody ValueMappingTemplateRequest valueMappingTemplateRequest, HttpServletRequest request) {	
-		ValueMappingTemplate valueMappingTemplate = new ValueMappingTemplate();
+		
+		ValueMappingTemplate  valueMappingTemplate = valueMappingTemplateRepository.findById(valueMappingTemplateRequest.getId());
+		if(valueMappingTemplate == null) {
+			valueMappingTemplate = valueMappingTemplateRepository.findByName(valueMappingTemplateRequest.getName());
+			if (valueMappingTemplate != null) {
+				return new ResponseEntity<>("{\"error\": \"mapping_exists\"}", HttpStatus.OK);
+			} else {
+				valueMappingTemplate = new ValueMappingTemplate();
+			}
+		}
+		
 		valueMappingTemplate.setName(valueMappingTemplateRequest.getName());
 		ObjectMapper mapper = new ObjectMapper();  
 		try{
