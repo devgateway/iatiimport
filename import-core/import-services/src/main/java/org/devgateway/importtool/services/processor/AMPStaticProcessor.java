@@ -867,15 +867,30 @@ public class AMPStaticProcessor implements IDestinationProcessor {
   		  tertiarySector.setPossibleValues(getCodeListValues("tertiary_sectors~sector_id"));
   		  fieldList.add(tertiarySector);
 		}
+      
+  	// Multi-language strings
+		Map<String, String> multilangfields = new HashMap<String, String>();
+		multilangfields.put("project_comments", "Project Comments");
+		multilangfields.put("objective", "Objective");
+		multilangfields.put("document_space", "Document Space");
+		multilangfields.put("status_reason", "Status Reason");
+		multilangfields.put("project_impact", "Project Impact");
+		multilangfields.put("activity_summary", "Activity Summary");
+		multilangfields.put("conditionalities", "Conditionalities");
+		multilangfields.put("project_management", "Project Management");
+		multilangfields.put("project_comments", "Project Comments");
+		multilangfields.put("lessons_learned", "Lessons Learned");
+		multilangfields.put("results", "Results");
+		multilangfields.put("description", "Description");      
 		
-
-       if(destinationFieldsList.contains("description")){
-    	// Multi-language strings
-    			FieldType ftDescription = getFieldType(fieldProps.get("description"));
-    			if(ftDescription != null) {
-    				fieldList.add(new Field("Activity Description", "description", ftDescription, true));
-    			}	
-		}
+		multilangfields.forEach((name, label) -> {
+			if(destinationFieldsList.contains("description")){
+		    			FieldType ftDescription = getFieldType(fieldProps.get(name));
+		    			if(ftDescription != null) {
+		    				fieldList.add(new Field(label, name, ftDescription, true));
+		    			}	
+				}
+		});
 		
 
 		// Dates
