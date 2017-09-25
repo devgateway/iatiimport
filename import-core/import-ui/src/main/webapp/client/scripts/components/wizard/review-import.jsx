@@ -10,7 +10,7 @@ var importSummaryStore = require('./../../stores/ImportSummaryStore');
 var ReviewImport = React.createClass({
 	mixins: [Reflux.ListenerMixin],
 	getInitialState: function() {
-		return {importSummary:{}};
+		return {importSummary:{}, importOption: constants.OVERWRITE_ALL_FUNDING};
 	 },
 	componentDidMount: function() {
 		this.props.eventHandlers.updateCurrentStep(constants.REVIEW_IMPORT);
@@ -38,7 +38,15 @@ var ReviewImport = React.createClass({
         if(confirm(this.props.i18nLib.t('wizard.review_import.question'))) {
             this.props.eventHandlers.goHome();
         }
-    },  
+    }, 
+    onImportOptionChange: function(event) {
+      if(event.target.checked) {
+         this.setState({importOption:event.target.value})
+      }
+    }, 
+    import: function(){
+       this.props.eventHandlers.launchImport(this.state.importOption);
+    },    
     render: function () {
     	var statusMessage = this.props.statusMessage.length > 0 ? <div className="alert alert-info" role="alert">{this.props.statusMessage}</div> : "";
         return (
@@ -47,7 +55,23 @@ var ReviewImport = React.createClass({
                 <div className="panel-body">
                    {statusMessage}
                     <div className="row">
-                        <div className="col-sm-3 col-md-3"></div>
+                        <div className="col-sm-6 col-md-6">
+                         <div className="panel panel-default panel-body">
+                           <label>{this.props.i18nLib.t('wizard.review_import.import_option')}</label><span className="import-option-explanation">{this.props.i18nLib.t('wizard.review_import.import_option_explanation')}</span>
+                           <div className="radio">
+                             <label><input type="radio" name="importOption" value={constants.OVERWRITE_ALL_FUNDING} onChange={this.onImportOptionChange} checked={constants.OVERWRITE_ALL_FUNDING === this.state.importOption}/>{this.props.i18nLib.t('wizard.review_import.import_option_overwrite_all')}</label> <br/>
+                             <label className="import-option-explanation">{this.props.i18nLib.t('wizard.review_import.import_option_overwrite_all_explanation')}</label>                             
+                            </div>
+                            <div className="radio">
+                              <label><input type="radio" name="importOption" value={constants.ONLY_ADD_NEW_FUNDING} onChange={this.onImportOptionChange} checked={constants.ONLY_ADD_NEW_FUNDING === this.state.importOption}/>{this.props.i18nLib.t('wizard.review_import.import_option_add_missing')}</label><br/>
+                              <label className="import-option-explanation">{this.props.i18nLib.t('wizard.review_import.import_option_add_missing_explanation')}</label>
+                            </div>
+                            <div className="radio">
+                               <label><input type="radio" name="importOption" value={constants.REPLACE_DONOR_FUNDING} onChange={this.onImportOptionChange} checked={constants.REPLACE_DONOR_FUNDING === this.state.importOption}/>{this.props.i18nLib.t('wizard.review_import.import_option_replace')}</label><br/>
+                               <label className="import-option-explanation">{this.props.i18nLib.t('wizard.review_import.import_option_replace_explanation')}</label>
+                             </div>
+                          </div>
+                        </div>
                         <div className="col-sm-6 col-md-6">
                             <div className="form-group has-success has-feedback">
                             
@@ -70,8 +94,7 @@ var ReviewImport = React.createClass({
                                 <input aria-describedby="inputSuccess2Status" className="form-control" id="inputSuccess2" type="text" value={this.props.i18nLib.t('wizard.review_import.values_mapped', this.state.importSummary)} readOnly="readonly"/>
                                 <span aria-hidden="true" className="glyphicon glyphicon-ok form-control-feedback"></span>
                             </div>
-                        </div>
-                        <div className="col-sm-3 col-md-3"></div>
+                        </div>                        
                     </div>
                     <div className="buttons">
                     
@@ -81,7 +104,7 @@ var ReviewImport = React.createClass({
                      </div>
                    <div className="col-md-6">                
                    <button className="btn btn-warning navbar-btn btn-custom" type="button" onClick={this.goHome}>{this.props.i18nLib.t('wizard.review_import.restart')}</button>&nbsp;
-                   <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.props.eventHandlers.launchImport}>{this.props.i18nLib.t('wizard.review_import.proceed_import')}</button>               
+                   <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.import}>{this.props.i18nLib.t('wizard.review_import.proceed_import')}</button>               
                    </div>
                    </div>                        
                    </div>
