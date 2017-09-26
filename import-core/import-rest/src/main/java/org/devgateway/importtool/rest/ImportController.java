@@ -28,6 +28,7 @@ import org.devgateway.importtool.services.processor.helper.IDestinationProcessor
 import org.devgateway.importtool.services.processor.helper.IDocumentMapper;
 import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
 import org.devgateway.importtool.services.processor.helper.JsonBean;
+import org.devgateway.importtool.services.request.ImportRequest;
 import org.devgateway.importtool.services.response.DocumentMappingResponse;
 import org.devgateway.importtool.services.response.ImportExecuteResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -148,14 +150,15 @@ class ImportController  {
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/execute")
-	void execute(HttpServletRequest request) {
+	void execute(@RequestBody ImportRequest importRequest, HttpServletRequest request) {
+		log.info(importRequest.getImportOption());
 		IDocumentMapper documentMapper = (IDocumentMapper) request.getSession().getAttribute(DOCUMENT_MAPPER);
 		if (documentMapper == null) {
 			documentMapper = new DocumentMapper();
 			request.getSession().setAttribute(DOCUMENT_MAPPER, documentMapper);
 		}		
 		Long fileId = (Long)request.getSession().getAttribute(CURRENT_FILE_ID);
-		importService.execute(documentMapper, fileId);		
+		importService.execute(documentMapper, fileId, importRequest);		
 	}
 
 	
