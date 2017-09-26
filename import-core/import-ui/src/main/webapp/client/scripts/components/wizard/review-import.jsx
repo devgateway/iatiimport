@@ -44,8 +44,15 @@ var ReviewImport = React.createClass({
          this.setState({importOption:event.target.value})
       }
     }, 
-    import: function(){
+    import: function() {
+     if (this.state.importOption === constants.OVERWRITE_ALL_FUNDING || this.state.importOption === constants.REPLACE_DONOR_FUNDING) {
+       var message = this.state.importOption === constants.OVERWRITE_ALL_FUNDING ? this.props.i18nLib.t('wizard.review_import.import_option_overwrite_prompt') : this.props.i18nLib.t('wizard.review_import.import_option_replace_prompt');
+       if (confirm(message)) {
+           this.props.eventHandlers.launchImport(this.state.importOption);
+       }
+     } else {
        this.props.eventHandlers.launchImport(this.state.importOption);
+     }       
     },    
     render: function () {
     	var statusMessage = this.props.statusMessage.length > 0 ? <div className="alert alert-info" role="alert">{this.props.statusMessage}</div> : "";

@@ -148,12 +148,13 @@ module.exports = {
 							'import_option': 'Import Option',
 							'import_option_explanation': ' (Determines how existing projects are updated)',
 							'import_option_overwrite_all': 'Overwrite all funding information',
-							'import_option_overwrite_all_explanation': 'All funding information in the project is overwritten with data from the IATI file',							
+							'import_option_overwrite_all_explanation': 'All funding information in the project is overwritten with data from the IATI file',
+							'import_option_overwrite_prompt': 'You have selected the "Overwrite all funding information" Import option. This option updates existing activities by overwriting all fundings of the affected activities. Do you want to proceed? ',
 							'import_option_add_missing': 'Only add missing information',
 							'import_option_add_missing_explanation':'Only adds new funding information to the project. Existing funding information is not overwritten',
 							'import_option_replace': 'Replace funding information',
-							'import_option_replace_explanation': 'Replaces funding information in the AMP project with funding information from the IATI file. This is done per donor. Data for donors that are not reporting is not affected.'
-							
+							'import_option_replace_explanation': 'Replaces funding information in the AMP project with funding information from the IATI file. This is done per donor. Data for donors that are not reporting is not affected.',
+							'import_option_replace_prompt': 'You have selected the "Replace funding information" Import option. This option updates existing activities by overwriting the fundings for donors that have data in the IATI file. Do you want to proceed? '							
 						},
 						'mappings_dropdown' : {
 							'confirm_delete' : 'Are you sure you want to delete  __templateName__ ?'
@@ -351,11 +352,13 @@ module.exports = {
 							'import_option': 'Import Option',
 							'import_option_explanation': ' (Determines how existing projects are updated)',
 							'import_option_overwrite_all': 'Overwrite all funding information',
-							'import_option_overwrite_all_explanation': 'All funding information in the project is overwritten with data from the IATI file',							
+							'import_option_overwrite_all_explanation': 'All funding information in the project is overwritten with data from the IATI file',
+							'import_option_overwrite_prompt': 'You have selected the "Overwrite all funding information" Import option. This option updates existing activities by overwriting all fundings of the affected activities. Do you want to proceed? ',
 							'import_option_add_missing': 'Only add missing information',
 							'import_option_add_missing_explanation':'Only adds new funding information to the project. Existing funding information is not overwritten',
 							'import_option_replace': 'Replace funding information',
-							'import_option_replace_explanation': 'Replaces funding information in the AMP project with funding information from the IATI file. This is done per donor. Data for donors that are not reporting is not affected.'
+							'import_option_replace_explanation': 'Replaces funding information in the AMP project with funding information from the IATI file. This is done per donor. Data for donors that are not reporting is not affected.',
+							'import_option_replace_prompt': 'You have selected the "Replace funding information" Import option. This option updates existing activities by overwriting the fundings for donors that have data in the IATI file. Do you want to proceed? '					
 						},
 						'mappings_dropdown' : {
 							'confirm_delete' : 'Está seguro de eliminar  __templateName__ ?'
@@ -550,11 +553,13 @@ module.exports = {
 							'import_option': 'Import Option',
 							'import_option_explanation': ' (Determines how existing projects are updated)',
 							'import_option_overwrite_all': 'Overwrite all funding information',
-							'import_option_overwrite_all_explanation': 'All funding information in the project is overwritten with data from the IATI file',							
+							'import_option_overwrite_all_explanation': 'All funding information in the project is overwritten with data from the IATI file',
+							'import_option_overwrite_prompt': 'You have selected the "Overwrite all funding information" Import option. This option updates existing activities by overwriting all fundings of the affected activities. Do you want to proceed? ',
 							'import_option_add_missing': 'Only add missing information',
 							'import_option_add_missing_explanation':'Only adds new funding information to the project. Existing funding information is not overwritten',
 							'import_option_replace': 'Replace funding information',
-							'import_option_replace_explanation': 'Replaces funding information in the AMP project with funding information from the IATI file. This is done per donor. Data for donors that are not reporting is not affected.'
+							'import_option_replace_explanation': 'Replaces funding information in the AMP project with funding information from the IATI file. This is done per donor. Data for donors that are not reporting is not affected.',
+							'import_option_replace_prompt': 'You have selected the "Replace funding information" Import option. This option updates existing activities by overwriting the fundings for donors that have data in the IATI file. Do you want to proceed? '			
 						},
 						'mappings_dropdown' : {
 							'confirm_delete' : ' Etes - vous sûr(e)de vouloir supprimer __templateName__ ? '
