@@ -713,6 +713,19 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		});
 	}
 
+	/**
+	 * This is called when the import option is "REPLACE_DONOR_FUNDING". It
+	 * modifies the fundings from amp by replacing/overwriting the fundings for
+	 * donors that have data in the IATI file. Funding for donors not in the
+	 * IATI file are not affected.
+	 * @param source
+	 * @param fieldMappings
+	 * @param valueMappings
+	 * @param project
+	 * @return
+	 * @throws ValueMappingException
+	 * @throws CurrencyNotFoundException
+	 */
 	private List<JsonBean> replaceDonorTransactions(InternalDocument source, List<FieldMapping> fieldMappings,
 			List<FieldValueMapping> valueMappings, JsonBean project)
 			throws ValueMappingException, CurrencyNotFoundException {
