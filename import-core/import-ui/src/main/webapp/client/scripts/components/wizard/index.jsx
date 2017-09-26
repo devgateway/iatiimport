@@ -149,7 +149,8 @@ var Wizard = React.createClass({
 		$.ajax({
 	    	url: '/importer/import/execute',	    		       
 	        dataType: 'json',
-	        data: {importOption: importOption},
+	        contentType: "application/json; charset=utf-8",
+	        data: JSON.stringify({importOption: importOption}),
 	        success: function(data) { 
 	        },
 	        type: 'POST'
