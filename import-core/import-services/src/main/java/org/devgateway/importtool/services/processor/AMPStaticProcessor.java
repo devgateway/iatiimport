@@ -605,16 +605,34 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		return funding;
 	}
 	
-	
+	/**
+	 * This is used when the import option is "ONLY_ADD_NEW_FUNDING". Updates
+	 * the funding from AMP by adding missing transactions. Since IATI
+	 * transactions do not have a unique identifier, we compare the fields to
+	 * check if the transaction exists.
+	 * 
+	 * @param source
+	 * @param fieldMappings
+	 * @param valueMappings
+	 * @param project
+	 * @return
+	 * @throws ValueMappingException
+	 * @throws CurrencyNotFoundException
+	 */
 	private List<JsonBean> addNewFunding(InternalDocument source, List<FieldMapping> fieldMappings,
 			List<FieldValueMapping> valueMappings, JsonBean project)
 			throws ValueMappingException, CurrencyNotFoundException {
 		JsonBean sourceFunding = getSourceFundings(source, fieldMappings, valueMappings);
-		List<LinkedHashMap<String, Object>> destinationFundings = project.get("fundings") != null
-				? (List<LinkedHashMap<String, Object>>) project.get("fundings") : null;
+		List<LinkedHashMap<String, Object>> destinationFundings = null;
+		if (project.get("fundings") != null) {
+			destinationFundings = (List<LinkedHashMap<String, Object>>) project.get("fundings");
+		}
+
 		List<JsonBean> updatedFundings = new ArrayList<>();
 		if (destinationFundings != null && destinationFundings.size() > 0) {
 			for (LinkedHashMap<String, Object> destFunding : destinationFundings) {
+				// if funding exists in project from amp, update it by adding
+				// missing transactions, else rebuild funding and add to list
 				if (sourceFunding.get("donor_organization_id").equals(destFunding.get("donor_organization_id"))) {
 					updatedFundings.add(getUpdatedFunding(sourceFunding, destFunding));
 				} else {
@@ -638,8 +656,9 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	}
     
 	/**
-	 * Create a new jsonbean object by modifying the funding from AMP.
-	 * If transaction is not found, add it funding details
+	 * Create a new jsonbean object by modifying the funding from AMP. If
+	 * transaction is not found, adds it to funding details
+	 * 
 	 * @param source
 	 * @param destFunding
 	 * @return
@@ -648,9 +667,11 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		JsonBean rebuiltDestFunding = new JsonBean();
 		for (Entry<String, Object> entry : destFunding.entrySet()) {
 			if ("funding_details".equals(entry.getKey())) {
-				List<Map<String, Object>> fundingDetailsDestination = entry.getValue() != null
-						? (List<Map<String, Object>>) entry.getValue() : new ArrayList<>();
 				List<JsonBean> fundingDetailsSource = (List<JsonBean>) source.get("funding_details");
+				List<Map<String, Object>> fundingDetailsDestination = new ArrayList<>();
+				if (entry.getValue() != null) {
+					fundingDetailsDestination = (List<Map<String, Object>>) entry.getValue();
+				}
 
 				for (JsonBean sourceTransaction : fundingDetailsSource) {
 					// if transaction is not found, add it to the funding
@@ -673,8 +694,8 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 	/**
 	 * checks if a transaction from the IATI file exists in the funding details
-	 * from AMP
-	 * 
+	 * from AMP.
+	 * Since IATI transactions do not have a unique identifier, we compare the fields to check if the transaction exists. 
 	 * @param fundingDetailsDestination
 	 *            - funding details from AMP
 	 * @param sourceTransaction
@@ -696,14 +717,16 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			List<FieldValueMapping> valueMappings, JsonBean project)
 			throws ValueMappingException, CurrencyNotFoundException {
 		JsonBean sourceFundings = getSourceFundings(source, fieldMappings, valueMappings);
-		List<LinkedHashMap<String, Object>> destinationFundings = project.get("fundings") != null
-				? (List<LinkedHashMap<String, Object>>) project.get("fundings") : null;
+		List<LinkedHashMap<String, Object>> destinationFundings = new ArrayList<>();
+		if (project.get("fundings") != null) {
+			destinationFundings = (List<LinkedHashMap<String, Object>>) project.get("fundings");
+		}
+
 		List<JsonBean> updatedFundings = new ArrayList<>();
-		
 		if (destinationFundings != null && destinationFundings.size() > 0) {
 			for (LinkedHashMap<String, Object> destFunding : destinationFundings) {
 				// if same donor_organization_id is found in both source data
-				// and amp project, replace the fundings in the project with
+				// and amp project, replace the fundings in the amp project with
 				// fundings from the IATI file
 				if (sourceFundings.get("donor_organization_id").equals(destFunding.get("donor_organization_id"))) {
 					updatedFundings.add(sourceFundings);
