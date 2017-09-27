@@ -449,3 +449,7 @@ tbody.scrollablebody td, thead.scrollablebody th {
 .id-column-width{
 	width:20%;
 }
+
+.import-option-explanation{
+	font-size: 12px;
+}

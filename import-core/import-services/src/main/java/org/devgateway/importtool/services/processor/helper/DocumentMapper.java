@@ -9,6 +9,7 @@ import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.endpoint.ApiMessage;
 import org.devgateway.importtool.endpoint.EPMessages;
 import org.devgateway.importtool.exceptions.MissingPrerequisitesException;
+import org.devgateway.importtool.services.request.ImportRequest;
 
 
 public class DocumentMapper implements IDocumentMapper {
@@ -70,7 +71,7 @@ public class DocumentMapper implements IDocumentMapper {
 
 	// Mapping and transformation operations go here
 	@Override
-	public List<ActionResult> execute() {	
+	public List<ActionResult> execute(ImportRequest importRequest) {	
 		this.destinationProcessor.preImportProcessing(this.documentMappings);
 		importStatus  = new ActionStatus(EPMessages.IMPORT_STATUS_MESSAGE.getDescription(), documentMappings.stream().filter(m -> m.getSelected() == true).count(),EPMessages.IMPORT_STATUS_MESSAGE.getCode());
 		importStatus.setStatus(Status.IN_PROGRESS);
@@ -79,14 +80,14 @@ public class DocumentMapper implements IDocumentMapper {
 		for (DocumentMapping doc : documentMappings) {
 			if (doc.getSelected()) {
 				importStatus.incrementProcessed();
-				results.add(processDocumentMapping(doc));
+				results.add(processDocumentMapping(doc, importRequest));
 			}
 		}
 		importStatus.setStatus(Status.COMPLETED);		
 		return results;
 	}
 
-	private ActionResult processDocumentMapping(DocumentMapping doc) {
+	private ActionResult processDocumentMapping(DocumentMapping doc, ImportRequest importRequest) {
 		InternalDocument source = doc.getSourceDocument();
 		InternalDocument destination = doc.getDestinationDocument();
 		ActionResult result = null;
@@ -96,7 +97,7 @@ public class DocumentMapper implements IDocumentMapper {
 			result = this.destinationProcessor.insert(source, this.getFieldMappingObject(), this.getValueMappingObject());
 			break;
 		case UPDATE:
-			result = this.destinationProcessor.update(source, destination, this.getFieldMappingObject(), this.getValueMappingObject(),doc.isOverrideTitle());
+			result = this.destinationProcessor.update(source, destination, this.getFieldMappingObject(), this.getValueMappingObject(),doc.isOverrideTitle(), importRequest);
 			break;
 		case NOOP:
 			break;

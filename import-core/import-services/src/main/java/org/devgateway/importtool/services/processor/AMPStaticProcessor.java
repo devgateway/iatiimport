@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -31,6 +32,7 @@ import org.devgateway.importtool.services.processor.helper.InternalDocument;
 import org.devgateway.importtool.services.processor.helper.JsonBean;
 import org.devgateway.importtool.services.processor.helper.TokenHeaderInterceptor;
 import org.devgateway.importtool.services.processor.helper.ValueMappingException;
+import org.devgateway.importtool.services.request.ImportRequest;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
@@ -200,13 +202,13 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	}
 
 	@Override
-	public ActionResult update(InternalDocument source, InternalDocument destination, List<FieldMapping> fieldMapping, List<FieldValueMapping> valueMapping, boolean overrideTitle) {
+	public ActionResult update(InternalDocument source, InternalDocument destination, List<FieldMapping> fieldMapping, List<FieldValueMapping> valueMapping, boolean overrideTitle, ImportRequest importRequest) {
 		ActionResult result;
 
 		RestTemplate restTemplate = getRestTemplate();
 		try {
 			JsonBean project = getProject(destination.getStringFields().get("id"));
-			updateProject(project, source, fieldMapping, valueMapping, overrideTitle);
+			updateProject(project, source, fieldMapping, valueMapping, overrideTitle, importRequest);
 			log.info(project);
 			JsonBean resultPost = restTemplate.postForObject(baseURL + "/rest/activity/" + destination.getStringFields().get("id"), project, JsonBean.class);
 			Object errorNode = resultPost.get("error");
@@ -271,7 +273,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		return result;
 	}
 
-	private void updateProject(JsonBean project, InternalDocument source, List<FieldMapping> fieldMappings, List<FieldValueMapping> valueMappings, boolean overrideTitle) throws ValueMappingException, CurrencyNotFoundException {		
+	private void updateProject(JsonBean project, InternalDocument source, List<FieldMapping> fieldMappings, List<FieldValueMapping> valueMappings, boolean overrideTitle, ImportRequest importRequest) throws ValueMappingException, CurrencyNotFoundException {		
 		if(overrideTitle){
 			project.set("project_title", getMultilangString(source, "project_title", "title"));	
 		}	
@@ -312,27 +314,47 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		}
 		// Process transactions
 		if (hasTransactions) {
-			JsonBean fundings = getTransactions(source, fieldMappings, valueMappings);
-			if (fundings != null) {
-				project.set("fundings", fundings);
-				Optional<Field> org = fieldList.stream().filter(n -> {
-					return n.getFieldName().equals("donor_organization");
-				}).findFirst();
-				if (org.isPresent()) {
-					List<JsonBean> listDonorOrganizations = new ArrayList<JsonBean>();
-					JsonBean donorRole = new JsonBean();
-					donorRole.set("organization", fundings.get("donor_organization_id"));
-					donorRole.set("role", 1);
-					if (org.get().isPercentage()) {
-						donorRole.set("percentage", 100);
-					}
-					listDonorOrganizations.add(donorRole);
-					project.set("donor_organization", listDonorOrganizations);
-				}
+			List<JsonBean> fundings = null;
+			switch(importRequest.getImportOption()) {
+			   case OVERWRITE_ALL_FUNDING:
+				   fundings = new ArrayList<>();
+				   fundings.add(getSourceFundings(source, fieldMappings, valueMappings));
+				   break;
+			   case ONLY_ADD_NEW_FUNDING:
+				   fundings = addNewFunding(source, fieldMappings, valueMappings, project);
+				   break;
+			   case REPLACE_DONOR_FUNDING:
+				   fundings = replaceDonorTransactions(source, fieldMappings, valueMappings, project);
+				   break;
+			   default:
+					break;
 			}
+			
+			if (fundings != null) {
+				project.set("fundings", fundings);				
+				project.set("donor_organization", getDonorOrgs(fundings));
+			}
+			
 		}
 	}
 
+	private List<JsonBean> getDonorOrgs(List<JsonBean> fundings){
+		List<JsonBean> listDonorOrganizations = new ArrayList<JsonBean>();
+		for(JsonBean funding : fundings) {
+			Optional<Field> org = fieldList.stream().filter(n -> {
+				return n.getFieldName().equals("donor_organization");
+			}).findFirst();
+			if (org.isPresent()) {				
+				JsonBean donorRole = new JsonBean();
+				donorRole.set("organization", funding.get("donor_organization_id"));
+				donorRole.set("role", 1);
+				listDonorOrganizations.add(donorRole);
+			}
+		}
+		
+		return listDonorOrganizations;
+		
+	}
 	private JsonBean getProject(String documentId) {
 		JsonBean projectObject = null;
 		RestTemplate restTemplate = getRestTemplate();
@@ -455,7 +477,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 		// Process transactions
 		if (hasTransactions) {
-			JsonBean fundings = getTransactions(source, fieldMappings, valueMappings);
+			JsonBean fundings = getSourceFundings(source, fieldMappings, valueMappings);
 			if (fundings != null) {
 				project.set("fundings", fundings);
 
@@ -493,7 +515,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	}
  
 	
-	private JsonBean getTransactions(InternalDocument source, List<FieldMapping> fieldMappings, List<FieldValueMapping> valueMappings) throws ValueMappingException, CurrencyNotFoundException {
+	private JsonBean getSourceFundings(InternalDocument source, List<FieldMapping> fieldMappings, List<FieldValueMapping> valueMappings) throws ValueMappingException, CurrencyNotFoundException {
 		List<JsonBean> fundingDetails = new ArrayList<JsonBean>();
 		String currencyCode = source.getStringFields().get("default-currency");
 		String currencyIdString = getCurrencyId(currencyCode);
@@ -577,6 +599,155 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		}
 		funding.set("funding_details", fundingDetails);
 		return funding;
+	}
+	
+	/**
+	 * This is used when the import option is "ONLY_ADD_NEW_FUNDING". Updates
+	 * the funding from AMP by adding missing transactions. Since IATI
+	 * transactions do not have a unique identifier, we compare the fields to
+	 * check if the transaction exists.
+	 * 
+	 * @param source
+	 * @param fieldMappings
+	 * @param valueMappings
+	 * @param project
+	 * @return
+	 * @throws ValueMappingException
+	 * @throws CurrencyNotFoundException
+	 */
+	private List<JsonBean> addNewFunding(InternalDocument source, List<FieldMapping> fieldMappings,
+			List<FieldValueMapping> valueMappings, JsonBean project)
+			throws ValueMappingException, CurrencyNotFoundException {
+		JsonBean sourceFunding = getSourceFundings(source, fieldMappings, valueMappings);
+		List<LinkedHashMap<String, Object>> destinationFundings = null;
+		if (project.get("fundings") != null) {
+			destinationFundings = (List<LinkedHashMap<String, Object>>) project.get("fundings");
+		}
+
+		List<JsonBean> updatedFundings = new ArrayList<>();
+		if (destinationFundings != null && destinationFundings.size() > 0) {
+			for (LinkedHashMap<String, Object> destFunding : destinationFundings) {
+				// if funding exists in project from amp, update it by adding
+				// missing transactions, else rebuild funding and add to list
+				if (sourceFunding.get("donor_organization_id").equals(destFunding.get("donor_organization_id"))) {
+					updatedFundings.add(getUpdatedFunding(sourceFunding, destFunding));
+				} else {
+					updatedFundings.add(mapToJsonBean(destFunding));
+				}
+			}
+		} else {
+			updatedFundings.add(sourceFunding);
+		}
+
+		return updatedFundings;
+	}
+
+	private JsonBean mapToJsonBean(LinkedHashMap<String, Object> map) {
+		JsonBean result = new JsonBean();
+		for (Entry<String, Object> entry : map.entrySet()) {
+			result.set(entry.getKey(), entry.getValue());
+		}
+
+		return result;
+	}
+    
+	/**
+	 * Create a new jsonbean object by modifying the funding from AMP. If
+	 * transaction is not found, adds it to funding details
+	 * 
+	 * @param source
+	 * @param destFunding
+	 * @return
+	 */
+	private JsonBean getUpdatedFunding(JsonBean source, LinkedHashMap<String, Object> destFunding) {
+		JsonBean rebuiltDestFunding = new JsonBean();
+		for (Entry<String, Object> entry : destFunding.entrySet()) {
+			if ("funding_details".equals(entry.getKey())) {
+				List<JsonBean> fundingDetailsSource = (List<JsonBean>) source.get("funding_details");
+				List<Map<String, Object>> fundingDetailsDestination = new ArrayList<>();
+				if (entry.getValue() != null) {
+					fundingDetailsDestination = (List<Map<String, Object>>) entry.getValue();
+				}
+
+				for (JsonBean sourceTransaction : fundingDetailsSource) {
+					// if transaction is not found, add it to the funding
+					// details retrieved from amp
+					boolean transactionExists = transactionExistsInProject(fundingDetailsDestination,
+							sourceTransaction);
+					if (Boolean.FALSE.equals(transactionExists)) {
+						fundingDetailsDestination.add(sourceTransaction.any());
+					}
+				}
+				rebuiltDestFunding.set("funding_details", fundingDetailsDestination);
+			} else {
+				rebuiltDestFunding.set(entry.getKey(), entry.getValue());
+			}
+
+		}
+
+		return rebuiltDestFunding;
+	}
+
+	/**
+	 * checks if a transaction from the IATI file exists in the funding details
+	 * from AMP.
+	 * Since IATI transactions do not have a unique identifier, we compare the fields to check if the transaction exists. 
+	 * @param fundingDetailsDestination
+	 *            - funding details from AMP
+	 * @param sourceTransaction
+	 *            - transaction from IATI file
+	 * @return
+	 */
+	private boolean transactionExistsInProject(List<Map<String, Object>> fundingDetailsDestination,
+			JsonBean sourceTransaction) {
+		return fundingDetailsDestination.stream().anyMatch(n -> {
+			return n.get("transaction_type").equals(sourceTransaction.get("transaction_type"))
+					&& n.get("adjustment_type").equals(sourceTransaction.get("adjustment_type"))
+					&& n.get("transaction_date").equals(sourceTransaction.get("transaction_date"))
+					&& n.get("currency").equals(sourceTransaction.get("currency"))
+					&& n.get("transaction_amount").equals(sourceTransaction.get("transaction_amount"));
+		});
+	}
+
+	/**
+	 * This is called when the import option is "REPLACE_DONOR_FUNDING". It
+	 * modifies the fundings from amp by replacing/overwriting the fundings for
+	 * donors that have data in the IATI file. Funding for donors not in the
+	 * IATI file are not affected.
+	 * @param source
+	 * @param fieldMappings
+	 * @param valueMappings
+	 * @param project
+	 * @return
+	 * @throws ValueMappingException
+	 * @throws CurrencyNotFoundException
+	 */
+	private List<JsonBean> replaceDonorTransactions(InternalDocument source, List<FieldMapping> fieldMappings,
+			List<FieldValueMapping> valueMappings, JsonBean project)
+			throws ValueMappingException, CurrencyNotFoundException {
+		JsonBean sourceFundings = getSourceFundings(source, fieldMappings, valueMappings);
+		List<LinkedHashMap<String, Object>> destinationFundings = new ArrayList<>();
+		if (project.get("fundings") != null) {
+			destinationFundings = (List<LinkedHashMap<String, Object>>) project.get("fundings");
+		}
+
+		List<JsonBean> updatedFundings = new ArrayList<>();
+		if (destinationFundings != null && destinationFundings.size() > 0) {
+			for (LinkedHashMap<String, Object> destFunding : destinationFundings) {
+				// if same donor_organization_id is found in both source data
+				// and amp project, replace the fundings in the amp project with
+				// fundings from the IATI file
+				if (sourceFundings.get("donor_organization_id").equals(destFunding.get("donor_organization_id"))) {
+					updatedFundings.add(sourceFundings);
+				} else {
+					updatedFundings.add(mapToJsonBean(destFunding));
+				}
+			}
+		} else {
+			updatedFundings.add(sourceFundings);
+		}
+
+		return updatedFundings;
 	}
 
 	private String getCurrencyId(String currencyCode) {
