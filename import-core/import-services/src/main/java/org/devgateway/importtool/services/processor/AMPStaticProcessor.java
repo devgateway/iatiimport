@@ -344,14 +344,10 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			Optional<Field> org = fieldList.stream().filter(n -> {
 				return n.getFieldName().equals("donor_organization");
 			}).findFirst();
-			if (org.isPresent()) {
-				
+			if (org.isPresent()) {				
 				JsonBean donorRole = new JsonBean();
 				donorRole.set("organization", funding.get("donor_organization_id"));
 				donorRole.set("role", 1);
-				if (org.get().isPercentage()) {
-					donorRole.set("percentage", 100);
-				}
 				listDonorOrganizations.add(donorRole);
 			}
 		}
