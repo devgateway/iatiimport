@@ -884,7 +884,6 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		multilangfields.put("description", "Description");      
 		
 		multilangfields.forEach((name, label) -> {
-			if(destinationFieldsList.contains("description")){
 			if(destinationFieldsList.contains(name)){
 		    			FieldType ftDescription = getFieldType(fieldProps.get(name));
 		    			if(ftDescription != null) {
