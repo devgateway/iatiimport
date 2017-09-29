@@ -864,6 +864,22 @@ public class IATI2XProcessor implements ISourceProcessor {
 		participatingOrg.setSubType("Funding");
 		participatingOrg.setSubTypeCode("1");
 		fieldList.add(participatingOrg);
+
+		Field accountableOrg = new Field("Accountable Organization", "participating-org", FieldType.ORGANIZATION, true);
+		accountableOrg.setSubType("Accountable");
+		accountableOrg.setSubTypeCode("2");
+		fieldList.add(accountableOrg);
+
+		Field extendingOrg = new Field("Extending Organization", "participating-org", FieldType.ORGANIZATION, true);
+		extendingOrg.setSubType("Extending");
+		extendingOrg.setSubTypeCode("3");
+		fieldList.add(extendingOrg);
+
+		Field implementingOrg = new Field("Implementing Organization", "participating-org", FieldType.ORGANIZATION, true);
+		implementingOrg.setSubType("Implementing");
+		implementingOrg.setSubTypeCode("4");
+		fieldList.add(implementingOrg);
+		
 // Provider Organization, within Transactions
 		Field providerOrg = new Field("Provider Organization - transactions", "provider-org", FieldType.ORGANIZATION, false);
 		providerOrg.setSubType("Provider");

@@ -1007,6 +1007,28 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		
 		
 		// Organizations
+
+		Map<String, String> organizationsRoles = new HashMap<String, String>();
+
+		organizationsRoles.put("responsible_organization", "Responsible Organization");
+		organizationsRoles.put("executing_agency", "Executing Agency");
+		organizationsRoles.put("implementing_agency", "Implementing Agency");
+		organizationsRoles.put("beneficiary_agency", "Beneficiary Agency");
+		organizationsRoles.put("contracting_agency", "Contracting Agency");
+		organizationsRoles.put("regional_group", "Regional Group");
+		organizationsRoles.put("sector_group", "Sector Group");
+		
+		organizationsRoles.forEach((name, label) -> {
+			if(destinationFieldsList.contains(name)){
+        		Field org = new Field(label, name, FieldType.ORGANIZATION, true);
+        		org.setPossibleValues(getCodeListValues("fundings~donor_organization_id"));
+        		if (fieldProps.get(name) != null && fieldProps.get(name).getProperty("percentage_constraint") != null) {
+        			org.setPercentage(true);
+        		}
+        		fieldList.add(org);
+			}
+		});
+
          if(destinationFieldsList.contains("fundings~donor_organization_id")){
         		Field fundingOrganization = new Field("Funding Organization", "donor_organization", FieldType.ORGANIZATION, true);
         		fundingOrganization.setPossibleValues(getCodeListValues("fundings~donor_organization_id"));
