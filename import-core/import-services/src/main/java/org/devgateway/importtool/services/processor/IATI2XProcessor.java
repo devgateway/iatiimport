@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -240,6 +241,33 @@ public class IATI2XProcessor implements ISourceProcessor {
 			NodeList nodeList = doc.getElementsByTagName(field.getFieldName());
 			List<FieldValue> reducedPossibleValues = new ArrayList<FieldValue>();
 			switch (field.getType()) {
+			case ORGANIZATION:
+				if (field.getPossibleValues() == null) {
+					field.setPossibleValues(new ArrayList<FieldValue>());
+				}
+				if (nodeList.getLength() > 0) {					
+					for (int i = 0; i < nodeList.getLength(); i++) {
+						Element fieldElement = (Element) nodeList.item(i);
+						
+						if(fieldElement.getElementsByTagName("narrative").getLength() > 0) {
+							final String orgCode = fieldElement.getElementsByTagName("narrative").item(0).getTextContent();
+							if("".equals(orgCode.trim())) {
+								continue;
+							}
+							Optional<FieldValue> fieldValue = field.getPossibleValues().stream().filter(n -> {
+								return n.getCode().equals(orgCode);
+							}).findFirst();
+							if(!fieldValue.isPresent()) {
+								FieldValue newfv = new FieldValue();
+								newfv.setCode(orgCode);
+								newfv.setValue(orgCode);							
+								newfv.setIndex(field.getPossibleValues().size());
+								field.getPossibleValues().add(newfv);
+							}
+						}
+					}
+				}
+				break;
 			case RECIPIENT_COUNTRY:
 			case LIST:
 				if (nodeList.getLength() > 0) {					
@@ -269,11 +297,11 @@ public class IATI2XProcessor implements ISourceProcessor {
 						}
 					}
 				}
+				field.setPossibleValues(reducedPossibleValues);
 				break;
 			default:
 				break;
 			}
-			field.setPossibleValues(reducedPossibleValues);
 		}
 		return filterFieldList;
 	}
@@ -358,11 +386,12 @@ public class IATI2XProcessor implements ISourceProcessor {
 		
 		this.getFields().forEach(field -> {			
 			if(field.getType().equals(FieldType.LIST)){				
-				Field filter = filterFieldList.stream().filter(n -> {
+				Optional<Field> optFilter = filterFieldList.stream().filter(n -> {
 					return field.getFieldName().equals(n.getFieldName());
-				}).findFirst().get();
+				}).findFirst();
 				
-				if(filter.getFilters().size() > 0){		
+				Field filter = optFilter.isPresent() ? optFilter.get() : null;
+				if(filter != null && filter.getFilters().size() > 0){		
 					if(!("/iati-activities/iati-activity[".equals(query.toString()))){					
 						query.append(" and ");	
 					}
@@ -589,11 +618,32 @@ public class IATI2XProcessor implements ISourceProcessor {
 							{
 								localDate = e.getElementsByTagName("transaction-date").item(0).getAttributes().getNamedItem("iso-date").getNodeValue();
 							}
-							// Receiving Org
-							receivingOrganization = (e.getElementsByTagName("receiver-org").item(0) != null && e.getElementsByTagName("receiver-org").item(0).getChildNodes().getLength() > 0) ? e.getElementsByTagName("receiver-org").item(0).getChildNodes().item(0).getNodeValue() : null;
 
+							// Providing Org
+							final String providingOrganization = extractNarrative(e, "provider-org");
+							
+							// Get the field for provider org
+							Optional<Field> fieldValue = filterFieldList.stream().filter(n -> {
+								return "provider-org".equals(n.getFieldName());
+							}).findFirst();
+
+							// If it has filters set, check if this transaction complies
+							if(fieldValue.isPresent() && fieldValue.get().getFilters().size() > 0) {
+								// See if the current transaction has the correct provider organization
+								Optional<String> optField = fieldValue.get().getFilters().stream().filter(n -> {
+									return n.equals(providingOrganization);
+								}).findAny();
+								
+								if(!optField.isPresent()) { // If it's not there, then move to the next transaction
+									continue;
+								}
+							}
+							// Receiving Org
+							receivingOrganization = extractNarrative(e, "receiver-org");
+							
 							Map<String, String> transactionFields = new HashMap<String, String>();
 							transactionFields.put("date", localDate);
+							transactionFields.put("providing-org", providingOrganization);
 							transactionFields.put("receiving-org", receivingOrganization);
 							transactionFields.put("reference", reference);
 							transactionFields.put("value", localValue);
@@ -632,6 +682,21 @@ public class IATI2XProcessor implements ISourceProcessor {
 
 		return list;
 	}
+
+	
+	private String extractNarrative(Element e, String string) {
+		Node node = e.getElementsByTagName(string).item(0);
+		if(node != null && node.getChildNodes().getLength() > 0) {
+		    for (int i = 0; i < node.getChildNodes().getLength(); i++) {
+		        Node nodeChild = node.getChildNodes().item(i);
+		        if (nodeChild.getNodeType() == Node.ELEMENT_NODE && "narrative".equals(nodeChild.getNodeName())) {
+		        	return nodeChild.getTextContent();
+		        }
+		    }
+		}
+		return null;
+	}
+
 
 	private Boolean includedByFilter(List<String> filters, String codeValue) {
 		if (filters.size() == 0)
@@ -679,8 +744,6 @@ public class IATI2XProcessor implements ISourceProcessor {
 		fieldList.add(new Field("IATI Identifier", "iati-identifier", FieldType.STRING, false));
 		fieldList.add(new Field("Title", "title", FieldType.MULTILANG_STRING, false));
 		fieldList.add(new Field("Description", "description", FieldType.MULTILANG_STRING, true));
-		// fieldList.add(new Field("Currency", "default-currency",
-		// FieldType.STRING, false));
 
 		// Code Lists
 		Field activityStatus = new Field("Activity Status", "activity-status", FieldType.LIST, true);
@@ -765,6 +828,12 @@ public class IATI2XProcessor implements ISourceProcessor {
 		participatingOrg.setSubType("Funding");
 		participatingOrg.setSubTypeCode("1");
 		fieldList.add(participatingOrg);
+// Provider Organization, within Transactions
+		Field providerOrg = new Field("Provider Organization - transactions", "provider-org", FieldType.ORGANIZATION, false);
+		providerOrg.setSubType("Provider");
+		fieldList.add(providerOrg);
+		filterFieldList.add(providerOrg);
+
 	}
 
 	
