@@ -316,6 +316,7 @@ var ChooseFields = React.createClass({
                         {rows[constants.FIELD_TYPE.MULTILANG_STRING]}
                         {rows[constants.FIELD_TYPE.STRING]}
                         {rows[constants.FIELD_TYPE.LIST]}
+                        {rows[constants.FIELD_TYPE.LOCATION]}
                         {rows[constants.FIELD_TYPE.DATE]}
                         {rows[constants.FIELD_TYPE.ORGANIZATION]}
                         {rows[constants.FIELD_TYPE.TRANSACTION]}

@@ -268,6 +268,7 @@ public class IATI2XProcessor implements ISourceProcessor {
 					}
 				}
 				break;
+			case LOCATION:
 			case RECIPIENT_COUNTRY:
 			case LIST:
 				if (nodeList.getLength() > 0) {					
@@ -436,6 +437,35 @@ public class IATI2XProcessor implements ISourceProcessor {
 			NodeList fieldNodeList;			
 			for (Field field : getFields()) {
 				switch (field.getType()) {
+				case LOCATION:
+					fieldNodeList = element.getElementsByTagName(field.getFieldName());
+					List <String> codesLocation = new ArrayList<String>(); 
+					for (int j = 0; j < fieldNodeList.getLength(); j++) {
+						Element fieldElement = (Element) fieldNodeList.item(j);
+						String code = extractNarrative(fieldElement, "name");							
+						if(!code.isEmpty()) {
+							codesLocation.add(code);
+							FieldValue fv = new FieldValue();
+							if(code != null && !code.isEmpty() ){
+								fv.setCode(code);
+								fv.setValue(code);	
+								fv.setSelected(true);
+							}
+							int index = field.getPossibleValues() == null ? 0 : field.getPossibleValues().size();
+							fv.setIndex(index);
+							if (field.getPossibleValues() == null) {
+								field.setPossibleValues(new ArrayList<FieldValue>());
+							}
+							if(!field.getPossibleValues().stream().anyMatch(n->{ return n.getCode().equals(code);})) {									
+								field.getPossibleValues().add(fv);
+							}
+						}				
+					}
+					if(!codesLocation.isEmpty()){
+						String[] codeValues = codesLocation.stream().toArray(String[]::new);						
+						document.addStringMultiField(field.getFieldName(), codeValues);
+					}
+					break;
 				case LIST:
 					if (field.isMultiple()) {
 						fieldNodeList = element.getElementsByTagName(field.getFieldName());						
@@ -794,6 +824,12 @@ public class IATI2XProcessor implements ISourceProcessor {
 		sector.setPercentage(true);
 		fieldList.add(sector);
 		filterFieldList.add(sector);
+
+		Field location = new Field("Location", "location", FieldType.LOCATION, true);
+		location.setPossibleValues(new ArrayList<FieldValue>());
+		location.setMultiple(true);
+		location.setPercentage(true);
+		fieldList.add(location);
 
 		// Dates
 		Field activityDateStartPlanned = new Field("Activity Date Start Planned", "activity-date", FieldType.DATE, true);

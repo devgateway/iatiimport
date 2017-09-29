@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -56,6 +57,9 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	
 	static final String AMP_IATI_ID_FIELD_PROPERTY = "AMPStaticProcessor.ampIatiIdField";
 	static final String AMP_IATI_ID_FIELD_DEFAULT_VALUE = "project_code";
+
+	static final String AMP_IMPLEMENTATION_LEVEL_ID_FIELD_PROPERTY= "AMPStaticProcessor.implementationLevel";
+	static final String AMP_IMPLEMENTATION_LEVEL_ID_DEFAULT_VALUE = "70";
 	
 	private Log log = LogFactory.getLog(getClass());
 
@@ -64,6 +68,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	private String DEFAULT_TITLE_FIELD = "project_title";
 	private String baseURL;
 	private String ampIatiIdField;
+	private String ampImplementationLevel;
 	private String fieldsEndpoint = "/rest/activity/fields";
 	private String documentsEndpoint = "/rest/activity/projects";
 	// private Properties properties = null;
@@ -114,6 +119,11 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			ampIatiIdField = AMP_IATI_ID_FIELD_DEFAULT_VALUE;
 		}
 		
+		ampImplementationLevel = System.getProperty(AMP_IMPLEMENTATION_LEVEL_ID_FIELD_PROPERTY);
+		if (StringUtils.isEmpty(ampIatiIdField)) {
+			ampImplementationLevel = AMP_IMPLEMENTATION_LEVEL_ID_DEFAULT_VALUE;
+		}
+
 		instantiateStaticFields();
 	}
 
@@ -303,6 +313,20 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			Field destinationField = mapping.getDestinationField();
 
 			switch (sourceField.getType()) {
+			case LOCATION:
+				Optional<FieldValueMapping> optValueMappingLocation = valueMappings.stream().filter(n -> {
+					return n.getSourceField().getFieldName().equals(mapping.getSourceField().getFieldName());
+				}).findFirst();
+				project.set(destinationField.getFieldName(), getCodesFromList(source, optValueMappingLocation.get(), false));
+				Properties props = getExtraInfo(source, optValueMappingLocation.get(), false);
+				if(props != null){
+					@SuppressWarnings("unchecked")
+					LinkedHashMap<String, Integer> hm = (LinkedHashMap<String, Integer>) props.get("extra_info");
+					Integer implementationLocation = hm.get("implementation_level_id");
+					project.set("implementation_location", implementationLocation);
+					project.set("implementation_level", ampImplementationLevel);
+				}
+				break;
 			case RECIPIENT_COUNTRY:
 			case LIST:
 				if (!destinationField.getFieldName().equals("type_of_assistance") && !destinationField.getFieldName().equals("financing_instrument")) {
@@ -446,6 +470,20 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			Field destinationField = mapping.getDestinationField();
 
 			switch (sourceField.getType()) {
+			case LOCATION:
+				Optional<FieldValueMapping> optValueMappingLocation = valueMappings.stream().filter(n -> {
+					return n.getSourceField().getFieldName().equals(mapping.getSourceField().getFieldName());
+				}).findFirst();
+				project.set(destinationField.getFieldName(), getCodesFromList(source, optValueMappingLocation.get(), false));
+				Properties props = getExtraInfo(source, optValueMappingLocation.get(), false);
+				if(props != null){
+					@SuppressWarnings("unchecked")
+					LinkedHashMap<String, Integer> hm = (LinkedHashMap<String, Integer>) props.get("extra_info");
+					Integer implementationLocation = hm.get("implementation_level_id");
+					project.set("implementation_location", implementationLocation);
+					project.set("implementation_level", ampImplementationLevel);
+				}
+				break;
 			case RECIPIENT_COUNTRY:
 			case LIST:
 				if (!destinationField.getFieldName().equals("type_of_assistance") && !destinationField.getFieldName().equals("financing_instrument")) {
@@ -734,6 +772,31 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	}
 
 	private List<JsonBean> getCodesFromList(InternalDocument source, FieldValueMapping mapping) {
+		return getCodesFromList(source, mapping, true);
+	}
+
+	private Properties getExtraInfo(InternalDocument source, FieldValueMapping mapping, Boolean suffix) {
+		Object value = source.getStringMultiFields().get(mapping.getSourceField().getFieldName());
+		Map<Integer, Integer> valueMapIndex = mapping.getValueIndexMapping();
+		List<FieldValue> sourcePossibleValues = mapping.getSourceField().getPossibleValues();
+		String[] stringValues = (String[]) value;
+		HashMap<Integer, Integer> uniqueValues = new HashMap<Integer, Integer>();
+		
+		for (int i = 0; i < stringValues.length; i++) {
+			final int stringValueIndex = i;
+			Optional<FieldValue> optSourceValueIndex = sourcePossibleValues.stream().filter(n -> {
+				return n.getCode().equals(stringValues[stringValueIndex]);
+			}).findAny();
+			Integer sourceValueIndex = optSourceValueIndex.get().getIndex();
+			Integer destinationValueIndex = valueMapIndex.get(sourceValueIndex);
+			List<FieldValue> destinationPossibleValues = mapping.getDestinationField().getPossibleValues();
+			FieldValue destinationValue = destinationPossibleValues.get(destinationValueIndex);
+			return destinationValue.getProperties();
+		}
+		return null;
+	}
+
+	private List<JsonBean> getCodesFromList(InternalDocument source, FieldValueMapping mapping, Boolean suffix) {
 		Object value = source.getStringMultiFields().get(mapping.getSourceField().getFieldName());
 		Map<Integer, Integer> valueMapIndex = mapping.getValueIndexMapping();
 		List<FieldValue> sourcePossibleValues = mapping.getSourceField().getPossibleValues();
@@ -764,7 +827,13 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		Integer divider = uniqueValues.size();
 		for(Entry<Integer, Integer> entry : uniqueValues.entrySet()) {
 			JsonBean bean = new JsonBean();
-			bean.set(mapping.getSourceField().getFieldName() + "_id", entry.getKey());
+			if(suffix) {
+				bean.set(mapping.getSourceField().getFieldName() + "_id", entry.getKey());
+			}
+			else
+			{
+				bean.set(mapping.getSourceField().getFieldName(), entry.getKey());
+			}
 			if (mapping.getSourceField().isPercentage() && entry.getValue() > 0){
 				bean.set(mapping.getSourceField().getFieldName() + "_percentage", (double)100 / (double)divider);
 			}
@@ -866,6 +935,13 @@ public class AMPStaticProcessor implements IDestinationProcessor {
     	  Field tertiarySector = new Field("Tertiary Sector", "tertiary_sectors", FieldType.LIST, true);
   		  tertiarySector.setPossibleValues(getCodeListValues("tertiary_sectors~sector_id"));
   		  fieldList.add(tertiarySector);
+		}
+// locations, locations~location, locations~location_percentage
+	  if(destinationFieldsList.contains("locations~location")){
+	  	Field location = new Field("Location", "locations", FieldType.LOCATION, true);
+	  	location.setPossibleValues(getCodeListValues("locations~location"));
+	  	location.setMultiple(true);
+		fieldList.add(location);
 		}
       
   	// Multi-language strings
@@ -1073,6 +1149,9 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 					fv.setIndex(index++);
 					fv.setCode(code);
 					fv.setValue(value);
+					if(node.get("extra_info") != null) {
+						fv.getProperties().put("extra_info", node.get("extra_info"));
+					}
 					possibleValues.add(fv);
 				}
 			}
