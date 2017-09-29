@@ -100,13 +100,13 @@ module.exports = {
 							'date' : 'Date Fields',
 							'transaction' : 'Transaction Fields',
 							'organization' : 'Orgarnization Fields',
+							'location': 'Location Fields',
 							'msg_error_retrieving_destination_fields' : ' Error retrieving destination fields.',
 							'msg_error_retrieving_source_fields' : ' Error retrieving source fields.',
 							'msg_error_retrieving_mappings' : ' Error retrieving field mappings.',
 							'msg_error_retrieving_templates' : ' Error loading mapping templates',
 							'msg_required_field':' is required by the destination system.',
 							'msg_field_has_dependencies': ' has the following dependencies: __dependencies__ '
-
 						},
 						'map_values' : {
 							'map_field_values' : 'Map Fields Values',
@@ -297,7 +297,8 @@ module.exports = {
 							'list' : 'Lista de Campos',
 							'date' : 'Campos de Fecha',
 							'transaction' : 'Campos de Transacciones',
-							'organization' : 'Campos de Orgarnizaciones',
+							'organization' : 'Campos de Organizaciones',
+							'location': 'Campos de localización',
 							'msg_error_retrieving_destination_fields' : ' Error al recuperar los campos de destino.',
 							'msg_error_retrieving_source_fields' : ' Error al recuperar los campos de origen.',
 							'msg_error_retrieving_mappings' : ' Error al recuperar el mapeo de los campos.',
@@ -494,6 +495,7 @@ module.exports = {
 							'date' : 'Champs Date',
 							'transaction' : 'Champs Transaction',
 							'organization' : 'Champs Organisations',
+							'location': 'Champs Localisation',
 							'msg_error_retrieving_destination_fields' : ' Erreur dans la recherche des champs destination.',
 							'msg_error_retrieving_source_fields' : ' Erreur dans la recherche des champs Source.',
 							'msg_error_retrieving_mappings' : ' Erreur dans la correspondence des champs.',

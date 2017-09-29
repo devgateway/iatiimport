@@ -59,7 +59,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	static final String AMP_IATI_ID_FIELD_DEFAULT_VALUE = "project_code";
 
 	static final String AMP_IMPLEMENTATION_LEVEL_ID_FIELD_PROPERTY= "AMPStaticProcessor.implementationLevel";
-	static final String AMP_IMPLEMENTATION_LEVEL_ID_DEFAULT_VALUE = "70";
+	static final Integer AMP_IMPLEMENTATION_LEVEL_ID_DEFAULT_VALUE = 70; //Coming form common AMP configuration
 	
 	private Log log = LogFactory.getLog(getClass());
 
@@ -68,10 +68,9 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	private String DEFAULT_TITLE_FIELD = "project_title";
 	private String baseURL;
 	private String ampIatiIdField;
-	private String ampImplementationLevel;
+	private Integer ampImplementationLevel;
 	private String fieldsEndpoint = "/rest/activity/fields";
 	private String documentsEndpoint = "/rest/activity/projects";
-	// private Properties properties = null;
 
 	private List<Field> fieldList = new ArrayList<Field>();
 	
@@ -118,11 +117,15 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		if (StringUtils.isEmpty(ampIatiIdField)) {
 			ampIatiIdField = AMP_IATI_ID_FIELD_DEFAULT_VALUE;
 		}
-		
-		ampImplementationLevel = System.getProperty(AMP_IMPLEMENTATION_LEVEL_ID_FIELD_PROPERTY);
-		if (StringUtils.isEmpty(ampIatiIdField)) {
+		String ampImplementationLevelProperty = System.getProperty(AMP_IMPLEMENTATION_LEVEL_ID_FIELD_PROPERTY);
+		if (ampImplementationLevelProperty != null) {
+			ampImplementationLevel = Integer.parseInt(ampImplementationLevelProperty);
+		}
+		else
+		{
 			ampImplementationLevel = AMP_IMPLEMENTATION_LEVEL_ID_DEFAULT_VALUE;
 		}
+		
 
 		instantiateStaticFields();
 	}
