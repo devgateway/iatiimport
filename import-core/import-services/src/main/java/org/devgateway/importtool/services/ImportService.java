@@ -26,6 +26,7 @@ import org.devgateway.importtool.services.processor.helper.FieldValueMapping;
 import org.devgateway.importtool.services.processor.helper.IDestinationProcessor;
 import org.devgateway.importtool.services.processor.helper.IDocumentMapper;
 import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
+import org.devgateway.importtool.services.request.ImportRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -145,8 +146,8 @@ public class ImportService {
 	}
 	
 	@Async
-	public void execute(IDocumentMapper documentMapper, Long fileId){
-		List<ActionResult> results = documentMapper.execute();		
+	public void execute(IDocumentMapper documentMapper, Long fileId, ImportRequest importRequest){
+		List<ActionResult> results = documentMapper.execute(importRequest);		
 		results.forEach(n -> {
 			insertLog(n, fileId);
 		});

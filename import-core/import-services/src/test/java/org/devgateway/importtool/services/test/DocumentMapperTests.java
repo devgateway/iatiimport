@@ -14,6 +14,8 @@ import org.devgateway.importtool.services.processor.helper.DocumentMapper;
 import org.devgateway.importtool.services.processor.helper.Field;
 import org.devgateway.importtool.services.processor.helper.FieldMapping;
 import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
+import org.devgateway.importtool.services.processor.helper.ImportOption;
+import org.devgateway.importtool.services.request.ImportRequest;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -48,6 +50,8 @@ public class DocumentMapperTests {
 		        AMPProcessor destinationProcessor = new AMPProcessor();
 				destinationProcessor.setTestMode(true);
 				destinationProcessor.setAuthenticationToken("27368298-48e3-48ef-9f75-13a58f2f5cb6");
+				ImportRequest importRequest = new ImportRequest();
+				importRequest.setImportOption(ImportOption.OVERWRITE_ALL_FUNDING);
 
 				InputStream is = this.getClass().getResourceAsStream("sample_files/Kosovo_Test_File.xml");
 				sourceProcessor.setInput(is);
@@ -85,7 +89,7 @@ public class DocumentMapperTests {
 					d.setSelected(true);
 				});
 				
-				List<ActionResult> result = documentMapper.execute();
+				List<ActionResult> result = documentMapper.execute(importRequest);
 				Assert.assertEquals("DocumentMapper - result size is equal to document mappings", result.size(), documentMapper.getDocumentMappings().size());				
 	}
 
