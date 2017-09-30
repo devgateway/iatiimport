@@ -6,9 +6,13 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.devgateway.importtool.endpoint.ApiMessage;
+import org.devgateway.importtool.endpoint.EPMessages;
 import org.devgateway.importtool.services.processor.IATI104Processor;
+import org.devgateway.importtool.services.processor.helper.ActionStatus;
 import org.devgateway.importtool.services.processor.helper.Field;
 import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
+import org.devgateway.importtool.services.processor.helper.Status;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,6 +42,7 @@ public class IATI104ProcessorTests {
 	public void testIATIFileIsParsedCorrectly() throws Exception {
 		ISourceProcessor transformer = new IATI104Processor();
 		InputStream is = this.getClass().getResourceAsStream("sample_files/activity-standard-example-minimal.xml");
+		transformer.setActionStatus(this.getStatus());
 		transformer.setInput(is);
 		
 		List<Field> fields = transformer.getFields();
@@ -70,6 +75,15 @@ public class IATI104ProcessorTests {
 			return expectedLanguages.stream().anyMatch(m -> m.equals(n));
 		});
 		Assert.assertEquals("Expected languages are available", matched, true);
+	}
+	
+	private ActionStatus getStatus() {
+		ActionStatus status = new ActionStatus();
+		status.setMessage(EPMessages.MAPPING_STATUS_MESSAGE.getDescription());
+		status.setCode(EPMessages.MAPPING_STATUS_MESSAGE.getCode());
+		status.setTotal(0L);
+		status.setStatus(Status.IN_PROGRESS);
+	    return status;
 	}
 	
 }
