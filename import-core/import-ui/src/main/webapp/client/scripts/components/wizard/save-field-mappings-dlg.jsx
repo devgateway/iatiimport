@@ -58,7 +58,7 @@ var SaveMappingsDialog = React.createClass({
   			      <div className="modal-footer">
   			        <button type="button" className="btn btn-default" data-dismiss="modal">{this.props.i18nLib.t('wizard.save_field_mappings_dlg.close')}</button>
                 <button type="button" className="btn btn-primary" onClick={this.saveMappings}>{this.props.i18nLib.t('wizard.save_field_mappings_dlg.save_mapping')}</button>
-                <button type="button" className="btn btn-primary" onClick={this.saveMappingsCopy}>{this.props.i18nLib.t('wizard.save_field_mappings_dlg.save_as_copy')}</button>
+                <button type="button" disabled = { this.props.mappingInfo ? "" : "disabled" } className="btn btn-primary" onClick={this.saveMappingsCopy}>{this.props.i18nLib.t('wizard.save_field_mappings_dlg.save_as_copy')}</button>
   			      </div>
   			    </div>
   			  </div>

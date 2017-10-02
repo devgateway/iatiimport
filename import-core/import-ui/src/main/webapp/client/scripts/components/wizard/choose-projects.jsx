@@ -21,31 +21,31 @@ var ChooseProjects = React.createClass({
     initializeFailed:false,
     componentWillMount: function () {
      this.props.eventHandlers.updateCurrentStep(constants.CHOOSE_PROJECTS);
-     this.listenTo(projectStore, this.updateProject);             
+     this.listenTo(projectStore, this.updateProject);
      this.loadData();
     },
-    updateProject: function (data) {        
+    updateProject: function (data) {
         this.setState({
             projectData: data
         });
-    }, 
+    },
     loadData: function(){
         var id;
     	this.props.eventHandlers.showLoadingIcon();
-    	this.initializeMapping();    	
+    	this.initializeMapping();
     	var self = this;
     	id = setInterval(function(){
     	   if(self.initializeFailed){
     	      clearInterval(id);
     	   }else{
     	      self.loadSourceProjects(id);
-    	   }    		
-    	}, 3000);    	
+    	   }
+    	}, 3000);
     	this.loadProjects();
-    },  
-    selectAll: function(){ 
     },
-    selectProject: function(event) {       
+    selectAll: function(){
+    },
+    selectProject: function(event) {
        this.props.eventHandlers.selectProject(event);
     },
     selectAllNew: function(event){
@@ -55,23 +55,23 @@ var ChooseProjects = React.createClass({
         this.selectAll(event.target.checked, 'UPDATE');
     },
     selectAll: function(checked, operation){
-    	_.each(this.state.projectData, function(item){     		 
-    	    if(item.operation === operation && ((operation == 'UPDATE' && item.destinationDocument.allowEdit === true) || operation == 'INSERT')){    		  
-    		    item.selected = checked;    		    
-    		}    			
+    	_.each(this.state.projectData, function(item){
+    	    if(item.operation === operation && ((operation == 'UPDATE' && item.destinationDocument.allowEdit === true) || operation == 'INSERT')){
+    		    item.selected = checked;
+    		}
     	});
     	this.forceUpdate();
     },
-    handleToggle: function(item, event) {    	
-        item.selected = event.target.checked;       
+    handleToggle: function(item, event) {
+        item.selected = event.target.checked;
         this.forceUpdate();
     },
     handleOverrideTitle: function(item, event){
-    	 item.overrideTitle = event.target.checked;       
+    	 item.overrideTitle = event.target.checked;
          this.forceUpdate();
     },
     overrideTitleAll: function(event){
-    	_.each(this.state.projectData, function(item){   		
+    	_.each(this.state.projectData, function(item){
     			item.overrideTitle = event.target.checked;
     	});
     	this.forceUpdate();
@@ -98,82 +98,82 @@ var ChooseProjects = React.createClass({
     },
     handleNext: function() {
     	if(_.where(this.state.projectData, {selected: true}).length > 0){
-    		  var processedData = this.state.projectData;    	        
+    		  var processedData = this.state.projectData;
     	        _.each(processedData, function(item){
                  //item.sourceDocument.dateFields = {};
     	        });
-    	        this.props.eventHandlers.chooseProjects(processedData, constants.DIRECTION_NEXT);    		
+    	        this.props.eventHandlers.chooseProjects(processedData, constants.DIRECTION_NEXT);
     	}else{
     		this.props.eventHandlers.displayError(this.props.i18nLib.t('wizard.choose_projects.msg_error_select_project'));
     	}
-      
+
     },
-    handlePrevious: function(){    	       
-    	this.props.eventHandlers.chooseProjects(this.state.projectData, constants.DIRECTION_PREVIOUS);	
+    handlePrevious: function(){
+    	this.props.eventHandlers.chooseProjects(this.state.projectData, constants.DIRECTION_PREVIOUS);
 	},
-	initializeMapping: function(){	     
+	initializeMapping: function(){
 	     var self = this;
 		 $.ajax({
 		        url: '/importer/import/initialize',
-		        timeout:appConfig.REQUEST_TIMEOUT,        
-		        error: function() {		
-		          self.initializeFailed = true;        	
+		        timeout:appConfig.REQUEST_TIMEOUT,
+		        error: function() {
+		          self.initializeFailed = true;
 		        },
 		        dataType: 'json',
 		        success: function(data) {
 		         if(data.error){
 		           self.initializeFailed = true;
-		           self.props.eventHandlers.hideLoadingIcon(); 
-		           self.setState({statusMessage: ""});	           
-		           var message = self.props.i18nLib.t('server_messages.' + data.code, data) || data.error;		           
-		           self.props.eventHandlers.displayError(message);		              		       
-		         }		          		        	        	
+		           self.props.eventHandlers.hideLoadingIcon();
+		           self.setState({statusMessage: ""});
+		           var message = self.props.i18nLib.t('server_messages.' + data.code, data) || data.error;
+		           self.props.eventHandlers.displayError(message);
+		         }
 		        },
 		        type: 'POST'
-		     }); 		     
-		    
+		     });
+
 	},
 	loadSourceProjects:  function(id){
-		appActions.loadProjectData.triggerPromise().then(function(data) { 
+		appActions.loadProjectData.triggerPromise().then(function(data) {
 		    this.setState({statusMessage: ""});
     		if(data.documentMappingStatus.status == "COMPLETED"){
-    			clearInterval(id);    			
-    			this.props.eventHandlers.hideLoadingIcon();                       
-        		this.updateProject(data.documentMappings);        		
+    			clearInterval(id);
+    			this.props.eventHandlers.hideLoadingIcon();
+        		this.updateProject(data.documentMappings);
     		} else{
     		    var message = this.props.i18nLib.t('server_messages.' + data.documentMappingStatus.code, data.documentMappingStatus) || data.documentMappingStatus.message;
     		    if(data.documentMappingStatus.status === 'FAILED_WITH_ERROR'){
     		       clearInterval(id);
-    		       this.initializeFailed = true;    		       
+    		       this.initializeFailed = true;
 		           this.props.eventHandlers.hideLoadingIcon();
 		           this.props.eventHandlers.displayError(message);
     		    }else{
-    		       this.setState({statusMessage: message});    		     
-    		    }    		     			
-    		}   		                
+    		       this.setState({statusMessage: message});
+    		    }
+    		}
     	}.bind(this))["catch"](function(err) {
     	    clearInterval(id);
-    		this.props.eventHandlers.hideLoadingIcon();    		
+    		this.props.eventHandlers.hideLoadingIcon();
     		this.props.eventHandlers.displayError(this.props.i18nLib.t('wizard.choose_projects.msg_error_select_project'));
-    	}.bind(this)); 
+    	}.bind(this));
 	},
 	loadProjects: function(){
 		var self = this;
 		$.ajax({
-	        url: '/importer/data/destination/project',	       
+	        url: '/importer/data/destination/project',
 	        dataType: 'json',
-	        success: function(result) { 
-	        	self.setState({destinationProjects: result});	 
+	        success: function(result) {
+	        	self.setState({destinationProjects: result});
 	        	self.forceUpdate();
 	        },
 	        type: 'GET'
 	     });
-	},	
+	},
 	getTitle: function(multilangFields, language){
 	 var title = multilangFields.title[language];
-	 if(title == null || title.length == 0){	  
+	 if(title == null || title.length == 0){
 	     for (var key in multilangFields.title) {
-           if (multilangFields.title.hasOwnProperty(key)) {             
+           if (multilangFields.title.hasOwnProperty(key)) {
               if(title == null || title.length == 0){
                   title = multilangFields.title[key];;
               }
@@ -182,33 +182,32 @@ var ChooseProjects = React.createClass({
 	 }
 	 return title
 	},
-    render: function () {  
+    render: function () {
         var newProjects = [];
         var existingProjects = [];
-        var language = this.props.i18nLib.lng() || 'en';         
+        var language = this.props.i18nLib.lng() || 'en';
         var statusMessage = this.state.statusMessage.length > 0 ? <div className="alert alert-info" role="alert">{this.state.statusMessage}</div> : "";
         if (this.state.projectData) {
-           $.map(this.state.projectData, function (item, i) {              
+           $.map(this.state.projectData, function (item, i) {
                 if (item.operation == 'INSERT') {
                     newProjects.push(<tr key={i}>
                         <td>
                            <input aria-label="Source" className="source"  type="checkbox" checked={item.selected} onChange={this.handleToggle.bind(this, item)} />
-                        </td>                         
+                        </td>
                         <td>
                         {item.sourceDocument.identifier}
-                        </td>                      
+                        </td>
                         <td>
-                            {this.getTitle(item.sourceDocument.multilangFields, language)} 
+                            {this.getTitle(item.sourceDocument.multilangFields, language)}
                         </td>
                         <td>
                           <AutoComplete context={constants.CHOOSE_PROJECTS} options={this.state.destinationProjects} display="title" language={language} placeholder="" refId="destSearch" onSelect={this.handleAutocompleteToggle.bind(this, item)} value={item.destinationDocument}/>
-                          <i>{this.state.destinationProjects.length} documents in the destination system </i>
                         </td>
                         <td>
                             <input aria-label="override-title" className="override-title"  type="checkbox" checked={item.overrideTitle} onChange={this.handleOverrideTitle.bind(this, item)} />
                          </td>
                     </tr>);
-                } else {                	
+                } else {
                     existingProjects.push(<tr key={i} className = {item.destinationDocument.allowEdit ? "" : "warning not-active" } >
                         <td >
                           <input aria-label="Source" className="source" type="checkbox" checked={item.selected} onChange={this.handleToggle.bind(this, item)} />
@@ -223,8 +222,8 @@ var ChooseProjects = React.createClass({
                             {item.destinationDocument.multilangFields.title[language]}
                         </td>
                         <td>
-                        <input aria-label="override-title" className="override-title"  type="checkbox" checked={item.overrideTitle} onChange={this.handleOverrideTitle.bind(this, item)} />
-                     </td>
+                          <input aria-label="override-title" className="override-title"  type="checkbox" checked={item.overrideTitle} onChange={this.handleOverrideTitle.bind(this, item)} />
+                        </td>
                     </tr>);
                 }
             }.bind(this));
@@ -236,7 +235,7 @@ var ChooseProjects = React.createClass({
                 <div className="panel-body">
                     {statusMessage}
                     <div className="panel panel-success">
-                        <div className="panel-heading">{this.props.i18nLib.t('wizard.choose_projects.new_projects')}</div>
+                        <div className="panel-heading">{this.props.i18nLib.t('wizard.choose_projects.new_projects')} <i>({this.state.destinationProjects.length} documents in the destination system)</i></div>
                         <div className="panel-body">
                             <table className="table">
                                 <thead>
@@ -244,10 +243,10 @@ var ChooseProjects = React.createClass({
                                         <th>
                                             <input type="checkbox" checked={this.checkAll('INSERT')} onChange={this.selectAllNew} />
                                             {this.props.i18nLib.t('wizard.choose_projects.import')}
-                                        </th>  
+                                        </th>
                                          <th className="id-column-width">
-                                            {this.props.i18nLib.t('wizard.choose_projects.iati_id')}  
-                                        </th>                                      
+                                            {this.props.i18nLib.t('wizard.choose_projects.iati_id')}
+                                        </th>
                                         <th>
                                             {this.props.i18nLib.t('wizard.choose_projects.source_project')}
                                         </th>
@@ -257,7 +256,7 @@ var ChooseProjects = React.createClass({
                                         <th>
                                         <input type="checkbox" checked={this.overrideAll('INSERT')} onChange={this.overrideTitleAll} />
                                         {this.props.i18nLib.t('wizard.choose_projects.override_title')}
-                                        </th>                                
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -276,10 +275,10 @@ var ChooseProjects = React.createClass({
                                         <th>
                                             <input type="checkbox" checked={this.checkAll('UPDATE')} onChange={this.selectAllExisting} />
                                             {this.props.i18nLib.t('wizard.choose_projects.update')}
-                                        </th> 
+                                        </th>
                                          <th className="id-column-width">
-                                            {this.props.i18nLib.t('wizard.choose_projects.iati_id')}                                            
-                                        </th>                                       
+                                            {this.props.i18nLib.t('wizard.choose_projects.iati_id')}
+                                        </th>
                                         <th>
                                             {this.props.i18nLib.t('wizard.choose_projects.source_project')}
                                         </th>
@@ -295,21 +294,21 @@ var ChooseProjects = React.createClass({
                                 <tbody>
                                     {existingProjects}
                                 </tbody>
-                            </table>                            
+                            </table>
                         </div>
                     </div>
                 </div>
-                <div className="buttons">                
-                    <div className="row">                          
-                        <div className="col-md-6">                
+                <div className="buttons">
+                    <div className="row">
+                        <div className="col-md-6">
                            <button ref="previousButton"   className="btn btn-success navbar-btn btn-custom btn-previous" type="button" onClick={this.handlePrevious}>{this.props.i18nLib.t('wizard.choose_projects.previous')}</button>
                          </div>
-                       <div className="col-md-6">                
-                          <button ref="nextButton"  disabled = { _.where(this.state.projectData, {selected: true}).length > 0 ? "" : "disabled"} className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.handleNext}>{this.props.i18nLib.t('wizard.choose_projects.next')}</button>               
+                       <div className="col-md-6">
+                          <button ref="nextButton"  disabled = { _.where(this.state.projectData, {selected: true}).length > 0 ? "" : "disabled"} className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.handleNext}>{this.props.i18nLib.t('wizard.choose_projects.next')}</button>
                        </div>
-                   </div>                   
+                   </div>
                 </div>
                 </div>
-            ); } }); 
-            
+            ); } });
+
 module.exports = ChooseProjects;
