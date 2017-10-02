@@ -20,8 +20,10 @@ import org.devgateway.importtool.services.processor.helper.FieldValue;
 import org.devgateway.importtool.services.processor.helper.FieldValueMapping;
 import org.devgateway.importtool.services.processor.helper.IDestinationProcessor;
 import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
+import org.devgateway.importtool.services.processor.helper.ImportOption;
 import org.devgateway.importtool.services.processor.helper.ActionResult;
 import org.devgateway.importtool.services.processor.helper.OperationType;
+import org.devgateway.importtool.services.request.ImportRequest;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -85,6 +87,8 @@ public class TestService {
 		ISourceProcessor sourceProcessor = new IATI104Processor();
 		IDestinationProcessor destinationProcessor = new AMPProcessor();
 		destinationProcessor.setAuthenticationToken("27368298-48e3-48ef-9f75-13a58f2f5cb6");
+		ImportRequest importRequest = new ImportRequest();
+		importRequest.setImportOption(ImportOption.OVERWRITE_ALL_FUNDING);
 
 		// Upload Source
 		InputStream is = this.getClass().getResourceAsStream("sample_files/Kosovo_Test_File.xml");
@@ -165,7 +169,7 @@ public class TestService {
 			// destinationFieldValue);
 		}
 		// Execute Import
-		List<ActionResult> result = documentMapper.execute();
+		List<ActionResult> result = documentMapper.execute(importRequest);
 		result.stream().forEach(n -> {
 //			System.out.println("Result Status: " + n.getStatus());
 //			System.out.println("Result Message: " + n.getMessage());
@@ -178,7 +182,8 @@ public class TestService {
 		// Select type of Source -> Destination process
 		ISourceProcessor sourceProcessor = new IATI201Processor();
 		IDestinationProcessor destinationProcessor = new AMPProcessor();
-
+		ImportRequest importRequest = new ImportRequest();
+		importRequest.setImportOption(ImportOption.OVERWRITE_ALL_FUNDING);
 		// Upload Source
 		InputStream is = this.getClass().getResourceAsStream("sample_files/activity-standard-example-minimal.xml");
 		sourceProcessor.setInput(is);
@@ -255,7 +260,7 @@ public class TestService {
 			// destinationFieldValue);
 		}
 		// Execute Import
-		List<ActionResult> result = documentMapper.execute();
+		List<ActionResult> result = documentMapper.execute(importRequest);
 		result.stream().forEach(n -> {
 //			System.out.println("Result Status: " + n.getStatus());
 //			System.out.println("Result Message: " + n.getMessage());

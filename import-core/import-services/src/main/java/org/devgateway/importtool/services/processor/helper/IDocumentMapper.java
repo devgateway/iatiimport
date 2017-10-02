@@ -2,6 +2,8 @@ package org.devgateway.importtool.services.processor.helper;
 
 import java.util.List;
 
+import org.devgateway.importtool.services.request.ImportRequest;
+
 public interface IDocumentMapper {
 
 	void setSourceProcessor(ISourceProcessor srcProcessor);
@@ -26,7 +28,7 @@ public interface IDocumentMapper {
 
 	void setValueMappingObject(List<FieldValueMapping> valueMappingObject);
 
-	List<ActionResult> execute();
+	List<ActionResult> execute(ImportRequest importRequest);
 	
 	
 	void setDocumentMappingStatus(Status documentMappingStatus);
