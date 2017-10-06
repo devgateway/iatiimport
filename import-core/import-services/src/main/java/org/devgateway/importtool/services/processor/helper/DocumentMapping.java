@@ -1,5 +1,6 @@
 package org.devgateway.importtool.services.processor.helper;
 
+import java.util.List;
 import java.util.UUID;
 
 public class DocumentMapping {
@@ -9,21 +10,19 @@ public class DocumentMapping {
 	private OperationType operation = OperationType.NOOP;
 	private Boolean selected = false;
 	private Boolean overrideTitle = false;
-
+	private List<InternalDocument> activitiesWithSimilarTitles;
+	
 	public Boolean isOverrideTitle() {
 		return overrideTitle;
 	}
-
 
 	public void setOverrideTitle(Boolean overrideTitle) {
 		this.overrideTitle = overrideTitle;
 	}
 
-
 	public InternalDocument getSourceDocument() {
 		return sourceDocument;
 	}
-
 
 	public void setSourceDocument(InternalDocument sourceDocument) {
 		this.sourceDocument = sourceDocument;
@@ -67,6 +66,16 @@ public class DocumentMapping {
 
 	public void setId(UUID id) {
 		this.id = id;
+	}
+
+
+	public List<InternalDocument> getActivitiesWithSimilarTitles() {
+		return activitiesWithSimilarTitles;
+	}
+
+
+	public void setActivitiesWithSimilarTitles(List<InternalDocument> activitiesWithSimilarTitles) {
+		this.activitiesWithSimilarTitles = activitiesWithSimilarTitles;
 	}
 
 
