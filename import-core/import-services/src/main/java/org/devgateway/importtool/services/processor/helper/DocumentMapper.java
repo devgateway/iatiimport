@@ -1,8 +1,11 @@
 package org.devgateway.importtool.services.processor.helper;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -10,6 +13,7 @@ import org.devgateway.importtool.endpoint.ApiMessage;
 import org.devgateway.importtool.endpoint.EPMessages;
 import org.devgateway.importtool.exceptions.MissingPrerequisitesException;
 import org.devgateway.importtool.services.request.ImportRequest;
+import org.apache.commons.text.similarity.LevenshteinDistance;
 
 
 public class DocumentMapper implements IDocumentMapper {
@@ -25,6 +29,7 @@ public class DocumentMapper implements IDocumentMapper {
 	private ActionStatus importStatus;
 	private ActionStatus documentMappingStatus;
 	private Log logger = LogFactory.getLog(getClass());
+	private static Integer SIMILARITY_EDIT_DISTANCE = 10;
 		
 	public ActionStatus getImportStatus() {
 		return importStatus;
@@ -155,12 +160,37 @@ public class DocumentMapper implements IDocumentMapper {
 				InternalDocument destDoc = optionalDestDoc.get();
 				String destinationIdValue = (String) destDoc.getStringFields().get(destinationIdField);
 				destDoc.setIdentifier(destinationIdValue);
-				this.addDocumentMapping(srcDoc, destDoc, OperationType.UPDATE);
-			} else {
-				this.addDocumentMapping(srcDoc, null, OperationType.INSERT);
-			}
+				this.addDocumentMapping(srcDoc, destDoc, OperationType.UPDATE, null);
+			} else {				
+				this.addDocumentMapping(srcDoc, null, OperationType.INSERT, this.findProjectsWithSimilarTitle(srcDoc, destinationDocuments));				
+			}	
+			
 		}		
 	    this.documentMappingStatus.setStatus(Status.COMPLETED);
+    }
+    
+    private List<InternalDocument> findProjectsWithSimilarTitle(InternalDocument srcDoc, List<InternalDocument> destinationDocuments) {
+    	 Map<String, String> srcTitles = srcDoc.getMultilangFields().get("title");
+    	List<InternalDocument> similarProjects = new ArrayList<>();
+    	for (InternalDocument destDoc : destinationDocuments) {
+    		 Map<String, String> destTitles = destDoc.getMultilangFields().get("title");
+    		 Iterator<Entry<String, String>> it = srcTitles.entrySet().iterator();
+    		 boolean foundSimilar = false;
+    		    while (it.hasNext() && foundSimilar == false) {
+    		        Map.Entry item = (Map.Entry)it.next();
+    		        String srcTitle = (String) item.getValue();
+    		        String destTitle = destTitles.get(item.getKey());
+    		        if (srcTitle != null && destTitle != null) {
+    		        	int editDistance = LevenshteinDistance.getDefaultInstance().apply(srcTitle, destTitle);
+    		        	if (editDistance <= SIMILARITY_EDIT_DISTANCE) {
+    		        		foundSimilar = true;
+    		        		similarProjects.add(destDoc);    		        		
+    		        	}    		        	
+    		        }   		        	        			       					
+    		    }   		
+    	}
+    	
+    	return similarProjects;
     }
     
     private void updateStatus(ApiMessage message, Status status){
@@ -172,7 +202,7 @@ public class DocumentMapper implements IDocumentMapper {
 		this.documentMappingStatus.setTotal(0L);
 		this.documentMappingStatus.setStatus(status);
     }
-	private void addDocumentMapping(InternalDocument srcDoc, InternalDocument destDoc, OperationType operation) {
+	private void addDocumentMapping(InternalDocument srcDoc, InternalDocument destDoc, OperationType operation, List<InternalDocument> projectsWithSimilarTitles) {
 		// Look for an existing src mapping
 		Optional<DocumentMapping> mapping = this.getDocumentMappings().stream().filter(n -> {
 			return n.getSourceDocument().getIdentifier().equals(srcDoc.getIdentifier());
@@ -182,6 +212,7 @@ public class DocumentMapper implements IDocumentMapper {
 			newMapping.setSourceDocument(srcDoc);
 			newMapping.setDestinationDocument(destDoc);
 			newMapping.setOperation(operation);
+			newMapping.setProjectsWithSimilarTitles(projectsWithSimilarTitles);
 			this.documentMappings.add(newMapping);
 		}
 

@@ -10,7 +10,8 @@ public class DocumentMapping {
 	private OperationType operation = OperationType.NOOP;
 	private Boolean selected = false;
 	private Boolean overrideTitle = false;
-	private List<InternalDocument> activitiesWithSimilarTitles;
+	private List<InternalDocument> projectsWithSimilarTitles;
+	
 	
 	public Boolean isOverrideTitle() {
 		return overrideTitle;
@@ -68,15 +69,11 @@ public class DocumentMapping {
 		this.id = id;
 	}
 
-
-	public List<InternalDocument> getActivitiesWithSimilarTitles() {
-		return activitiesWithSimilarTitles;
+	public List<InternalDocument> getProjectsWithSimilarTitles() {
+		return projectsWithSimilarTitles;
 	}
 
-
-	public void setActivitiesWithSimilarTitles(List<InternalDocument> activitiesWithSimilarTitles) {
-		this.activitiesWithSimilarTitles = activitiesWithSimilarTitles;
+	public void setProjectsWithSimilarTitles(List<InternalDocument> projectsWithSimilarTitles) {
+		this.projectsWithSimilarTitles = projectsWithSimilarTitles;
 	}
-
-
 }

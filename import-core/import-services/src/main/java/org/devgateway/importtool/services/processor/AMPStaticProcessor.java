@@ -57,6 +57,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	
 	static final String AMP_IATI_ID_FIELD_PROPERTY = "AMPStaticProcessor.ampIatiIdField";
 	static final String AMP_IATI_ID_FIELD_DEFAULT_VALUE = "project_code";
+	private static final String DEFAULT_LANGUAGE_CODE = "en";
 	
 	private Log log = LogFactory.getLog(getClass());
 
@@ -176,6 +177,10 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		while (it.hasNext()) {
 			Entry<String, JsonNode> entry = it.next();
 			languages.put(entry.getKey(), entry.getValue().asText());
+		}
+		
+		if (languages.isEmpty()) {
+			languages.put(DEFAULT_LANGUAGE_CODE, jsonNode.asText());
 		}
 		return languages;
 	}
