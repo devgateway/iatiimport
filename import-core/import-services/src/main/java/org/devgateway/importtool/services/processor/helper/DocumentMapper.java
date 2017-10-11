@@ -99,7 +99,12 @@ public class DocumentMapper implements IDocumentMapper {
 		switch (doc.getOperation()) {
 		case INSERT:
 			// For now, we pass the mapping. Find a better more efficient way.
-			result = this.destinationProcessor.insert(source, this.getFieldMappingObject(), this.getValueMappingObject());
+			if (destination != null) {
+				result = this.destinationProcessor.update(source, destination, this.getFieldMappingObject(), this.getValueMappingObject(),doc.isOverrideTitle(), importRequest);
+			} else {
+				result = this.destinationProcessor.insert(source, this.getFieldMappingObject(), this.getValueMappingObject());
+			}
+			
 			break;
 		case UPDATE:
 			result = this.destinationProcessor.update(source, destination, this.getFieldMappingObject(), this.getValueMappingObject(),doc.isOverrideTitle(), importRequest);
