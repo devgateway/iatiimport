@@ -89,6 +89,8 @@ var AutoComplete = React.createClass({
 
     	if(this.props.value) {
     		$el.val(this.props.value);
+    	} else{
+    	   $el.val('');
     	}
 
     },
@@ -96,6 +98,8 @@ var AutoComplete = React.createClass({
     	var $el = $(this.refs[this.props.refId].getDOMNode());
     	if(this.props.value) {
     		$el.val(this.props.value);
+    	} else {
+    	   $el.val('');
     	}
     },
     render: function () {       

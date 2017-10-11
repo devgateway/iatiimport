@@ -81,7 +81,15 @@ module.exports = {
 							'previous' : '<< Previous',
 							'msg_error_retrieving_projects' : ' Error retrieving filters.',
 							'msg_error_select_project' : ' Please select at least one project to proceed',
-						    'msg_project_not_editable':'Projects marked with an * and highlighted are not editable because they are not in the current workspace.'
+						    'msg_project_not_editable':'Projects marked with an * and highlighted are not editable because they are not in the current workspace.',
+						    'similar_titles': '# of Similar Titles'
+						},
+						'similar_projects_dlg': {
+							'title': 'Projects with similar title',
+							'close': 'Close',
+							'select_project': 'Map Selected Project',
+							'iati_id': 'IATI ID',
+							'project_title': 'Project Title'
 						},
 						'map_fields' : {
 							'choose_map_fields' : 'Choose and Map Fields',
@@ -106,7 +114,6 @@ module.exports = {
 							'msg_error_retrieving_templates' : ' Error loading mapping templates',
 							'msg_required_field':' is required by the destination system.',
 							'msg_field_has_dependencies': ' has the following dependencies: __dependencies__ '
-
 						},
 						'map_values' : {
 							'map_field_values' : 'Map Fields Values',
@@ -125,7 +132,6 @@ module.exports = {
 							'title' : 'Save Field Mappings',
 							'close' : 'close',
 							'save_mapping' : 'Save Mapping'
-
 						},
 						'save_value_mappings_dlg' : {
 							'msg_error_saving' : 'Error saving template',
@@ -285,7 +291,15 @@ module.exports = {
 							'previous' : '<< Anterior',
 							'msg_error_retrieving_projects' : ' Error al recuperar los filtros.',
 							'msg_error_select_project' : ' Favor seleccionar al menos un proyecto para continuar',
-						    'msg_project_not_editable':'Los proyectos marcador por un * y resaltados no pueden ser editados puesto que no encuentran en el espacio de trabajo actual.'
+						    'msg_project_not_editable':'Los proyectos marcador por un * y resaltados no pueden ser editados puesto que no encuentran en el espacio de trabajo actual.',
+						    'similar_titles': '# of Similar Titles'
+						},
+						'similar_projects_dlg': {
+							'title': 'Projects with similar title',
+							'close': 'Close',
+							'select_project': 'Map Selected Project',
+							'iati_id': 'IATI ID',
+							'project_title': 'Project Title'
 						},
 						'map_fields' : {
 							'choose_map_fields' : 'Seleccionar y mapear los campos',
@@ -488,7 +502,15 @@ module.exports = {
 							'next' : ' Suivant >> ',
 							'previous' : ' << Précédent ',
 							'msg_error_retrieving_projects' : ' Erreur dans la recherche des Filtres.',
-							'msg_error_select_project' : ' Veuillez sélectionner au moins un projet pour continuer '
+							'msg_error_select_project' : ' Veuillez sélectionner au moins un projet pour continuer ',
+							'similar_titles': '# of Similar Titles'
+						},
+						'similar_projects_dlg': {
+							'title': 'Projects with similar title',
+							'close': 'Close',
+							'select_project': 'Map Selected Project',
+							'iati_id': 'IATI ID',
+							'project_title': 'Project Title'
 						},
 						'map_fields' : {
 							'choose_map_fields' : 'Choisir et faire correspondre les champs',
