@@ -11,7 +11,11 @@ var SaveMappingsDialog = React.createClass({
       this.saveMappings(event, true);
     },
     saveMappings: function(event, saveCopy){
-     var mappingId = (saveCopy &&  typeof saveCopy === "boolean" ) ? null : this.props.mappingInfo.id;
+     var mappingId = null;
+     if(saveCopy &&  typeof saveCopy === "boolean") {
+       mappingId = this.props.mappingInfo.id;
+     }
+
      formActions.saveFieldMappingsTemplate({fieldMapping:this.props.mappingFieldsData, name:this.state.name, id: mappingId }).then(function(data) {
         if(data.error){
            this.displayError(this.props.i18nLib.t('wizard.save_field_mappings_dlg.'+ data.error));

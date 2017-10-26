@@ -28,7 +28,10 @@ var SaveMappingsDialog = React.createClass({
 
      });
 
-     var mappingId = (saveCopy &&  typeof saveCopy === "boolean" ) ? null : this.props.mappingInfo.id;
+     var mappingId = null;
+     if(saveCopy &&  typeof saveCopy === "boolean") {
+       mappingId = this.props.mappingInfo.id;
+     }
 
      formActions.saveValueMappingsTemplate({fieldValueMapping:mapped, name:this.state.name, id: mappingId }).then(function(data) {
         if(data.error){
