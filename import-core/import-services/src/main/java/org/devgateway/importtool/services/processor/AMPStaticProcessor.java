@@ -79,6 +79,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	private List<ClientHttpRequestInterceptor> interceptors = new ArrayList<ClientHttpRequestInterceptor>();
 	
 	private List<String> destinationFieldsList = new ArrayList<String>(); //fields returned by current AMP installation
+	private HashMap<String, Map<String,String>> destinationFieldsListLabels = new HashMap<String, Map<String,String>>();
 
 	
 
@@ -1042,7 +1043,9 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		fieldList.add(new Field("IATI Identifier", "iati-identifier", FieldType.STRING, false));
 		
 		if(destinationFieldsList.contains("project_title")){
-			fieldList.add(new Field("Project Title", "project_title", getFieldType(fieldProps.get("project_title")), false));
+			Field projectTitle = new Field("Project Title", "project_title", getFieldType(fieldProps.get("project_title")), false);
+			projectTitle.setAttributes(destinationFieldsListLabels.get("project_title"));
+			fieldList.add(projectTitle);
 		}
 		
 
@@ -1051,18 +1054,22 @@ public class AMPStaticProcessor implements IDestinationProcessor {
         	Field activityStatus = new Field("Activity Status", "activity_status", FieldType.LIST, true);
     		activityStatus.setPossibleValues(getCodeListValues("activity_status"));
     		activityStatus.setRequired(true);
+    		activityStatus.setMultiLangDisplayName(destinationFieldsListLabels.get("activity_status"));
     		fieldList.add(activityStatus);		
 		}
+
         if(destinationFieldsList.contains("a.c._chapter")){
         	Field acChapter = new Field("AC Chapter", "a.c._chapter", FieldType.LIST, true);
         	acChapter.setPossibleValues(getCodeListValues("a.c._chapter"));
         	acChapter.setRequired(false);
+        	acChapter.setMultiLangDisplayName(destinationFieldsListLabels.get("a.c._chapter"));
     		fieldList.add(acChapter);		
 		}
 		
         if(destinationFieldsList.contains("fundings~type_of_assistance")){
         	Field typeOfAssistence = new Field("Type of Assistance", "type_of_assistance", FieldType.LIST, true);
     		typeOfAssistence.setPossibleValues(getCodeListValues("fundings~type_of_assistance"));    		
+    		typeOfAssistence.setMultiLangDisplayName(destinationFieldsListLabels.get("fundings~type_of_assistance"));
     		fieldList.add(typeOfAssistence);	
     		trnDependencies.add(typeOfAssistence);
 		}
@@ -1071,6 +1078,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
       if(destinationFieldsList.contains("fundings~financing_instrument")){
     	  Field financialInstrument = new Field("Aid Modality", "financing_instrument", FieldType.LIST, true);
   		  financialInstrument.setPossibleValues(getCodeListValues("fundings~financing_instrument"));
+  		  financialInstrument.setMultiLangDisplayName(destinationFieldsListLabels.get("financing_instrument"));
   		  fieldList.add(financialInstrument);	
   		  trnDependencies.add(financialInstrument);
 	   }
@@ -1079,20 +1087,23 @@ public class AMPStaticProcessor implements IDestinationProcessor {
         if(destinationFieldsList.contains("fundings~funding_details~adjustment_type")){
         	Field adjustmentType = new Field("Adjustment Type", "adjustment_type", FieldType.LIST, true);
     		adjustmentType.setPossibleValues(getCodeListValues("fundings~funding_details~adjustment_type"));
+    		adjustmentType.setMultiLangDisplayName(destinationFieldsListLabels.get("fundings~funding_details~adjustment_type"));
     		fieldList.add(adjustmentType);	
 		}
 		
 
        if(destinationFieldsList.contains("fundings~funding_details~transaction_type")){
-	Field transactionType = new Field("Transaction Type", "transaction_type", FieldType.LIST, false);
-	transactionType.setPossibleValues(getCodeListValues("fundings~funding_details~transaction_type"));
-	fieldList.add(transactionType);	
+    	   Field transactionType = new Field("Transaction Type", "transaction_type", FieldType.LIST, false);
+			transactionType.setPossibleValues(getCodeListValues("fundings~funding_details~transaction_type"));
+			transactionType.setMultiLangDisplayName(destinationFieldsListLabels.get("fundings~funding_details~transaction_type"));
+			fieldList.add(transactionType);	
 		}
 		
         if(destinationFieldsList.contains("primary_sectors~sector_id")){
         	Field primarySector = new Field("Primary Sector", "primary_sectors", FieldType.LIST, true);
     		primarySector.setPossibleValues(getCodeListValues("primary_sectors~sector_id"));
     		primarySector.setMultiple(true);
+    		primarySector.setMultiLangDisplayName(destinationFieldsListLabels.get("primary_sectors"));
     		fieldList.add(primarySector);
 		}
 		
@@ -1100,6 +1111,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
         if(destinationFieldsList.contains("secondary_sectors~sector_id")){
         	Field secondarySector = new Field("Secondary Sector", "secondary_sectors", FieldType.LIST, true);
     		secondarySector.setPossibleValues(getCodeListValues("secondary_sectors~sector_id"));
+    		secondarySector.setMultiLangDisplayName(destinationFieldsListLabels.get("secondary_sectors"));
     		fieldList.add(secondarySector);
 		}
 		
@@ -1107,12 +1119,15 @@ public class AMPStaticProcessor implements IDestinationProcessor {
       if(destinationFieldsList.contains("tertiary_sectors~sector_id")){
     	  Field tertiarySector = new Field("Tertiary Sector", "tertiary_sectors", FieldType.LIST, true);
   		  tertiarySector.setPossibleValues(getCodeListValues("tertiary_sectors~sector_id"));
+  		  tertiarySector.setMultiLangDisplayName(destinationFieldsListLabels.get("tertiary_sectors"));
   		  fieldList.add(tertiarySector);
 		}
-// locations, locations~location, locations~location_percentage
+
+      // locations, locations~location, locations~location_percentage
 	  if(destinationFieldsList.contains("locations~location")){
 	  	Field location = new Field("Location", "locations", FieldType.LOCATION, true);
 	  	location.setPossibleValues(getCodeListValues("locations~location"));
+	  	location.setMultiLangDisplayName(destinationFieldsListLabels.get("locations~location"));
 	  	location.setMultiple(true);
 		fieldList.add(location);
 		}
@@ -1136,47 +1151,36 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			if(destinationFieldsList.contains(name)){
 		    			FieldType ftDescription = getFieldType(fieldProps.get(name));
 		    			if(ftDescription != null) {
-		    				fieldList.add(new Field(label, name, ftDescription, true));
+		    				Field newField = new Field(label, name, ftDescription, true);
+		    				newField.setMultiLangDisplayName(destinationFieldsListLabels.get(name));
+		    				fieldList.add(newField);
 		    			}	
 				}
 		});
 		
 
 		// Dates
-		if (fieldProps.get("actual_start_date") != null) {
-			fieldList.add(new Field("Actual Start Date", "actual_start_date", FieldType.DATE, true));
-		}
-		if (fieldProps.get("actual_completion_date") != null) {
-			fieldList.add(new Field("Actual Completion Date", "actual_completion_date", FieldType.DATE, true));
-		}
-		if (fieldProps.get("actual_approval_date") != null) {
-			fieldList.add(new Field("Actual Approval Date", "actual_approval_date", FieldType.DATE, true));
-		}
+		Map<String, String> dateFields = new HashMap<String, String>();
+		dateFields.put("actual_start_date", "Actual Start Date");
+		dateFields.put("actual_completion_date", "Actual Completion Date");
+		dateFields.put("actual_approval_date", "Actual Approval Date");
+		dateFields.put("proposed_start_date", "Proposed Start Date");
+		dateFields.put("proposed_approval_date", "Proposed Approval Date");
+		dateFields.put("proposed_completion_date", "Proposed Completion Date");
+		dateFields.put("planned_start_date", "Planned Start Date");
+		dateFields.put("original_completion_date", "Original Completion Date");
 
-		if (fieldProps.get("proposed_start_date") != null) {
-			fieldList.add(new Field("Proposed Start Date", "proposed_start_date", FieldType.DATE, true));
-		}
-		if (fieldProps.get("proposed_approval_date") != null) {
-			fieldList.add(new Field("Proposed Approval Date", "proposed_approval_date", FieldType.DATE, true));
-		}
-		if (fieldProps.get("proposed_completion_date") != null) {
-			fieldList.add(new Field("Proposed Completion Date", "proposed_completion_date", FieldType.DATE, true));
-		}
-
-		if (fieldProps.get("planned_start_date") != null) {
-			fieldList.add(new Field("Planned Start Date", "planned_start_date", FieldType.DATE, true));
-		}
-		if (fieldProps.get("original_completion_date") != null) {
-			fieldList.add(new Field("Original Completion Date", "original_completion_date", FieldType.DATE, true));
-		}
-
-		
-		
-
-		
-		
-		
-
+		Field actualStartDate = new Field("", "actual_start_date", FieldType.DATE, true);
+		dateFields.forEach((name, label) -> {
+			if(fieldProps.get(name) != null){
+		    			FieldType ftDescription = getFieldType(fieldProps.get(name));
+		    			if(ftDescription != null) {
+		    				Field newField = new Field(label, name, FieldType.DATE, true);
+		    				newField.setMultiLangDisplayName(destinationFieldsListLabels.get(name));
+		    				fieldList.add(newField);
+		    			}	
+				}
+		});
 		
 		
 		// Organizations
@@ -1194,6 +1198,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		organizationsRoles.forEach((name, label) -> {
 			if(destinationFieldsList.contains(name)){
         		Field org = new Field(label, name, FieldType.ORGANIZATION, true);
+        		org.setMultiLangDisplayName(destinationFieldsListLabels.get(name));
         		org.setPossibleValues(getCodeListValues("fundings~donor_organization_id"));
         		if (fieldProps.get(name) != null && fieldProps.get(name).getProperty("percentage_constraint") != null) {
         			org.setPercentage(true);
@@ -1205,6 +1210,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
          if(destinationFieldsList.contains("fundings~donor_organization_id")){
         		Field fundingOrganization = new Field("Funding Organization", "donor_organization", FieldType.ORGANIZATION, true);
         		fundingOrganization.setPossibleValues(getCodeListValues("fundings~donor_organization_id"));
+        		fundingOrganization.setMultiLangDisplayName(destinationFieldsListLabels.get("fundings~donor_organization_idfundings~donor_organization_id"));
         		if (fieldProps.get("donor_organization") != null && fieldProps.get("donor_organization").getProperty("percentage_constraint") != null) {
         			fundingOrganization.setPercentage(true);
         		}        		
@@ -1282,7 +1288,9 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 					JsonNode node = mainNode.next();
 					String fieldName = node.get("field_name").asText();
 					String fieldType = node.get("field_type").asText();
-					destinationFieldsList.add(fieldName);					
+					Map<String, String> fieldLabel = extractMultilanguageText(node.get("field_label"));
+					destinationFieldsList.add(fieldName);
+					destinationFieldsListLabels.put(fieldName, fieldLabel);
 					addChildrenToDestinationFieldList(node,fieldName);
 					
 					
@@ -1314,8 +1322,10 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			while (childFields.hasNext()) {
 				JsonNode child = childFields.next();				
 				String childFieldName = child.get("field_name").asText();
+				Map<String, String> childFieldLabel = extractMultilanguageText(child.get("field_label"));
 				String name = fieldName + "~" + childFieldName;
 				destinationFieldsList.add(name);				
+				destinationFieldsListLabels.put(name, childFieldLabel);
 				if(node.get("children") != null){
 					addChildrenToDestinationFieldList(child, name);
 				}

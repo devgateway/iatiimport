@@ -115,13 +115,20 @@ var ChooseFields = React.createClass({
 	selectFieldMapping: function(event){
 		this.props.eventHandlers.selectFieldMapping(event);
 	},
-	getOptions: function(sourceField){
+	getOptions: function(sourceField, language){
 		var options = [];
 		$.map(this.state.destinationFieldsData, function(item, i) {
+			var label = "";
+			if(item.multiLangDisplayName && item.multiLangDisplayName[language]) {
+				label = item.multiLangDisplayName[language];
+			}
+			else {
+				label = item.displayName || item.uniqueFieldName;
+			}
 			if(item.mappable && sourceField.type == item.type){
-				options.push({value:item.uniqueFieldName, label:item.displayName || item.uniqueFieldName})
+				options.push({value:item.uniqueFieldName, label:label})
 			}else if(item.mappable && sourceField.type != item.type && (item.type === "STRING" || item.type === "MULTILANG_STRING") && (sourceField.type === "STRING" || sourceField.type === "MULTILANG_STRING") ){
-		      options.push({value:item.uniqueFieldName, label:item.displayName || item.uniqueFieldName})
+		      options.push({value:item.uniqueFieldName, label:label})
 		    }
 		});
 		return options
@@ -256,7 +263,8 @@ var ChooseFields = React.createClass({
            };
 
            $.map(this.state.sourceFieldsData, function(item, i) {
-                var options = this.getOptions(item);
+                var language = this.props.i18nLib.lng() || "en";
+                var options = this.getOptions(item, language);
                 if(item.mappable) {
                 	if(!rows[item.type]) {
                 		rows[item.type] = [];
