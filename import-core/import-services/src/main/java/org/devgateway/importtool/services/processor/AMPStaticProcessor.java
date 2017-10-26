@@ -223,6 +223,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 	@Override
 	public void setAuthenticationToken(String authToken) {
+		this.interceptors.clear();
 		this.interceptors.add(new TokenHeaderInterceptor(authToken));
 	}
 
