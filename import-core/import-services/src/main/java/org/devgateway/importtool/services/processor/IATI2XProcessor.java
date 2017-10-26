@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -267,6 +269,7 @@ public class IATI2XProcessor implements ISourceProcessor {
 						}
 					}
 				}
+				field.getPossibleValues().sort(Comparator.comparing(FieldValue::getCode));
 				break;
 			case LOCATION:
 			case RECIPIENT_COUNTRY:
