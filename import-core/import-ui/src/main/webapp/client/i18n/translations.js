@@ -81,7 +81,8 @@ module.exports = {
 							'previous' : '<< Previous',
 							'msg_error_retrieving_projects' : ' Error retrieving filters.',
 							'msg_error_select_project' : ' Please select at least one project to proceed',
-						    'msg_project_not_editable':'Projects marked with an * and highlighted are not editable because they are not in the current workspace.'
+						  'msg_project_not_editable':'Projects marked with an * and highlighted are not editable because they are not in the current workspace.',
+							'message': 'projects in the destination system'
 						},
 						'map_fields' : {
 							'choose_map_fields' : 'Choose and Map Fields',
@@ -158,7 +159,7 @@ module.exports = {
 							'import_option_add_missing_explanation':'Only adds new funding information to the project. Existing funding information is not overwritten',
 							'import_option_replace': 'Replace funding information',
 							'import_option_replace_explanation': 'Replaces funding information in the AMP project with funding information from the IATI file. This is done per donor. Data for donors that are not reporting is not affected.',
-							'import_option_replace_prompt': 'You have selected the "Replace funding information" Import option. This option updates existing activities by overwriting the fundings for donors that have data in the IATI file. Do you want to proceed? '							
+							'import_option_replace_prompt': 'You have selected the "Replace funding information" Import option. This option updates existing activities by overwriting the fundings for donors that have data in the IATI file. Do you want to proceed? '
 						},
 						'mappings_dropdown' : {
 							'confirm_delete' : 'Are you sure you want to delete  __templateName__ ?'
@@ -289,7 +290,9 @@ module.exports = {
 							'previous' : '<< Anterior',
 							'msg_error_retrieving_projects' : ' Error al recuperar los filtros.',
 							'msg_error_select_project' : ' Favor seleccionar al menos un proyecto para continuar',
-						    'msg_project_not_editable':'Los proyectos marcador por un * y resaltados no pueden ser editados puesto que no encuentran en el espacio de trabajo actual.'
+					    'msg_project_not_editable':'Los proyectos marcador por un * y resaltados no pueden ser editados puesto que no encuentran en el espacio de trabajo actual.',
+							'message': 'proyectos en el sistema destino'
+
 						},
 						'map_fields' : {
 							'choose_map_fields' : 'Seleccionar y mapear los campos',
@@ -366,7 +369,7 @@ module.exports = {
 							'import_option_add_missing_explanation':'Only adds new funding information to the project. Existing funding information is not overwritten',
 							'import_option_replace': 'Replace funding information',
 							'import_option_replace_explanation': 'Replaces funding information in the AMP project with funding information from the IATI file. This is done per donor. Data for donors that are not reporting is not affected.',
-							'import_option_replace_prompt': 'You have selected the "Replace funding information" Import option. This option updates existing activities by overwriting the fundings for donors that have data in the IATI file. Do you want to proceed? '					
+							'import_option_replace_prompt': 'You have selected the "Replace funding information" Import option. This option updates existing activities by overwriting the fundings for donors that have data in the IATI file. Do you want to proceed? '
 						},
 						'mappings_dropdown' : {
 							'confirm_delete' : 'Está seguro de eliminar  __templateName__ ?'
@@ -496,7 +499,8 @@ module.exports = {
 							'next' : ' Suivant >> ',
 							'previous' : ' << Précédent ',
 							'msg_error_retrieving_projects' : ' Erreur dans la recherche des Filtres.',
-							'msg_error_select_project' : ' Veuillez sélectionner au moins un projet pour continuer '
+							'msg_error_select_project' : ' Veuillez sélectionner au moins un projet pour continuer ',
+							'message' : ' projets dans le système de destination'
 						},
 						'map_fields' : {
 							'choose_map_fields' : 'Choisir et faire correspondre les champs',
@@ -573,7 +577,7 @@ module.exports = {
 							'import_option_add_missing_explanation': "N'ajoute que les nouvelles informations de financement au projet. Les informations de financement existantes restent inchangées",
 							'import_option_replace': 'Remplacer les informations de financement',
 							'import_option_replace_explanation': "Remplace les informations de financement dans le projet AMP avec des informations de financement provenant du fichier IATI. Ceci est fait par donateur. Les données des donateurs ni figurant pas dans le fichier IATI ne seront pas affectées.",
-							'import_option_replace_prompt': "Vous avez sélectionné l'option d'import Remplacer les informations de financement. Cette option met à jour les activités existantes en écrasant toutes les transactions financières des donateurs qui sont inclus dans le fichier de l'IATI. Voulez-vous continuer?"			
+							'import_option_replace_prompt': "Vous avez sélectionné l'option d'import Remplacer les informations de financement. Cette option met à jour les activités existantes en écrasant toutes les transactions financières des donateurs qui sont inclus dans le fichier de l'IATI. Voulez-vous continuer?"
 						},
 						'mappings_dropdown' : {
 							'confirm_delete' : ' Etes - vous sûr(e)de vouloir supprimer __templateName__ ? '
