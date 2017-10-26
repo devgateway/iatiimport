@@ -406,11 +406,14 @@ public class IATI2XProcessor implements ISourceProcessor {
 			document.addStringField("default-currency", currency);
 			String defaultLanguageCode = !("".equals(element.getAttribute("xml:lang"))) ? element.getAttribute("xml:lang") : this.defaultLanguage;
 			
-			Element reportingOrgNode = element.getElementsByTagName("reporting-org").item(0) != null ? (Element)element.getElementsByTagName("reporting-org").item(0) : null;
+			Element reportingOrgNode = element.getElementsByTagName("reporting-org").item(0) != null
+					? (Element) element.getElementsByTagName("reporting-org").item(0) : null;
 			String reportingOrg = "";
 			if (reportingOrgNode != null) {
-				reportingOrg = reportingOrgNode.getElementsByTagName("narrative").item(0) != null ? reportingOrgNode.getElementsByTagName("narrative").item(0).getTextContent() : "";
+				reportingOrg = reportingOrgNode.getElementsByTagName("narrative").item(0) != null
+						? reportingOrgNode.getElementsByTagName("narrative").item(0).getTextContent() : "";
 			}
+			
 			NodeList fieldNodeList;			
 			for (Field field : getFields()) {
 				switch (field.getType()) {
@@ -598,20 +601,23 @@ public class IATI2XProcessor implements ISourceProcessor {
 								localDate = e.getElementsByTagName("transaction-date").item(0).getAttributes().getNamedItem("iso-date").getNodeValue();
 							}
 							// Receiving Org
-							Element receiverNode = e.getElementsByTagName("receiver-org").item(0) != null ? (Element)e.getElementsByTagName("receiver-org").item(0) : null;
-							
+							Element receiverNode = e.getElementsByTagName("receiver-org").item(0) != null
+									? (Element) e.getElementsByTagName("receiver-org").item(0) : null;
+
 							receivingOrganization = "";
 							if (receiverNode != null) {
-								receivingOrganization = receiverNode.getElementsByTagName("narrative").item(0) != null ? receiverNode.getElementsByTagName("narrative").item(0).getTextContent() : "";
+								receivingOrganization = receiverNode.getElementsByTagName("narrative").item(0) != null
+										? receiverNode.getElementsByTagName("narrative").item(0).getTextContent() : "";
 							}
-							
-							Element providerNode = e.getElementsByTagName("provider-org").item(0) != null ? (Element)e.getElementsByTagName("provider-org").item(0) : null;
+
+							Element providerNode = e.getElementsByTagName("provider-org").item(0) != null
+									? (Element) e.getElementsByTagName("provider-org").item(0) : null;
 							if (providerNode != null) {
-								providerOrganization = providerNode.getElementsByTagName("narrative").item(0) != null ? providerNode.getElementsByTagName("narrative").item(0).getTextContent() : "";
+								providerOrganization = providerNode.getElementsByTagName("narrative").item(0) != null
+										? providerNode.getElementsByTagName("narrative").item(0).getTextContent() : "";
 							}
-							
-							
-							if (StringUtils.isEmpty(providerOrganization.trim()) ) {
+
+							if (StringUtils.isEmpty(providerOrganization.trim())) {
 								providerOrganization = reportingOrg;
 							}
 
