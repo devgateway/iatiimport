@@ -1054,10 +1054,10 @@ public class AMPStaticProcessor implements IDestinationProcessor {
     		fieldList.add(activityStatus);		
 		}
         if(destinationFieldsList.contains("a.c._chapter")){
-        	Field activityStatus = new Field("AC Chapter", "a.c._chapter", FieldType.LIST, false);
-    		activityStatus.setPossibleValues(getCodeListValues("a.c._chapter"));
-    		activityStatus.setRequired(false);
-    		fieldList.add(activityStatus);		
+        	Field acChapter = new Field("AC Chapter", "a.c._chapter", FieldType.LIST, true);
+        	acChapter.setPossibleValues(getCodeListValues("a.c._chapter"));
+        	acChapter.setRequired(false);
+    		fieldList.add(acChapter);		
 		}
 		
         if(destinationFieldsList.contains("fundings~type_of_assistance")){
