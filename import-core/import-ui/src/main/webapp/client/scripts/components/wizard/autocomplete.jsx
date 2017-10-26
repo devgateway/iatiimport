@@ -14,6 +14,7 @@ var AutoComplete = React.createClass({
     	  var language = this.props.language;
     	  var $el = $(this.refs[this.props.refId].getDOMNode());
           var searchEngine = new Bloodhound({
+              limit: 100,
               datumTokenizer: function (d) {
                   return Bloodhound.tokenizers.whitespace(d.multilangFields.title[language]);
               },
@@ -21,28 +22,28 @@ var AutoComplete = React.createClass({
               local: this.props.options
           });
           searchEngine.initialize();
-          
+
           $el.typeahead(null, {
               name      : this.props.name,
               display: function(v){ return v.multilangFields.title[language];},
               source    : searchEngine.ttAdapter()
           });
-          
-         
-          
-          $el.bind('typeahead:selected', function (obj, datum, name) {           
+
+
+
+          $el.bind('typeahead:selected', function (obj, datum, name) {
               self.props.onSelect(datum);
           });
 
-          if(this.props.value) {        	  
+          if(this.props.value) {
               $el.val(this.props.value.multilangFields.title[this.props.language]);
           }
     },
     initializeValuesAutocomplete: function(){
-    	
+
     	var $el = $(this.refs[this.props.refId].getDOMNode());
     	var bloodhound = new Bloodhound({
-    		limit: 10,
+        limit: 100,
     		datumTokenizer: function(item) {
     		      return Bloodhound.tokenizers.whitespace(item.label);
     		  },
@@ -60,7 +61,7 @@ var AutoComplete = React.createClass({
     	{
     		name: 'values',
     		displayKey: function(item) {
-    		    return item.label;        
+    		    return item.label;
     		},
     		source: bloodhound.ttAdapter(),
     		templates: {
@@ -73,18 +74,18 @@ var AutoComplete = React.createClass({
     	});
 
     	var self = this;
-    	
-    	$el.bind('typeahead:selected', function (obj, datum, name) {    	             
+
+    	$el.bind('typeahead:selected', function (obj, datum, name) {
     		self.props.handleChange(self.props.data, datum.value);
     	});
-    	
-    	        
-        $el.bind("paste", $.proxy(function(e){  
-           e.preventDefault();          
+
+
+        $el.bind("paste", $.proxy(function(e){
+           e.preventDefault();
             //var pastedData = e.originalEvent.clipboardData.getData('text');
-            //var option = _.find(this.props.options, { 'label':  pastedData});           
+            //var option = _.find(this.props.options, { 'label':  pastedData});
             //$(e.target).trigger('typeahead:selected', option);
-           
+
         }, this));
 
     	if(this.props.value) {
@@ -104,7 +105,7 @@ var AutoComplete = React.createClass({
         }
     	}
     },
-    render: function () {       
+    render: function () {
         return (
             <div className="autocomplete">
                 <input className="typeahead" placeholder={this.props.placeholder} ref={this.props.refId} type="text" />
