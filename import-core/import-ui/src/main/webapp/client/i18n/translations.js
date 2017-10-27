@@ -100,7 +100,7 @@ module.exports = {
 							'list' : 'List Fields',
 							'date' : 'Date Fields',
 							'transaction' : 'Transaction Fields',
-							'organization' : 'Orgarnization Fields',
+							'organization' : 'Organization Fields',
 							'location': 'Location Fields',
 							'msg_error_retrieving_destination_fields' : ' Error retrieving destination fields.',
 							'msg_error_retrieving_source_fields' : ' Error retrieving source fields.',
