@@ -31,7 +31,6 @@ import org.devgateway.importtool.services.processor.helper.FieldType;
 import org.devgateway.importtool.services.processor.helper.FieldValue;
 import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
 import org.devgateway.importtool.services.processor.helper.InternalDocument;
-import org.parboiled.common.StringUtils;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
@@ -405,15 +404,6 @@ public class IATI2XProcessor implements ISourceProcessor {
 			String currency = !("".equals(element.getAttribute("default-currency"))) ? element.getAttribute("default-currency") : this.defaultCurrency;			
 			document.addStringField("default-currency", currency);
 			String defaultLanguageCode = !("".equals(element.getAttribute("xml:lang"))) ? element.getAttribute("xml:lang") : this.defaultLanguage;
-			
-			Element reportingOrgNode = element.getElementsByTagName("reporting-org").item(0) != null
-					? (Element) element.getElementsByTagName("reporting-org").item(0) : null;
-			String reportingOrg = "";
-			if (reportingOrgNode != null) {
-				reportingOrg = reportingOrgNode.getElementsByTagName("narrative").item(0) != null
-						? reportingOrgNode.getElementsByTagName("narrative").item(0).getTextContent() : "";
-			}
-			
 			NodeList fieldNodeList;			
 			for (Field field : getFields()) {
 				switch (field.getType()) {
@@ -580,6 +570,7 @@ public class IATI2XProcessor implements ISourceProcessor {
 							String reference = "";
 							String receivingOrganization = "";
 							String providerOrganization = "";
+							String providerRef = "";
 
 							Element e = (Element) nodes.item(j);
 							// Reference
@@ -600,7 +591,7 @@ public class IATI2XProcessor implements ISourceProcessor {
 							{
 								localDate = e.getElementsByTagName("transaction-date").item(0).getAttributes().getNamedItem("iso-date").getNodeValue();
 							}
-							// Receiving Org
+							
 							Element receiverNode = e.getElementsByTagName("receiver-org").item(0) != null
 									? (Element) e.getElementsByTagName("receiver-org").item(0) : null;
 
@@ -615,16 +606,16 @@ public class IATI2XProcessor implements ISourceProcessor {
 							if (providerNode != null) {
 								providerOrganization = providerNode.getElementsByTagName("narrative").item(0) != null
 										? providerNode.getElementsByTagName("narrative").item(0).getTextContent() : "";
+							    providerRef = providerNode.getAttribute("ref");
 							}
 
-							if (StringUtils.isEmpty(providerOrganization.trim())) {
-								providerOrganization = reportingOrg;
-							}
-
+							log.info("provider-org:" + providerOrganization + ", providerRef:" + providerRef);
+							log.info("value:" + localValue);
 							Map<String, String> transactionFields = new HashMap<String, String>();
 							transactionFields.put("date", localDate);
 							transactionFields.put("receiving-org", receivingOrganization);
 							transactionFields.put("provider-org", providerOrganization);
+							transactionFields.put("provider-org-ref", providerRef);							
 							transactionFields.put("reference", reference);
 							transactionFields.put("value", localValue);
 							transactionFields.put("subtype", field.getSubType());

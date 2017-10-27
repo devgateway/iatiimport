@@ -528,6 +528,12 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			percentage = (StringUtils.isEmpty(recipientCountry.getPercentage())) ?  100.00 : Double.parseDouble(recipientCountry.getPercentage());
 		}
 		
+		Map<String, Map<String, String>> organizations = source.getOrganizationFields().entrySet().stream().filter(p -> {
+			return p.getValue().get("role").equals("Funding");
+		}).collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
+		
+		Entry<String, Map<String, String>> organization = organizations.entrySet().stream().findFirst().get();
+		
 		Map<String,List<JsonBean>> providerFundingDetails = new HashMap<>();
 		for (FieldMapping mapping : fieldMappings) {
 			Field sourceField = mapping.getSourceField();
@@ -545,10 +551,13 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				// Now we need the mapping of the field
 				String destinationSubType = destinationField.getSubType();                
 				for (Entry<String, Map<String, String>> entry : transactions.entrySet()) {
-					JsonBean fundingDetail = new JsonBean();
-					
+					JsonBean fundingDetail = new JsonBean();					
 					Map<String, String> value = entry.getValue();					
 					String provider = value.get("provider-org");
+					// if no provider tag on transaction use first funding org
+					if (StringUtils.isEmpty(provider)) {
+						provider = organization.getValue().get("value");
+					}
 					
 					log.info("Provider: " + value.get("provider-org"));
 					List<JsonBean> fundingDetails = providerFundingDetails.get(provider);
@@ -570,9 +579,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		}
 
 		
-		Map<String, Map<String, String>> organizations = source.getOrganizationFields().entrySet().stream().filter(p -> {
-			return p.getValue().get("role").equals("Funding");
-		}).collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
+		
 
 		for (Entry<String, Map<String, String>> entry : organizations.entrySet()) {
 			log.info("Donor: " + entry.getValue().get("value"));

@@ -381,6 +381,21 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 			String currency = !("".equals(element.getAttribute("default-currency"))) ? element.getAttribute("default-currency") : this.defaultCurrency;			
 			document.addStringField("default-currency", currency);	
 			String defaultLanguageCode = !("".equals(element.getAttribute("xml:lang"))) ? element.getAttribute("xml:lang") : this.defaultLanguage;
+			
+			Element reportingOrgNode = element.getElementsByTagName("reporting-org").item(0) != null
+					? (Element) element.getElementsByTagName("reporting-org").item(0) : null;
+			String reportingOrg = "";
+			String reportingOrgRef = "";
+			String reportingOrgType = "";
+			if (reportingOrgNode != null) {
+				reportingOrg = reportingOrgNode.getChildNodes().item(0).getNodeValue();
+				reportingOrgRef = reportingOrgNode.getAttribute("ref");	
+				reportingOrgType = reportingOrgNode.getAttribute("type");
+			}
+			
+			log.info("reportingOrg:" + reportingOrg );
+			log.info("reportingOrgRef:" + reportingOrgRef);
+			
 			NodeList fieldNodeList;			
 			for (Field field : getFields()) {
 				switch (field.getType()) {
@@ -489,10 +504,13 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 								if(!field.getPossibleValues().stream().anyMatch(n->{ return n.getCode().equals(stringOrgValue);})) {									
 									field.getPossibleValues().add(fv);
 								}
+								
+								
 								document.addOrganizationField(field.getFieldName() + "_" + field.getSubType() + "_" + index, orgFields);
 							}
 						}
 					}
+					
 					break;
 				case MULTILANG_STRING:					
 					Map<String, String> mlv = new HashMap<String, String>();
@@ -540,16 +558,36 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 							if (!isValidDate(localDate)){
 								localDate = (e.getElementsByTagName("transaction-date").item(0) != null && e.getElementsByTagName("transaction-date").item(0).getAttributes() != null) ? e.getElementsByTagName("transaction-date").item(0).getAttributes().getNamedItem("iso-date").getNodeValue() : "";
 							}
-							// Receiving Org
-							receivingOrganization = (e.getElementsByTagName("receiver-org").item(0) != null && e.getElementsByTagName("receiver-org").item(0).getChildNodes().getLength() > 0) ? e.getElementsByTagName("receiver-org").item(0).getChildNodes().item(0).getNodeValue() : null;
+							
+							Element receiverNode = e.getElementsByTagName("receiver-org").item(0) != null
+									? (Element) e.getElementsByTagName("receiver-org").item(0) : null;
 
+							receivingOrganization = "";
+							if (receiverNode != null) {
+								receivingOrganization = receiverNode.getChildNodes().item(0) != null
+										? receiverNode.getChildNodes().item(0).getNodeValue() : "";
+							}
+							
+							
+							String providerOrganization = ""; 
+							String providerRef = "";
+									
+					        Element providerNode = e.getElementsByTagName("provider-org").item(0) != null
+									? (Element) e.getElementsByTagName("provider-org").item(0) : null;
+									
+							if (providerNode != null) {
+								providerOrganization = providerNode.getChildNodes().getLength() > 0 ? providerNode.getChildNodes().item(0).getNodeValue() : "";
+							    providerRef = providerNode.getAttribute("ref");
+							}
+														
 							Map<String, String> transactionFields = new HashMap<String, String>();
 							transactionFields.put("date", localDate);
 							transactionFields.put("receiving-org", receivingOrganization);
+							transactionFields.put("provider-org", providerOrganization);
+							transactionFields.put("provider-org-ref", providerRef);	
 							transactionFields.put("reference", reference);
 							transactionFields.put("value", localValue);
 							transactionFields.put("subtype", field.getSubType());
-
 							document.addTransactionField("transaction" + field.getSubType() + "_" + j, transactionFields);
 						}
 
