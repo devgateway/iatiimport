@@ -367,7 +367,10 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 					if(!("/iati-activities/iati-activity[".equals(query.toString()))){					
 						query.append(" and ");	
 					}
-					query.append(field.getFieldName() + "[");
+					//Some filters need relative paths
+					String fieldName = getFieldName(field.getFieldName());
+
+					query.append(fieldName + "[");
 					for (int i = 0;i < filter.getFilters().size(); i++) {
 						String value = filter.getFilters().get(i);
 						if(i > 0){
@@ -389,7 +392,16 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 		NodeList activities = (NodeList)xPath.compile(query.toString()).evaluate(this.getDoc(), XPathConstants.NODESET);
 		return activities;
 	}
-	
+
+	private String getFieldName(String fieldName) {
+		String name = fieldName;
+		switch(fieldName) {
+		case "sector":
+			name = "transaction/sector";
+			break;
+		}
+		return name;
+	}
 	
 	private List<InternalDocument> extractDocuments(Document doc) throws Exception {		
 		// Extract global values		
