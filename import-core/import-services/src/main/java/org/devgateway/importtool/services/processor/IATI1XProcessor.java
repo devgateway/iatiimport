@@ -567,24 +567,24 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 								receivingOrganization = receiverNode.getChildNodes().item(0) != null
 										? receiverNode.getChildNodes().item(0).getNodeValue() : "";
 							}
-							
-							
-							String providerOrganization = ""; 
+
+							String providerOrganization = "";
 							String providerRef = "";
-									
-					        Element providerNode = e.getElementsByTagName("provider-org").item(0) != null
+
+							Element providerNode = e.getElementsByTagName("provider-org").item(0) != null
 									? (Element) e.getElementsByTagName("provider-org").item(0) : null;
-									
+
 							if (providerNode != null) {
-								providerOrganization = providerNode.getChildNodes().getLength() > 0 ? providerNode.getChildNodes().item(0).getNodeValue() : "";
-							    providerRef = providerNode.getAttribute("ref");
+								providerOrganization = providerNode.getChildNodes().getLength() > 0
+										? providerNode.getChildNodes().item(0).getNodeValue() : "";
+								providerRef = providerNode.getAttribute("ref");
 							}
-														
+
 							Map<String, String> transactionFields = new HashMap<String, String>();
 							transactionFields.put("date", localDate);
 							transactionFields.put("receiving-org", receivingOrganization);
 							transactionFields.put("provider-org", providerOrganization);
-							transactionFields.put("provider-org-ref", providerRef);	
+							transactionFields.put("provider-org-ref", providerRef);
 							transactionFields.put("reference", reference);
 							transactionFields.put("value", localValue);
 							transactionFields.put("subtype", field.getSubType());

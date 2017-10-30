@@ -606,21 +606,19 @@ public class IATI2XProcessor implements ISourceProcessor {
 							if (providerNode != null) {
 								providerOrganization = providerNode.getElementsByTagName("narrative").item(0) != null
 										? providerNode.getElementsByTagName("narrative").item(0).getTextContent() : "";
-							    providerRef = providerNode.getAttribute("ref");
+								providerRef = providerNode.getAttribute("ref");
 							}
 
-							log.info("provider-org:" + providerOrganization + ", providerRef:" + providerRef);
-							log.info("value:" + localValue);
 							Map<String, String> transactionFields = new HashMap<String, String>();
 							transactionFields.put("date", localDate);
 							transactionFields.put("receiving-org", receivingOrganization);
 							transactionFields.put("provider-org", providerOrganization);
-							transactionFields.put("provider-org-ref", providerRef);							
+							transactionFields.put("provider-org-ref", providerRef);
 							transactionFields.put("reference", reference);
 							transactionFields.put("value", localValue);
 							transactionFields.put("subtype", field.getSubType());
-							
-							document.addTransactionField("transaction" + field.getSubType() + "_" + j, transactionFields);
+							document.addTransactionField("transaction" + field.getSubType() + "_" + j,
+									transactionFields);
 						}
 
 					} catch (XPathExpressionException e1) {

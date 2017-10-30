@@ -517,105 +517,111 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		List<JsonBean> fundings = new ArrayList<>();
 		String currencyCode = source.getStringFields().get("default-currency");
 		String currencyIdString = getCurrencyId(currencyCode);
-		if(currencyIdString == null){
+		if (currencyIdString == null) {
 			throw new CurrencyNotFoundException("Currency code " + currencyCode + " could not be found in AMP");
 		}
+		
 		int currencyId = Integer.parseInt(currencyIdString);
-		Optional<FieldValue> optionalRecipientCountry = source.getRecepientCountryFields().get("recipient-country").stream().findFirst();
+		Optional<FieldValue> optionalRecipientCountry = source.getRecepientCountryFields().get("recipient-country")
+				.stream().findFirst();
+		
 		Double percentage = 100.00;
-		if(optionalRecipientCountry.isPresent()){
+		if (optionalRecipientCountry.isPresent()) {
 			FieldValue recipientCountry = optionalRecipientCountry.get();
-			percentage = (StringUtils.isEmpty(recipientCountry.getPercentage())) ?  100.00 : Double.parseDouble(recipientCountry.getPercentage());
+			percentage = (StringUtils.isEmpty(recipientCountry.getPercentage())) ? 100.00
+					: Double.parseDouble(recipientCountry.getPercentage());
 		}
-		
-		Map<String, Map<String, String>> organizations = source.getOrganizationFields().entrySet().stream().filter(p -> {
-			return p.getValue().get("role").equals("Funding");
-		}).collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
-		
+
+		Map<String, Map<String, String>> organizations = source.getOrganizationFields().entrySet().stream()
+				.filter(p -> {
+					return p.getValue().get("role").equals("Funding");
+				}).collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
+
 		Entry<String, Map<String, String>> organization = organizations.entrySet().stream().findFirst().get();
-		
-		Map<String,List<JsonBean>> providerFundingDetails = new HashMap<>();
+
+		Map<String, List<JsonBean>> providerFundingDetails = new HashMap<>();
 		for (FieldMapping mapping : fieldMappings) {
 			Field sourceField = mapping.getSourceField();
 			Field destinationField = mapping.getDestinationField();
-			if (sourceField.getType() == FieldType.TRANSACTION) {
-				// What kind of transaction is this???
-				String sourceSubType = sourceField.getSubType();
 
-				// Get the transactions from the source that are of that subtype
-				// then!!!
-				Map<String, Map<String, String>> transactions = source.getTransactionFields().entrySet().stream().filter(p -> {
-					return p.getValue().get("subtype").equals(sourceSubType);
-				}).collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
+			if (sourceField.getType() == FieldType.TRANSACTION) {
+
+				String sourceSubType = sourceField.getSubType();
+				Map<String, Map<String, String>> transactions = source.getTransactionFields().entrySet().stream()
+						.filter(p -> {
+							return p.getValue().get("subtype").equals(sourceSubType);
+						}).collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
 
 				// Now we need the mapping of the field
-				String destinationSubType = destinationField.getSubType();                
+				String destinationSubType = destinationField.getSubType();
+				// this maps transactions to donor organizations using the
+				// provider-org
 				for (Entry<String, Map<String, String>> entry : transactions.entrySet()) {
-					JsonBean fundingDetail = new JsonBean();					
-					Map<String, String> value = entry.getValue();					
+					JsonBean fundingDetail = new JsonBean();
+					Map<String, String> value = entry.getValue();
 					String provider = value.get("provider-org");
 					// if no provider tag on transaction use first funding org
-					if (StringUtils.isEmpty(provider)) {
+					// in participating-orgs
+					if (StringUtils.isEmpty(provider.trim())) {
 						provider = organization.getValue().get("value");
 					}
-					
-					log.info("Provider: " + value.get("provider-org"));
+
 					List<JsonBean> fundingDetails = providerFundingDetails.get(provider);
 					if (fundingDetails == null) {
 						fundingDetails = new ArrayList<JsonBean>();
 					}
-					
+
 					String amount = value.get("value");
 					String dateString = value.get("date");
 					fundingDetail.set("transaction_type", getTransactionType(sourceSubType));
 					fundingDetail.set("adjustment_type", getAdjustmentType(destinationSubType));
 					fundingDetail.set("transaction_date", getTransactionDate(dateString));
 					fundingDetail.set("currency", currencyId);
-					fundingDetail.set("transaction_amount", getTransactionAmount(amount,percentage));
+					fundingDetail.set("transaction_amount", getTransactionAmount(amount, percentage));
 					fundingDetails.add(fundingDetail);
 					providerFundingDetails.put(provider, fundingDetails);
 				}
 			}
 		}
 
-		
-		
-
+		// create fundings and add transactions to the fundings
 		for (Entry<String, Map<String, String>> entry : organizations.entrySet()) {
-			log.info("Donor: " + entry.getValue().get("value"));
-			List<JsonBean> fundingDetails = providerFundingDetails.get(entry.getValue().get("value")); 
+			List<JsonBean> fundingDetails = providerFundingDetails.get(entry.getValue().get("value"));
 			if (fundingDetails != null) {
 				JsonBean funding = new JsonBean();
-				int donorId = getIdFromList(entry.getValue().get("value"), "participating-org", fieldMappings, valueMappings, false);
-				funding.set("donor_organization_id", donorId);	
-				
+				int donorId = getIdFromList(entry.getValue().get("value"), "participating-org", fieldMappings,
+						valueMappings, false);
+				funding.set("donor_organization_id", donorId);
+
 				try {
 					String typeOfAssistance = source.getStringFields().get("default-finance-type");
-					if(typeOfAssistance != null){
-						funding.set("type_of_assistance", getIdFromList(typeOfAssistance, "default-finance-type", fieldMappings, valueMappings, true));
-					}			
+					if (typeOfAssistance != null) {
+						funding.set("type_of_assistance", getIdFromList(typeOfAssistance, "default-finance-type",
+								fieldMappings, valueMappings, true));
+					}
 				} catch (ValueMappingException e) {
 					log.debug("Dependent field not loaded: default-finance-type");
 				}
 
 				try {
-					if(source.getStringFields().get("default-aid-type") != null ){
+					if (source.getStringFields().get("default-aid-type") != null) {
 						String financingInstrument = source.getStringFields().get("default-aid-type");
-						funding.set("financing_instrument", getIdFromList(financingInstrument, "default-aid-type", fieldMappings, valueMappings, true));
-					}			
+						funding.set("financing_instrument", getIdFromList(financingInstrument, "default-aid-type",
+								fieldMappings, valueMappings, true));
+					}
 				} catch (ValueMappingException e) {
 					log.debug("Dependent field not loaded: default-aid-type");
 				}
-				
-				if(destinationFieldsList.contains("fundings~source_role")){
-					  funding.set("source_role", 1);	
+
+				if (destinationFieldsList.contains("fundings~source_role")) {
+					funding.set("source_role", 1);
 				}
-				
+
 				funding.set("funding_details", fundingDetails);
 				fundings.add(funding);
 			}
 		}
-				
+
 		return fundings;
 	}
 	
@@ -842,8 +848,9 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		String transactionTypeId = transactionType.getPossibleValues().stream().filter(n -> {
 			return n.getValue().equals(getTTNameSource(transactionTypeValue));
 		}).findFirst().get().getCode();
+		
 		return Integer.parseInt(transactionTypeId);
-		// return null;
+		
 	}
 
 	private String getTTNameSource(String transactionTypeValue) {
