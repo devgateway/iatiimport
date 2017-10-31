@@ -11,6 +11,7 @@ public class Field {
 	private String fieldName;
 	private String displayName;
 	private Map<String, String> attributes;
+	private Map<String, String> multiLangDisplayName;
 	private List<Field> childFields;
 	private List<FieldValue> possibleValues;
 	private List<FieldValue> usedValues;
@@ -198,6 +199,14 @@ public class Field {
 
 	public void setUsedValues(List<FieldValue> usedValues) {
 		this.usedValues = usedValues;
+	}
+
+	public Map<String, String> getMultiLangDisplayName() {
+		return multiLangDisplayName;
+	}
+
+	public void setMultiLangDisplayName(Map<String, String> multiLangDisplayName) {
+		this.multiLangDisplayName = multiLangDisplayName;
 	}
 
 }

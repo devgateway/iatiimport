@@ -9,5 +9,7 @@ import org.springframework.data.repository.query.Param;
 public interface FieldMappingTemplateRepository extends PagingAndSortingRepository<FieldMappingTemplate, Long> {
 	
 	List<FieldMappingTemplate> findAll();
-	FieldMappingTemplate findById(@Param("id") Long id);	
+	FieldMappingTemplate findById(@Param("id") Long id);
+	FieldMappingTemplate findByName(@Param("name") String name);
+	
 }

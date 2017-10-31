@@ -91,6 +91,7 @@ public class DocumentMapper implements IDocumentMapper {
 		InternalDocument source = doc.getSourceDocument();
 		InternalDocument destination = doc.getDestinationDocument();
 		ActionResult result = null;
+
 		switch (doc.getOperation()) {
 		case INSERT:
 			// For now, we pass the mapping. Find a better more efficient way.
