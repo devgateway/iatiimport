@@ -460,7 +460,7 @@ public class IATI2XProcessor implements ISourceProcessor {
 					for (int j = 0; j < fieldNodeList.getLength(); j++) {
 						Element fieldElement = (Element) fieldNodeList.item(j);
 						String code = extractNarrative(fieldElement, "name");							
-						if(!code.isEmpty()) {
+						if(code != null && !code.isEmpty()) {
 							codesLocation.add(code);
 							FieldValue fv = new FieldValue();
 							if(code != null && !code.isEmpty() ){
