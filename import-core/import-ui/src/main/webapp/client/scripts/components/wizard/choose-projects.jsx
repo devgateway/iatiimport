@@ -183,18 +183,18 @@ var ChooseProjects = React.createClass({
 	getTitle: function(multilangFields){
 	  var language = this.props.i18nLib.lng() || 'en';   
 	  var title = multilangFields.title[language];
-	  if(title == null || title.length == 0){	  
+	  if (title == null || title.length == 0) {	  
 	     for (var key in multilangFields.title) {
            if (multilangFields.title.hasOwnProperty(key)) {             
-              if(title == null || title.length == 0){
-                  title = multilangFields.title[key];;
+              if (title == null || title.length == 0) {
+                  title = multilangFields.title[key];
               }
            }
          }
 	 }
 	 return title
 	},
-	showSimilarProjectsDialog(event) {
+	showSimilarProjectsDialog: function(event) {
 	   var projectMapping = _.find(this.state.projectData, function(item) { return item.id === event.target.dataset.id;});
 	   this.setState({showSimilarProjects: !this.state.showSimilarProjects, projectMapping: projectMapping});
 	},

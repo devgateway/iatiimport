@@ -4,7 +4,7 @@ var SimilarProjectsDialog = React.createClass({
     getInitialState: function() {
        return {selectedProject: null};
     }, 
-    onProjectSelectionChange(event){      
+    onProjectSelectionChange: function(event) {      
        var selectedProject = _.find(this.props.projectMapping.projectsWithSimilarTitles, function(item) { return item.identifier === event.target.dataset.id;});
        this.setState({selectedProject: selectedProject});
     },
@@ -23,7 +23,7 @@ var SimilarProjectsDialog = React.createClass({
           $.map(this.props.projectMapping.projectsWithSimilarTitles, function (item, i) { 
             rows.push(<tr>
                        <td>
-                        <input type="checkbox" checked={this.state.selectedProject ? this.state.selectedProject.identifier === item.identifier : false} data-id={item.identifier} onChange={this.onProjectSelectionChange} />
+                        <input type="checkbox" checked={this.state.selectedProject ? (this.state.selectedProject.identifier === item.identifier) : false} data-id={item.identifier} onChange={this.onProjectSelectionChange} />
                           </td>
                           <td>
                            {item.identifier}

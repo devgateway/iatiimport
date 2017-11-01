@@ -87,16 +87,16 @@ var AutoComplete = React.createClass({
            
         }, this));
 
-    	if(this.props.value) {
+    	if (this.props.value) {
     		$el.val(this.props.value);
-    	} else{
+    	} else {
     	   $el.val('');
     	}
 
     },
     componentDidUpdate: function(prevProps, prevState){
     	var $el = $(this.refs[this.props.refId].getDOMNode());
-    	if(this.props.value) {
+    	if (this.props.value) {
     		$el.val(this.props.value);
     	} else {
     	   $el.val('');
