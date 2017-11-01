@@ -217,6 +217,29 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 			NodeList nodeList = doc.getElementsByTagName(field.getFieldName());
 			List<FieldValue> reducedPossibleValues = new ArrayList<FieldValue>();
 			switch (field.getType()) {
+			case ORGANIZATION:
+				if (field.getPossibleValues() == null) {
+					field.setPossibleValues(new ArrayList<FieldValue>());
+				}
+				if (nodeList.getLength() > 0) {					
+					for (int i = 0; i < nodeList.getLength(); i++) {
+						Element fieldElement = (Element) nodeList.item(i);
+						final String orgCode = fieldElement.getAttribute("value");
+						Optional<FieldValue> fieldValue = field.getPossibleValues().stream().filter(n -> {
+							return n.getCode().equals(orgCode);
+						}).findFirst();
+						if(!fieldValue.isPresent()) {
+							FieldValue newfv = new FieldValue();
+							final String name = fieldElement.getTextContent();
+							newfv.setCode(orgCode);
+							newfv.setValue(name);							
+							newfv.setIndex(field.getPossibleValues().size());
+							field.getPossibleValues().add(newfv);
+						}
+					}
+				}
+				break;
+			case LOCATION:
 			case RECIPIENT_COUNTRY:
 			case LIST:
 				if (nodeList.getLength() > 0) {					
@@ -248,11 +271,11 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 						}
 					}
 				}
+				field.setPossibleValues(reducedPossibleValues);
 				break;
 			default:
 				break;
 			}
-			field.setPossibleValues(reducedPossibleValues);
 		}
 		return filterFieldList;
 	}
@@ -335,15 +358,19 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 		
 		this.getFields().forEach(field -> {			
 			if(field.getType().equals(FieldType.LIST)){				
-				Field filter = filterFieldList.stream().filter(n -> {
+				Optional<Field> optFilter = filterFieldList.stream().filter(n -> {
 					return field.getFieldName().equals(n.getFieldName());
-				}).findFirst().get();
+				}).findFirst();
 				
-				if(filter.getFilters().size() > 0){			
+				Field filter = optFilter.isPresent() ? optFilter.get() : null;
+				if(filter != null && filter.getFilters().size() > 0){		
 					if(!("/iati-activities/iati-activity[".equals(query.toString()))){					
 						query.append(" and ");	
 					}
-					query.append(field.getFieldName() + "[");
+					//Some filters need relative paths
+					String fieldName = getFieldName(field.getFieldName());
+
+					query.append(fieldName + "[");
 					for (int i = 0;i < filter.getFilters().size(); i++) {
 						String value = filter.getFilters().get(i);
 						if(i > 0){
@@ -365,7 +392,16 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 		NodeList activities = (NodeList)xPath.compile(query.toString()).evaluate(this.getDoc(), XPathConstants.NODESET);
 		return activities;
 	}
-	
+
+	private String getFieldName(String fieldName) {
+		String name = fieldName;
+		switch(fieldName) {
+		case "sector":
+			name = "transaction/sector";
+			break;
+		}
+		return name;
+	}
 	
 	private List<InternalDocument> extractDocuments(Document doc) throws Exception {		
 		// Extract global values		
@@ -382,23 +418,39 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 			document.addStringField("default-currency", currency);	
 			String defaultLanguageCode = !("".equals(element.getAttribute("xml:lang"))) ? element.getAttribute("xml:lang") : this.defaultLanguage;
 			
-			Element reportingOrgNode = element.getElementsByTagName("reporting-org").item(0) != null
-					? (Element) element.getElementsByTagName("reporting-org").item(0) : null;
-			String reportingOrg = "";
-			String reportingOrgRef = "";
-			String reportingOrgType = "";
-			if (reportingOrgNode != null) {
-				reportingOrg = reportingOrgNode.getChildNodes().item(0).getNodeValue();
-				reportingOrgRef = reportingOrgNode.getAttribute("ref");	
-				reportingOrgType = reportingOrgNode.getAttribute("type");
-			}
-			
-			log.info("reportingOrg:" + reportingOrg );
-			log.info("reportingOrgRef:" + reportingOrgRef);
 			
 			NodeList fieldNodeList;			
 			for (Field field : getFields()) {
 				switch (field.getType()) {
+				case LOCATION:
+					fieldNodeList = element.getElementsByTagName(field.getFieldName());
+					List <String> codesLocation = new ArrayList<String>(); 
+					for (int j = 0; j < fieldNodeList.getLength(); j++) {
+						Element fieldElement = (Element) fieldNodeList.item(j);
+						String code = "code";							
+						if(!code.isEmpty()) {
+							codesLocation.add(code);
+							FieldValue fv = new FieldValue();
+							if(code != null && !code.isEmpty() ){
+								fv.setCode(code);
+								fv.setValue(code);	
+								fv.setSelected(true);
+							}
+							int index = field.getPossibleValues() == null ? 0 : field.getPossibleValues().size();
+							fv.setIndex(index);
+							if (field.getPossibleValues() == null) {
+								field.setPossibleValues(new ArrayList<FieldValue>());
+							}
+							if(!field.getPossibleValues().stream().anyMatch(n->{ return n.getCode().equals(code);})) {									
+								field.getPossibleValues().add(fv);
+							}
+						}				
+					}
+					if(!codesLocation.isEmpty()){
+						String[] codeValues = codesLocation.stream().toArray(String[]::new);						
+						document.addStringMultiField(field.getFieldName(), codeValues);
+					}
+					break;
 				case LIST:
 					if (field.isMultiple()) {
 						fieldNodeList = element.getElementsByTagName(field.getFieldName());						
@@ -543,8 +595,7 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 						nodes = (NodeList) xPath.evaluate("transaction/transaction-type[@code='" + field.getSubType() + "' or @code= '" + field.getSubTypeCode() + "']/parent::*", element, XPathConstants.NODESET);
 						for (int j = 0; j < nodes.getLength(); ++j) {
 							String reference = "";
-							String receivingOrganization = "";
-
+							
 							Element e = (Element) nodes.item(j);
 							// Reference
 							reference = e.getAttribute("ref");
@@ -562,28 +613,37 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 							Element receiverNode = e.getElementsByTagName("receiver-org").item(0) != null
 									? (Element) e.getElementsByTagName("receiver-org").item(0) : null;
 
-							receivingOrganization = "";
-							if (receiverNode != null) {
-								receivingOrganization = receiverNode.getChildNodes().item(0) != null
+							final String receivingOrganization = (receiverNode != null && receiverNode.getChildNodes().item(0) != null)
 										? receiverNode.getChildNodes().item(0).getNodeValue() : "";
-							}
-
-							String providerOrganization = "";
-							String providerRef = "";
-
+							
 							Element providerNode = e.getElementsByTagName("provider-org").item(0) != null
 									? (Element) e.getElementsByTagName("provider-org").item(0) : null;
 
-							if (providerNode != null) {
-								providerOrganization = providerNode.getChildNodes().getLength() > 0
-										? providerNode.getChildNodes().item(0).getNodeValue() : "";
-								providerRef = providerNode.getAttribute("ref");
-							}
+							final String providingOrganization = (providerNode != null && providerNode.getChildNodes().getLength() > 0)
+							? providerNode.getChildNodes().item(0).getNodeValue() : "";
+							final String providerRef = (providerNode != null) ? providerNode.getAttribute("ref") : "";
+											
+							// Get the field for provider org
+							Optional<Field> fieldValue = filterFieldList.stream().filter(n -> {
+								return "provider-org".equals(n.getFieldName());
+							}).findFirst();
 
+							// If it has filters set, check if this transaction complies
+							if(fieldValue.isPresent() && fieldValue.get().getFilters().size() > 0) {
+								// See if the current transaction has the correct provider organization
+								Optional<String> optField = fieldValue.get().getFilters().stream().filter(n -> {
+									return n.equals(providingOrganization);
+								}).findAny();
+								
+								if(!optField.isPresent()) { // If it's not there, then move to the next transaction
+									continue;
+								}
+							}
+							
 							Map<String, String> transactionFields = new HashMap<String, String>();
 							transactionFields.put("date", localDate);
 							transactionFields.put("receiving-org", receivingOrganization);
-							transactionFields.put("provider-org", providerOrganization);
+							transactionFields.put("providing-org", providingOrganization);
 							transactionFields.put("provider-org-ref", providerRef);
 							transactionFields.put("reference", reference);
 							transactionFields.put("value", localValue);
@@ -746,6 +806,12 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 		fieldList.add(sector);
 		filterFieldList.add(sector);
 
+		Field location = new Field("Location", "location", FieldType.LOCATION, true);
+		location.setPossibleValues(new ArrayList<FieldValue>());
+		location.setMultiple(true);
+		location.setPercentage(true);
+		fieldList.add(location);
+
 		// Dates
 		Field activityDateStartPlanned = new Field("Activity Date Start Planned", "activity-date", FieldType.DATE, true);
 		activityDateStartPlanned.setSubType("start-planned");
@@ -779,6 +845,24 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 		participatingOrg.setSubType("Funding");
 		fieldList.add(participatingOrg);
 		
+		Field accountableOrg = new Field("Accountable Organization", "participating-org", FieldType.ORGANIZATION, true);
+		accountableOrg.setSubType("Accountable");
+		fieldList.add(accountableOrg);
+
+		Field extendingOrg = new Field("Extending Organization", "participating-org", FieldType.ORGANIZATION, true);
+		extendingOrg.setSubType("Extending");
+		fieldList.add(extendingOrg);
+
+		Field implementingOrg = new Field("Implementing Organization", "participating-org", FieldType.ORGANIZATION, true);
+		implementingOrg.setSubType("Implementing");
+		fieldList.add(implementingOrg);
+		
+		// Provider Organization, within Transactions
+		Field providerOrg = new Field("Provider Organization", "provider-org", FieldType.ORGANIZATION, false);
+		providerOrg.setSubType("Provider");
+		fieldList.add(providerOrg);
+		filterFieldList.add(providerOrg);
+
 		//Contact Info
 		Field contact = new Field("Contact Info", "contact-info", FieldType.CONTACT, false);
 		contact.setMultiple(true);

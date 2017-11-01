@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -13,6 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -240,6 +243,35 @@ public class IATI2XProcessor implements ISourceProcessor {
 			NodeList nodeList = doc.getElementsByTagName(field.getFieldName());
 			List<FieldValue> reducedPossibleValues = new ArrayList<FieldValue>();
 			switch (field.getType()) {
+			case ORGANIZATION:
+				if (field.getPossibleValues() == null) {
+					field.setPossibleValues(new ArrayList<FieldValue>());
+				}
+				if (nodeList.getLength() > 0) {					
+					for (int i = 0; i < nodeList.getLength(); i++) {
+						Element fieldElement = (Element) nodeList.item(i);
+						
+						if(fieldElement.getElementsByTagName("narrative").getLength() > 0) {
+							final String orgCode = fieldElement.getElementsByTagName("narrative").item(0).getTextContent();
+							if("".equals(orgCode.trim())) {
+								continue;
+							}
+							Optional<FieldValue> fieldValue = field.getPossibleValues().stream().filter(n -> {
+								return n.getCode().equals(orgCode);
+							}).findFirst();
+							if(!fieldValue.isPresent()) {
+								FieldValue newfv = new FieldValue();
+								newfv.setCode(orgCode);
+								newfv.setValue(orgCode);							
+								newfv.setIndex(field.getPossibleValues().size());
+								field.getPossibleValues().add(newfv);
+							}
+						}
+					}
+				}
+				field.getPossibleValues().sort(Comparator.comparing(FieldValue::getCode));
+				break;
+			case LOCATION:
 			case RECIPIENT_COUNTRY:
 			case LIST:
 				if (nodeList.getLength() > 0) {					
@@ -269,11 +301,11 @@ public class IATI2XProcessor implements ISourceProcessor {
 						}
 					}
 				}
+				field.setPossibleValues(reducedPossibleValues);
 				break;
 			default:
 				break;
 			}
-			field.setPossibleValues(reducedPossibleValues);
 		}
 		return filterFieldList;
 	}
@@ -358,15 +390,19 @@ public class IATI2XProcessor implements ISourceProcessor {
 		
 		this.getFields().forEach(field -> {			
 			if(field.getType().equals(FieldType.LIST)){				
-				Field filter = filterFieldList.stream().filter(n -> {
+				Optional<Field> optFilter = filterFieldList.stream().filter(n -> {
 					return field.getFieldName().equals(n.getFieldName());
-				}).findFirst().get();
+				}).findFirst();
 				
-				if(filter.getFilters().size() > 0){		
+				Field filter = optFilter.isPresent() ? optFilter.get() : null;
+				if(filter != null && filter.getFilters().size() > 0){		
 					if(!("/iati-activities/iati-activity[".equals(query.toString()))){					
 						query.append(" and ");	
 					}
-					query.append(field.getFieldName() + "[");
+					
+					//Some filters need relative paths
+					String fieldName = getFieldName(field.getFieldName());
+					query.append(fieldName + "[");
 					for (int i = 0;i < filter.getFilters().size(); i++) {
 						String value = filter.getFilters().get(i);
 						if(i > 0){
@@ -389,6 +425,17 @@ public class IATI2XProcessor implements ISourceProcessor {
 		return activities;
 	 }
 
+	private String getFieldName(String fieldName) {
+		String name = fieldName;
+		switch(fieldName) {
+		case "sector":
+			name = "transaction/sector";
+			break;
+		}
+		return name;
+	}
+
+
 	private List<InternalDocument> extractDocuments(Document doc) throws Exception {
 		// Extract global values
 
@@ -407,6 +454,35 @@ public class IATI2XProcessor implements ISourceProcessor {
 			NodeList fieldNodeList;			
 			for (Field field : getFields()) {
 				switch (field.getType()) {
+				case LOCATION:
+					fieldNodeList = element.getElementsByTagName(field.getFieldName());
+					List <String> codesLocation = new ArrayList<String>(); 
+					for (int j = 0; j < fieldNodeList.getLength(); j++) {
+						Element fieldElement = (Element) fieldNodeList.item(j);
+						String code = extractNarrative(fieldElement, "name");							
+						if(code != null && !code.isEmpty()) {
+							codesLocation.add(code);
+							FieldValue fv = new FieldValue();
+							if(code != null && !code.isEmpty() ){
+								fv.setCode(code);
+								fv.setValue(code);	
+								fv.setSelected(true);
+							}
+							int index = field.getPossibleValues() == null ? 0 : field.getPossibleValues().size();
+							fv.setIndex(index);
+							if (field.getPossibleValues() == null) {
+								field.setPossibleValues(new ArrayList<FieldValue>());
+							}
+							if(!field.getPossibleValues().stream().anyMatch(n->{ return n.getCode().equals(code);})) {									
+								field.getPossibleValues().add(fv);
+							}
+						}				
+					}
+					if(!codesLocation.isEmpty()){
+						String[] codeValues = codesLocation.stream().toArray(String[]::new);						
+						document.addStringMultiField(field.getFieldName(), codeValues);
+					}
+					break;
 				case LIST:
 					if (field.isMultiple()) {
 						fieldNodeList = element.getElementsByTagName(field.getFieldName());						
@@ -568,11 +644,7 @@ public class IATI2XProcessor implements ISourceProcessor {
 						nodes = (NodeList) xPath.evaluate("transaction/transaction-type[@code='" + field.getSubType() + "' or @code= '" + field.getSubTypeCode() + "']/parent::*", element, XPathConstants.NODESET);
 						for (int j = 0; j < nodes.getLength(); ++j) {
 							String reference = "";
-							String receivingOrganization = "";
-							String providerOrganization = "";
-							String providerRef = "";
-
-							Element e = (Element) nodes.item(j);
+													Element e = (Element) nodes.item(j);
 							// Reference
 							reference = e.getAttribute("ref");
 							// Amount
@@ -594,25 +666,45 @@ public class IATI2XProcessor implements ISourceProcessor {
 							
 							Element receiverNode = e.getElementsByTagName("receiver-org").item(0) != null
 									? (Element) e.getElementsByTagName("receiver-org").item(0) : null;
-
-							receivingOrganization = "";
-							if (receiverNode != null) {
-								receivingOrganization = receiverNode.getElementsByTagName("narrative").item(0) != null
+														
+							final String receivingOrganization = (receiverNode != null && receiverNode.getElementsByTagName("narrative").item(0) != null)
 										? receiverNode.getElementsByTagName("narrative").item(0).getTextContent() : "";
-							}
+							
 
 							Element providerNode = e.getElementsByTagName("provider-org").item(0) != null
 									? (Element) e.getElementsByTagName("provider-org").item(0) : null;
-							if (providerNode != null) {
-								providerOrganization = providerNode.getElementsByTagName("narrative").item(0) != null
-										? providerNode.getElementsByTagName("narrative").item(0).getTextContent() : "";
-								providerRef = providerNode.getAttribute("ref");
-							}
 
+							final String providingOrganization = (providerNode != null
+									&& providerNode.getElementsByTagName("narrative").item(0) != null)
+											? providerNode.getElementsByTagName("narrative").item(0).getTextContent()
+											: "";
+							final String providerRef = providerNode != null ? providerNode.getAttribute("ref") : "";
+							
+
+							
+							// Get the field for provider org
+							Optional<Field> fieldValue = filterFieldList.stream().filter(n -> {
+								return "provider-org".equals(n.getFieldName());
+							}).findFirst();
+
+							// If it has filters set, check if this transaction complies
+							if(fieldValue.isPresent() && fieldValue.get().getFilters().size() > 0) {
+								// See if the current transaction has the correct provider organization
+								Optional<String> optField = fieldValue.get().getFilters().stream().filter(n -> {
+									return n.equals(providingOrganization);
+								}).findAny();
+								
+								if(!optField.isPresent()) { // If it's not there, then move to the next transaction
+									continue;
+								}
+							}
+							// Receiving Org
+							receivingOrganization = extractNarrative(e, "receiver-org");
+							
 							Map<String, String> transactionFields = new HashMap<String, String>();
 							transactionFields.put("date", localDate);
+							transactionFields.put("providing-org", providingOrganization);
 							transactionFields.put("receiving-org", receivingOrganization);
-							transactionFields.put("provider-org", providerOrganization);
 							transactionFields.put("provider-org-ref", providerRef);
 							transactionFields.put("reference", reference);
 							transactionFields.put("value", localValue);
@@ -651,6 +743,21 @@ public class IATI2XProcessor implements ISourceProcessor {
 
 		return list;
 	}
+
+	
+	private String extractNarrative(Element e, String string) {
+		Node node = e.getElementsByTagName(string).item(0);
+		if(node != null && node.getChildNodes().getLength() > 0) {
+		    for (int i = 0; i < node.getChildNodes().getLength(); i++) {
+		        Node nodeChild = node.getChildNodes().item(i);
+		        if (nodeChild.getNodeType() == Node.ELEMENT_NODE && "narrative".equals(nodeChild.getNodeName())) {
+		        	return nodeChild.getTextContent();
+		        }
+		    }
+		}
+		return null;
+	}
+
 
 	private Boolean includedByFilter(List<String> filters, String codeValue) {
 		if (filters.size() == 0)
@@ -698,8 +805,6 @@ public class IATI2XProcessor implements ISourceProcessor {
 		fieldList.add(new Field("IATI Identifier", "iati-identifier", FieldType.STRING, false));
 		fieldList.add(new Field("Title", "title", FieldType.MULTILANG_STRING, false));
 		fieldList.add(new Field("Description", "description", FieldType.MULTILANG_STRING, true));
-		// fieldList.add(new Field("Currency", "default-currency",
-		// FieldType.STRING, false));
 
 		// Code Lists
 		Field activityStatus = new Field("Activity Status", "activity-status", FieldType.LIST, true);
@@ -751,6 +856,12 @@ public class IATI2XProcessor implements ISourceProcessor {
 		fieldList.add(sector);
 		filterFieldList.add(sector);
 
+		Field location = new Field("Location", "location", FieldType.LOCATION, true);
+		location.setPossibleValues(new ArrayList<FieldValue>());
+		location.setMultiple(true);
+		location.setPercentage(true);
+		fieldList.add(location);
+
 		// Dates
 		Field activityDateStartPlanned = new Field("Activity Date Start Planned", "activity-date", FieldType.DATE, true);
 		activityDateStartPlanned.setSubType("start-planned");
@@ -784,6 +895,28 @@ public class IATI2XProcessor implements ISourceProcessor {
 		participatingOrg.setSubType("Funding");
 		participatingOrg.setSubTypeCode("1");
 		fieldList.add(participatingOrg);
+
+		Field accountableOrg = new Field("Accountable Organization", "participating-org", FieldType.ORGANIZATION, true);
+		accountableOrg.setSubType("Accountable");
+		accountableOrg.setSubTypeCode("2");
+		fieldList.add(accountableOrg);
+
+		Field extendingOrg = new Field("Extending Organization", "participating-org", FieldType.ORGANIZATION, true);
+		extendingOrg.setSubType("Extending");
+		extendingOrg.setSubTypeCode("3");
+		fieldList.add(extendingOrg);
+
+		Field implementingOrg = new Field("Implementing Organization", "participating-org", FieldType.ORGANIZATION, true);
+		implementingOrg.setSubType("Implementing");
+		implementingOrg.setSubTypeCode("4");
+		fieldList.add(implementingOrg);
+		
+// Provider Organization, within Transactions
+		Field providerOrg = new Field("Provider Organization - transactions", "provider-org", FieldType.ORGANIZATION, false);
+		providerOrg.setSubType("Provider");
+		fieldList.add(providerOrg);
+		filterFieldList.add(providerOrg);
+
 	}
 
 	
