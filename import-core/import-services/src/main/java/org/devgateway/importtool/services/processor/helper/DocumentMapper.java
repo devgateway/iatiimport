@@ -78,17 +78,27 @@ public class DocumentMapper implements IDocumentMapper {
 	@Override
 	public List<ActionResult> execute(ImportRequest importRequest) {	
 		this.destinationProcessor.preImportProcessing(this.documentMappings);
-		importStatus  = new ActionStatus(EPMessages.IMPORT_STATUS_MESSAGE.getDescription(), documentMappings.stream().filter(m -> m.getSelected() == true).count(),EPMessages.IMPORT_STATUS_MESSAGE.getCode());
+		importStatus = new ActionStatus(EPMessages.IMPORT_STATUS_MESSAGE.getDescription(),
+				documentMappings.stream().filter(m -> m.getSelected() == true).count(),
+				EPMessages.IMPORT_STATUS_MESSAGE.getCode());
 		importStatus.setStatus(Status.IN_PROGRESS);
-		
+
 		results = new ArrayList<ActionResult>();
 		for (DocumentMapping doc : documentMappings) {
 			if (doc.getSelected()) {
 				importStatus.incrementProcessed();
+
+				// if activity was mapped to an existing AMP activity, modify
+				// the operation to UPDATE
+				if (doc.getDestinationDocument() != null) {
+					doc.setOperation(OperationType.UPDATE);
+				}
+
 				results.add(processDocumentMapping(doc, importRequest));
 			}
 		}
-		importStatus.setStatus(Status.COMPLETED);		
+		importStatus.setStatus(Status.COMPLETED);
+
 		return results;
 	}
 
@@ -99,15 +109,12 @@ public class DocumentMapper implements IDocumentMapper {
 		switch (doc.getOperation()) {
 		case INSERT:
 			// For now, we pass the mapping. Find a better more efficient way.
-			if (destination != null) {
-				result = this.destinationProcessor.update(source, destination, this.getFieldMappingObject(), this.getValueMappingObject(),doc.isOverrideTitle(), importRequest);
-			} else {
-				result = this.destinationProcessor.insert(source, this.getFieldMappingObject(), this.getValueMappingObject());
-			}
-			
+			result = this.destinationProcessor.insert(source, this.getFieldMappingObject(),
+					this.getValueMappingObject());
 			break;
 		case UPDATE:
-			result = this.destinationProcessor.update(source, destination, this.getFieldMappingObject(), this.getValueMappingObject(),doc.isOverrideTitle(), importRequest);
+			result = this.destinationProcessor.update(source, destination, this.getFieldMappingObject(),
+					this.getValueMappingObject(), doc.isOverrideTitle(), importRequest);
 			break;
 		case NOOP:
 			break;
@@ -150,8 +157,8 @@ public class DocumentMapper implements IDocumentMapper {
 		}		
 	}
 	
-    private void mapProjects(List<InternalDocument> sourceDocuments, List<InternalDocument> destinationDocuments){    	
-    	this.updateStatus(EPMessages.MAPPING_STATUS_MESSAGE, Status.IN_PROGRESS);		
+	private void mapProjects(List<InternalDocument> sourceDocuments, List<InternalDocument> destinationDocuments) {
+		this.updateStatus(EPMessages.MAPPING_STATUS_MESSAGE, Status.IN_PROGRESS);
 		for (InternalDocument srcDoc : sourceDocuments) {
 			this.documentMappingStatus.incrementProcessed();
 			String sourceIdField = this.sourceProcessor.getIdField();
@@ -165,37 +172,38 @@ public class DocumentMapper implements IDocumentMapper {
 				InternalDocument destDoc = optionalDestDoc.get();
 				String destinationIdValue = (String) destDoc.getStringFields().get(destinationIdField);
 				destDoc.setIdentifier(destinationIdValue);
-				this.addDocumentMapping(srcDoc, destDoc, OperationType.UPDATE, null);
-			} else {				
-				this.addDocumentMapping(srcDoc, null, OperationType.INSERT, this.findProjectsWithSimilarTitle(srcDoc, destinationDocuments));				
-			}	
-			
-		}		
-	    this.documentMappingStatus.setStatus(Status.COMPLETED);
-    }
+				this.addDocumentMapping(srcDoc, destDoc, OperationType.UPDATE);
+			} else {
+				this.addDocumentMapping(srcDoc, null, OperationType.INSERT,
+						this.findProjectsWithSimilarTitle(srcDoc, destinationDocuments));
+			}
+
+		}
+		this.documentMappingStatus.setStatus(Status.COMPLETED);
+	}
     
     private List<InternalDocument> findProjectsWithSimilarTitle(InternalDocument srcDoc, List<InternalDocument> destinationDocuments) {
-    	 Map<String, String> srcTitles = srcDoc.getMultilangFields().get("title");
-    	List<InternalDocument> similarProjects = new ArrayList<>();
-    	for (InternalDocument destDoc : destinationDocuments) {
-    		 Map<String, String> destTitles = destDoc.getMultilangFields().get("title");
-    		 Iterator<Entry<String, String>> it = srcTitles.entrySet().iterator();
-    		 boolean foundSimilar = false;
-    		    while (it.hasNext() && foundSimilar == false) {
-    		        Map.Entry item = (Map.Entry)it.next();
-    		        String srcTitle = (String) item.getValue();
-    		        String destTitle = destTitles.get(item.getKey());
-    		        if (srcTitle != null && destTitle != null) {
-    		        	int editDistance = LevenshteinDistance.getDefaultInstance().apply(srcTitle, destTitle);
-    		        	if (editDistance <= SIMILARITY_EDIT_DISTANCE) {
-    		        		foundSimilar = true;
-    		        		similarProjects.add(destDoc);    		        		
-    		        	}    		        	
-    		        }   		        	        			       					
-    		    }   		
-    	}
-    	
-    	return similarProjects;
+		Map<String, String> srcTitles = srcDoc.getMultilangFields().get("title");
+		List<InternalDocument> similarProjects = new ArrayList<>();
+		for (InternalDocument destDoc : destinationDocuments) {
+			Map<String, String> destTitles = destDoc.getMultilangFields().get("title");
+			Iterator<Entry<String, String>> it = srcTitles.entrySet().iterator();
+			boolean foundSimilar = false;
+			while (it.hasNext() && foundSimilar == false) {
+				Map.Entry item = (Map.Entry) it.next();
+				String srcTitle = (String) item.getValue();
+				String destTitle = destTitles.get(item.getKey());
+				if (srcTitle != null && destTitle != null) {
+					int editDistance = LevenshteinDistance.getDefaultInstance().apply(srcTitle, destTitle);
+					if (editDistance <= SIMILARITY_EDIT_DISTANCE) {
+						foundSimilar = true;
+						similarProjects.add(destDoc);
+					}
+				}
+			}
+		}
+
+		return similarProjects;
     }
     
     private void updateStatus(ApiMessage message, Status status){
@@ -221,6 +229,10 @@ public class DocumentMapper implements IDocumentMapper {
 			this.documentMappings.add(newMapping);
 		}
 
+	}
+	
+	private void addDocumentMapping(InternalDocument srcDoc, InternalDocument destDoc, OperationType operation) {
+		addDocumentMapping(srcDoc, destDoc, operation, null);
 	}
 
 	public List<DocumentMapping> getDocumentMappings() {
