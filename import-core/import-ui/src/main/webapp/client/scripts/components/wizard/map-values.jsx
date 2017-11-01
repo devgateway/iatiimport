@@ -120,7 +120,11 @@ var MapValues = React.createClass({
 		}.bind(this));
   },
   isMappingComplete: function(){
-	var notMapped = _.filter(this.state.mappings, function(m) {  var hasNull = false;
+	var notMapped = _.filter(this.state.mappings, function(m) {
+	     var hasNull = false;
+       if(m.sourceField.fieldName === "participating-org" && m.sourceField.subType === "Funding") {
+         return false;
+       }
 	     for (var member in m.valueIndexMapping) {
 	        if (m.valueIndexMapping[member] == null)
 	            hasNull = true;
