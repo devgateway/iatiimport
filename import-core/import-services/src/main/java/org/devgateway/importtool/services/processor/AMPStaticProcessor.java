@@ -612,11 +612,11 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				// Now we need the mapping of the field
 				String destinationSubType = destinationField.getSubType();
 				// this maps transactions to donor organizations using the
-				// provider-org
+				// providing-org
 				for (Entry<String, Map<String, String>> entry : transactions.entrySet()) {
 					JsonBean fundingDetail = new JsonBean();
 					Map<String, String> value = entry.getValue();
-					String provider = value.get("provider-org");
+					String provider = value.get("providing-org");
 					// if no provider tag on transaction use first funding org
 					// in participating-orgs
 					if (StringUtils.isEmpty(provider.trim())) {
