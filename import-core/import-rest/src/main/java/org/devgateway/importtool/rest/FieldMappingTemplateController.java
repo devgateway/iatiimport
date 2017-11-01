@@ -37,17 +37,27 @@ class FieldMappingTemplateController {
 	
 	@RequestMapping(method = RequestMethod.POST, value = "/save")
 	public ResponseEntity<String> save(@RequestBody FieldMappingTemplateRequest fieldMappingTemplateRequest, HttpServletRequest request) {	
-		FieldMappingTemplate fieldMappingTemplate = new FieldMappingTemplate();
+		FieldMappingTemplate fieldMappingTemplate = fieldMappingTemplateRepository
+				.findById(fieldMappingTemplateRequest.getId());
+		if (fieldMappingTemplate == null) {
+			fieldMappingTemplate = fieldMappingTemplateRepository.findByName(fieldMappingTemplateRequest.getName());
+			if (fieldMappingTemplate != null) {
+				return new ResponseEntity<>("{\"error\": \"mapping_exists\"}", HttpStatus.OK);
+			} else {
+				fieldMappingTemplate = new FieldMappingTemplate();
+			}
+		}
 		fieldMappingTemplate.setName(fieldMappingTemplateRequest.getName());
-		ObjectMapper mapper = new ObjectMapper();  
-		try{
-		   String mapping = mapper.writeValueAsString(fieldMappingTemplateRequest.getFieldMapping());
-		   fieldMappingTemplate.setMappingTemplate(mapping);
-		   fieldMappingTemplateRepository.save(fieldMappingTemplate);		
+
+		try {
+			ObjectMapper mapper = new ObjectMapper();
+			String mapping = mapper.writeValueAsString(fieldMappingTemplateRequest.getFieldMapping());
+			fieldMappingTemplate.setMappingTemplate(mapping);
+			fieldMappingTemplateRepository.save(fieldMappingTemplate);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			e.printStackTrace();
-			return new ResponseEntity<>("{\"error\": \"Error saving template.\"}",HttpStatus.OK);
+			return new ResponseEntity<>("{\"error\": \"msg_error_saving\"}", HttpStatus.OK);
 		}
 		
 		

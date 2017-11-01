@@ -89,7 +89,9 @@ module.exports = {
 							'close': 'Close',
 							'select_project': 'Map Selected Project',
 							'iati_id': 'IATI ID',
-							'project_title': 'Project Title'
+							'project_title': 'Project Title',
+						   'msg_project_not_editable':'Projects marked with an * and highlighted are not editable because they are not in the current workspace.',
+							'message': 'projects in the destination system'
 						},
 						'map_fields' : {
 							'choose_map_fields' : 'Choose and Map Fields',
@@ -107,7 +109,8 @@ module.exports = {
 							'list' : 'List Fields',
 							'date' : 'Date Fields',
 							'transaction' : 'Transaction Fields',
-							'organization' : 'Orgarnization Fields',
+							'organization' : 'Organization Fields',
+							'location': 'Location Fields',
 							'msg_error_retrieving_destination_fields' : ' Error retrieving destination fields.',
 							'msg_error_retrieving_source_fields' : ' Error retrieving source fields.',
 							'msg_error_retrieving_mappings' : ' Error retrieving field mappings.',
@@ -131,13 +134,17 @@ module.exports = {
 							'msg_error_saving' : 'Error saving template',
 							'title' : 'Save Field Mappings',
 							'close' : 'close',
-							'save_mapping' : 'Save Mapping'
+							'save_mapping' : 'Save Mapping',
+							'save_as_copy' : 'Save as Copy',
+							'mapping_exists' : 'Mapping name already exists'
 						},
 						'save_value_mappings_dlg' : {
 							'msg_error_saving' : 'Error saving template',
 							'title' : 'Save Value Mappings',
 							'close' : 'close',
-							'save_mapping' : 'Save Mapping'
+							'save_mapping' : 'Save Mapping',
+							'save_as_copy' : 'Save as Copy',
+							'mapping_exists' : 'Mapping name already exists'
 						},
 						'review_import' : {
 							'review_import' : 'Review and Import',
@@ -160,7 +167,7 @@ module.exports = {
 							'import_option_add_missing_explanation':'Only adds new funding information to the project. Existing funding information is not overwritten',
 							'import_option_replace': 'Replace funding information',
 							'import_option_replace_explanation': 'Replaces funding information in the AMP project with funding information from the IATI file. This is done per donor. Data for donors that are not reporting is not affected.',
-							'import_option_replace_prompt': 'You have selected the "Replace funding information" Import option. This option updates existing activities by overwriting the fundings for donors that have data in the IATI file. Do you want to proceed? '							
+							'import_option_replace_prompt': 'You have selected the "Replace funding information" Import option. This option updates existing activities by overwriting the fundings for donors that have data in the IATI file. Do you want to proceed? '
 						},
 						'mappings_dropdown' : {
 							'confirm_delete' : 'Are you sure you want to delete  __templateName__ ?'
@@ -172,7 +179,7 @@ module.exports = {
 							'upload_date': 'Upload Date',
 							'action': 'Action',
 							'view_import': 'View Import',
-							'delete': 'Delete'		 
+							'delete': 'Delete'
 						},
 						'select': 'Select',
 						'import_report':{
@@ -191,7 +198,7 @@ module.exports = {
 					  104: 'Error uploading file. Check if the initial steps are done.',
 					  105: 'Error uploading file.',
 					  106: 'Importing __processed__ of __total__ projects',
-					  107: 'Mapping __processed__ of __total__'					  
+					  107: 'Mapping __processed__ of __total__'
 				  },
 				  'previous_imports' : {
 					   'title': 'Previous Imports',
@@ -209,7 +216,7 @@ module.exports = {
 						'enabled': 'Enabled'
 					}
 				}
-			},	
+			},
 			'es' : {
 				translation : {
 					'header' : {
@@ -299,7 +306,9 @@ module.exports = {
 							'close': 'Close',
 							'select_project': 'Map Selected Project',
 							'iati_id': 'IATI ID',
-							'project_title': 'Project Title'
+							'project_title': 'Project Title',
+					        'msg_project_not_editable':'Los proyectos marcador por un * y resaltados no pueden ser editados puesto que no encuentran en el espacio de trabajo actual.',
+							'message': 'proyectos en el sistema destino'
 						},
 						'map_fields' : {
 							'choose_map_fields' : 'Seleccionar y mapear los campos',
@@ -317,7 +326,8 @@ module.exports = {
 							'list' : 'Lista de Campos',
 							'date' : 'Campos de Fecha',
 							'transaction' : 'Campos de Transacciones',
-							'organization' : 'Campos de Orgarnizaciones',
+							'organization' : 'Campos de Organizaciones',
+							'location': 'Campos de localización',
 							'msg_error_retrieving_destination_fields' : ' Error al recuperar los campos de destino.',
 							'msg_error_retrieving_source_fields' : ' Error al recuperar los campos de origen.',
 							'msg_error_retrieving_mappings' : ' Error al recuperar el mapeo de los campos.',
@@ -342,14 +352,17 @@ module.exports = {
 							'msg_error_saving' : 'Error al guardar la plantilla',
 							'title' : 'Guardar el Mapeo de los Campos',
 							'close' : 'cerrar',
-							'save_mapping' : 'Guardar Mapeo'
-
+							'save_mapping' : 'Guardar Mapeo',
+							'save_as_copy' : 'Save as Copy',
+							'mapping_exists' : 'Mapeo existente'
 						},
 						'save_value_mappings_dlg' : {
 							'msg_error_saving' : 'Error al guardar la plantilla',
 							'title' : 'Guardar los Valores de Mapeo',
 							'close' : 'cerrar',
-							'save_mapping' : 'Guardar Mapeo'
+							'save_mapping' : 'Guardar Mapeo',
+							'save_as_copy' : 'Save as Copy',
+							'mapping_exists' : 'Mapeo existente'
 						},
 						'review_import' : {
 							'review_import' : 'Revisar e Importar',
@@ -372,7 +385,7 @@ module.exports = {
 							'import_option_add_missing_explanation':'Only adds new funding information to the project. Existing funding information is not overwritten',
 							'import_option_replace': 'Replace funding information',
 							'import_option_replace_explanation': 'Replaces funding information in the AMP project with funding information from the IATI file. This is done per donor. Data for donors that are not reporting is not affected.',
-							'import_option_replace_prompt': 'You have selected the "Replace funding information" Import option. This option updates existing activities by overwriting the fundings for donors that have data in the IATI file. Do you want to proceed? '					
+							'import_option_replace_prompt': 'You have selected the "Replace funding information" Import option. This option updates existing activities by overwriting the fundings for donors that have data in the IATI file. Do you want to proceed? '
 						},
 						'mappings_dropdown' : {
 							'confirm_delete' : 'Está seguro de eliminar  __templateName__ ?'
@@ -384,9 +397,9 @@ module.exports = {
 							'upload_date': 'Fecha de Carga',
 							'action': 'Acción',
 							'view_import': 'Ver Importación',
-							'delete': 'Eliminar'		 
+							'delete': 'Eliminar'
 						},
-					    'select': 'Seleccionar',						
+					    'select': 'Seleccionar',
 						'import_report':{
 							'import_process': 'Proceso de Importación',
 							'project_id': 'ID Proyecto',
@@ -403,7 +416,7 @@ module.exports = {
 					  104: 'Error al cargar el archivo. Verificar que los primeros pasos hayan sido completados.',
 					  105: 'Error al cargar el archivo.',
 					  106: 'Importando __processed__ proyecto de __total__',
-					  107: 'Mapping __processed__ of __total__'					  
+					  107: 'Mapping __processed__ of __total__'
 				  },
 				  'previous_imports' : {
 					   'title': 'Importaciones previas',
@@ -421,7 +434,7 @@ module.exports = {
 						'enabled': 'Habilitado'
 					}
 				}
-			},		
+			},
 			'fr' : {
 				translation : {
 					'header' : {
@@ -510,7 +523,8 @@ module.exports = {
 							'close': 'Close',
 							'select_project': 'Map Selected Project',
 							'iati_id': 'IATI ID',
-							'project_title': 'Project Title'
+							'project_title': 'Project Title',
+							'message' : ' projets dans le système de destination'
 						},
 						'map_fields' : {
 							'choose_map_fields' : 'Choisir et faire correspondre les champs',
@@ -529,6 +543,7 @@ module.exports = {
 							'date' : 'Champs Date',
 							'transaction' : 'Champs Transaction',
 							'organization' : 'Champs Organisations',
+							'location': 'Champs Localisation',
 							'msg_error_retrieving_destination_fields' : ' Erreur dans la recherche des champs destination.',
 							'msg_error_retrieving_source_fields' : ' Erreur dans la recherche des champs Source.',
 							'msg_error_retrieving_mappings' : ' Erreur dans la correspondence des champs.',
@@ -552,13 +567,18 @@ module.exports = {
 							'msg_error_saving' : ' Erreur dans la sauvegarde du modèle ',
 							'title' : ' Enregistrer la correspondance des champs ',
 							'close' : ' Fermer ',
-							'save_mapping' : ' Enregistrer la correspondance '
+							'save_mapping' : ' Enregistrer la correspondance ',
+							'save_as_copy' : 'Sauvegarder copie',
+							'mapping_exists' : 'Existe déjà'
+
 						},
 						'save_value_mappings_dlg' : {
 							'msg_error_saving' : ' Erreur dans la sauvegarde du modèles ',
 							'title' : ' Enregistrer la correspondence des valeurs ',
 							'close' : ' Fermer ',
-							'save_mapping' : ' Enregistrer la correspondance '
+							'save_mapping' : ' Enregistrer la correspondance ',
+							'save_as_copy' : 'Sauvegarder copie',
+							'mapping_exists' : 'Existe déjà'
 						},
 						'review_import' : {
 							'review_import' : ' Revoir et Télécharger ',
@@ -581,7 +601,7 @@ module.exports = {
 							'import_option_add_missing_explanation': "N'ajoute que les nouvelles informations de financement au projet. Les informations de financement existantes restent inchangées",
 							'import_option_replace': 'Remplacer les informations de financement',
 							'import_option_replace_explanation': "Remplace les informations de financement dans le projet AMP avec des informations de financement provenant du fichier IATI. Ceci est fait par donateur. Les données des donateurs ni figurant pas dans le fichier IATI ne seront pas affectées.",
-							'import_option_replace_prompt': "Vous avez sélectionné l'option d'import Remplacer les informations de financement. Cette option met à jour les activités existantes en écrasant toutes les transactions financières des donateurs qui sont inclus dans le fichier de l'IATI. Voulez-vous continuer?"			
+							'import_option_replace_prompt': "Vous avez sélectionné l'option d'import Remplacer les informations de financement. Cette option met à jour les activités existantes en écrasant toutes les transactions financières des donateurs qui sont inclus dans le fichier de l'IATI. Voulez-vous continuer?"
 						},
 						'mappings_dropdown' : {
 							'confirm_delete' : ' Etes - vous sûr(e)de vouloir supprimer __templateName__ ? '
@@ -612,7 +632,7 @@ module.exports = {
 						  104: "Une erreur s'est produite dans le téléchargement du fichier. Veuillez vérifier les étapes initiales.",
 						  105: "Une erreur s'est produite dans le téléchargement du fichier.",
 						  106: 'Chargement de __processed__ sur __total__ projets',
-						  107: 'Correspondance  __processed__ sur __total__ projets'				  
+						  107: 'Correspondance  __processed__ sur __total__ projets'
 					  },
 					  'previous_imports' : {
 						   'title': 'Previous Imports',
@@ -629,7 +649,7 @@ module.exports = {
 							'description': 'Description',
 							'enabled': 'Enabled'
 						}
-				}		
+				}
 			}
 
 		}
