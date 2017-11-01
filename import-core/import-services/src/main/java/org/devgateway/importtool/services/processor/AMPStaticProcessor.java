@@ -1079,7 +1079,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
       if(destinationFieldsList.contains("fundings~financing_instrument")){
     	  Field financialInstrument = new Field("Aid Modality", "financing_instrument", FieldType.LIST, true);
   		  financialInstrument.setPossibleValues(getCodeListValues("fundings~financing_instrument"));
-  		  financialInstrument.setMultiLangDisplayName(destinationFieldsListLabels.get("financing_instrument"));
+  		  financialInstrument.setMultiLangDisplayName(destinationFieldsListLabels.get("fundings~financing_instrument"));
   		  fieldList.add(financialInstrument);	
   		  trnDependencies.add(financialInstrument);
 	   }
@@ -1211,7 +1211,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
          if(destinationFieldsList.contains("fundings~donor_organization_id")){
         		Field fundingOrganization = new Field("Funding Organization", "donor_organization", FieldType.ORGANIZATION, true);
         		fundingOrganization.setPossibleValues(getCodeListValues("fundings~donor_organization_id"));
-        		fundingOrganization.setMultiLangDisplayName(destinationFieldsListLabels.get("fundings~donor_organization_idfundings~donor_organization_id"));
+        		fundingOrganization.setMultiLangDisplayName(destinationFieldsListLabels.get("fundings~donor_organization_id"));
         		if (fieldProps.get("donor_organization") != null && fieldProps.get("donor_organization").getProperty("percentage_constraint") != null) {
         			fundingOrganization.setPercentage(true);
         		}        		
