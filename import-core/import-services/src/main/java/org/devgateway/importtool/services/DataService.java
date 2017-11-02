@@ -26,7 +26,7 @@ public class DataService {
 				FieldValueMapping fvm = new FieldValueMapping();
 				fvm.setSourceField(fieldMapping.getSourceField());
 				fvm.setDestinationField(fieldMapping.getDestinationField());
-				if (fieldMapping.getSourceField().getType() == FieldType.LIST || fieldMapping.getSourceField().getType() == FieldType.ORGANIZATION) {
+				if (fieldMapping.getSourceField().getType() == FieldType.LIST || fieldMapping.getSourceField().getType() == FieldType.ORGANIZATION || fieldMapping.getSourceField().getType() == FieldType.LOCATION) {
 					Field source = fieldMapping.getSourceField();
 					if(source.getPossibleValues() != null){
 						source.getPossibleValues().stream().forEach(fieldValue -> {
@@ -49,7 +49,7 @@ public class DataService {
 					FieldValueMapping fvm = new FieldValueMapping();
 					fvm.setSourceField(fieldMapping.getSourceField());
 					fvm.setDestinationField(fieldMapping.getDestinationField());
-					if (fieldMapping.getSourceField().getType() == FieldType.LIST || fieldMapping.getSourceField().getType() == FieldType.ORGANIZATION) {
+					if (fieldMapping.getSourceField().getType() == FieldType.LIST || fieldMapping.getSourceField().getType() == FieldType.ORGANIZATION || fieldMapping.getSourceField().getType() == FieldType.LOCATION) {
 						Field source = fieldMapping.getSourceField();
 						source.getPossibleValues().stream().forEach(fieldValue -> {
 							if(fieldValue.isSelected()){

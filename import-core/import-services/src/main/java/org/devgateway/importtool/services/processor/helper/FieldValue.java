@@ -1,11 +1,19 @@
 package org.devgateway.importtool.services.processor.helper;
 
+import java.util.Properties;
+
 public class FieldValue {
 	private int index;
 	private String code;
 	private String value;
 	private boolean selected = false;
 	private String percentage = "";
+	private Properties properties;
+	
+	public FieldValue() {
+		 this.properties = new Properties();
+	}
+	
 	public String getCode() {
 		return code;
 	}
@@ -39,5 +47,11 @@ public class FieldValue {
 	}
 	public void setIndex(int index) {
 		this.index = index;
+	}
+	public Properties getProperties() {
+		return properties;
+	}
+	public void setProperties(Properties properties) {
+		this.properties = properties;
 	}
 }

@@ -10,24 +10,41 @@ var DestinationSessionStore = Reflux.createStore({
 
   init: function() {
     this.listenTo(appActions.initDestinationSession, this.handleInitSession);
+    this.listenTo(appActions.refreshDestinationSession, this.handleRefreshSession);
+
   },
 
   handleInitSession: function() {
-    var self = this;   
-    $.get('/importer/import/wipeall', function(){});    
- 
+    var self = this;
+    $.get('/importer/import/wipeall', function(){});
+
     $.ajax({
         url: appConfig.DESTINATION_API_HOST + appConfig.DESTINATION_AUTH_TOKEN_ENDPOINT,
         timeout: appConfig.REQUEST_TIMEOUT,
         error: function() {
-        	appActions.initDestinationSession.failed();          
+        	appActions.initDestinationSession.failed();
         },
         dataType: 'json',
-        success: function(data) { 
-          appActions.initDestinationSession.completed(data);          
+        success: function(data) {
+          appActions.initDestinationSession.completed(data);
         },
         type: 'GET'
-     }); 
+     });
+  },
+  handleRefreshSession: function() {
+    var self = this;
+    $.ajax({
+        url: appConfig.DESTINATION_API_HOST + appConfig.DESTINATION_AUTH_TOKEN_ENDPOINT,
+        timeout: appConfig.REQUEST_TIMEOUT,
+        error: function() {
+        	appActions.refreshDestinationSession.failed();
+        },
+        dataType: 'json',
+        success: function(data) {
+          appActions.refreshDestinationSession.completed(data);
+        },
+        type: 'GET'
+     });
   }
 
 });
