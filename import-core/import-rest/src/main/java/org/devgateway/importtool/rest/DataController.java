@@ -118,7 +118,6 @@ class DataController {
 		List<FieldValueMapping> valueMapping = dataService.getValueMapping(documentMapper);
 
 		
-		// TODO: Improve this section of code.
 		// Get the providing organization field
 		ISourceProcessor processor = (ISourceProcessor) request.getSession().getAttribute(SOURCE_PROCESSOR);
 		List<Field> sourceFields = processor.getFilterFields();
@@ -130,25 +129,26 @@ class DataController {
 		Optional<FieldValueMapping> optValueMapping = valueMapping.stream().filter(n -> {
 			return ("participating-org".equals(n.getSourceField().getFieldName()) && "Funding".equals(n.getSourceField().getSubType()) && "1".equals(n.getSourceField().getSubTypeCode()));
 		}).findFirst();
-		FieldValueMapping fvm = optValueMapping.get();
-		Field fundOrg = fvm.getSourceField();
 		
+		if(optValueMapping.isPresent()){
+			FieldValueMapping fvm = optValueMapping.get();
+			Field fundOrg = fvm.getSourceField();
+			// Get Filters
+			if(optProvOrg.isPresent() && optProvOrg.get().getFilters() != null && optProvOrg.get().getFilters().size() > 0) {
+				Field provOrg = optProvOrg.get();
+				List<String> filters = provOrg.getFilters();
+				List<FieldValue> reducedList = new ArrayList<FieldValue>();
 
-		// Get Filters
-		if(optProvOrg.isPresent() && optProvOrg.get().getFilters() != null && optProvOrg.get().getFilters().size() > 0) {
-			Field provOrg = optProvOrg.get();
-			List<String> filters = provOrg.getFilters();
-			List<FieldValue> reducedList = new ArrayList<FieldValue>();
-
-			for (int i = 0; i < filters.size(); i++) {
-				final String filter = filters.get(i);
-				fundOrg.getPossibleValues().forEach(n -> {
-					if(n.getCode().equals(filter)) {
-						reducedList.add(n);
-					}					
-				});
+				for (int i = 0; i < filters.size(); i++) {
+					final String filter = filters.get(i);
+					fundOrg.getPossibleValues().forEach(n -> {
+						if(n.getCode().equals(filter)) {
+							reducedList.add(n);
+						}					
+					});
+				}
+				fundOrg.setPossibleValues(reducedList);
 			}
-			fundOrg.setPossibleValues(reducedList);
 		}
 		
 		return new ResponseEntity<>(dataService.getValueMapping(documentMapper), HttpStatus.OK);
