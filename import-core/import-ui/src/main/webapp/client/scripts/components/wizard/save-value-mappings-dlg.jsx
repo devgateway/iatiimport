@@ -30,7 +30,9 @@ var SaveMappingsDialog = React.createClass({
 
      var mappingId = null;
      if(saveCopy &&  typeof saveCopy === "boolean") {
-       mappingId = this.props.mappingInfo.id;
+       mappingId = null;
+     } else {
+       mappingId = this.props.mappingInfo ? this.props.mappingInfo.id : null;
      }
 
      formActions.saveValueMappingsTemplate({fieldValueMapping:mapped, name:this.state.name, id: mappingId }).then(function(data) {
@@ -39,6 +41,7 @@ var SaveMappingsDialog = React.createClass({
         }else{
         	this.refs.mappingsName.getDOMNode().value = '';
             this.props.reloadTemplateData();
+            this.props.loadMappingTemplate(data.id);
             $('#saveMapValues').modal('hide');
         }
      }.bind(this))["catch"](function(err) {

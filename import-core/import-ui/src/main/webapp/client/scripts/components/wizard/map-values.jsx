@@ -173,7 +173,7 @@ var MapValues = React.createClass({
        </div>
       </div>
         </div>
-        <SaveMappingsDialog {...this.props} reloadTemplateData = {this.loadTemplateData} mappings = {this.state.mappings}  mappingInfo = {this.state.mappingInfo}/>
+        <SaveMappingsDialog {...this.props} loadMappingTemplate = {this.loadMappingTemplate} reloadTemplateData = {this.loadTemplateData} mappings = {this.state.mappings}  mappingInfo = {this.state.mappingInfo}/>
         </div>
       ); } });
 
