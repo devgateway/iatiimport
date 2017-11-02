@@ -19,6 +19,8 @@ import org.springframework.context.annotation.Configuration;
 @EnableAutoConfiguration
 public class Application extends WebMvcAutoConfiguration {
 	public static void main(String[] args) {
+        System.setProperty("server.tomcat.max-threads","200");
+        System.setProperty("server.connection-timeout","60000");
 		SpringApplication.run(Application.class, args);
 	}
 
