@@ -61,8 +61,7 @@ class ValueMappingTemplateController {
 			return new ResponseEntity<>("{\"error\": \"Error saving template.\"}",HttpStatus.OK);
 		}
 		
-		
-		return new ResponseEntity<>("{}", HttpStatus.OK);
+		return new ResponseEntity<>("{\"id\": " + valueMappingTemplate.getId() + ", \"name\": \"" + valueMappingTemplate.getName() + "\" }", HttpStatus.OK);
 	}
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/list")
