@@ -3,13 +3,14 @@
 var Reflux = require('reflux');
 var appActions = Reflux.createActions([
   'initSession',
-  'loadMenuData',   
+  'loadMenuData',
   'loadSourceValuesData',
   'loadDestinationValuesData'
 ]);
 
 
 appActions.initDestinationSession = Reflux.createAction({ asyncResult: true });
+appActions.refreshDestinationSession = Reflux.createAction({ asyncResult: true });
 appActions.initializeMapping = Reflux.createAction({ asyncResult: true });
 appActions.loadProjectData = Reflux.createAction({ asyncResult: true });
 appActions.loadFileData = Reflux.createAction({ asyncResult: true });

@@ -76,6 +76,15 @@ class ImportController  {
 		request.getSession().setAttribute(SESSION_TOKEN, importSessionToken);
 		return new ResponseEntity<>(importSessionToken, HttpStatus.OK);
 	}
+	@RequestMapping(method = RequestMethod.GET, value = "/refresh/{authenticationToken}")
+	public ResponseEntity<List<File>> refreshToken(@PathVariable String authenticationToken, HttpServletRequest request) {
+		ImportSessionToken authToken = (ImportSessionToken) request.getSession().getAttribute(SESSION_TOKEN);
+		authToken.setAuthenticationToken(authenticationToken);
+		IDestinationProcessor destProcessor = (IDestinationProcessor) request.getSession().getAttribute(DESTINATION_PROCESSOR);
+		destProcessor.setAuthenticationToken(authenticationToken);
+
+		return new ResponseEntity<>(null, HttpStatus.OK);
+	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/uploaded")
 	public ResponseEntity<List<File>> listFiles(HttpServletRequest request) {

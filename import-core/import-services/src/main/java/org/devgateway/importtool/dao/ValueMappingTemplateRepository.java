@@ -10,4 +10,5 @@ public interface ValueMappingTemplateRepository extends PagingAndSortingReposito
 	
 	List<ValueMappingTemplate> findAll();
 	ValueMappingTemplate findById(@Param("id") Long id);	
+	ValueMappingTemplate findByName(@Param("name") String name);	
 }

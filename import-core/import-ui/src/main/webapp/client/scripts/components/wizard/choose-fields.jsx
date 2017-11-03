@@ -32,7 +32,7 @@ var ChooseFields = React.createClass({
 		this.listenTo(fieldMappingStore, this.updateFieldMappingStore);
 		this.listenTo(fieldMappingTemplateStore, this.updateMappingTemplatesData);
 		this.loadData();
-	},    
+	},
 	updateSourceFields: function(data) {
 		this.setState({
 			sourceFieldsData: data
@@ -42,7 +42,7 @@ var ChooseFields = React.createClass({
 		this.setState({
 			destinationFieldsData: data
 		});
-	}, 
+	},
 	updateFieldMappingStore: function(data) {
 		this.setState({
 			mappingFieldsData: data
@@ -52,80 +52,87 @@ var ChooseFields = React.createClass({
 		this.setState({
 			mappingTemplatesData: data
 		});
-	},  
+	},
 	clearFlags: function(){
 		this.destDataLoaded = false;
 		this.sourceDataLoaded = false;
 		this.mappingDataLoaded = false;
-	}, 
+	},
 	displayError: function(){
 		if(this.destDataLoaded && this.sourceDataLoaded && this.mappingDataLoaded){
-			this.props.eventHandlers.displayError(this.errorMsg); 
+			this.props.eventHandlers.displayError(this.errorMsg);
 		}
 	},
 	hideLoadingIcon: function(){
 		if(this.destDataLoaded && this.sourceDataLoaded && this.mappingDataLoaded){
 			this.props.eventHandlers.hideLoadingIcon();
 		}
-	},   
+	},
 	loadData: function(){
-		this.clearFlags(); 
+		this.clearFlags();
 		this.errorMsg = "";
 		this.props.eventHandlers.showLoadingIcon();
-		appActions.loadDestinationFieldsData.triggerPromise().then(function(data) {                             
+		appActions.loadDestinationFieldsData.triggerPromise().then(function(data) {
 			this.updateDestinationFields(data);
-			this.destDataLoaded = true; 
+			this.destDataLoaded = true;
 			this.hideLoadingIcon();
 		}.bind(this))["catch"](function(err) {
-			this.destDataLoaded = true; 
-			this.hideLoadingIcon();        
+			this.destDataLoaded = true;
+			this.hideLoadingIcon();
 			this.errorMsg += this.props.i18nLib.t('wizard.map_fields.msg_error_retrieving_destination_fields');
-			this.displayError(); 
-		}.bind(this)); 
+			this.displayError();
+		}.bind(this));
 
-		appActions.loadSourceFieldsData.triggerPromise().then(function(data) {                              
+		appActions.loadSourceFieldsData.triggerPromise().then(function(data) {
 			this.updateSourceFields(data);
 			this.sourceDataLoaded = true;
 			this.hideLoadingIcon();
 		}.bind(this))["catch"](function(err) {
 			this.sourceDataLoaded = true;
-			this.hideLoadingIcon();        
-			this.errorMsg += this.props.i18nLib.t('wizard.map_fields.msg_error_retrieving_source_fields');  
-			this.displayError();      
+			this.hideLoadingIcon();
+			this.errorMsg += this.props.i18nLib.t('wizard.map_fields.msg_error_retrieving_source_fields');
+			this.displayError();
 		}.bind(this));
 
-		appActions.loadMappingFieldsData.triggerPromise().then(function(data) {                              
-			this.updateFieldMappingStore(data); 
+		appActions.loadMappingFieldsData.triggerPromise().then(function(data) {
+			this.updateFieldMappingStore(data);
 			this.mappingDataLoaded = true;
 			this.hideLoadingIcon();
 		}.bind(this))["catch"](function(err) {
 			this.mappingDataLoaded = true;
-			this.hideLoadingIcon();       
-			this.errorMsg += this.props.i18nLib.t('wizard.map_fields.msg_error_retrieving_mappings');  
-			this.displayError();       
+			this.hideLoadingIcon();
+			this.errorMsg += this.props.i18nLib.t('wizard.map_fields.msg_error_retrieving_mappings');
+			this.displayError();
 		}.bind(this));
 
-		appActions.loadFieldMappingsTemplateList.triggerPromise().then(function(data) {                              
-			this.updateMappingTemplatesData(data); 
-		}.bind(this))["catch"](function(err) {			     
+		appActions.loadFieldMappingsTemplateList.triggerPromise().then(function(data) {
+			this.updateMappingTemplatesData(data);
+		}.bind(this))["catch"](function(err) {
 			this.errorMsg += this.props.i18nLib.t('wizard.map_fields.msg_error_retrieving_templates');
-			this.displayError();			
+			this.displayError();
 		}.bind(this));
-	},  
+	},
 	selectFieldMapping: function(event){
 		this.props.eventHandlers.selectFieldMapping(event);
 	},
-	getOptions: function(sourceField){    
+	getOptions: function(sourceField, language){
 		var options = [];
 		$.map(this.state.destinationFieldsData, function(item, i) {
-			if(item.mappable && sourceField.type == item.type){              
-				options.push({value:item.uniqueFieldName, label:item.displayName || item.uniqueFieldName})
+			var label = "";
+			if(item.multiLangDisplayName && item.multiLangDisplayName[language]) {
+				label = item.multiLangDisplayName[language];
+			}
+			else {
+				label = item.displayName || item.uniqueFieldName;
+			}
+			if(item.mappable && sourceField.type == item.type){
+				options.push({value:item.uniqueFieldName, label:label})
 			}else if(item.mappable && sourceField.type != item.type && (item.type === "STRING" || item.type === "MULTILANG_STRING") && (sourceField.type === "STRING" || sourceField.type === "MULTILANG_STRING") ){
-		      options.push({value:item.uniqueFieldName, label:item.displayName || item.uniqueFieldName})
-		    }              
+		      options.push({value:item.uniqueFieldName, label:label})
+		    }
 		});
 		return options
-	}, 
+	},
 	checkAll: function() {
 		var mappableFields = _.where(this.state.sourceFieldsData, {mappable: true});
 		return (mappableFields.length == this.state.mappingFieldsData.length);
@@ -139,7 +146,7 @@ var ChooseFields = React.createClass({
 	selectAll: function(event){
 		var mappings = this.state.mappingFieldsData;
 		if(event.target.checked) {
-			_.each(this.state.sourceFieldsData, function(sourceField){ 			
+			_.each(this.state.sourceFieldsData, function(sourceField){
 				if(_.find(mappings, function(v){ return v.sourceField.uniqueFieldName == sourceField.uniqueFieldName;}) == null && sourceField.mappable){
 					var mappingObject = {
 							sourceField: sourceField,
@@ -154,7 +161,7 @@ var ChooseFields = React.createClass({
 		}
 		this.setState({
 			mappingFieldsData: mappings
-		}); 
+		});
 		this.forceUpdate();
 	},
 	handleToggle: function(item, event) {
@@ -182,57 +189,62 @@ var ChooseFields = React.createClass({
 			this.forceUpdate();
 		}
 	},
-	loadMappingTemplate: function(id){ 
+	loadMappingTemplate: function(id){
 		var mappingFieldsData = this.state.mappingFieldsData;
 		var self = this;
 		var mappings = [];
-		appActions.loadFieldMappingsById(id).then(function(data) {			
-			$.map(this.state.sourceFieldsData, function(item, i) { 
+		appActions.loadFieldMappingsById(id).then(function(data) {
+			$.map(this.state.sourceFieldsData, function(item, i) {
 				var mappingFromTemplate = _.find(data.fieldMapping, function(v) { return item.uniqueFieldName == v.sourceField.uniqueFieldName});
 				if(mappingFromTemplate){
 					mappingFromTemplate.destinationField = _.find(self.state.destinationFieldsData, {uniqueFieldName: mappingFromTemplate.destinationField.uniqueFieldName});
 					mappingFromTemplate.sourceField  = _.find(self.state.sourceFieldsData, {uniqueFieldName: mappingFromTemplate.sourceField.uniqueFieldName});
 					mappings.push(mappingFromTemplate);
 				}
-				
-                
+
+
+			});
+			var mappingInfo = {
+					name: data.name,
+					id: data.id
+				};
+			this.setState({
+				mappingFieldsData: mappings,
+				mappingInfo: mappingInfo
+			});
+			this.forceUpdate();
+		}.bind(this));
+	},
+	deleteMappingTemplate: function(id){
+		appActions.deleteMappingTemplate(id).then(function(data) {
+			var templateData = this.state.mappingTemplatesData;
+			var dataAfterDelete = templateData.filter(function (item) {
+				return item.id != id;
 			});
 			this.setState({
-				mappingFieldsData: mappings
-			});            
-			this.forceUpdate();             
-		}.bind(this));
-	}, 
-	deleteMappingTemplate: function(id){     
-		appActions.deleteMappingTemplate(id).then(function(data) {    	   
-			var templateData = this.state.mappingTemplatesData;   	   
-			var dataAfterDelete = templateData.filter(function (item) {    		   
-				return item.id != id;
-			});    	     
-			this.setState({
 				mappingTemplatesData: dataAfterDelete
-			});            
-			this.forceUpdate();             
+			});
+			this.forceUpdate();
 		}.bind(this));
-	},  
+	},
 	reloadTemplateData: function(){
-		appActions.loadFieldMappingsTemplateList.triggerPromise().then(function(data) {                              
-			this.updateMappingTemplatesData(data); 
-		}.bind(this))["catch"](function(err) { 
+		appActions.loadFieldMappingsTemplateList.triggerPromise().then(function(data) {
+			this.updateMappingTemplatesData(data);
+		}.bind(this))["catch"](function(err) {
 			this.errorMsg += this.props.i18nLib.t('wizard.map_fields.msg_error_retrieving_templates');
 			this.displayError();
 		}.bind(this));
 	},
 	isMappingComplete: function(){
-		var notMapped = _.filter(this.state.mappingFieldsData, function(m) {  
+		var notMapped = _.filter(this.state.mappingFieldsData, function(m) {
 			return _.isUndefined(m.destinationField) || _.isNull(m.destinationField)
-	    });		
-		return (this.state.mappingFieldsData.length > 0 && notMapped.length == 0) 
+	    });
+		return (this.state.mappingFieldsData.length > 0 && notMapped.length == 0)
 	},
     render: function() {
     	var rows = {};
         if (this.state.destinationFieldsData && this.state.sourceFieldsData) {
-           var infoMessages = "";           
+           var infoMessages = "";
            if(this.state.destinationFieldsData.length > 0) {
                 var requiredMessage = [];
                 var dependenciesMessage = [];
@@ -250,22 +262,23 @@ var ChooseFields = React.createClass({
                 }
            };
 
-           $.map(this.state.sourceFieldsData, function(item, i) { 
-                var options = this.getOptions(item);
-                if(item.mappable) {                	
+           $.map(this.state.sourceFieldsData, function(item, i) {
+                var language = this.props.i18nLib.lng() || "en";
+                var options = this.getOptions(item, language);
+                if(item.mappable) {
                 	if(!rows[item.type]) {
                 		rows[item.type] = [];
                 		rows[item.type].push(<tr className="group-header"><td className = "group-title">{this.props.i18nLib.t('wizard.map_fields.' + item.type.toLowerCase())}</td> <td ></td> <td ></td></tr>);
                 	}
-                    var selected = _.some(this.state.mappingFieldsData, function(v) { return item.uniqueFieldName == v.sourceField.uniqueFieldName});				
+                    var selected = _.some(this.state.mappingFieldsData, function(v) { return item.uniqueFieldName == v.sourceField.uniqueFieldName});
                     var mapping = _.find(this.state.mappingFieldsData, function(v) { return item.uniqueFieldName == v.sourceField.uniqueFieldName});
-                    
+
                     var value = "";
                     var cellMessage = "";
-                    if(mapping && mapping.destinationField) {					    
-                        value = mapping.destinationField.uniqueFieldName;				
+                    if(mapping && mapping.destinationField) {
+                        value = mapping.destinationField.uniqueFieldName;
                         if(mapping.destinationField.required) {
-                            cellMessage = <span className="label label-danger">Required</span>; 
+                            cellMessage = <span className="label label-danger">Required</span>;
                         }
                     }
                     rows[item.type].push(<tr key={item.uniqueFieldName}>
@@ -277,12 +290,12 @@ var ChooseFields = React.createClass({
                                 {item.displayName}
                             </div>
                         </td>
-                        <td >             
+                        <td >
                         <CustomSelect {...this.props} disabled = {mapping ? "" : "disabled"} initialOption={value} options={options} value="value" label="label" data={item} handleChange={this.handleSelectToggle}/>
                         {cellMessage}
                         </td>
                     </tr>);
-                }                
+                }
             }.bind(this));
         }
 
@@ -307,29 +320,30 @@ var ChooseFields = React.createClass({
                                 </th>
                             </tr>
                         </thead>
-                        <tbody>                       
-                        {rows[constants.FIELD_TYPE.MULTILANG_STRING]}                        
-                        {rows[constants.FIELD_TYPE.STRING]}                        
-                        {rows[constants.FIELD_TYPE.LIST]}                        
-                        {rows[constants.FIELD_TYPE.DATE]}                        
-                        {rows[constants.FIELD_TYPE.ORGANIZATION]}                        
+                        <tbody>
+                        {rows[constants.FIELD_TYPE.MULTILANG_STRING]}
+                        {rows[constants.FIELD_TYPE.STRING]}
+                        {rows[constants.FIELD_TYPE.LIST]}
+                        {rows[constants.FIELD_TYPE.LOCATION]}
+                        {rows[constants.FIELD_TYPE.DATE]}
+                        {rows[constants.FIELD_TYPE.ORGANIZATION]}
                         {rows[constants.FIELD_TYPE.TRANSACTION]}
                         </tbody>
                     </table>
                 </div>
                 <div className="buttons">
-                <div className="row">                          
-                <div className="col-md-6">                
+                <div className="row">
+                <div className="col-md-6">
                    <button ref="previousButton"  className="btn btn-success navbar-btn btn-custom btn-previous" type="button" onClick={this.handlePrevious}>{this.props.i18nLib.t('wizard.map_fields.previous')}</button>
                  </div>
-               <div className="col-md-6">                
+               <div className="col-md-6">
                   <button className="btn btn-warning navbar-btn btn-custom" type="button" data-toggle="modal" data-target="#saveMapFields">{this.props.i18nLib.t('wizard.map_fields.save')}</button>&nbsp;
-                  <button disabled = {this.isMappingComplete() ? "" : "disabled"}  className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.handleNext}>{this.props.i18nLib.t('wizard.map_fields.next')}</button>               
+                  <button disabled = {this.isMappingComplete() ? "" : "disabled"}  className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.handleNext}>{this.props.i18nLib.t('wizard.map_fields.next')}</button>
                </div>
-                </div>                   
                 </div>
-                 <SaveMappingsDialog {...this.props} reloadTemplateData = {this.reloadTemplateData} mappingFieldsData = {this.state.mappingFieldsData} />		 
                 </div>
-            ); } }); 
-            
+                 <SaveMappingsDialog {...this.props} loadMappingTemplate = {this.loadMappingTemplate} reloadTemplateData = {this.reloadTemplateData} mappingFieldsData = {this.state.mappingFieldsData} mappingInfo = {this.state.mappingInfo}/>
+                </div>
+            ); } });
+
  module.exports = ChooseFields;
