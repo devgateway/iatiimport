@@ -360,7 +360,6 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			if (org.isPresent()) {				
 				JsonBean donorRole = new JsonBean();
 				donorRole.set("organization", funding.get("donor_organization_id"));
-				donorRole.set("role", 1);
 				listDonorOrganizations.add(donorRole);
 			}
 		}
@@ -501,7 +500,6 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 					List<JsonBean> listDonorOrganizations = new ArrayList<JsonBean>();
 					JsonBean donorRole = new JsonBean();
 					donorRole.set("organization", fundings.get("donor_organization_id"));
-					donorRole.set("role", 1);
 					if (org.get().isPercentage()) {
 						donorRole.set("percentage", 100);
 					}
