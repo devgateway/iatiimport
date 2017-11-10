@@ -644,9 +644,7 @@ public class IATI2XProcessor implements ISourceProcessor {
 						nodes = (NodeList) xPath.evaluate("transaction/transaction-type[@code='" + field.getSubType() + "' or @code= '" + field.getSubTypeCode() + "']/parent::*", element, XPathConstants.NODESET);
 						for (int j = 0; j < nodes.getLength(); ++j) {
 							String reference = "";
-							String receivingOrganization = "";
-
-							Element e = (Element) nodes.item(j);
+													Element e = (Element) nodes.item(j);
 							// Reference
 							reference = e.getAttribute("ref");
 							// Amount
@@ -664,39 +662,50 @@ public class IATI2XProcessor implements ISourceProcessor {
 															// defensive
 							{
 								localDate = e.getElementsByTagName("transaction-date").item(0).getAttributes().getNamedItem("iso-date").getNodeValue();
-							}
+							}				
+																		
+							final String receivingOrganization = extractNarrative(e, "receiver-org");
+							Element providerNode = e.getElementsByTagName("provider-org").item(0) != null
+									? (Element) e.getElementsByTagName("provider-org").item(0) : null;
 
-							// Providing Org
-							final String providingOrganization = extractNarrative(e, "provider-org");
-							
+							final String providingOrganization = (providerNode != null
+									&& providerNode.getElementsByTagName("narrative").item(0) != null)
+											? providerNode.getElementsByTagName("narrative").item(0).getTextContent()
+											: "";
+							final String providerRef = providerNode != null ? providerNode.getAttribute("ref") : "";
+
 							// Get the field for provider org
 							Optional<Field> fieldValue = filterFieldList.stream().filter(n -> {
 								return "provider-org".equals(n.getFieldName());
 							}).findFirst();
 
-							// If it has filters set, check if this transaction complies
-							if(fieldValue.isPresent() && fieldValue.get().getFilters().size() > 0) {
-								// See if the current transaction has the correct provider organization
+							// If it has filters set, check if this transaction
+							// complies
+							if (fieldValue.isPresent() && fieldValue.get().getFilters().size() > 0) {
+								// See if the current transaction has the
+								// correct provider organization
 								Optional<String> optField = fieldValue.get().getFilters().stream().filter(n -> {
 									return n.equals(providingOrganization);
 								}).findAny();
-								
-								if(!optField.isPresent()) { // If it's not there, then move to the next transaction
+
+								if (!optField.isPresent()) {
+									// If it's not there, then move to the next
+									// transaction
 									continue;
 								}
 							}
 							// Receiving Org
-							receivingOrganization = extractNarrative(e, "receiver-org");
-							
+
 							Map<String, String> transactionFields = new HashMap<String, String>();
 							transactionFields.put("date", localDate);
 							transactionFields.put("providing-org", providingOrganization);
 							transactionFields.put("receiving-org", receivingOrganization);
+							transactionFields.put("provider-org-ref", providerRef);
 							transactionFields.put("reference", reference);
 							transactionFields.put("value", localValue);
 							transactionFields.put("subtype", field.getSubType());
-							
-							document.addTransactionField("transaction" + field.getSubType() + "_" + j, transactionFields);
+							document.addTransactionField("transaction" + field.getSubType() + "_" + j,
+									transactionFields);
 						}
 
 					} catch (XPathExpressionException e1) {

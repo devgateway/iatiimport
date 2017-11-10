@@ -367,8 +367,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			List<JsonBean> fundings = null;
 			switch(importRequest.getImportOption()) {
 			   case OVERWRITE_ALL_FUNDING:
-				   fundings = new ArrayList<>();
-				   fundings.add(getSourceFundings(source, fieldMappings, valueMappings));
+				   fundings = getSourceFundings(source, fieldMappings, valueMappings);
 				   break;
 			   case ONLY_ADD_NEW_FUNDING:
 				   fundings = addNewFunding(source, fieldMappings, valueMappings, project);
@@ -541,24 +540,10 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 		// Process transactions
 		if (hasTransactions) {
-			JsonBean fundings = getSourceFundings(source, fieldMappings, valueMappings);
+			List<JsonBean> fundings = getSourceFundings(source, fieldMappings, valueMappings);
 			if (fundings != null) {
-				project.set("fundings", fundings);
-
-				Optional<Field> org = fieldList.stream().filter(n -> {
-					return n.getFieldName().equals("donor_organization");
-				}).findFirst();
-				if (org.isPresent()) {
-					List<JsonBean> listDonorOrganizations = new ArrayList<JsonBean>();
-					JsonBean donorRole = new JsonBean();
-					donorRole.set("organization", fundings.get("donor_organization_id"));
-					donorRole.set("role", 1);
-					if (org.get().isPercentage()) {
-						donorRole.set("percentage", 100);
-					}
-					listDonorOrganizations.add(donorRole);
-					project.set("donor_organization", listDonorOrganizations);
-				}
+				project.set("fundings", fundings);				
+				project.set("donor_organization", getDonorOrgs(fundings));
 			}
 		}
 
@@ -585,90 +570,116 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	}
  
 	
-	private JsonBean getSourceFundings(InternalDocument source, List<FieldMapping> fieldMappings, List<FieldValueMapping> valueMappings) throws ValueMappingException, CurrencyNotFoundException {
-		List<JsonBean> fundingDetails = new ArrayList<JsonBean>();
+	private List<JsonBean> getSourceFundings(InternalDocument source, List<FieldMapping> fieldMappings, List<FieldValueMapping> valueMappings) throws ValueMappingException, CurrencyNotFoundException {
+		List<JsonBean> fundings = new ArrayList<>();
 		String currencyCode = source.getStringFields().get("default-currency");
 		String currencyIdString = getCurrencyId(currencyCode);
-		if(currencyIdString == null){
+		if (currencyIdString == null) {
 			throw new CurrencyNotFoundException("Currency code " + currencyCode + " could not be found in AMP");
 		}
-		int currencyId = Integer.parseInt(currencyIdString);
-		Optional<FieldValue> optionalRecipientCountry = source.getRecepientCountryFields().get("recipient-country").stream().findFirst();
-		Double percentage = 100.00;
-		if(optionalRecipientCountry.isPresent()){
-			FieldValue recipientCountry = optionalRecipientCountry.get();
-			percentage = (StringUtils.isEmpty(recipientCountry.getPercentage())) ?  100.00 : Double.parseDouble(recipientCountry.getPercentage());
-		}
 		
-        
+		int currencyId = Integer.parseInt(currencyIdString);
+		Optional<FieldValue> optionalRecipientCountry = source.getRecepientCountryFields().get("recipient-country")
+				.stream().findFirst();
+		
+		Double percentage = 100.00;
+		if (optionalRecipientCountry.isPresent()) {
+			FieldValue recipientCountry = optionalRecipientCountry.get();
+			percentage = (StringUtils.isEmpty(recipientCountry.getPercentage())) ? 100.00
+					: Double.parseDouble(recipientCountry.getPercentage());
+		}
+
+		Map<String, Map<String, String>> organizations = source.getOrganizationFields().entrySet().stream()
+				.filter(p -> {
+					return p.getValue().get("role").equals("Funding");
+				}).collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
+
+		Entry<String, Map<String, String>> organization = organizations.entrySet().stream().findFirst().get();
+
+		Map<String, List<JsonBean>> providerFundingDetails = new HashMap<>();
 		for (FieldMapping mapping : fieldMappings) {
 			Field sourceField = mapping.getSourceField();
 			Field destinationField = mapping.getDestinationField();
-			if (sourceField.getType() == FieldType.TRANSACTION) {
-				// What kind of transaction is this???
-				String sourceSubType = sourceField.getSubType();
 
-				// Get the transactions from the source that are of that subtype
-				// then!!!
-				Map<String, Map<String, String>> transactions = source.getTransactionFields().entrySet().stream().filter(p -> {
-					return p.getValue().get("subtype").equals(sourceSubType);
-				}).collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
+			if (sourceField.getType() == FieldType.TRANSACTION) {
+
+				String sourceSubType = sourceField.getSubType();
+				Map<String, Map<String, String>> transactions = source.getTransactionFields().entrySet().stream()
+						.filter(p -> {
+							return p.getValue().get("subtype").equals(sourceSubType);
+						}).collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
 
 				// Now we need the mapping of the field
 				String destinationSubType = destinationField.getSubType();
-
+				// this maps transactions to donor organizations using the
+				// providing-org
 				for (Entry<String, Map<String, String>> entry : transactions.entrySet()) {
 					JsonBean fundingDetail = new JsonBean();
 					Map<String, String> value = entry.getValue();
+					String provider = value.get("providing-org");
+					// if no provider tag on transaction use first funding org
+					// in participating-orgs
+					if (StringUtils.isEmpty(provider.trim())) {
+						provider = organization.getValue().get("value");
+					}
+
+					List<JsonBean> fundingDetails = providerFundingDetails.get(provider);
+					if (fundingDetails == null) {
+						fundingDetails = new ArrayList<JsonBean>();
+					}
+
 					String amount = value.get("value");
 					String dateString = value.get("date");
-
 					fundingDetail.set("transaction_type", getTransactionType(sourceSubType));
 					fundingDetail.set("adjustment_type", getAdjustmentType(destinationSubType));
 					fundingDetail.set("transaction_date", getTransactionDate(dateString));
 					fundingDetail.set("currency", currencyId);
-					fundingDetail.set("transaction_amount", getTransactionAmount(amount,percentage));
+					fundingDetail.set("transaction_amount", getTransactionAmount(amount, percentage));
 					fundingDetails.add(fundingDetail);
+					providerFundingDetails.put(provider, fundingDetails);
 				}
 			}
 		}
 
-		JsonBean funding = new JsonBean();
-		Map<String, Map<String, String>> organizations = source.getOrganizationFields().entrySet().stream().filter(p -> {
-			return p.getValue().get("role").equals("Funding");
-		}).collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
+		// create fundings and add transactions to the fundings
+		for (Entry<String, Map<String, String>> entry : organizations.entrySet()) {
+			List<JsonBean> fundingDetails = providerFundingDetails.get(entry.getValue().get("value"));
+			if (fundingDetails != null) {
+				JsonBean funding = new JsonBean();
+				int donorId = getIdFromList(entry.getValue().get("value"), "participating-org", fieldMappings,
+						valueMappings, false);
+				funding.set("donor_organization_id", donorId);
 
-		if (organizations.size() > 0) {
-			Entry<String, Map<String, String>> organization = organizations.entrySet().stream().findFirst().get();
-			if(organization.getValue().get("value") != null){
-				int donorId = getIdFromList(organization.getValue().get("value"), "participating-org", fieldMappings, valueMappings, false);
-				funding.set("donor_organization_id", donorId);	
-			}			
+				try {
+					String typeOfAssistance = source.getStringFields().get("default-finance-type");
+					if (typeOfAssistance != null) {
+						funding.set("type_of_assistance", getIdFromList(typeOfAssistance, "default-finance-type",
+								fieldMappings, valueMappings, true));
+					}
+				} catch (ValueMappingException e) {
+					log.debug("Dependent field not loaded: default-finance-type");
+				}
+
+				try {
+					if (source.getStringFields().get("default-aid-type") != null) {
+						String financingInstrument = source.getStringFields().get("default-aid-type");
+						funding.set("financing_instrument", getIdFromList(financingInstrument, "default-aid-type",
+								fieldMappings, valueMappings, true));
+					}
+				} catch (ValueMappingException e) {
+					log.debug("Dependent field not loaded: default-aid-type");
+				}
+
+				if (destinationFieldsList.contains("fundings~source_role")) {
+					funding.set("source_role", 1);
+				}
+
+				funding.set("funding_details", fundingDetails);
+				fundings.add(funding);
+			}
 		}
 
-		try {
-			String typeOfAssistance = source.getStringFields().get("default-finance-type");
-			if(typeOfAssistance != null){
-				funding.set("type_of_assistance", getIdFromList(typeOfAssistance, "default-finance-type", fieldMappings, valueMappings, true));
-			}			
-		} catch (ValueMappingException e) {
-			log.debug("Dependent field not loaded: default-finance-type");
-		}
-
-		try {
-			if(source.getStringFields().get("default-aid-type") != null ){
-				String financingInstrument = source.getStringFields().get("default-aid-type");
-				funding.set("financing_instrument", getIdFromList(financingInstrument, "default-aid-type", fieldMappings, valueMappings, true));
-			}			
-		} catch (ValueMappingException e) {
-			log.debug("Dependent field not loaded: default-aid-type");
-		}
-		
-		if(destinationFieldsList.contains("fundings~source_role")){
-			  funding.set("source_role", 1);	
-		}
-		funding.set("funding_details", fundingDetails);
-		return funding;
+		return fundings;
 	}
 	
 	/**
@@ -688,27 +699,28 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	private List<JsonBean> addNewFunding(InternalDocument source, List<FieldMapping> fieldMappings,
 			List<FieldValueMapping> valueMappings, JsonBean project)
 			throws ValueMappingException, CurrencyNotFoundException {
-		JsonBean sourceFunding = getSourceFundings(source, fieldMappings, valueMappings);
+		List<JsonBean> sourceFundings = getSourceFundings(source, fieldMappings, valueMappings);
 		List<LinkedHashMap<String, Object>> destinationFundings = null;
 		if (project.get("fundings") != null) {
 			destinationFundings = (List<LinkedHashMap<String, Object>>) project.get("fundings");
 		}
 
-		List<JsonBean> updatedFundings = new ArrayList<>();
-		if (destinationFundings != null && destinationFundings.size() > 0) {
-			for (LinkedHashMap<String, Object> destFunding : destinationFundings) {
-				// if funding exists in project from amp, update it by adding
-				// missing transactions, else rebuild funding and add to list
-				if (sourceFunding.get("donor_organization_id").equals(destFunding.get("donor_organization_id"))) {
-					updatedFundings.add(getUpdatedFunding(sourceFunding, destFunding));
-				} else {
-					updatedFundings.add(mapToJsonBean(destFunding));
+		List<JsonBean> updatedFundings = new ArrayList<>();		
+		for (JsonBean sourceFunding: sourceFundings) {
+			if (destinationFundings != null && destinationFundings.size() > 0) {
+				for (LinkedHashMap<String, Object> destFunding : destinationFundings) {
+					// if funding exists in project from amp, update it by adding
+					// missing transactions, else rebuild funding and add to list
+					if (sourceFunding.get("donor_organization_id").equals(destFunding.get("donor_organization_id"))) {
+						updatedFundings.add(getUpdatedFunding(sourceFunding, destFunding));
+					} else {
+						updatedFundings.add(mapToJsonBean(destFunding));
+					}
 				}
+			} else {
+				updatedFundings.add(sourceFunding);
 			}
-		} else {
-			updatedFundings.add(sourceFunding);
 		}
-
 		return updatedFundings;
 	}
 
@@ -795,27 +807,30 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	private List<JsonBean> replaceDonorTransactions(InternalDocument source, List<FieldMapping> fieldMappings,
 			List<FieldValueMapping> valueMappings, JsonBean project)
 			throws ValueMappingException, CurrencyNotFoundException {
-		JsonBean sourceFundings = getSourceFundings(source, fieldMappings, valueMappings);
+		List<JsonBean> sourceFundings = getSourceFundings(source, fieldMappings, valueMappings);
 		List<LinkedHashMap<String, Object>> destinationFundings = new ArrayList<>();
 		if (project.get("fundings") != null) {
 			destinationFundings = (List<LinkedHashMap<String, Object>>) project.get("fundings");
 		}
 
 		List<JsonBean> updatedFundings = new ArrayList<>();
-		if (destinationFundings != null && destinationFundings.size() > 0) {
-			for (LinkedHashMap<String, Object> destFunding : destinationFundings) {
-				// if same donor_organization_id is found in both source data
-				// and amp project, replace the fundings in the amp project with
-				// fundings from the IATI file
-				if (sourceFundings.get("donor_organization_id").equals(destFunding.get("donor_organization_id"))) {
-					updatedFundings.add(sourceFundings);
-				} else {
-					updatedFundings.add(mapToJsonBean(destFunding));
+		for (JsonBean sourceFunding: sourceFundings) {
+			if (destinationFundings != null && destinationFundings.size() > 0) {
+				for (LinkedHashMap<String, Object> destFunding : destinationFundings) {
+					// if same donor_organization_id is found in both source data
+					// and amp project, replace the fundings in the amp project with
+					// fundings from the IATI file
+					if (sourceFunding.get("donor_organization_id").equals(destFunding.get("donor_organization_id"))) {
+						updatedFundings.add(sourceFunding);
+					} else {
+						updatedFundings.add(mapToJsonBean(destFunding));
+					}
 				}
+			} else {
+				updatedFundings.add(sourceFunding);
 			}
-		} else {
-			updatedFundings.add(sourceFundings);
 		}
+		
 
 		return updatedFundings;
 	}
@@ -890,8 +905,9 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		String transactionTypeId = transactionType.getPossibleValues().stream().filter(n -> {
 			return n.getValue().equals(getTTNameSource(transactionTypeValue));
 		}).findFirst().get().getCode();
+		
 		return Integer.parseInt(transactionTypeId);
-		// return null;
+		
 	}
 
 	private String getTTNameSource(String transactionTypeValue) {
