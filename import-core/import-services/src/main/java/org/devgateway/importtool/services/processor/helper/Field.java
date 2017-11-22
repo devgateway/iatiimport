@@ -22,6 +22,7 @@ public class Field {
 	private List<Field> dependencies = new ArrayList<Field>();
 	private boolean isRequired;
 	private boolean isExclusive;
+	private int length;
 	
 	private boolean filterRequired;
 	// These types are silly but needed for now.
@@ -207,6 +208,14 @@ public class Field {
 
 	public void setMultiLangDisplayName(Map<String, String> multiLangDisplayName) {
 		this.multiLangDisplayName = multiLangDisplayName;
+	}
+
+	public int getLength() {
+		return length;
+	}
+
+	public void setLength(int length) {
+		this.length = length;
 	}
 
 }
