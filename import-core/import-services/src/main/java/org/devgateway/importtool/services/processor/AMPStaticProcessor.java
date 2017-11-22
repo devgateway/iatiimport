@@ -3,6 +3,7 @@ package org.devgateway.importtool.services.processor;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -52,13 +53,15 @@ import org.springframework.util.StringUtils;
 public class AMPStaticProcessor implements IDestinationProcessor {
 	private String descriptiveName = "AMP";
 	static final String BASEURL_PROPERTY = "AMPStaticProcessor.baseURL";
-	static final String BASEURL_DEFAULT_VALUE = "http://localhost:8081";	
+	static final String BASEURL_DEFAULT_VALUE = "http://localhost:8081";
 	static final String AMP_IATI_ID_FIELD_PROPERTY = "AMPStaticProcessor.ampIatiIdField";
 	static final String AMP_IATI_ID_FIELD_DEFAULT_VALUE = "project_code";
 	private static final String DEFAULT_LANGUAGE_CODE = "en";
 	static final String AMP_IMPLEMENTATION_LEVEL_ID_FIELD_PROPERTY= "AMPStaticProcessor.implementationLevel";
 	static final Integer AMP_IMPLEMENTATION_LEVEL_ID_DEFAULT_VALUE = 70; //Coming form common AMP configuration
     private Log log = LogFactory.getLog(getClass());
+	// AMP Configuration Details
+	private String DEFAULT_ID_FIELD = "amp-identifier";
 	private String DEFAULT_TITLE_FIELD = "project_title";
 	private String baseURL;
 	private String ampIatiIdField;
@@ -67,47 +70,39 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	private String documentsEndpoint = "/rest/activity/projects";
 
 	private List<Field> fieldList = new ArrayList<Field>();
-	
-	
 	private List<ClientHttpRequestInterceptor> interceptors = new ArrayList<ClientHttpRequestInterceptor>();
-	
-	private List<String> destinationFieldsList = new ArrayList<String>(); //fields returned by current AMP installation
-	private HashMap<String, Map<String,String>> destinationFieldsListLabels = new HashMap<String, Map<String,String>>();
-
-	
+	private List<String> destinationFieldsList = new ArrayList<String>(); // fields returned by current AMP installation
+	private HashMap<String, Map<String, String>> destinationFieldsListLabels = new HashMap<String, Map<String, String>>();
 
 	public List<String> getDestinationFieldsList() {
 		return destinationFieldsList;
 	}
-
 
 	public void setDestinationFieldsList(List<String> destinationFieldsList) {
 		this.destinationFieldsList = destinationFieldsList;
 	}
 
 	private RestTemplate template;
-	
-	private  ActionStatus actionStatus;
+
+	private ActionStatus actionStatus;
 
 	public ActionStatus getActionStatus() {
 		return actionStatus;
 	}
 
-
 	public void setActionStatus(ActionStatus actionStatus) {
 		this.actionStatus = actionStatus;
 	}
 
-
 	public AMPStaticProcessor(String authenticationToken) {
 		// this.properties = initProps();
 		this.setAuthenticationToken(authenticationToken);
-		
+
 		baseURL = System.getProperty(BASEURL_PROPERTY);
 		if (StringUtils.isEmpty(baseURL)) {
 			this.baseURL = BASEURL_DEFAULT_VALUE;
 		}
-		
+
 		ampIatiIdField = System.getProperty(AMP_IATI_ID_FIELD_PROPERTY);
 		if (StringUtils.isEmpty(ampIatiIdField)) {
 			ampIatiIdField = AMP_IATI_ID_FIELD_DEFAULT_VALUE;
@@ -115,12 +110,9 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		String ampImplementationLevelProperty = System.getProperty(AMP_IMPLEMENTATION_LEVEL_ID_FIELD_PROPERTY);
 		if (ampImplementationLevelProperty != null) {
 			ampImplementationLevel = Integer.parseInt(ampImplementationLevelProperty);
-		}
-		else
-		{
+		} else {
 			ampImplementationLevel = AMP_IMPLEMENTATION_LEVEL_ID_DEFAULT_VALUE;
 		}
-		
 
 		instantiateStaticFields();
 	}
@@ -133,7 +125,8 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	@Override
 	// Updated!
 	public List<InternalDocument> getDocuments(Boolean onlyEditable) {
-		actionStatus = new ActionStatus(EPMessages.FETCHING_DESTINATION_PROJECTS.getDescription(), 0L, EPMessages.FETCHING_DESTINATION_PROJECTS.getCode());
+		actionStatus = new ActionStatus(EPMessages.FETCHING_DESTINATION_PROJECTS.getDescription(), 0L,
+				EPMessages.FETCHING_DESTINATION_PROJECTS.getCode());
 		List<InternalDocument> list = new ArrayList<InternalDocument>();
 		String result = "";
 
@@ -152,7 +145,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 					String id = node.get("internal_id").asText();
 					String internalId = node.get("amp_id").asText();
 					// Needs to be checked, since it's configurable it might not have a value
-					if(node.get(ampIatiIdField) != null) {
+					if (node.get(ampIatiIdField) != null) {
 						document.setIdentifier(node.get(ampIatiIdField).asText());
 						document.addStringField(ampIatiIdField, node.get(ampIatiIdField).asText());
 					}
@@ -229,83 +222,13 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		this.documentsEndpoint = documentsEndpoint;
 	}
 
-	@Override
-	public ActionResult update(InternalDocument source, InternalDocument destination, List<FieldMapping> fieldMapping, List<FieldValueMapping> valueMapping, boolean overrideTitle, ImportRequest importRequest) {
-		ActionResult result;
-
-		RestTemplate restTemplate = getRestTemplate();
-		try {
-			JsonBean project = getProject(destination.getStringFields().get("id"));
-			updateProject(project, source, fieldMapping, valueMapping, overrideTitle, importRequest);
-			log.info(project);
-			JsonBean resultPost = restTemplate.postForObject(baseURL + "/rest/activity/" + destination.getStringFields().get("id"), project, JsonBean.class);
-			Object errorNode = resultPost.get("error");
-
-			if (errorNode == null) {
-				Integer id = (int) resultPost.get("internal_id");
-				String message = "";
-				if (resultPost.get("project_title") instanceof Map) {
-					@SuppressWarnings("unchecked")
-					Map<String, String> titleMultilang = (Map<String, String>) resultPost.get("project_title");
-					message = (String) titleMultilang.entrySet().stream().map(i -> i.getValue()).collect(Collectors.joining(", "));
-				} else {
-					message = resultPost.getString("project_title");
-				}
-				result = new ActionResult(id.toString(), "UPDATE", "OK", message);
-			} else {
-				String error = errorNode.toString();
-				result = new ActionResult("N/A", "REJECT", "ERROR", "Error: " + error);
-			}
-
-		} catch (RestClientException e) {
-			log.error("Error importing activity " + e);
-			if (e.getClass().equals(HttpServerErrorException.class)) {
-				HttpServerErrorException ex = (HttpServerErrorException) e;
-				JsonBean resultPost = JsonBean.getJsonBeanFromString(ex.getResponseBodyAsString());
-				if(resultPost != null){
-					Object errorNode = resultPost.get("error");
-					Map<?,?> activity = (Map<?,?>)resultPost.get("activity");				
-					Object projectTitle = (activity != null && activity.get("project_title") != null) ? activity.get("project_title") : "";
-					result = new ActionResult("N/A", "ERROR", "ERROR", "REST Exception:" + projectTitle + " " +  errorNode);
-				}else{
-					result = new ActionResult("N/A", "ERROR", "ERROR", "REST Exception:" + e.getMessage());
-				}	
-			} 
-			else if (e.getClass().equals(HttpClientErrorException.class)) {
-				HttpClientErrorException ex = (HttpClientErrorException) e;
-				JsonBean resultPost = JsonBean.getJsonBeanFromString(ex.getResponseBodyAsString());
-				if(resultPost != null){
-					Object errorNode = resultPost.get("error");
-					Map<?,?> activity = (Map<?,?>)resultPost.get("activity");				
-					Object projectTitle = (activity != null && activity.get("project_title") != null) ? activity.get("project_title") : "";
-					result = new ActionResult("N/A", "ERROR", "ERROR", "REST Exception:" + projectTitle + " " +  errorNode);
-				}else{
-					result = new ActionResult("N/A", "ERROR", "ERROR", "REST Exception:" + e.getMessage());
-				}				
-			}
-			else {
-				result = new ActionResult("N/A", "ERROR", "ERROR", "REST Exception:" + e.getMessage());
-			}
-			
-		} catch (ValueMappingException e) {
-			log.error("Error importing activity " + e);
-			result = new ActionResult("N/A", "ERROR", "ERROR", "Value Mapping Exception: " + e.getMessage());
-		}catch (CurrencyNotFoundException e) {
-			log.error("Error importing activity " + e);
-			result = new ActionResult("N/A", "ERROR", "ERROR", "Currency Not Found Exception: " + e.getMessage());
-		}catch(Exception e){
-			log.error("Error importing activity " + e);
-			result = new ActionResult("N/A", "ERROR", "ERROR", "Import failed with an error");
+	private void updateProject(JsonBean project, InternalDocument source, List<FieldMapping> fieldMappings,
+			List<FieldValueMapping> valueMappings, boolean overrideTitle, ImportRequest importRequest)
+			throws ValueMappingException, CurrencyNotFoundException, Exception {
+		if (overrideTitle) {
+			project.set("project_title", getMultilangString(source, "project_title", "title"));
 		}
-		
-		return result;
-	}
-
-	private void updateProject(JsonBean project, InternalDocument source, List<FieldMapping> fieldMappings, List<FieldValueMapping> valueMappings, boolean overrideTitle, ImportRequest importRequest) throws ValueMappingException, CurrencyNotFoundException {		
-		if(overrideTitle){
-			project.set("project_title", getMultilangString(source, "project_title", "title"));	
-		}
-		project.set(ampIatiIdField, source.getIdentifier());		
+		project.set(ampIatiIdField, source.getIdentifier());
 
 		Boolean hasTransactions = false;
 		for (FieldMapping mapping : fieldMappings) {
@@ -317,9 +240,10 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				Optional<FieldValueMapping> optValueMappingLocation = valueMappings.stream().filter(n -> {
 					return n.getSourceField().getFieldName().equals(mapping.getSourceField().getFieldName());
 				}).findFirst();
-				project.set(destinationField.getFieldName(), getCodesFromList(source, optValueMappingLocation.get(), false));
+				project.set(destinationField.getFieldName(),
+						getCodesFromList(source, optValueMappingLocation.get(), false));
 				Properties props = getExtraInfo(source, optValueMappingLocation.get(), false);
-				if(props != null){
+				if (props != null) {
 					@SuppressWarnings("unchecked")
 					LinkedHashMap<String, Integer> hm = (LinkedHashMap<String, Integer>) props.get("extra_info");
 					Integer implementationLocation = hm.get("implementation_level_id");
@@ -329,7 +253,8 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				break;
 			case RECIPIENT_COUNTRY:
 			case LIST:
-				if (!destinationField.getFieldName().equals("type_of_assistance") && !destinationField.getFieldName().equals("financing_instrument")) {
+				if (!destinationField.getFieldName().equals("type_of_assistance")
+						&& !destinationField.getFieldName().equals("financing_instrument")) {
 					Optional<FieldValueMapping> optValueMapping = valueMappings.stream().filter(n -> {
 						return n.getSourceField().getFieldName().equals(mapping.getSourceField().getFieldName());
 					}).findFirst();
@@ -339,9 +264,18 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 						project.set(destinationField.getFieldName(), getCodeFromList(source, optValueMapping.get()));
 					}
 				}
-				break;			
+				break;
 			case MULTILANG_STRING:
-				project.set(destinationField.getFieldName(), getMapFromString(source, destinationField.getFieldName(), mapping));
+				Object fieldValue = getMapFromString(source, destinationField.getFieldName(), mapping);
+				if(destinationField.getLength() > 0 && fieldValue instanceof Map) {
+					//NOOP
+				}
+				else {
+					String fieldValueString = (String)fieldValue;
+					fieldValue = fieldValueString.length() > destinationField.getLength() ? fieldValueString.substring(0, destinationField.getLength()) : fieldValueString;
+				}
+
+				project.set(destinationField.getFieldName(), fieldValue);
 				break;
 			case DATE:
 				project.set(destinationField.getFieldName(), getFormattedDateFromString(source, mapping));
@@ -359,46 +293,46 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		// Process transactions
 		if (hasTransactions) {
 			List<JsonBean> fundings = null;
-			switch(importRequest.getImportOption()) {
-			   case OVERWRITE_ALL_FUNDING:
-				   fundings = new ArrayList<>();
-				   fundings.add(getSourceFundings(source, fieldMappings, valueMappings));
-				   break;
-			   case ONLY_ADD_NEW_FUNDING:
-				   fundings = addNewFunding(source, fieldMappings, valueMappings, project);
-				   break;
-			   case REPLACE_DONOR_FUNDING:
-				   fundings = replaceDonorTransactions(source, fieldMappings, valueMappings, project);
-				   break;
-			   default:
-					break;
+			switch (importRequest.getImportOption()) {
+			case OVERWRITE_ALL_FUNDING:
+				fundings = getSourceFundings(source, fieldMappings, valueMappings);
+				break;
+			case ONLY_ADD_NEW_FUNDING:
+				fundings = addNewFunding(source, fieldMappings, valueMappings, project);
+				break;
+			case REPLACE_DONOR_FUNDING:
+				fundings = replaceDonorTransactions(source, fieldMappings, valueMappings, project);
+				break;
+			default:
+				break;
 			}
-			
+
 			if (fundings != null) {
-				project.set("fundings", fundings);				
+				project.set("fundings", fundings);
 				project.set("donor_organization", getDonorOrgs(fundings));
 			}
-			
+
 		}
 	}
 
-	private List<JsonBean> getDonorOrgs(List<JsonBean> fundings){
+	private List<JsonBean> getDonorOrgs(List<JsonBean> fundings) {
 		List<JsonBean> listDonorOrganizations = new ArrayList<JsonBean>();
-		for(JsonBean funding : fundings) {
+		for (JsonBean funding : fundings) {
 			Optional<Field> org = fieldList.stream().filter(n -> {
 				return n.getFieldName().equals("donor_organization");
 			}).findFirst();
-			if (org.isPresent()) {				
+			if (org.isPresent()) {
 				JsonBean donorRole = new JsonBean();
 				donorRole.set("organization", funding.get("donor_organization_id"));
 				donorRole.set("role", 1);
 				listDonorOrganizations.add(donorRole);
 			}
 		}
-		
+
 		return listDonorOrganizations;
-		
+
 	}
+
 	private JsonBean getProject(String documentId) {
 		JsonBean projectObject = null;
 		RestTemplate restTemplate = getRestTemplate();
@@ -416,20 +350,78 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	}
 
 	@Override
-	public ActionResult insert(InternalDocument source, List<FieldMapping> fieldMapping, List<FieldValueMapping> valueMapping) {
+	public ActionResult update(InternalDocument source, InternalDocument destination, List<FieldMapping> fieldMapping,
+			List<FieldValueMapping> valueMapping, boolean overrideTitle, ImportRequest importRequest) {
+		ActionResult result = null;
+		JsonBean project = getProject(destination.getStringFields().get("id"));
+		try {
+			updateProject(project, source, fieldMapping, valueMapping, overrideTitle, importRequest);
+			result = executeOperation(project, source, destination, fieldMapping, valueMapping);
+		} catch (ValueMappingException e) {
+			log.error("Error importing activity " + e);
+			result = new ActionResult("N/A", "ERROR", "ERROR", "Value Mapping Exception: " + e.getMessage());
+		} catch (CurrencyNotFoundException e) {
+			log.error("Error importing activity " + e);
+			result = new ActionResult("N/A", "ERROR", "ERROR", "Currency Not Found Exception: " + e.getMessage());
+		} catch (Exception e) {
+			log.error("Error importing activity " + e);
+			result = new ActionResult("N/A", "ERROR", "ERROR", "Description: " + e.getMessage());
+		}
+		return result;
+	}
 
+	@Override
+	public ActionResult insert(InternalDocument source, List<FieldMapping> fieldMapping,
+			List<FieldValueMapping> valueMapping) {
 		ActionResult result;
-
 		RestTemplate restTemplate = getRestTemplate();
 		try {
 			JsonBean project = transformProject(source, fieldMapping, valueMapping);
-			log.info(project);			
-			JsonBean resultPost = restTemplate.postForObject(baseURL + "/rest/activity", project, JsonBean.class);
+			result = executeOperation(project, source, null, fieldMapping, valueMapping);
+
+		} catch (ValueMappingException e) {
+			log.error("Error importing activity " + e);
+			result = new ActionResult("N/A", "ERROR", "ERROR", "Value Mapping Exception: " + e.getMessage());
+		} catch (CurrencyNotFoundException e) {
+			log.error("Error importing activity " + e);
+			result = new ActionResult("N/A", "ERROR", "ERROR", "Currency Not Found Exception: " + e.getMessage());
+		} catch (Exception e) {
+			log.error("Error importing activity " + e);
+			result = new ActionResult("N/A", "ERROR", "ERROR", "Error: " + e.getMessage());
+		}
+		return result;
+	}
+
+	public ActionResult executeOperation(JsonBean project, InternalDocument source, InternalDocument destination,
+			List<FieldMapping> fieldMapping, List<FieldValueMapping> valueMapping) {
+		log.info(project);
+		ActionResult result = null;
+		RestTemplate restTemplate = getRestTemplate();
+		try {
+			JsonBean resultPost = null;
+			String operation = "";
+			if (destination == null) {
+				resultPost = restTemplate.postForObject(baseURL + "/rest/activity", project, JsonBean.class);
+				operation = "INSERT";
+			} else {
+				resultPost = restTemplate.postForObject(
+						baseURL + "/rest/activity/" + destination.getStringFields().get("id"), project, JsonBean.class);
+				operation = "UPDATE";
+			}
 			Object errorNode = resultPost.get("error");
 
 			if (errorNode == null) {
 				Integer id = (int) resultPost.get("internal_id");
-				result = new ActionResult(id.toString(), "INSERT", "OK", resultPost.getString("project_title"));
+				String message = "";
+				if (resultPost.get("project_title") instanceof Map) {
+					@SuppressWarnings("unchecked")
+					Map<String, String> titleMultilang = (Map<String, String>) resultPost.get("project_title");
+					message = (String) titleMultilang.entrySet().stream().map(i -> i.getValue())
+							.collect(Collectors.joining(", "));
+				} else {
+					message = resultPost.getString("project_title");
+				}
+				result = new ActionResult(id.toString(), operation, "OK", message);
 			} else {
 				String error = errorNode.toString();
 				result = new ActionResult("N/A", "REJECT", "ERROR", "Error: " + error);
@@ -437,54 +429,69 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 		} catch (RestClientException e) {
 			log.error("Error importing activity " + e);
+			e.printStackTrace();
 			if (e.getClass().equals(HttpServerErrorException.class)) {
 				HttpServerErrorException ex = (HttpServerErrorException) e;
 				JsonBean resultPost = JsonBean.getJsonBeanFromString(ex.getResponseBodyAsString());
-				if(resultPost != null){
+				if (resultPost != null) {
 					Object errorNode = resultPost.get("error");
-					Map<?,?> activity = (Map<?,?>)resultPost.get("activity");				
-					Object projectTitle = (activity != null && activity.get("project_title") != null) ? activity.get("project_title") : "";
-					result = new ActionResult("N/A", "ERROR", "ERROR", "REST Exception:" + projectTitle + " " +  errorNode);
-				}else{
-					result = new ActionResult("N/A", "ERROR", "ERROR", "REST Exception:" + e.getMessage());	
-				}				
-				
-			} 
-			else if (e.getClass().equals(HttpClientErrorException.class)) {
-				HttpClientErrorException ex = (HttpClientErrorException) e;
-				JsonBean resultPost = JsonBean.getJsonBeanFromString(ex.getResponseBodyAsString());
-				if(resultPost != null){
-					Object errorNode = resultPost.get("error");
-					Map<?,?> activity = (Map<?,?>)resultPost.get("activity");				
-					Object projectTitle = (activity != null && activity.get("project_title") != null) ? activity.get("project_title") : "";
-					result = new ActionResult("N/A", "ERROR", "ERROR", "REST Exception:" + projectTitle + " " + errorNode);
-				}else{					
+					Map<?, ?> activity = (Map<?, ?>) resultPost.get("activity");
+					Object projectTitle = (activity != null && activity.get("project_title") != null)
+							? activity.get("project_title")
+							: "";
+					result = new ActionResult("N/A", "ERROR", "ERROR",
+							"REST Exception:" + projectTitle + " " + errorNode);
+				} else {
 					result = new ActionResult("N/A", "ERROR", "ERROR", "REST Exception:" + e.getMessage());
 				}
-				
-			}		
-			else {
+			} else if (e.getClass().equals(HttpClientErrorException.class)) {
+				HttpClientErrorException ex = (HttpClientErrorException) e;
+				JsonBean resultPost = JsonBean.getJsonBeanFromString(ex.getResponseBodyAsString());
+				if (resultPost != null) {
+					Object errorNode = resultPost.get("error");
+					Map<?, ?> activity = (Map<?, ?>) resultPost.get("activity");
+					Object projectTitle = (activity != null && activity.get("project_title") != null)
+							? activity.get("project_title")
+							: "";
+					result = new ActionResult("N/A", "ERROR", "ERROR",
+							"REST Exception:" + projectTitle + " " + errorNode);
+				} else {
+					result = new ActionResult("N/A", "ERROR", "ERROR", "REST Exception:" + e.getMessage());
+				}
+			} else {
 				result = new ActionResult("N/A", "ERROR", "ERROR", "REST Exception:" + e.getMessage());
 			}
-		} catch (ValueMappingException e) {
-			log.error("Error importing activity " + e);
-			result = new ActionResult("N/A", "ERROR", "ERROR", "Value Mapping Exception: " + e.getMessage());
-		}catch (CurrencyNotFoundException e) {
-			log.error("Error importing activity " + e);
-			result = new ActionResult("N/A", "ERROR", "ERROR", "Currency Not Found Exception: " + e.getMessage());
-		}catch(Exception e){
+
+		} catch (Exception e) {
 			log.error("Error importing activity " + e);
 			result = new ActionResult("N/A", "ERROR", "ERROR", "Import failed with an error");
 		}
 		return result;
 	}
 
-	
-	private JsonBean transformProject(InternalDocument source, List<FieldMapping> fieldMappings, List<FieldValueMapping> valueMappings) throws ValueMappingException, CurrencyNotFoundException {
+	private JsonBean transformProject(InternalDocument source, List<FieldMapping> fieldMappings,
+			List<FieldValueMapping> valueMappings) throws ValueMappingException, CurrencyNotFoundException, Exception {
 		Boolean hasTransactions = false;
 		JsonBean project = new JsonBean();
-		project.set(ampIatiIdField, source.getIdentifier());		
+		project.set(ampIatiIdField, source.getIdentifier());
 		project.set("project_title", getMultilangString(source, "project_title", "title"));
+
+		// Check for project title length and trim them
+		if (project.get("project_title") instanceof Map) {
+			@SuppressWarnings("unchecked")
+			Map<String, String> titleMultilang = (Map<String, String>) project.get("project_title");
+			Map<Object, Object> titleMultilangShort = titleMultilang.entrySet().stream().map(e -> new AbstractMap.SimpleEntry<>(e.getKey(), e.getValue().substring(0, 255)))
+			         .collect(Collectors.toMap(
+			             Map.Entry::getKey,
+			             Map.Entry::getValue
+			         ));
+			project.set("project_title", titleMultilangShort);
+		} else {
+			String projectTitle = (String) project.get("project_title");
+			String projectTitleValue = projectTitle.length() > 255 ? projectTitle.substring(0, 255) : projectTitle;
+			project.set("project_title", projectTitleValue);
+		}
+		
 		for (FieldMapping mapping : fieldMappings) {
 			Field sourceField = mapping.getSourceField();
 			Field destinationField = mapping.getDestinationField();
@@ -494,9 +501,10 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				Optional<FieldValueMapping> optValueMappingLocation = valueMappings.stream().filter(n -> {
 					return n.getSourceField().getFieldName().equals(mapping.getSourceField().getFieldName());
 				}).findFirst();
-				project.set(destinationField.getFieldName(), getCodesFromList(source, optValueMappingLocation.get(), false));
+				project.set(destinationField.getFieldName(),
+						getCodesFromList(source, optValueMappingLocation.get(), false));
 				Properties props = getExtraInfo(source, optValueMappingLocation.get(), false);
-				if(props != null){
+				if (props != null) {
 					@SuppressWarnings("unchecked")
 					LinkedHashMap<String, Integer> hm = (LinkedHashMap<String, Integer>) props.get("extra_info");
 					Integer implementationLocation = hm.get("implementation_level_id");
@@ -506,7 +514,8 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				break;
 			case RECIPIENT_COUNTRY:
 			case LIST:
-				if (!destinationField.getFieldName().equals("type_of_assistance") && !destinationField.getFieldName().equals("financing_instrument")) {
+				if (!destinationField.getFieldName().equals("type_of_assistance")
+						&& !destinationField.getFieldName().equals("financing_instrument")) {
 					Optional<FieldValueMapping> optValueMapping = valueMappings.stream().filter(n -> {
 						return n.getSourceField().getFieldName().equals(mapping.getSourceField().getFieldName());
 					}).findFirst();
@@ -518,7 +527,16 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				}
 				break;
 			case MULTILANG_STRING:
-				project.set(destinationField.getFieldName(), getMapFromString(source, destinationField.getFieldName(), mapping));
+				Object fieldValue = getMapFromString(source, destinationField.getFieldName(), mapping);
+				if(destinationField.getLength() > 0 && fieldValue instanceof Map) {
+					log.info("trim it!");
+				}
+				else {
+					String fieldValueString = (String)fieldValue;
+					fieldValue = fieldValueString.length() > destinationField.getLength() ? fieldValueString.substring(0, destinationField.getLength()) : fieldValueString;
+				}
+
+				project.set(destinationField.getFieldName(), fieldValue);
 				break;
 			case DATE:
 				project.set(destinationField.getFieldName(), getFormattedDateFromString(source, mapping));
@@ -535,24 +553,10 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 		// Process transactions
 		if (hasTransactions) {
-			JsonBean fundings = getSourceFundings(source, fieldMappings, valueMappings);
+			List<JsonBean> fundings = getSourceFundings(source, fieldMappings, valueMappings);
 			if (fundings != null) {
 				project.set("fundings", fundings);
-
-				Optional<Field> org = fieldList.stream().filter(n -> {
-					return n.getFieldName().equals("donor_organization");
-				}).findFirst();
-				if (org.isPresent()) {
-					List<JsonBean> listDonorOrganizations = new ArrayList<JsonBean>();
-					JsonBean donorRole = new JsonBean();
-					donorRole.set("organization", fundings.get("donor_organization_id"));
-					donorRole.set("role", 1);
-					if (org.get().isPercentage()) {
-						donorRole.set("percentage", 100);
-					}
-					listDonorOrganizations.add(donorRole);
-					project.set("donor_organization", listDonorOrganizations);
-				}
+				project.set("donor_organization", getDonorOrgs(fundings));
 			}
 		}
 
@@ -568,108 +572,135 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		if (field.getType() == FieldType.MULTILANG_STRING) {
 			return source.getMultilangFields().get(sourceFieldName);
 		} else {
-			if(fieldValues.size() > 0) {
+			if (fieldValues.size() > 0) {
 				return fieldValues.values().iterator().next();
-			}
-			else
-			{
+			} else {
 				return "";
 			}
 		}
 	}
- 
-	
-	private JsonBean getSourceFundings(InternalDocument source, List<FieldMapping> fieldMappings, List<FieldValueMapping> valueMappings) throws ValueMappingException, CurrencyNotFoundException {
-		List<JsonBean> fundingDetails = new ArrayList<JsonBean>();
+
+	private List<JsonBean> getSourceFundings(InternalDocument source, List<FieldMapping> fieldMappings,
+			List<FieldValueMapping> valueMappings) throws Exception {
+		List<JsonBean> fundings = new ArrayList<>();
 		String currencyCode = source.getStringFields().get("default-currency");
 		String currencyIdString = getCurrencyId(currencyCode);
-		if(currencyIdString == null){
+		if (currencyIdString == null) {
 			throw new CurrencyNotFoundException("Currency code " + currencyCode + " could not be found in AMP");
 		}
+
 		int currencyId = Integer.parseInt(currencyIdString);
-		Optional<FieldValue> optionalRecipientCountry = source.getRecepientCountryFields().get("recipient-country").stream().findFirst();
+		Optional<FieldValue> optionalRecipientCountry = source.getRecepientCountryFields().get("recipient-country")
+				.stream().findFirst();
+
 		Double percentage = 100.00;
-		if(optionalRecipientCountry.isPresent()){
+		if (optionalRecipientCountry.isPresent()) {
 			FieldValue recipientCountry = optionalRecipientCountry.get();
-			percentage = (StringUtils.isEmpty(recipientCountry.getPercentage())) ?  100.00 : Double.parseDouble(recipientCountry.getPercentage());
+			percentage = (StringUtils.isEmpty(recipientCountry.getPercentage())) ? 100.00
+					: Double.parseDouble(recipientCountry.getPercentage());
 		}
-		
-        
+
+		Map<String, Map<String, String>> organizations = source.getOrganizationFields().entrySet().stream()
+				.filter(p -> {
+					return p.getValue().get("role").equals("Funding");
+				}).collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
+
+		if(organizations.size() == 0) {
+			throw new Exception("Provider organization missing. Project ID: " + source.getIdentifier());
+		}
+		Entry<String, Map<String, String>> organization = organizations.entrySet().stream().findFirst().get();
+
+		Map<String, List<JsonBean>> providerFundingDetails = new HashMap<>();
 		for (FieldMapping mapping : fieldMappings) {
 			Field sourceField = mapping.getSourceField();
 			Field destinationField = mapping.getDestinationField();
-			if (sourceField.getType() == FieldType.TRANSACTION) {
-				// What kind of transaction is this???
-				String sourceSubType = sourceField.getSubType();
 
-				// Get the transactions from the source that are of that subtype
-				// then!!!
-				Map<String, Map<String, String>> transactions = source.getTransactionFields().entrySet().stream().filter(p -> {
-					return p.getValue().get("subtype").equals(sourceSubType);
-				}).collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
+			if (sourceField.getType() == FieldType.TRANSACTION) {
+
+				String sourceSubType = sourceField.getSubType();
+				Map<String, Map<String, String>> transactions = source.getTransactionFields().entrySet().stream()
+						.filter(p -> {
+							return p.getValue().get("subtype").equals(sourceSubType);
+						}).collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
 
 				// Now we need the mapping of the field
 				String destinationSubType = destinationField.getSubType();
-
+				// this maps transactions to donor organizations using the
+				// providing-org
 				for (Entry<String, Map<String, String>> entry : transactions.entrySet()) {
 					JsonBean fundingDetail = new JsonBean();
 					Map<String, String> value = entry.getValue();
+					String provider = value.get("providing-org");
+					// if no provider tag on transaction use first funding org
+					// in participating-orgs
+					if (StringUtils.isEmpty(provider.trim())) {
+						provider = organization.getValue().get("value");
+					}
+
+					List<JsonBean> fundingDetails = providerFundingDetails.get(provider);
+					if (fundingDetails == null) {
+						fundingDetails = new ArrayList<JsonBean>();
+					}
+
 					String amount = value.get("value");
 					String dateString = value.get("date");
-
 					fundingDetail.set("transaction_type", getTransactionType(sourceSubType));
 					fundingDetail.set("adjustment_type", getAdjustmentType(destinationSubType));
 					fundingDetail.set("transaction_date", getTransactionDate(dateString));
 					fundingDetail.set("currency", currencyId);
-					fundingDetail.set("transaction_amount", getTransactionAmount(amount,percentage));
+					fundingDetail.set("transaction_amount", getTransactionAmount(amount, percentage));
 					fundingDetails.add(fundingDetail);
+					providerFundingDetails.put(provider, fundingDetails);
 				}
 			}
 		}
 
-		JsonBean funding = new JsonBean();
-		Map<String, Map<String, String>> organizations = source.getOrganizationFields().entrySet().stream().filter(p -> {
-			return p.getValue().get("role").equals("Funding");
-		}).collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
+		// create fundings and add transactions to the fundings
+		for (Entry<String, Map<String, String>> entry : organizations.entrySet()) {
+			List<JsonBean> fundingDetails = providerFundingDetails.get(entry.getValue().get("value"));
+			if (fundingDetails != null) {
+				JsonBean funding = new JsonBean();
+				int donorId = getIdFromList(entry.getValue().get("value"), "participating-org", fieldMappings,
+						valueMappings, false);
+				funding.set("donor_organization_id", donorId);
 
-		if (organizations.size() > 0) {
-			Entry<String, Map<String, String>> organization = organizations.entrySet().stream().findFirst().get();
-			if(organization.getValue().get("value") != null){
-				int donorId = getIdFromList(organization.getValue().get("value"), "participating-org", fieldMappings, valueMappings, false);
-				funding.set("donor_organization_id", donorId);	
-			}			
+				try {
+					String typeOfAssistance = source.getStringFields().get("default-finance-type");
+					if (typeOfAssistance != null) {
+						funding.set("type_of_assistance", getIdFromList(typeOfAssistance, "default-finance-type",
+								fieldMappings, valueMappings, true));
+					}
+				} catch (ValueMappingException e) {
+					log.debug("Dependent field not loaded: default-finance-type");
+				}
+
+				try {
+					if (source.getStringFields().get("default-aid-type") != null) {
+						String financingInstrument = source.getStringFields().get("default-aid-type");
+						funding.set("financing_instrument", getIdFromList(financingInstrument, "default-aid-type",
+								fieldMappings, valueMappings, true));
+					}
+				} catch (ValueMappingException e) {
+					log.debug("Dependent field not loaded: default-aid-type");
+				}
+
+				if (destinationFieldsList.contains("fundings~source_role")) {
+					funding.set("source_role", 1);
+				}
+
+				funding.set("funding_details", fundingDetails);
+				fundings.add(funding);
+			}
 		}
 
-		try {
-			String typeOfAssistance = source.getStringFields().get("default-finance-type");
-			if(typeOfAssistance != null){
-				funding.set("type_of_assistance", getIdFromList(typeOfAssistance, "default-finance-type", fieldMappings, valueMappings, true));
-			}			
-		} catch (ValueMappingException e) {
-			log.debug("Dependent field not loaded: default-finance-type");
-		}
-
-		try {
-			if(source.getStringFields().get("default-aid-type") != null ){
-				String financingInstrument = source.getStringFields().get("default-aid-type");
-				funding.set("financing_instrument", getIdFromList(financingInstrument, "default-aid-type", fieldMappings, valueMappings, true));
-			}			
-		} catch (ValueMappingException e) {
-			log.debug("Dependent field not loaded: default-aid-type");
-		}
-		
-		if(destinationFieldsList.contains("fundings~source_role")){
-			  funding.set("source_role", 1);	
-		}
-		funding.set("funding_details", fundingDetails);
-		return funding;
+		return fundings;
 	}
-	
+
 	/**
-	 * This is used when the import option is "ONLY_ADD_NEW_FUNDING". Updates
-	 * the funding from AMP by adding missing transactions. Since IATI
-	 * transactions do not have a unique identifier, we compare the fields to
-	 * check if the transaction exists.
+	 * This is used when the import option is "ONLY_ADD_NEW_FUNDING". Updates the
+	 * funding from AMP by adding missing transactions. Since IATI transactions do
+	 * not have a unique identifier, we compare the fields to check if the
+	 * transaction exists.
 	 * 
 	 * @param source
 	 * @param fieldMappings
@@ -681,28 +712,29 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	 */
 	private List<JsonBean> addNewFunding(InternalDocument source, List<FieldMapping> fieldMappings,
 			List<FieldValueMapping> valueMappings, JsonBean project)
-			throws ValueMappingException, CurrencyNotFoundException {
-		JsonBean sourceFunding = getSourceFundings(source, fieldMappings, valueMappings);
+			throws ValueMappingException, CurrencyNotFoundException, Exception {
+		List<JsonBean> sourceFundings = getSourceFundings(source, fieldMappings, valueMappings);
 		List<LinkedHashMap<String, Object>> destinationFundings = null;
 		if (project.get("fundings") != null) {
 			destinationFundings = (List<LinkedHashMap<String, Object>>) project.get("fundings");
 		}
 
 		List<JsonBean> updatedFundings = new ArrayList<>();
-		if (destinationFundings != null && destinationFundings.size() > 0) {
-			for (LinkedHashMap<String, Object> destFunding : destinationFundings) {
-				// if funding exists in project from amp, update it by adding
-				// missing transactions, else rebuild funding and add to list
-				if (sourceFunding.get("donor_organization_id").equals(destFunding.get("donor_organization_id"))) {
-					updatedFundings.add(getUpdatedFunding(sourceFunding, destFunding));
-				} else {
-					updatedFundings.add(mapToJsonBean(destFunding));
+		for (JsonBean sourceFunding : sourceFundings) {
+			if (destinationFundings != null && destinationFundings.size() > 0) {
+				for (LinkedHashMap<String, Object> destFunding : destinationFundings) {
+					// if funding exists in project from amp, update it by adding
+					// missing transactions, else rebuild funding and add to list
+					if (sourceFunding.get("donor_organization_id").equals(destFunding.get("donor_organization_id"))) {
+						updatedFundings.add(getUpdatedFunding(sourceFunding, destFunding));
+					} else {
+						updatedFundings.add(mapToJsonBean(destFunding));
+					}
 				}
+			} else {
+				updatedFundings.add(sourceFunding);
 			}
-		} else {
-			updatedFundings.add(sourceFunding);
 		}
-
 		return updatedFundings;
 	}
 
@@ -714,7 +746,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 		return result;
 	}
-    
+
 	/**
 	 * Create a new jsonbean object by modifying the funding from AMP. If
 	 * transaction is not found, adds it to funding details
@@ -753,9 +785,10 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	}
 
 	/**
-	 * checks if a transaction from the IATI file exists in the funding details
-	 * from AMP.
-	 * Since IATI transactions do not have a unique identifier, we compare the fields to check if the transaction exists. 
+	 * checks if a transaction from the IATI file exists in the funding details from
+	 * AMP. Since IATI transactions do not have a unique identifier, we compare the
+	 * fields to check if the transaction exists.
+	 * 
 	 * @param fundingDetailsDestination
 	 *            - funding details from AMP
 	 * @param sourceTransaction
@@ -774,10 +807,11 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	}
 
 	/**
-	 * This is called when the import option is "REPLACE_DONOR_FUNDING". It
-	 * modifies the fundings from amp by replacing/overwriting the fundings for
-	 * donors that have data in the IATI file. Funding for donors not in the
-	 * IATI file are not affected.
+	 * This is called when the import option is "REPLACE_DONOR_FUNDING". It modifies
+	 * the fundings from amp by replacing/overwriting the fundings for donors that
+	 * have data in the IATI file. Funding for donors not in the IATI file are not
+	 * affected.
+	 * 
 	 * @param source
 	 * @param fieldMappings
 	 * @param valueMappings
@@ -788,27 +822,29 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	 */
 	private List<JsonBean> replaceDonorTransactions(InternalDocument source, List<FieldMapping> fieldMappings,
 			List<FieldValueMapping> valueMappings, JsonBean project)
-			throws ValueMappingException, CurrencyNotFoundException {
-		JsonBean sourceFundings = getSourceFundings(source, fieldMappings, valueMappings);
+			throws ValueMappingException, CurrencyNotFoundException, Exception {
+		List<JsonBean> sourceFundings = getSourceFundings(source, fieldMappings, valueMappings);
 		List<LinkedHashMap<String, Object>> destinationFundings = new ArrayList<>();
 		if (project.get("fundings") != null) {
 			destinationFundings = (List<LinkedHashMap<String, Object>>) project.get("fundings");
 		}
 
 		List<JsonBean> updatedFundings = new ArrayList<>();
-		if (destinationFundings != null && destinationFundings.size() > 0) {
-			for (LinkedHashMap<String, Object> destFunding : destinationFundings) {
-				// if same donor_organization_id is found in both source data
-				// and amp project, replace the fundings in the amp project with
-				// fundings from the IATI file
-				if (sourceFundings.get("donor_organization_id").equals(destFunding.get("donor_organization_id"))) {
-					updatedFundings.add(sourceFundings);
-				} else {
-					updatedFundings.add(mapToJsonBean(destFunding));
+		for (JsonBean sourceFunding : sourceFundings) {
+			if (destinationFundings != null && destinationFundings.size() > 0) {
+				for (LinkedHashMap<String, Object> destFunding : destinationFundings) {
+					// if same donor_organization_id is found in both source data
+					// and amp project, replace the fundings in the amp project with
+					// fundings from the IATI file
+					if (sourceFunding.get("donor_organization_id").equals(destFunding.get("donor_organization_id"))) {
+						updatedFundings.add(sourceFunding);
+					} else {
+						updatedFundings.add(mapToJsonBean(destFunding));
+					}
 				}
+			} else {
+				updatedFundings.add(sourceFunding);
 			}
-		} else {
-			updatedFundings.add(sourceFundings);
 		}
 
 		return updatedFundings;
@@ -824,20 +860,21 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		}).findFirst();
 
 		FieldValue currencyValue;
-		if(foundCurrency.isPresent()){
+		if (foundCurrency.isPresent()) {
 			currencyValue = foundCurrency.get();
 			return currencyValue.getCode();
 		}
 		return null;
-		
+
 	}
 
 	private Object getTransactionAmount(String amount, Double percentage) {
 		Double amountValue = Double.parseDouble(amount);
-		return (amountValue * percentage)/100;
+		return (amountValue * percentage) / 100;
 	}
 
-	private int getIdFromList(String fieldValue, String sourceField, List<FieldMapping> fieldMappings, List<FieldValueMapping> valueMappings, Boolean useCode) throws ValueMappingException {
+	private int getIdFromList(String fieldValue, String sourceField, List<FieldMapping> fieldMappings,
+			List<FieldValueMapping> valueMappings, Boolean useCode) throws ValueMappingException {
 		Optional<FieldValueMapping> optVm = valueMappings.stream().filter(n -> {
 			return n.getSourceField().getFieldName().equals(sourceField);
 		}).findFirst();
@@ -884,8 +921,9 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		String transactionTypeId = transactionType.getPossibleValues().stream().filter(n -> {
 			return n.getValue().equals(getTTNameSource(transactionTypeValue));
 		}).findFirst().get().getCode();
+
 		return Integer.parseInt(transactionTypeId);
-		// return null;
+
 	}
 
 	private String getTTNameSource(String transactionTypeValue) {
@@ -928,7 +966,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	private String getFormattedDateFromString(InternalDocument source, FieldMapping mapping) {
 		String uniqueFieldName = mapping.getSourceField().getUniqueFieldName();
 		Date date = source.getDateFields().get(uniqueFieldName);
-		if(date == null) 
+		if (date == null)
 			return null;
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 		String nowAsISO = df.format(date);
@@ -949,7 +987,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		Map<Integer, Integer> valueMapIndex = mapping.getValueIndexMapping();
 		List<FieldValue> sourcePossibleValues = mapping.getSourceField().getPossibleValues();
 		String[] stringValues = (String[]) value;
-				
+
 		for (int i = 0; i < stringValues.length; i++) {
 			final int stringValueIndex = i;
 			Optional<FieldValue> optSourceValueIndex = sourcePossibleValues.stream().filter(n -> {
@@ -970,7 +1008,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		List<FieldValue> sourcePossibleValues = mapping.getSourceField().getPossibleValues();
 		String[] stringValues = (String[]) value;
 		HashMap<Integer, Integer> uniqueValues = new HashMap<Integer, Integer>();
-		
+
 		for (int i = 0; i < stringValues.length; i++) {
 			final int stringValueIndex = i;
 			Optional<FieldValue> optSourceValueIndex = sourcePossibleValues.stream().filter(n -> {
@@ -982,28 +1020,24 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			FieldValue destinationValue = destinationPossibleValues.get(destinationValueIndex);
 			Integer intValue = Integer.parseInt(destinationValue.getCode());
 			Integer count = uniqueValues.get(intValue);
-			if(count == null) {
+			if (count == null) {
 				uniqueValues.put(intValue, 1);
-			}
-			else
-			{
+			} else {
 				uniqueValues.put(intValue, count + 1);
 			}
 		}
-		
+
 		List<JsonBean> beanList = new ArrayList<JsonBean>();
 		Integer divider = uniqueValues.size();
-		for(Entry<Integer, Integer> entry : uniqueValues.entrySet()) {
+		for (Entry<Integer, Integer> entry : uniqueValues.entrySet()) {
 			JsonBean bean = new JsonBean();
-			if(suffix) {
+			if (suffix) {
 				bean.set(mapping.getSourceField().getFieldName() + "_id", entry.getKey());
-			}
-			else
-			{
+			} else {
 				bean.set(mapping.getSourceField().getFieldName(), entry.getKey());
 			}
-			if (mapping.getSourceField().isPercentage() && entry.getValue() > 0){
-				bean.set(mapping.getSourceField().getFieldName() + "_percentage", (double)100 / (double)divider);
+			if (mapping.getSourceField().isPercentage() && entry.getValue() > 0) {
+				bean.set(mapping.getSourceField().getFieldName() + "_percentage", (double) 100 / (double) divider);
 			}
 			beanList.add(bean);
 		}
@@ -1030,103 +1064,101 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 		Map<String, Properties> fieldProps = getFieldProps();
 		// Transaction Fields
-        List<Field> trnDependencies = new ArrayList<Field>();
+		List<Field> trnDependencies = new ArrayList<Field>();
 
 		// Fixed fields
-		
+
 		fieldList.add(new Field("IATI Identifier", "iati-identifier", FieldType.STRING, false));
-		
-		if(destinationFieldsList.contains("project_title")){
-			Field projectTitle = new Field("Project Title", "project_title", getFieldType(fieldProps.get("project_title")), false);
+
+		if (destinationFieldsList.contains("project_title")) {
+			Field projectTitle = new Field("Project Title", "project_title",
+					getFieldType(fieldProps.get("project_title")), false);
 			projectTitle.setAttributes(destinationFieldsListLabels.get("project_title"));
 			fieldList.add(projectTitle);
 		}
-		
 
 		// Code Lists
-        if(destinationFieldsList.contains("activity_status")){
-        	Field activityStatus = new Field("Activity Status", "activity_status", FieldType.LIST, true);
-    		activityStatus.setPossibleValues(getCodeListValues("activity_status"));
-    		activityStatus.setRequired(true);
-    		activityStatus.setMultiLangDisplayName(destinationFieldsListLabels.get("activity_status"));
-    		fieldList.add(activityStatus);		
+		if (destinationFieldsList.contains("activity_status")) {
+			Field activityStatus = new Field("Activity Status", "activity_status", FieldType.LIST, true);
+			activityStatus.setPossibleValues(getCodeListValues("activity_status"));
+			activityStatus.setRequired(true);
+			activityStatus.setMultiLangDisplayName(destinationFieldsListLabels.get("activity_status"));
+			fieldList.add(activityStatus);
 		}
 
-        if(destinationFieldsList.contains("a.c._chapter")){
-        	Field acChapter = new Field("AC Chapter", "a.c._chapter", FieldType.LIST, true);
-        	acChapter.setPossibleValues(getCodeListValues("a.c._chapter"));
-        	acChapter.setRequired(false);
-        	acChapter.setMultiLangDisplayName(destinationFieldsListLabels.get("a.c._chapter"));
-    		fieldList.add(acChapter);		
+		if (destinationFieldsList.contains("a.c._chapter")) {
+			Field acChapter = new Field("AC Chapter", "a.c._chapter", FieldType.LIST, true);
+			acChapter.setPossibleValues(getCodeListValues("a.c._chapter"));
+			acChapter.setRequired(false);
+			acChapter.setMultiLangDisplayName(destinationFieldsListLabels.get("a.c._chapter"));
+			fieldList.add(acChapter);
 		}
-		
-        if(destinationFieldsList.contains("fundings~type_of_assistance")){
-        	Field typeOfAssistence = new Field("Type of Assistance", "type_of_assistance", FieldType.LIST, true);
-    		typeOfAssistence.setPossibleValues(getCodeListValues("fundings~type_of_assistance"));    		
-    		typeOfAssistence.setMultiLangDisplayName(destinationFieldsListLabels.get("fundings~type_of_assistance"));
-    		fieldList.add(typeOfAssistence);	
-    		trnDependencies.add(typeOfAssistence);
+
+		if (destinationFieldsList.contains("fundings~type_of_assistance")) {
+			Field typeOfAssistence = new Field("Type of Assistance", "type_of_assistance", FieldType.LIST, true);
+			typeOfAssistence.setPossibleValues(getCodeListValues("fundings~type_of_assistance"));
+			typeOfAssistence.setMultiLangDisplayName(destinationFieldsListLabels.get("fundings~type_of_assistance"));
+			fieldList.add(typeOfAssistence);
+			trnDependencies.add(typeOfAssistence);
 		}
-		
 
-      if(destinationFieldsList.contains("fundings~financing_instrument")){
-    	  Field financialInstrument = new Field("Aid Modality", "financing_instrument", FieldType.LIST, true);
-  		  financialInstrument.setPossibleValues(getCodeListValues("fundings~financing_instrument"));
-  		  financialInstrument.setMultiLangDisplayName(destinationFieldsListLabels.get("financing_instrument"));
-  		  fieldList.add(financialInstrument);	
-  		  trnDependencies.add(financialInstrument);
-	   }
-		
-
-        if(destinationFieldsList.contains("fundings~funding_details~adjustment_type")){
-        	Field adjustmentType = new Field("Adjustment Type", "adjustment_type", FieldType.LIST, true);
-    		adjustmentType.setPossibleValues(getCodeListValues("fundings~funding_details~adjustment_type"));
-    		adjustmentType.setMultiLangDisplayName(destinationFieldsListLabels.get("fundings~funding_details~adjustment_type"));
-    		fieldList.add(adjustmentType);	
+		if (destinationFieldsList.contains("fundings~financing_instrument")) {
+			Field financialInstrument = new Field("Aid Modality", "financing_instrument", FieldType.LIST, true);
+			financialInstrument.setPossibleValues(getCodeListValues("fundings~financing_instrument"));
+			financialInstrument
+					.setMultiLangDisplayName(destinationFieldsListLabels.get("fundings~financing_instrument"));
+			fieldList.add(financialInstrument);
+			trnDependencies.add(financialInstrument);
 		}
-		
 
-       if(destinationFieldsList.contains("fundings~funding_details~transaction_type")){
-    	   Field transactionType = new Field("Transaction Type", "transaction_type", FieldType.LIST, false);
+		if (destinationFieldsList.contains("fundings~funding_details~adjustment_type")) {
+			Field adjustmentType = new Field("Adjustment Type", "adjustment_type", FieldType.LIST, true);
+			adjustmentType.setPossibleValues(getCodeListValues("fundings~funding_details~adjustment_type"));
+			adjustmentType.setMultiLangDisplayName(
+					destinationFieldsListLabels.get("fundings~funding_details~adjustment_type"));
+			fieldList.add(adjustmentType);
+		}
+
+		if (destinationFieldsList.contains("fundings~funding_details~transaction_type")) {
+			Field transactionType = new Field("Transaction Type", "transaction_type", FieldType.LIST, false);
 			transactionType.setPossibleValues(getCodeListValues("fundings~funding_details~transaction_type"));
-			transactionType.setMultiLangDisplayName(destinationFieldsListLabels.get("fundings~funding_details~transaction_type"));
-			fieldList.add(transactionType);	
-		}
-		
-        if(destinationFieldsList.contains("primary_sectors~sector_id")){
-        	Field primarySector = new Field("Primary Sector", "primary_sectors", FieldType.LIST, true);
-    		primarySector.setPossibleValues(getCodeListValues("primary_sectors~sector_id"));
-    		primarySector.setMultiple(true);
-    		primarySector.setMultiLangDisplayName(destinationFieldsListLabels.get("primary_sectors"));
-    		fieldList.add(primarySector);
-		}
-		
-
-        if(destinationFieldsList.contains("secondary_sectors~sector_id")){
-        	Field secondarySector = new Field("Secondary Sector", "secondary_sectors", FieldType.LIST, true);
-    		secondarySector.setPossibleValues(getCodeListValues("secondary_sectors~sector_id"));
-    		secondarySector.setMultiLangDisplayName(destinationFieldsListLabels.get("secondary_sectors"));
-    		fieldList.add(secondarySector);
-		}
-		
-
-      if(destinationFieldsList.contains("tertiary_sectors~sector_id")){
-    	  Field tertiarySector = new Field("Tertiary Sector", "tertiary_sectors", FieldType.LIST, true);
-  		  tertiarySector.setPossibleValues(getCodeListValues("tertiary_sectors~sector_id"));
-  		  tertiarySector.setMultiLangDisplayName(destinationFieldsListLabels.get("tertiary_sectors"));
-  		  fieldList.add(tertiarySector);
+			transactionType.setMultiLangDisplayName(
+					destinationFieldsListLabels.get("fundings~funding_details~transaction_type"));
+			fieldList.add(transactionType);
 		}
 
-      // locations, locations~location, locations~location_percentage
-	  if(destinationFieldsList.contains("locations~location")){
-	  	Field location = new Field("Location", "locations", FieldType.LOCATION, true);
-	  	location.setPossibleValues(getCodeListValues("locations~location"));
-	  	location.setMultiLangDisplayName(destinationFieldsListLabels.get("locations~location"));
-	  	location.setMultiple(true);
-		fieldList.add(location);
+		if (destinationFieldsList.contains("primary_sectors~sector_id")) {
+			Field primarySector = new Field("Primary Sector", "primary_sectors", FieldType.LIST, true);
+			primarySector.setPossibleValues(getCodeListValues("primary_sectors~sector_id"));
+			primarySector.setMultiple(true);
+			primarySector.setMultiLangDisplayName(destinationFieldsListLabels.get("primary_sectors"));
+			fieldList.add(primarySector);
 		}
-      
-  	// Multi-language strings
+
+		if (destinationFieldsList.contains("secondary_sectors~sector_id")) {
+			Field secondarySector = new Field("Secondary Sector", "secondary_sectors", FieldType.LIST, true);
+			secondarySector.setPossibleValues(getCodeListValues("secondary_sectors~sector_id"));
+			secondarySector.setMultiLangDisplayName(destinationFieldsListLabels.get("secondary_sectors"));
+			fieldList.add(secondarySector);
+		}
+
+		if (destinationFieldsList.contains("tertiary_sectors~sector_id")) {
+			Field tertiarySector = new Field("Tertiary Sector", "tertiary_sectors", FieldType.LIST, true);
+			tertiarySector.setPossibleValues(getCodeListValues("tertiary_sectors~sector_id"));
+			tertiarySector.setMultiLangDisplayName(destinationFieldsListLabels.get("tertiary_sectors"));
+			fieldList.add(tertiarySector);
+		}
+
+		// locations, locations~location, locations~location_percentage
+		if (destinationFieldsList.contains("locations~location")) {
+			Field location = new Field("Location", "locations", FieldType.LOCATION, true);
+			location.setPossibleValues(getCodeListValues("locations~location"));
+			location.setMultiLangDisplayName(destinationFieldsListLabels.get("locations~location"));
+			location.setMultiple(true);
+			fieldList.add(location);
+		}
+
+		// Multi-language strings
 		Map<String, String> multilangfields = new HashMap<String, String>();
 		multilangfields.put("project_comments", "Project Comments");
 		multilangfields.put("objective", "Objective");
@@ -1139,19 +1171,20 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		multilangfields.put("project_comments", "Project Comments");
 		multilangfields.put("lessons_learned", "Lessons Learned");
 		multilangfields.put("results", "Results");
-		multilangfields.put("description", "Description");      
-		
+		multilangfields.put("description", "Description");
+
 		multilangfields.forEach((name, label) -> {
-			if(destinationFieldsList.contains(name)){
-		    			FieldType ftDescription = getFieldType(fieldProps.get(name));
-		    			if(ftDescription != null) {
-		    				Field newField = new Field(label, name, ftDescription, true);
-		    				newField.setMultiLangDisplayName(destinationFieldsListLabels.get(name));
-		    				fieldList.add(newField);
-		    			}	
+			if (destinationFieldsList.contains(name)) {
+				FieldType ftDescription = getFieldType(fieldProps.get(name));
+				if (ftDescription != null) {
+					Field newField = new Field(label, name, ftDescription, true);
+					int fieldLength = getFieldLength(fieldProps.get(name));
+					newField.setLength(fieldLength);
+					newField.setMultiLangDisplayName(destinationFieldsListLabels.get(name));
+					fieldList.add(newField);
 				}
+			}
 		});
-		
 
 		// Dates
 		Map<String, String> dateFields = new HashMap<String, String>();
@@ -1166,17 +1199,16 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 		Field actualStartDate = new Field("", "actual_start_date", FieldType.DATE, true);
 		dateFields.forEach((name, label) -> {
-			if(fieldProps.get(name) != null){
-		    			FieldType ftDescription = getFieldType(fieldProps.get(name));
-		    			if(ftDescription != null) {
-		    				Field newField = new Field(label, name, FieldType.DATE, true);
-		    				newField.setMultiLangDisplayName(destinationFieldsListLabels.get(name));
-		    				fieldList.add(newField);
-		    			}	
+			if (fieldProps.get(name) != null) {
+				FieldType ftDescription = getFieldType(fieldProps.get(name));
+				if (ftDescription != null) {
+					Field newField = new Field(label, name, FieldType.DATE, true);
+					newField.setMultiLangDisplayName(destinationFieldsListLabels.get(name));
+					fieldList.add(newField);
 				}
+			}
 		});
-		
-		
+
 		// Organizations
 
 		Map<String, String> organizationsRoles = new HashMap<String, String>();
@@ -1188,29 +1220,32 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		organizationsRoles.put("contracting_agency", "Contracting Agency");
 		organizationsRoles.put("regional_group", "Regional Group");
 		organizationsRoles.put("sector_group", "Sector Group");
-		
+
 		organizationsRoles.forEach((name, label) -> {
-			if(destinationFieldsList.contains(name)){
-        		Field org = new Field(label, name, FieldType.ORGANIZATION, true);
-        		org.setMultiLangDisplayName(destinationFieldsListLabels.get(name));
-        		org.setPossibleValues(getCodeListValues("fundings~donor_organization_id"));
-        		if (fieldProps.get(name) != null && fieldProps.get(name).getProperty("percentage_constraint") != null) {
-        			org.setPercentage(true);
-        		}
-        		fieldList.add(org);
+			if (destinationFieldsList.contains(name)) {
+				Field org = new Field(label, name, FieldType.ORGANIZATION, true);
+				org.setMultiLangDisplayName(destinationFieldsListLabels.get(name));
+				org.setPossibleValues(getCodeListValues("fundings~donor_organization_id"));
+				if (fieldProps.get(name) != null && fieldProps.get(name).getProperty("percentage_constraint") != null) {
+					org.setPercentage(true);
+				}
+				fieldList.add(org);
 			}
 		});
 
-         if(destinationFieldsList.contains("fundings~donor_organization_id")){
-        		Field fundingOrganization = new Field("Funding Organization", "donor_organization", FieldType.ORGANIZATION, true);
-        		fundingOrganization.setPossibleValues(getCodeListValues("fundings~donor_organization_id"));
-        		fundingOrganization.setMultiLangDisplayName(destinationFieldsListLabels.get("fundings~donor_organization_idfundings~donor_organization_id"));
-        		if (fieldProps.get("donor_organization") != null && fieldProps.get("donor_organization").getProperty("percentage_constraint") != null) {
-        			fundingOrganization.setPercentage(true);
-        		}        		
-        		fieldList.add(fundingOrganization);
-        		trnDependencies.add(fundingOrganization);
-		 }		
+		if (destinationFieldsList.contains("fundings~donor_organization_id")) {
+			Field fundingOrganization = new Field("Funding Organization", "donor_organization", FieldType.ORGANIZATION,
+					true);
+			fundingOrganization.setPossibleValues(getCodeListValues("fundings~donor_organization_id"));
+			fundingOrganization
+					.setMultiLangDisplayName(destinationFieldsListLabels.get("fundings~donor_organization_id"));
+			if (fieldProps.get("donor_organization") != null
+					&& fieldProps.get("donor_organization").getProperty("percentage_constraint") != null) {
+				fundingOrganization.setPercentage(true);
+			}
+			fieldList.add(fundingOrganization);
+			trnDependencies.add(fundingOrganization);
+		}
 
 		// Transactions
 		Field actualCommitments = new Field("Actual Commitments", "transaction", FieldType.TRANSACTION, true);
@@ -1240,9 +1275,17 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 	}
 
+	private int getFieldLength(Properties properties) {
+		if (properties == null || properties.get("length") == null) {
+			return 0;
+		}
+		String value = (String) properties.get("length");
+		int fieldLength = Integer.parseInt(value);
+		return fieldLength;
+	}
+
 	private FieldType getFieldType(Properties properties) {
-		if(properties == null || properties.get("field_type") == null)
-		{
+		if (properties == null || properties.get("field_type") == null) {
 			return null;
 		}
 		FieldType ft = FieldType.STRING;
@@ -1282,16 +1325,21 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 					JsonNode node = mainNode.next();
 					String fieldName = node.get("field_name").asText();
 					String fieldType = node.get("field_type").asText();
+					
 					Map<String, String> fieldLabel = extractMultilanguageText(node.get("field_label"));
 					destinationFieldsList.add(fieldName);
 					destinationFieldsListLabels.put(fieldName, fieldLabel);
-					addChildrenToDestinationFieldList(node,fieldName);
-					
-					
+					addChildrenToDestinationFieldList(node, fieldName);
+
 					JsonNode translatable = node.get("translatable");
 					JsonNode percentageConstraint = node.get("percentage_constraint");
+					JsonNode length = node.get("field_length");
+
 					Properties prop = new Properties();
 					prop.setProperty("field_type", fieldType);
+					if(length != null) {
+						prop.setProperty("length", length.asText());
+					}
 					if (translatable != null) {
 						prop.setProperty("translatable", translatable.asText());
 					}
@@ -1299,7 +1347,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 						prop.setProperty("percentage_constraint", percentageConstraint.asText());
 					}
 					fieldProperties.put(fieldName, prop);
-					
+
 				}
 			}
 
@@ -1309,24 +1357,25 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		return fieldProperties;
 	}
 
-	private void addChildrenToDestinationFieldList(JsonNode node, String fieldName){
+	private void addChildrenToDestinationFieldList(JsonNode node, String fieldName) {
 		JsonNode children = node.get("children");
-		if(children != null && children.isArray()){
-			Iterator<JsonNode> childFields = children.elements();						
+		if (children != null && children.isArray()) {
+			Iterator<JsonNode> childFields = children.elements();
 			while (childFields.hasNext()) {
-				JsonNode child = childFields.next();				
+				JsonNode child = childFields.next();
 				String childFieldName = child.get("field_name").asText();
 				Map<String, String> childFieldLabel = extractMultilanguageText(child.get("field_label"));
 				String name = fieldName + "~" + childFieldName;
-				destinationFieldsList.add(name);				
+				destinationFieldsList.add(name);
 				destinationFieldsListLabels.put(name, childFieldLabel);
-				if(node.get("children") != null){
+				if (node.get("children") != null) {
 					addChildrenToDestinationFieldList(child, name);
 				}
 			}
-		}	
-		
+		}
+
 	}
+
 	private List<FieldValue> getCodeListValues(String codeListName) {
 		String result = "";
 		List<FieldValue> possibleValues = new ArrayList<FieldValue>();
@@ -1348,7 +1397,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 					fv.setIndex(index++);
 					fv.setCode(code);
 					fv.setValue(value);
-					if(node.get("extra_info") != null) {
+					if (node.get("extra_info") != null) {
 						fv.getProperties().put("extra_info", node.get("extra_info"));
 					}
 					possibleValues.add(fv);
@@ -1360,32 +1409,32 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		}
 		return possibleValues;
 	}
-	
+
 	@Override
-	public List<DocumentMapping> preImportProcessing(List<DocumentMapping> documentMappings) {		
+	public List<DocumentMapping> preImportProcessing(List<DocumentMapping> documentMappings) {
 		Map<String, Integer> titleCount = new HashMap<>();
 		for (DocumentMapping doc : documentMappings) {
 			if (doc.getSelected()) {
-				InternalDocument source = doc.getSourceDocument();				
-				modifyDuplicateProjectTitles(source,titleCount);
+				InternalDocument source = doc.getSourceDocument();
+				modifyDuplicateProjectTitles(source, titleCount);
 			}
-		}		
+		}
 		return documentMappings;
 	}
-	
+
 	@SuppressWarnings("unchecked")
-	private void modifyDuplicateProjectTitles(InternalDocument source,Map<String, Integer> titleCount){
-		Map<String,String> titles = source.getMultilangFields().get("title");
+	private void modifyDuplicateProjectTitles(InternalDocument source, Map<String, Integer> titleCount) {
+		Map<String, String> titles = source.getMultilangFields().get("title");
 		Iterator<Entry<String, String>> it = titles.entrySet().iterator();
-	    while (it.hasNext()) {
-	        Map.Entry item = (Map.Entry)it.next();
-	        String title = (String) item.getValue();
-	        Integer count = (titleCount.get(title) != null) ? titleCount.get(title) : 0;
-	        titleCount.put(title, ++count);
-	        if(!title.startsWith(source.getIdentifier()) && count > 1){
-	        	item.setValue(source.getIdentifier() + " " + title);
-	        }			        			       					
-	    }			
+		while (it.hasNext()) {
+			Map.Entry item = (Map.Entry) it.next();
+			String title = (String) item.getValue();
+			Integer count = (titleCount.get(title) != null) ? titleCount.get(title) : 0;
+			titleCount.put(title, ++count);
+			if (!title.startsWith(source.getIdentifier()) && count > 1) {
+				item.setValue(source.getIdentifier() + " " + title);
+			}
+		}
 	}
 
 }

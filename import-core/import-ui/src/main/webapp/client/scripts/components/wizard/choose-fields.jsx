@@ -342,7 +342,7 @@ var ChooseFields = React.createClass({
                </div>
                 </div>
                 </div>
-                 <SaveMappingsDialog {...this.props} reloadTemplateData = {this.reloadTemplateData} mappingFieldsData = {this.state.mappingFieldsData} mappingInfo = {this.state.mappingInfo}/>
+                 <SaveMappingsDialog {...this.props} loadMappingTemplate = {this.loadMappingTemplate} reloadTemplateData = {this.reloadTemplateData} mappingFieldsData = {this.state.mappingFieldsData} mappingInfo = {this.state.mappingInfo}/>
                 </div>
             ); } });
 

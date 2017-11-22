@@ -61,7 +61,7 @@ class FieldMappingTemplateController {
 		}
 		
 		
-		return new ResponseEntity<>("{}", HttpStatus.OK);
+		return new ResponseEntity<>("{\"id\": " + fieldMappingTemplate.getId() + ", \"name\": \"" + fieldMappingTemplate.getName() + "\" }", HttpStatus.OK);
 	}
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/list")

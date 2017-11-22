@@ -51,7 +51,7 @@ var Wizard = React.createClass({
 				var self = this;
 				self.setIntervalTokenId = setInterval(function(){
 					self.checkTokenStatus();
-				}, 5000);
+				}, 1000);
 
 	      }.bind(this))["catch"](function(err) {
 	      }.bind(this));

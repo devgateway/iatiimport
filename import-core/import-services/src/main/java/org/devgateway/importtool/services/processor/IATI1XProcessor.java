@@ -417,6 +417,8 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 			String currency = !("".equals(element.getAttribute("default-currency"))) ? element.getAttribute("default-currency") : this.defaultCurrency;			
 			document.addStringField("default-currency", currency);	
 			String defaultLanguageCode = !("".equals(element.getAttribute("xml:lang"))) ? element.getAttribute("xml:lang") : this.defaultLanguage;
+			
+			
 			NodeList fieldNodeList;			
 			for (Field field : getFields()) {
 				switch (field.getType()) {
@@ -554,10 +556,13 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 								if(!field.getPossibleValues().stream().anyMatch(n->{ return n.getCode().equals(stringOrgValue);})) {									
 									field.getPossibleValues().add(fv);
 								}
+								
+								
 								document.addOrganizationField(field.getFieldName() + "_" + field.getSubType() + "_" + index, orgFields);
 							}
 						}
 					}
+					
 					break;
 				case MULTILANG_STRING:					
 					Map<String, String> mlv = new HashMap<String, String>();
@@ -590,8 +595,7 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 						nodes = (NodeList) xPath.evaluate("transaction/transaction-type[@code='" + field.getSubType() + "' or @code= '" + field.getSubTypeCode() + "']/parent::*", element, XPathConstants.NODESET);
 						for (int j = 0; j < nodes.getLength(); ++j) {
 							String reference = "";
-							String receivingOrganization = "";
-
+							
 							Element e = (Element) nodes.item(j);
 							// Reference
 							reference = e.getAttribute("ref");
@@ -605,38 +609,53 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 							if (!isValidDate(localDate)){
 								localDate = (e.getElementsByTagName("transaction-date").item(0) != null && e.getElementsByTagName("transaction-date").item(0).getAttributes() != null) ? e.getElementsByTagName("transaction-date").item(0).getAttributes().getNamedItem("iso-date").getNodeValue() : "";
 							}
-							
-							// Providing Org
-							final String providingOrganization = (e.getElementsByTagName("provider-org").item(0) != null && e.getElementsByTagName("provider-org").item(0).getChildNodes().getLength() > 0) ? e.getElementsByTagName("provider-org").item(0).getChildNodes().item(0).getNodeValue() : null;
-							
+
+							Element receiverNode = e.getElementsByTagName("receiver-org").item(0) != null
+									? (Element) e.getElementsByTagName("receiver-org").item(0) : null;
+
+							final String receivingOrganization = (receiverNode != null
+									&& receiverNode.getChildNodes().item(0) != null)
+											? receiverNode.getChildNodes().item(0).getNodeValue() : "";
+
+							Element providerNode = e.getElementsByTagName("provider-org").item(0) != null
+									? (Element) e.getElementsByTagName("provider-org").item(0) : null;
+
+							final String providingOrganization = (providerNode != null
+									&& providerNode.getChildNodes().getLength() > 0)
+											? providerNode.getChildNodes().item(0).getNodeValue() : "";
+							final String providerRef = (providerNode != null) ? providerNode.getAttribute("ref") : "";
+
 							// Get the field for provider org
 							Optional<Field> fieldValue = filterFieldList.stream().filter(n -> {
 								return "provider-org".equals(n.getFieldName());
 							}).findFirst();
 
-							// If it has filters set, check if this transaction complies
-							if(fieldValue.isPresent() && fieldValue.get().getFilters().size() > 0) {
-								// See if the current transaction has the correct provider organization
+							// If it has filters set, check if this transaction
+							// complies
+							if (fieldValue.isPresent() && fieldValue.get().getFilters().size() > 0) {
+								// See if the current transaction has the
+								// correct provider organization
 								Optional<String> optField = fieldValue.get().getFilters().stream().filter(n -> {
 									return n.equals(providingOrganization);
 								}).findAny();
-								
-								if(!optField.isPresent()) { // If it's not there, then move to the next transaction
+
+								if (!optField.isPresent()) {
+									// If it's not there, then move to the next
+									// transaction
 									continue;
 								}
 							}
-							
-							// Receiving Org
-							receivingOrganization = (e.getElementsByTagName("receiver-org").item(0) != null && e.getElementsByTagName("receiver-org").item(0).getChildNodes().getLength() > 0) ? e.getElementsByTagName("receiver-org").item(0).getChildNodes().item(0).getNodeValue() : null;
 
 							Map<String, String> transactionFields = new HashMap<String, String>();
 							transactionFields.put("date", localDate);
 							transactionFields.put("receiving-org", receivingOrganization);
+							transactionFields.put("providing-org", providingOrganization);
+							transactionFields.put("provider-org-ref", providerRef);
 							transactionFields.put("reference", reference);
 							transactionFields.put("value", localValue);
 							transactionFields.put("subtype", field.getSubType());
-
-							document.addTransactionField("transaction" + field.getSubType() + "_" + j, transactionFields);
+							document.addTransactionField("transaction" + field.getSubType() + "_" + j,
+									transactionFields);
 						}
 
 					} catch (XPathExpressionException e1) {
