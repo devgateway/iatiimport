@@ -75,8 +75,11 @@ var AutoComplete = React.createClass({
 
     	var self = this;
 
-    	$el.bind('typeahead:selected', function (obj, datum, name) {
+      $el.bind('typeahead:selected', function (obj, datum, name) {
     		self.props.handleChange(self.props.data, datum.value);
+    	});
+      $el.bind('typeahead:autocompleted', function (obj, datum, name) {
+        self.props.handleChange(self.props.data, datum.value);
     	});
 
 
