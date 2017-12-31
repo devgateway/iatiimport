@@ -6,7 +6,6 @@
 	<name>IMPORT TOOL Parent Package</name>
 	<url>http://maven.apache.org</url>
 	<version>0.0.16-DEV-SNAPSHOT</version>
-
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<version>1.2.2.RELEASE</version>
