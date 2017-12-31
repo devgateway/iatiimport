@@ -65,6 +65,7 @@ var MapValues = React.createClass({
     var mapping = _.find(this.state.mappings, function(v) { return v.sourceField.uniqueFieldName == sourceFieldData.sourceFieldName });
     var selectedDestination = _.find(mapping.destinationField.possibleValues, function(v) { return v.code == selectedDestinationValue});
     mapping.valueIndexMapping[sourceFieldData.sourceIndexValue] = selectedDestination ? selectedDestination.index : null;
+    console.log(mapping.valueIndexMapping);
     //yeah, no mutation here. TODO: Fix it!
     this.forceUpdate();
   },
@@ -78,7 +79,7 @@ var MapValues = React.createClass({
 				  if(templateMapping){
 					 for(var vmapping in templateMapping.valueIndexMapping ){
 						var templateDestination =  _.find(templateMapping.destinationField.possibleValues, function(p){ return p.index == templateMapping.valueIndexMapping[vmapping]});
-						var selectedDestination = _.find(mapping.destinationField.possibleValues, function(v) { return v.value == templateDestination.value});
+						var selectedDestination = _.find(mapping.destinationField.possibleValues, function(v) { return v && templateDestination && v.value == templateDestination.value});
 						if(selectedDestination){
 							mapping.valueIndexMapping[vmapping] = selectedDestination ? selectedDestination.index : null;
 

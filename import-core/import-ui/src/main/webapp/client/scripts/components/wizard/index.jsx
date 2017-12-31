@@ -38,7 +38,7 @@ var Wizard = React.createClass({
 		appActions.initDestinationSession.triggerPromise().then(function(data) {
 			  appConfig.DESTINATION_AUTH_TOKEN = data.token;
 		    appConfig.DESTINATION_USERNAME = data['user-name'];
-				appConfig.DESTINATION_AUTH_TOKEN_EXPIRATION = data["token-expiration"];
+				appConfig.DESTINATION_AUTH_TOKEN_EXPIRATION =  data["token-expiration"] || (new Date).getTime() + (30*60*1000);
 		    Cookies.set("DESTINATION_AUTH_TOKEN", data.token);
 		    Cookies.set("DESTINATION_USERNAME", data['user-name']);
 		    // Added true always for now, the API returns wrong value
@@ -61,11 +61,12 @@ var Wizard = React.createClass({
 		var currentTime = (new Date).getTime();
 		var expirationTime = appConfig.DESTINATION_AUTH_TOKEN_EXPIRATION;
 		var secondsToExpire = (appConfig.DESTINATION_AUTH_TOKEN_EXPIRATION - currentTime)/1000;
+		//console.log("Session in " + secondstoExpire);
 		if(secondsToExpire < 0) {
 			appActions.refreshDestinationSession.triggerPromise().then(function(data) {
 				  appConfig.DESTINATION_AUTH_TOKEN = data.token;
 			    appConfig.DESTINATION_USERNAME = data['user-name'];
-					appConfig.DESTINATION_AUTH_TOKEN_EXPIRATION = data["token-expiration"];
+					appConfig.DESTINATION_AUTH_TOKEN_EXPIRATION =  data["token-expiration"] || (new Date).getTime() + (30*60*1000);
 			    Cookies.set("DESTINATION_AUTH_TOKEN", data.token);
 			    Cookies.set("DESTINATION_USERNAME", data['user-name']);
 			    // Added true always for now, the API returns wrong value
