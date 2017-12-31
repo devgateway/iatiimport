@@ -12,11 +12,7 @@
 	<parent>
 		<groupId>org.devgateway.importtool</groupId>
 		<artifactId>importtool</artifactId>
-<<<<<<< HEAD
 		<version>0.0.16-DEV-SNAPSHOT</version>
-=======
-		<version>0.0.15-SNAPSHOT</version>
->>>>>>> refs/heads/master
 	</parent>
 
 	<dependencies>
