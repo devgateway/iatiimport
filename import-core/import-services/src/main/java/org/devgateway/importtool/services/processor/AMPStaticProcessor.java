@@ -273,10 +273,13 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				Object fieldValue = getMapFromString(source, destinationField.getFieldName(), mapping);
 				if(destinationField.getLength() > 0 && fieldValue instanceof Map) {
 					//NOOP
-				}
-				else {
+				} else {
 					String fieldValueString = (String)fieldValue;
-					fieldValue = fieldValueString.length() > destinationField.getLength() ? fieldValueString.substring(0, destinationField.getLength()) : fieldValueString;
+					if (destinationField.getLength() != 0 && fieldValueString.length() > destinationField.getLength()) {
+						fieldValue = fieldValueString.substring(0, destinationField.getLength());
+					} else {
+						fieldValue = fieldValueString;
+					}	
 				}
 
 				project.set(destinationField.getFieldName(), fieldValue);
@@ -533,11 +536,14 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			case MULTILANG_STRING:
 				Object fieldValue = getMapFromString(source, destinationField.getFieldName(), mapping);
 				if(destinationField.getLength() > 0 && fieldValue instanceof Map) {
-					log.info("trim it!");
-				}
-				else {
+					//NOOP
+				} else {
 					String fieldValueString = (String)fieldValue;
-					fieldValue = fieldValueString.length() > destinationField.getLength() ? fieldValueString.substring(0, destinationField.getLength()) : fieldValueString;
+					if (destinationField.getLength() != 0 && fieldValueString.length() > destinationField.getLength()) {
+						fieldValue = fieldValueString.substring(0, destinationField.getLength());
+					} else {
+						fieldValue = fieldValueString;
+					}				
 				}
 
 				project.set(destinationField.getFieldName(), fieldValue);
