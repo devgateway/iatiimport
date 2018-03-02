@@ -5,6 +5,7 @@ This tool allows users to import data in IATI format into a target system. The t
 # Requirements
  - Java 8 or later	
  - Apache Maven 3.2.2
+ - Node 4.7.0 (doesn't work with newest versions of node)
 
 # Configuration
  After pulling the source code from github, you need to make some changes to import-core/import-ui/src/main/webapp/client/scripts/conf/index.js.
@@ -23,6 +24,10 @@ This tool allows users to import data in IATI format into a target system. The t
 ```
 cd import-core/import-ui/src/main/webapp
 npm install --dev
+##notice that you might need to run. Do it if you get grunt or bower commands not found
+npm install grunt -g
+npm install bower -g
+bower install
 grunt build
 ```
  
