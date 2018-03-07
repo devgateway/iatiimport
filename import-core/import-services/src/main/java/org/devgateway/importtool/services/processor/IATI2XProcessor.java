@@ -885,6 +885,12 @@ public class IATI2XProcessor implements ISourceProcessor {
 		disbursements.setSubTypeCode("3");
 		fieldList.add(disbursements);
 
+		Field expenditure = new Field(Constants.EXPENDITURES, "transaction", FieldType.TRANSACTION, true);
+		expenditure.setSubType("E");
+		expenditure.setSubTypeCode("4");
+		fieldList.add(expenditure);
+
+
 		// Organization Fields
 		Field participatingOrg = new Field("Funding Organization", "participating-org", FieldType.ORGANIZATION, true);
 		participatingOrg.setSubType("Funding");
