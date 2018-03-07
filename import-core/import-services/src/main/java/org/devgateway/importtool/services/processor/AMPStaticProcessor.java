@@ -1256,7 +1256,8 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		actualDisbursements.setDependencies(trnDependencies);
 		fieldList.add(actualDisbursements);
 
-		Field actualExpenditure = new Field(Constants.PLANNED_EXPENDITURES, "transaction", FieldType.TRANSACTION, true);
+		Field actualExpenditure = new Field(Constants.ACTUAL_EXPENDITURES, "transaction", FieldType.TRANSACTION,
+				true);
 		actualExpenditure.setSubType("AE");
 		actualExpenditure.setDependencies(trnDependencies);
 		fieldList.add(actualExpenditure);
