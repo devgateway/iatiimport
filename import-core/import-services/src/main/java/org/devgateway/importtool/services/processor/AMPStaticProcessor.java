@@ -81,9 +81,12 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 	protected static final Map<String, String> tTNameSourceMap = new HashMap<String, String>() {
 		{
-			put("C", Constants.COMMITMENTS);
-			put("D", Constants.DISBURSEMENTS);
-			put("E", Constants.EXPENDITURES);
+			put("AC", Constants.COMMITMENTS);
+			put("AD", Constants.DISBURSEMENTS);
+			put("AE", Constants.EXPENDITURES);
+			put("PC", Constants.COMMITMENTS);
+			put("PD", Constants.DISBURSEMENTS);
+			put("PE", Constants.EXPENDITURES);
 		}
 	};
 
@@ -663,7 +666,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 					String amount = value.get("value");
 					String dateString = value.get("date");
-					fundingDetail.set("transaction_type", getTransactionType(sourceSubType));
+					fundingDetail.set("transaction_type", getTransactionType(destinationSubType)); 
 					fundingDetail.set("adjustment_type", getAdjustmentType(destinationSubType));
 					fundingDetail.set("transaction_date", getTransactionDate(dateString));
 					fundingDetail.set("currency", currencyId);
