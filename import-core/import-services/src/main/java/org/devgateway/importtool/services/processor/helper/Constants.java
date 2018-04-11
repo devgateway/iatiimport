@@ -20,4 +20,14 @@ public class Constants {
 	public static final String 	ENABLED_TAG = "enabled";
 	public static final String IMPORT_STATUS_MESSAGE = "Importing %s of %s projects";
 
+	public static final String ACTUAL = "Actual";
+	public static final String PLANNED = "Planned";
+	public static final String COMMITMENTS = "Commitments";
+	public static final String DISBURSEMENTS = "Disbursements";
+	public static final String EXPENDITURES = "Expenditures";
+
+	public static final String ACTUAL_EXPENDITURES = ACTUAL + " " + EXPENDITURES;
+	public static final String PLANNED_EXPENDITURES = PLANNED + " " + EXPENDITURES;
+
+
 }
