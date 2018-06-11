@@ -20,19 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.endpoint.EPMessages;
 import org.devgateway.importtool.exceptions.CurrencyNotFoundException;
-import org.devgateway.importtool.services.processor.helper.ActionResult;
-import org.devgateway.importtool.services.processor.helper.ActionStatus;
-import org.devgateway.importtool.services.processor.helper.DocumentMapping;
-import org.devgateway.importtool.services.processor.helper.Field;
-import org.devgateway.importtool.services.processor.helper.FieldMapping;
-import org.devgateway.importtool.services.processor.helper.FieldType;
-import org.devgateway.importtool.services.processor.helper.FieldValue;
-import org.devgateway.importtool.services.processor.helper.FieldValueMapping;
-import org.devgateway.importtool.services.processor.helper.IDestinationProcessor;
-import org.devgateway.importtool.services.processor.helper.InternalDocument;
-import org.devgateway.importtool.services.processor.helper.JsonBean;
-import org.devgateway.importtool.services.processor.helper.TokenHeaderInterceptor;
-import org.devgateway.importtool.services.processor.helper.ValueMappingException;
+import org.devgateway.importtool.services.processor.helper.*;
 import org.devgateway.importtool.services.request.ImportRequest;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.web.client.HttpClientErrorException;
@@ -85,6 +73,30 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	private RestTemplate template;
 
 	private ActionStatus actionStatus;
+
+	protected static final Map<String, String> tTNameSourceMap = new HashMap<String, String>() {
+		{
+			put("AC", Constants.COMMITMENTS);
+			put("AD", Constants.DISBURSEMENTS);
+			put("AE", Constants.EXPENDITURES);
+			put("PC", Constants.COMMITMENTS);
+			put("PD", Constants.DISBURSEMENTS);
+			put("PE", Constants.EXPENDITURES);
+		}
+	};
+
+	protected static final Map<String, String> aTNameDestinationMap = new HashMap<String, String>() {
+		{
+			put("AC", Constants.ACTUAL);
+			put("AD", Constants.ACTUAL);
+			put("AE", Constants.ACTUAL);
+			put("PC", Constants.PLANNED);
+			put("PD", Constants.PLANNED);
+			put("PE", Constants.PLANNED);
+
+
+		}
+	};
 
 	public ActionStatus getActionStatus() {
 		return actionStatus;
@@ -269,10 +281,13 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				Object fieldValue = getMapFromString(source, destinationField.getFieldName(), mapping);
 				if(destinationField.getLength() > 0 && fieldValue instanceof Map) {
 					//NOOP
-				}
-				else {
+				} else {
 					String fieldValueString = (String)fieldValue;
-					fieldValue = fieldValueString.length() > destinationField.getLength() ? fieldValueString.substring(0, destinationField.getLength()) : fieldValueString;
+					if (destinationField.getLength() != 0 && fieldValueString.length() > destinationField.getLength()) {
+						fieldValue = fieldValueString.substring(0, destinationField.getLength());
+					} else {
+						fieldValue = fieldValueString;
+					}	
 				}
 
 				project.set(destinationField.getFieldName(), fieldValue);
@@ -529,11 +544,14 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			case MULTILANG_STRING:
 				Object fieldValue = getMapFromString(source, destinationField.getFieldName(), mapping);
 				if(destinationField.getLength() > 0 && fieldValue instanceof Map) {
-					log.info("trim it!");
-				}
-				else {
+					//NOOP
+				} else {
 					String fieldValueString = (String)fieldValue;
-					fieldValue = fieldValueString.length() > destinationField.getLength() ? fieldValueString.substring(0, destinationField.getLength()) : fieldValueString;
+					if (destinationField.getLength() != 0 && fieldValueString.length() > destinationField.getLength()) {
+						fieldValue = fieldValueString.substring(0, destinationField.getLength());
+					} else {
+						fieldValue = fieldValueString;
+					}				
 				}
 
 				project.set(destinationField.getFieldName(), fieldValue);
@@ -644,7 +662,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 					String amount = value.get("value");
 					String dateString = value.get("date");
-					fundingDetail.set("transaction_type", getTransactionType(sourceSubType));
+					fundingDetail.set("transaction_type", getTransactionType(destinationSubType)); 
 					fundingDetail.set("adjustment_type", getAdjustmentType(destinationSubType));
 					fundingDetail.set("transaction_date", getTransactionDate(dateString));
 					fundingDetail.set("currency", currencyId);
@@ -919,33 +937,11 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		}).findFirst().get();
 
 		String transactionTypeId = transactionType.getPossibleValues().stream().filter(n -> {
-			return n.getValue().equals(getTTNameSource(transactionTypeValue));
+			return n.getValue().equals(tTNameSourceMap.get(transactionTypeValue));
 		}).findFirst().get().getCode();
 
 		return Integer.parseInt(transactionTypeId);
 
-	}
-
-	private String getTTNameSource(String transactionTypeValue) {
-		switch (transactionTypeValue) {
-		case "C":
-			return "Commitments";
-		case "D":
-			return "Disbursements";
-		}
-		return "";
-	}
-
-	private String getATNameDestination(String transactionTypeValue) {
-		switch (transactionTypeValue) {
-		case "AC":
-		case "AD":
-			return "Actual";
-		case "PC":
-		case "PD":
-			return "Planned";
-		}
-		return "";
 	}
 
 	private int getAdjustmentType(String value) {
@@ -954,7 +950,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		}).findFirst().get();
 
 		String adjustmentTypeValue = adjustmentType.getPossibleValues().stream().filter(n -> {
-			return n.getValue().equals(getATNameDestination(value));
+			return n.getValue().equals(aTNameDestinationMap.get(value));
 		}).findFirst().get().getCode();
 		return Integer.parseInt(adjustmentTypeValue);
 	}
@@ -1258,6 +1254,12 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		actualDisbursements.setDependencies(trnDependencies);
 		fieldList.add(actualDisbursements);
 
+		Field actualExpenditure = new Field(Constants.ACTUAL_EXPENDITURES, "transaction", FieldType.TRANSACTION,
+				true);
+		actualExpenditure.setSubType("AE");
+		actualExpenditure.setDependencies(trnDependencies);
+		fieldList.add(actualExpenditure);
+
 		Field plannedCommitments = new Field("Planned Commitments", "transaction", FieldType.TRANSACTION, true);
 		plannedCommitments.setSubType("PC");
 		plannedCommitments.setDependencies(trnDependencies);
@@ -1267,6 +1269,11 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		plannedDisbursements.setSubType("PD");
 		plannedDisbursements.setDependencies(trnDependencies);
 		fieldList.add(plannedDisbursements);
+
+		Field plannedExpenditures = new Field(Constants.PLANNED_EXPENDITURES, "transaction", FieldType.TRANSACTION, true);
+		plannedExpenditures.setSubType("PE");
+		plannedExpenditures.setDependencies(trnDependencies);
+		fieldList.add(plannedExpenditures);
 
 		// Currency
 		Field currency = new Field("Currency Code", "currency_code", FieldType.LIST, true);
