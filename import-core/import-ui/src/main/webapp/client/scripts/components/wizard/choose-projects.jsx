@@ -265,7 +265,7 @@ var ChooseProjects = React.createClass({
                 <div className="panel-body">
                     {statusMessage}
                     <div className="panel panel-success">
-                        <div className="panel-heading">{this.props.i18nLib.t('wizard.choose_projects.new_projects')} <i>({this.state.destinationProjects.length} {this.props.i18nLib.t('wizard.choose_projects.message')})</i></div>
+                        <div className="panel-heading">{this.props.i18nLib.t('wizard.choose_projects.new_projects')} <i>({this.state.destinationProjects.length} {this.props.i18nLib.t('wizard.choose_projects.choose_projects')})</i></div>
                         <div className="panel-body">
                          <SimilarProjectsDialog projectMapping={this.state.projectMapping} getTitle={this.getTitle} mapProject={this.mapProject} {...this.props} />
                             <table className="table">

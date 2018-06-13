@@ -282,7 +282,6 @@ module.exports = {
 							'previous' : '<< Anterior',
 							'msg_error_retrieving_languages' : 'Error al recuperar los idiomas.',
 							'msg_error_retrieving_filters' : ' Error al recuperar los filtros.'
-
 						},
 						'choose_projects' : {
 							'choose_projects' : 'Seleccionar Proyectos',
@@ -299,14 +298,14 @@ module.exports = {
 							'msg_error_retrieving_projects' : ' Error al recuperar los filtros.',
 							'msg_error_select_project' : ' Favor seleccionar al menos un proyecto para continuar',
 						    'msg_project_not_editable':'Los proyectos marcador por un * y resaltados no pueden ser editados puesto que no encuentran en el espacio de trabajo actual.',
-						    'similar_titles': '# of Similar Titles'
+						    'similar_titles': '# de títulos similares'
 						},
 						'similar_projects_dlg': {
-							'title': 'Projects with similar title',
-							'close': 'Close',
-							'select_project': 'Map Selected Project',
+							'title': 'Proyectos con títulos similares',
+							'close': 'Cerrar',
+							'select_project': 'Mapear los proyectos seleccionados',
 							'iati_id': 'IATI ID',
-							'project_title': 'Project Title',
+							'project_title': 'Título del proyecto',
 					        'msg_project_not_editable':'Los proyectos marcador por un * y resaltados no pueden ser editados puesto que no encuentran en el espacio de trabajo actual.',
 							'message': 'proyectos en el sistema destino'
 						},
@@ -516,14 +515,14 @@ module.exports = {
 							'previous' : ' << Précédent ',
 							'msg_error_retrieving_projects' : ' Erreur dans la recherche des Filtres.',
 							'msg_error_select_project' : ' Veuillez sélectionner au moins un projet pour continuer ',
-							'similar_titles': '# of Similar Titles'
+							'similar_titles': 'Nbre de titres similaires'
 						},
 						'similar_projects_dlg': {
-							'title': 'Projects with similar title',
-							'close': 'Close',
-							'select_project': 'Map Selected Project',
+							'title': 'Projets ayant un titre similaire',
+							'close': 'Fermer',
+							'select_project': 'Maintenir la version du projet',
 							'iati_id': 'IATI ID',
-							'project_title': 'Project Title',
+							'project_title': 'Titre du projet ',
 							'message' : ' projets dans le système de destination'
 						},
 						'map_fields' : {
