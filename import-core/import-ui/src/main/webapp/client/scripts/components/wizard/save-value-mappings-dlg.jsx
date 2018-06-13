@@ -79,7 +79,7 @@ var SaveMappingsDialog = React.createClass({
 			        Mapping Name: <input ref="mappingsName" type="text" onChange = {this.handleNameChange}  value={this.state.name}/>
 			      </div>
 			      <div className="modal-footer">
-			        <button type="button" className="btn btn-default" data-dismiss="modal">{this.props.i18nLib.t('wizard.save_value_mappings_dlg.close')}</button>
+			        <button type="button" className="btn btn-default btn-warning" data-dismiss="modal">{this.props.i18nLib.t('wizard.save_value_mappings_dlg.close')}</button>
 			        <button type="button" className="btn btn-primary" onClick={this.saveMappings}>{this.props.i18nLib.t('wizard.save_value_mappings_dlg.save_mapping')}</button>
               <button type="button" className="btn btn-primary" onClick={this.saveMappingsCopy}>{this.props.i18nLib.t('wizard.save_value_mappings_dlg.save_as_copy')}</button>
 			      </div>

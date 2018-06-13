@@ -62,7 +62,7 @@ var ImportReport = React.createClass({
         
       </div>
       <div className="modal-footer">
-        <button type="button" className="btn btn-default" data-dismiss="modal">{this.props.i18nLib.t('wizard.import_report.close')}</button>
+        <button type="button" className="btn btn-default btn-warning" data-dismiss="modal">{this.props.i18nLib.t('wizard.import_report.close')}</button>
       </div>
     </div>
   </div>
