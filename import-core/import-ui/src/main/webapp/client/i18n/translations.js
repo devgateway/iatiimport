@@ -133,7 +133,7 @@ module.exports = {
 						'save_field_mappings_dlg' : {
 							'msg_error_saving' : 'Error saving template',
 							'title' : 'Save Field Mappings',
-							'close' : 'close',
+							'close' : 'Close',
 							'save_mapping' : 'Save Mapping',
 							'save_as_copy' : 'Save as Copy',
 							'mapping_exists' : 'Mapping name already exists'
@@ -141,7 +141,7 @@ module.exports = {
 						'save_value_mappings_dlg' : {
 							'msg_error_saving' : 'Error saving template',
 							'title' : 'Save Value Mappings',
-							'close' : 'close',
+							'close' : 'Close',
 							'save_mapping' : 'Save Mapping',
 							'save_as_copy' : 'Save as Copy',
 							'mapping_exists' : 'Mapping name already exists'
@@ -350,7 +350,7 @@ module.exports = {
 						'save_field_mappings_dlg' : {
 							'msg_error_saving' : 'Error al guardar la plantilla',
 							'title' : 'Guardar el Mapeo de los Campos',
-							'close' : 'cerrar',
+							'close' : 'Cerrar',
 							'save_mapping' : 'Guardar Mapeo',
 							'save_as_copy' : 'Save as Copy',
 							'mapping_exists' : 'Mapeo existente'
@@ -358,7 +358,7 @@ module.exports = {
 						'save_value_mappings_dlg' : {
 							'msg_error_saving' : 'Error al guardar la plantilla',
 							'title' : 'Guardar los Valores de Mapeo',
-							'close' : 'cerrar',
+							'close' : 'Cerrar',
 							'save_mapping' : 'Guardar Mapeo',
 							'save_as_copy' : 'Save as Copy',
 							'mapping_exists' : 'Mapeo existente'
