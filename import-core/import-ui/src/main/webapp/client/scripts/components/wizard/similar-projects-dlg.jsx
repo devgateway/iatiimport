@@ -40,7 +40,7 @@ var SimilarProjectsDialog = React.createClass({
 			   <div ref="similarProjectsDialog" className="modal-dialog">
 			    <div className="modal-content">
 			      <div className="modal-header">
-			        <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">�</span></button>
+			        <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">x</span></button>
 			        <h4 className="modal-title" id="myModalLabel2">{this.props.i18nLib.t('wizard.similar_projects_dlg.title')}</h4>
 			      </div>
 			      <div className="modal-body">

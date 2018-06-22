@@ -67,7 +67,7 @@ var SaveMappingsDialog = React.createClass({
 			  <div ref="saveMappingDialog" className="modal-dialog">
 			    <div className="modal-content">
 			      <div className="modal-header">
-			        <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">�</span></button>
+			        <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">x</span></button>
 			        <h4 className="modal-title" id="myModalLabel2">{this.props.i18nLib.t('wizard.save_value_mappings_dlg.title')}</h4>
 			      </div>
 			      <div className="modal-body">
