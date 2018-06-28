@@ -39,20 +39,15 @@ import org.springframework.util.StringUtils;
 // TODO: Better error handling to the end user. Friendlier user messages, specially when referencing a missing dependency
 
 public class AMPStaticProcessor implements IDestinationProcessor {
-	private static final String DEFAULT_LANGUAGE = "en";
 	private String descriptiveName = "AMP";
-
 	static final String BASEURL_PROPERTY = "AMPStaticProcessor.baseURL";
 	static final String BASEURL_DEFAULT_VALUE = "http://localhost:8081";
-
 	static final String AMP_IATI_ID_FIELD_PROPERTY = "AMPStaticProcessor.ampIatiIdField";
 	static final String AMP_IATI_ID_FIELD_DEFAULT_VALUE = "project_code";
-
-	static final String AMP_IMPLEMENTATION_LEVEL_ID_FIELD_PROPERTY = "AMPStaticProcessor.implementationLevel";
-	static final Integer AMP_IMPLEMENTATION_LEVEL_ID_DEFAULT_VALUE = 70; // Coming form common AMP configuration
-
-	private Log log = LogFactory.getLog(getClass());
-
+	private static final String DEFAULT_LANGUAGE_CODE = "en";
+	static final String AMP_IMPLEMENTATION_LEVEL_ID_FIELD_PROPERTY= "AMPStaticProcessor.implementationLevel";
+	static final Integer AMP_IMPLEMENTATION_LEVEL_ID_DEFAULT_VALUE = 70; //Coming form common AMP configuration
+    private Log log = LogFactory.getLog(getClass());
 	// AMP Configuration Details
 	private String DEFAULT_ID_FIELD = "amp-identifier";
 	private String DEFAULT_TITLE_FIELD = "project_title";
@@ -197,8 +192,9 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			Entry<String, JsonNode> entry = it.next();
 			languages.put(entry.getKey(), entry.getValue().asText());
 		}
-		if (languages.size() == 0) {
-			languages.put(DEFAULT_LANGUAGE, jsonNode.asText());
+		
+		if (languages.isEmpty()) {
+			languages.put(DEFAULT_LANGUAGE_CODE, jsonNode.asText());
 		}
 		return languages;
 	}
@@ -987,7 +983,6 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		Map<Integer, Integer> valueMapIndex = mapping.getValueIndexMapping();
 		List<FieldValue> sourcePossibleValues = mapping.getSourceField().getPossibleValues();
 		String[] stringValues = (String[]) value;
-		HashMap<Integer, Integer> uniqueValues = new HashMap<Integer, Integer>();
 
 		for (int i = 0; i < stringValues.length; i++) {
 			final int stringValueIndex = i;
