@@ -901,11 +901,11 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			return n.getSourceField().getFieldName().equals(sourceField);
 		}).findFirst();
 
-		if (!optVm.isPresent()) {
-			throw new ValueMappingException(sourceField + " not found.");
+		if ((!optVm.isPresent()) || (optVm.get().getSourceField().getPossibleValues() == null)) {
+			throw new ValueMappingException("The mapping for " + sourceField + " is invalid. No source values were found." );
 		}
+		
 		FieldValueMapping vm = optVm.get();
-
 		FieldValue fvs = vm.getSourceField().getPossibleValues().stream().filter(n -> {
 			if (useCode) {
 				return n.getCode().equals(fieldValue);
@@ -916,7 +916,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		Integer sourceValueIndex = fvs.getIndex();
 		Integer destinationValueIndex = vm.getValueIndexMapping().get(sourceValueIndex);
 		FieldValue fvd = vm.getDestinationField().getPossibleValues().stream().filter(n -> {
-			return n.getIndex() == destinationValueIndex;
+			return destinationValueIndex != null && n.getIndex() == destinationValueIndex;
 		}).findFirst().get();
 		return Integer.parseInt(fvd.getCode());
 	}
@@ -978,7 +978,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		return langString;
 	}
 
-	private List<JsonBean> getCodesFromList(InternalDocument source, FieldValueMapping mapping) {
+	private List<JsonBean> getCodesFromList(InternalDocument source, FieldValueMapping mapping) throws ValueMappingException {
 		return getCodesFromList(source, mapping, true);
 	}
 
@@ -1003,13 +1003,17 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		return null;
 	}
 
-	private List<JsonBean> getCodesFromList(InternalDocument source, FieldValueMapping mapping, Boolean suffix) {
+	private List<JsonBean> getCodesFromList(InternalDocument source, FieldValueMapping mapping, Boolean suffix) throws ValueMappingException {
 		Object value = source.getStringMultiFields().get(mapping.getSourceField().getFieldName());
 		Map<Integer, Integer> valueMapIndex = mapping.getValueIndexMapping();
 		List<FieldValue> sourcePossibleValues = mapping.getSourceField().getPossibleValues();
 		String[] stringValues = (String[]) value;
 		HashMap<Integer, Integer> uniqueValues = new HashMap<Integer, Integer>();
 
+		if (stringValues == null) {
+			throw new ValueMappingException("The mapping for " + mapping.getSourceField().getDisplayName() + " is invalid. No source values were found." );
+		}
+		
 		for (int i = 0; i < stringValues.length; i++) {
 			final int stringValueIndex = i;
 			Optional<FieldValue> optSourceValueIndex = sourcePossibleValues.stream().filter(n -> {
@@ -1045,7 +1049,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		return beanList;
 	}
 
-	private Integer getCodeFromList(InternalDocument source, FieldValueMapping mapping) {
+	private Integer getCodeFromList(InternalDocument source, FieldValueMapping mapping) throws ValueMappingException {
 		Object value = source.getStringFields().get(mapping.getSourceField().getFieldName());
 		Map<Integer, Integer> valueMapIndex = mapping.getValueIndexMapping();
 		List<FieldValue> sourcePossibleValues = mapping.getSourceField().getPossibleValues();
@@ -1053,6 +1057,11 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		Optional<FieldValue> optSourceValueIndex = sourcePossibleValues.stream().filter(n -> {
 			return n.getCode().equals(stringValue);
 		}).findAny();
+		
+		if (!optSourceValueIndex.isPresent()) {
+			throw new ValueMappingException("The mapping for " + mapping.getSourceField().getDisplayName() + " is invalid. No source values were found." );
+		}
+		
 		Integer sourceValueIndex = optSourceValueIndex.get().getIndex();
 		Integer destinationValueIndex = valueMapIndex.get(sourceValueIndex);
 		List<FieldValue> destinationPossibleValues = mapping.getDestinationField().getPossibleValues();
