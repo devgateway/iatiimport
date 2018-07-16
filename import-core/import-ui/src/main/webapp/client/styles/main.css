@@ -453,3 +453,26 @@ tbody.scrollablebody td, thead.scrollablebody th {
 .import-option-explanation{
 	font-size: 12px;
 }
+
+ .badge {
+    height: 30px;
+    width: 30px;
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle;
+    border-radius: 50%;
+    background: #337AB7;
+    color: white;
+}
+
+.no-left-padding {
+	padding-left:0px !important;	
+}
+
+.no-right-padding {
+	padding-right:0px !important;	
+}
+
+.glyphicon-remove-custom{
+	margin-top:5px !important;
+}
