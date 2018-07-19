@@ -569,7 +569,7 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 					break;
 				case MULTILANG_STRING:					
 					Map<String, String> mlv = new HashMap<String, String>();
-					fieldNodeList = element.getElementsByTagName(field.getFieldName());
+					fieldNodeList = (NodeList) xPath.evaluate(field.getFieldName(), element, XPathConstants.NODESET);
 					for (int k = 0; k < fieldNodeList.getLength(); ++k) {
 						Element fieldElement = (Element) fieldNodeList.item(k);
 						if (fieldElement.getChildNodes().getLength() == 1) {
