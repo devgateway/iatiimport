@@ -309,6 +309,9 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 				DocumentBuilder builder = factory.newDocumentBuilder();
 				Document doc = builder.parse(is);
 				NodeList nodeList = doc.getElementsByTagName(standardFieldName);
+				if (nodeList.getLength() == 0) {
+					nodeList = doc.getElementsByTagName("codelist-item");
+				}
 				int index = 0;
 				for (int i = 0; i < nodeList.getLength(); i++) {
 					Node node = nodeList.item(i);
