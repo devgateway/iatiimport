@@ -91,6 +91,11 @@ public class DocumentMapper implements IDocumentMapper {
 		InternalDocument source = doc.getSourceDocument();
 		InternalDocument destination = doc.getDestinationDocument();
 		ActionResult result = null;
+		
+		//if source project is mapped to an existing project, update the existing project
+		if (destination != null) {
+			doc.setOperation(OperationType.UPDATE);
+		}
 
 		switch (doc.getOperation()) {
 		case INSERT:
