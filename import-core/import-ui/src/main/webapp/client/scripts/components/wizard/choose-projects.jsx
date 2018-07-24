@@ -8,6 +8,7 @@ var appConfig = require('./../../conf');
 var Router = require('react-router');
 var Link = Router.Link;
 var AutoComplete = require('./autocomplete');
+var SimilarProjectsDialog = require('./similar-projects-dlg');
 var _ = require('lodash/dist/lodash.underscore');
 var constants = require('./../../utils/constants');
 
@@ -16,10 +17,14 @@ var ChooseProjects = React.createClass({
         Reflux.ListenerMixin
     ],
     getInitialState: function() {
-       return {projectData: [], destinationProjects: [], statusMessage: ""};
+       return {projectData: [], destinationProjects: [], statusMessage: "", showSimilarProjects: false, projectMapping: null};
     },
     initializeFailed:false,
     componentWillMount: function () {
+     this.getTitle = this.getTitle.bind(this);
+     this.showSimilarProjectsDialog = this.showSimilarProjectsDialog.bind(this);
+     this.mapProject = this.mapProject.bind(this);
+     this.resetMapping = this.resetMapping.bind(this);
      this.props.eventHandlers.updateCurrentStep(constants.CHOOSE_PROJECTS);
      this.listenTo(projectStore, this.updateProject);
      this.loadData();
@@ -79,6 +84,12 @@ var ChooseProjects = React.createClass({
     handleAutocompleteToggle: function(item, datum) {
         item.destinationDocument = datum;
         this.forceUpdate();
+    },
+    mapProject: function(mapping, project) {
+       var projectData = this.state.projectData;
+       var projectMapping = _.find(projectData, function(m) { return m.id === mapping.id});
+       projectMapping.destinationDocument = project;
+       this.setState({projectData: projectData});
     },
     checkAll: function(operation){
         var projects = _.where(this.state.projectData, {operation: operation});
@@ -168,12 +179,13 @@ var ChooseProjects = React.createClass({
 	        },
 	        type: 'GET'
 	     });
-	},
-	getTitle: function(multilangFields, language){
-	 var title = multilangFields.title[language];
-	 if(title == null || title.length == 0){
+	},	
+	getTitle: function(multilangFields){
+	  var language = this.props.i18nLib.lng() || 'en';   
+	  var title = multilangFields.title[language];
+	  if(title == null || title.length == 0){	  
 	     for (var key in multilangFields.title) {
-           if (multilangFields.title.hasOwnProperty(key)) {
+           if (multilangFields.title.hasOwnProperty(key)) {             
               if(title == null || title.length == 0){
                   title = multilangFields.title[key];;
               }
@@ -181,6 +193,16 @@ var ChooseProjects = React.createClass({
          }
 	 }
 	 return title
+	},
+	showSimilarProjectsDialog: function(event) {
+	   var projectMapping = _.find(this.state.projectData, function(item) { return item.id === event.target.dataset.id;});
+	   this.setState({showSimilarProjects: !this.state.showSimilarProjects, projectMapping: projectMapping});
+	},
+	resetMapping: function(event) {
+	   var projectData = this.state.projectData;
+       var projectMapping = _.find(projectData, function(m) { return m.id === event.target.dataset.id});
+       projectMapping.destinationDocument = null;
+       this.setState({projectData: projectData});
 	},
     render: function () {
         var newProjects = [];
@@ -196,12 +218,18 @@ var ChooseProjects = React.createClass({
                         </td>
                         <td>
                         {item.sourceDocument.identifier}
-                        </td>
+                        </td>                      
                         <td>
-                            {this.getTitle(item.sourceDocument.multilangFields, language)}
+                            {this.getTitle(item.sourceDocument.multilangFields)} 
                         </td>
-                        <td>
-                          <AutoComplete context={constants.CHOOSE_PROJECTS} options={this.state.destinationProjects} display="title" language={language} placeholder="" refId="destSearch" onSelect={this.handleAutocompleteToggle.bind(this, item)} value={item.destinationDocument}/>
+                        <td className="no-right-padding">                            
+                          <AutoComplete context={constants.CHOOSE_PROJECTS} options={this.state.destinationProjects} display="title" language={language} placeholder="" refId="destSearch" onSelect={this.handleAutocompleteToggle.bind(this, item)} value={item.destinationDocument ? this.getTitle(item.destinationDocument.multilangFields) : ''}/>
+                       </td>
+                        <td className="no-left-padding"><span className="glyphicon glyphicon-remove glyphicon-remove-custom" data-id={item.id} onClick={this.resetMapping}></span></td>
+                        <td> 
+                        { item.projectsWithSimilarTitles && item.projectsWithSimilarTitles.length > 0 && 
+                            <span className="badge" onClick={this.showSimilarProjectsDialog} data-id={item.id} data-toggle="modal" data-target="#similarProjects">{item.projectsWithSimilarTitles.length}</span>
+                        }
                         </td>
                         <td>
                             <input aria-label="override-title" className="override-title"  type="checkbox" checked={item.overrideTitle} onChange={this.handleOverrideTitle.bind(this, item)} />
@@ -209,14 +237,14 @@ var ChooseProjects = React.createClass({
                     </tr>);
                 } else {
                     existingProjects.push(<tr key={i} className = {item.destinationDocument.allowEdit ? "" : "warning not-active" } >
-                        <td >
+                        <td>
                           <input aria-label="Source" className="source" type="checkbox" checked={item.selected} onChange={this.handleToggle.bind(this, item)} />
                         </td>
                         <td>
                         {item.sourceDocument.identifier}
                         </td>
                         <td>{item.destinationDocument.allowEdit ? "" : " * " }
-                            {this.getTitle(item.sourceDocument.multilangFields, language)}
+                            {this.getTitle(item.sourceDocument.multilangFields)}
                         </td>
                         <td>
                             {item.destinationDocument.multilangFields.title[language]}
@@ -229,14 +257,17 @@ var ChooseProjects = React.createClass({
             }.bind(this));
         };
 
-        return (
+        return ( 
+           <div>         
+             
             <div className="panel panel-default">
                 <div className="panel-heading"><strong>{this.props.i18nLib.t('wizard.choose_projects.choose_projects')}</strong></div>
                 <div className="panel-body">
                     {statusMessage}
                     <div className="panel panel-success">
-                        <div className="panel-heading">{this.props.i18nLib.t('wizard.choose_projects.new_projects')} <i>({this.state.destinationProjects.length} {this.props.i18nLib.t('wizard.choose_projects.message')})</i></div>
+                        <div className="panel-heading">{this.props.i18nLib.t('wizard.choose_projects.new_projects')} <i>({this.state.destinationProjects.length} {this.props.i18nLib.t('wizard.choose_projects.choose_projects')})</i></div>
                         <div className="panel-body">
+                         <SimilarProjectsDialog projectMapping={this.state.projectMapping} getTitle={this.getTitle} mapProject={this.mapProject} {...this.props} />
                             <table className="table">
                                 <thead>
                                     <tr>
@@ -253,6 +284,8 @@ var ChooseProjects = React.createClass({
                                         <th>
                                             {this.props.i18nLib.t('wizard.choose_projects.destination_project')}
                                         </th>
+                                        <th></th>
+                                        <th>{this.props.i18nLib.t('wizard.choose_projects.similar_titles')}</th>
                                         <th>
                                         <input type="checkbox" checked={this.overrideAll('INSERT')} onChange={this.overrideTitleAll} />
                                         {this.props.i18nLib.t('wizard.choose_projects.override_title')}
@@ -309,6 +342,7 @@ var ChooseProjects = React.createClass({
                    </div>
                 </div>
                 </div>
-            ); } });
-
+                </div>
+            ); } }); 
+            
 module.exports = ChooseProjects;

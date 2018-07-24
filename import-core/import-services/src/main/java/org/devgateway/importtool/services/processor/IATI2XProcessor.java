@@ -589,11 +589,10 @@ public class IATI2XProcessor implements ISourceProcessor {
 					}
 					break;
 				case MULTILANG_STRING:
-
 					String mlStringValue = "";
 					NodeList narrativeNodeList;
 					Map<String, String> mlv = new HashMap<String, String>();
-					fieldNodeList = element.getElementsByTagName(field.getFieldName());
+					fieldNodeList = (NodeList) xPath.evaluate(field.getFieldName(), element, XPathConstants.NODESET);
 					if (fieldNodeList.getLength() > 0) {
 						List<Element> titles = new ArrayList<Element>();
 						for (int j = 0; j < fieldNodeList.getLength(); j++) {
