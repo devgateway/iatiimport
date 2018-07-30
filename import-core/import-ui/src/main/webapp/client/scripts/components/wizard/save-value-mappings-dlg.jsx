@@ -62,7 +62,7 @@ var SaveMappingsDialog = React.createClass({
 	     box.fadeOut({duration:10000});
     },
     isValidName: function() {
-        return this.state.name &&  this.state.name.length > 0  
+        return this.state.name &&  this.state.name.trim().length > 0;
        },
     render: function () {
     return (
