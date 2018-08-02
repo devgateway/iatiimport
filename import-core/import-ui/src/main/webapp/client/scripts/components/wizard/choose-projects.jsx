@@ -158,16 +158,18 @@ var ChooseProjects = React.createClass({
     	}.bind(this));
 	},
 	loadProjects: function(){
-		var self = this;
+		var self = this;		
 		$.ajax({
-	        url: '/importer/data/destination/project',
-	        dataType: 'json',
-	        success: function(result) {
-	        	self.setState({destinationProjects: result});
-	        	self.forceUpdate();
-	        },
-	        type: 'GET'
-	     });
+	            url: '/importer/data/destination/project',
+	            dataType: 'json',
+	            success: function(result) {	                       
+	                self.setState({destinationProjects: result},  function() {
+	                    self.forceUpdate();
+	                });	               
+	            },
+	            type: 'GET'
+	         });
+	    	
 	},
 	getTitle: function(multilangFields, language){
 	 var title = multilangFields.title[language];
@@ -201,7 +203,9 @@ var ChooseProjects = React.createClass({
                             {this.getTitle(item.sourceDocument.multilangFields, language)}
                         </td>
                         <td>
-                          <AutoComplete context={constants.CHOOSE_PROJECTS} options={this.state.destinationProjects} display="title" language={language} placeholder="" refId="destSearch" onSelect={this.handleAutocompleteToggle.bind(this, item)} value={item.destinationDocument}/>
+                         {(this.state.destinationProjects && this.state.destinationProjects.length > 0) &&
+                             <AutoComplete context={constants.CHOOSE_PROJECTS} options={this.state.destinationProjects} display="title" language={language} placeholder="" refId="destSearch" onSelect={this.handleAutocompleteToggle.bind(this, item)} value={item.destinationDocument}/> 
+                         }                          
                         </td>
                         <td>
                             <input aria-label="override-title" className="override-title"  type="checkbox" checked={item.overrideTitle} onChange={this.handleOverrideTitle.bind(this, item)} />
