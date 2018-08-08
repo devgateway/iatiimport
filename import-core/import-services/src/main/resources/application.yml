@@ -14,13 +14,13 @@ spring:
 spring:
   profiles: default
   dataSource:
-    driverClassName : org.h2.Driver
-    url: jdbc:h2:~/import_tool
-    password : 
-    username : sa
+    driverClassName : org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/import_tool
+    password : amp321
+    username : amp
     
   jpa:
-    database : H2
+    database : POSTGRESQL
     hibernate:
       ddl-auto : update
       show-sql: true
