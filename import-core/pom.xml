@@ -16,7 +16,7 @@
 		<module>import-rest</module>
 		<module>import-services</module>
 		<module>import-ui</module>
-		
+		<module>import-scheduler</module>
 	</modules>
 
 	<properties>
@@ -27,16 +27,6 @@
 		<spring-social.version>1.1.0.M4</spring-social.version>
 	</properties>
 	<packaging>pom</packaging>
-
-	<!-- <java.version>1.8</java.version> <sd.rest>2.0.0.RC1</sd.rest> <spring.version>4.0.1.RELEASE</spring.version> 
-		<m2eclipse.wtp.contextRoot>/</m2eclipse.wtp.contextRoot> <spring.framework.version>4.1.5.RELEASE</spring.framework.version> 
-		<spring.datajpa.version>1.8.0.RELEASE</spring.datajpa.version> <hibernate.core.version>4.3.8.Final</hibernate.core.version> 
-		<hibernate.version>4.3.8.Final</hibernate.version> <spring.security.version>3.2.6.RELEASE</spring.security.version> 
-		<spring.boot.version>1.2.2.RELEASE</spring.boot.version> <jackson.version>2.5.1</jackson.version> 
-		<h2.version>1.4.186</h2.version> <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding> -->
-
-
-
 	<contributors>
 		<contributor>
 			<email>fferreyra@developmentgateway.org</email>
@@ -45,7 +35,6 @@
 			<organizationUrl>http://www.developmentgateway.org</organizationUrl>
 		</contributor>
 	</contributors>
-
 	<dependencies>
 		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
@@ -75,9 +64,6 @@
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>
-			<!--<dependency> <groupId>org.springframework.security.oauth</groupId> 
-				<artifactId>spring-security-oauth2-javaconfig</artifactId> <version>1.0.0.CI-SNAPSHOT</version> 
-				</dependency> -->
 			<dependency>
 				<groupId>org.devgateway.importtool</groupId>
 				<artifactId>import-rest</artifactId>
@@ -91,6 +77,11 @@
 			<dependency>
 				<groupId>org.devgateway.importtool</groupId>
 				<artifactId>import-ui</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.devgateway.importtool</groupId>
+				<artifactId>import-scheduler</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
