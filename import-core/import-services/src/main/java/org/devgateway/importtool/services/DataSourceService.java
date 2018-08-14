@@ -19,7 +19,7 @@ public class DataSourceService {
 	}
 	
 	public String getDataSourceURL(String reportingOrgId) {
-		String url = "";
+		String url = null;
 		Iterable<DataSource> dataSources = dataSourceRepository.findAll();
 		
 		if (dataSources.iterator().hasNext()) {

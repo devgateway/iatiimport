@@ -436,7 +436,8 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				} else {
 					message = resultPost.getString("project_title");
 				}
-				result = new ActionResult(id.toString(), operation, "OK", message);
+				result = new ActionResult(id.toString(), operation, "OK", message,
+						null, null);
 			} else {
 				String error = errorNode.toString();
 				result = new ActionResult("N/A", "REJECT", "ERROR", "Error: " + error);

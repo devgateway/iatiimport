@@ -29,6 +29,7 @@ import org.devgateway.importtool.services.processor.helper.ActionStatus;
 import org.devgateway.importtool.services.processor.helper.Field;
 import org.devgateway.importtool.services.processor.helper.FieldType;
 import org.devgateway.importtool.services.processor.helper.FieldValue;
+import org.devgateway.importtool.services.processor.helper.IATIProcessorHelper;
 import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
 import org.devgateway.importtool.services.processor.helper.InternalDocument;
 import org.springframework.context.annotation.Scope;
@@ -41,7 +42,7 @@ import org.xml.sax.SAXException;
 
 @Component("IATI1X")
 @Scope("session")
-abstract public class IATI1XProcessor  implements ISourceProcessor {
+abstract public class IATI1XProcessor  extends IATIProcessor {
 
 	protected static final String ISO_DATE = "yyyy-MM-dd";
 
@@ -52,7 +53,6 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 	protected List<Field> filterFieldList = new ArrayList<Field>();
 
 	// Field names on the source document that hold key information
-	protected String DEFAULT_ID_FIELD = "iati-identifier";
 	protected String DEFAULT_TITLE_FIELD = "title";
 	protected String PROCESSOR_VERSION = "";
 
@@ -100,22 +100,6 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 
 	public void setCodelistPath(String codelistPath) {
 		this.codelistPath = codelistPath;
-	}
-
-	// Map that holds information about how the field names map to code lists
-	private static Map<String, String> mappingNameFile = new HashMap<String, String>();
-	static {
-		mappingNameFile.put("activity-status", "ActivityStatus");
-		mappingNameFile.put("activity-scope", "ActivityScope");
-		mappingNameFile.put("collaboration-type", "CollaborationType");
-		mappingNameFile.put("recipient-country", "Country");
-		mappingNameFile.put("recipient-region", "Region");
-		mappingNameFile.put("default-aid-type", "AidType");
-		mappingNameFile.put("default-finance-type", "FinanceType");
-		mappingNameFile.put("default-flow-type", "FlowType");
-		mappingNameFile.put("default-tied-status", "TiedStatus");
-		mappingNameFile.put("policy-marker", "PolicyMarker");
-		mappingNameFile.put("sector", "Sector");
 	}
 
 	public IATI1XProcessor(){
@@ -298,7 +282,7 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 	}
 
 	private List<FieldValue> getCodeListValues(String codeListName, Boolean concatenate) {
-		String standardFieldName = mappingNameFile.get(codeListName);
+		String standardFieldName = IATIProcessorHelper.mappingNameFile.get(codeListName);
 		List<FieldValue> possibleValues = new ArrayList<FieldValue>();
 		InputStream is = this.getClass().getResourceAsStream(this.getCodelistPath() + standardFieldName + ".xml");
 		if (is != null) {
@@ -455,54 +439,19 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 					}
 					break;
 				case LIST:
-					if (field.isMultiple()) {
-						fieldNodeList = element.getElementsByTagName(field.getFieldName());						
-						List <String> codes = new ArrayList<String>(); 
-						for (int j = 0; j < fieldNodeList.getLength(); j++) {
-							Element fieldElement = (Element) fieldNodeList.item(j);
-							String code = fieldElement.getAttribute("code");								
-							if(!code.isEmpty()){
-								codes.add(code);
-								Optional<FieldValue> foundfv = field.getPossibleValues().stream().filter( n -> {return n.getCode().equals(code);}).findFirst();
-								FieldValue fv  = foundfv.isPresent() ? foundfv.get() : null;
-								if(fv != null && fv.isSelected() != true){
-									fv.setSelected(true);
-								}
-							}				
-						}
-						if(!codes.isEmpty()){
-							String[] codeValues = codes.stream().toArray(String[]::new);						
-							document.addStringMultiField(field.getFieldName(), codeValues);
-						}
-					} else {						
-						fieldNodeList = element.getElementsByTagName(field.getFieldName());
-						if (fieldNodeList.getLength() > 0 && fieldNodeList.getLength() == 1) {							
-							Element fieldElement = (Element) fieldNodeList.item(0);
-							String codeValue = fieldElement.getAttribute("code");							
-							if(!codeValue.isEmpty()){
-								Optional<FieldValue> foundfv = field.getPossibleValues().stream().filter( n -> {
-									return n.getCode().equals(codeValue);
-								}).findFirst();
-								FieldValue fv  = foundfv.isPresent() ? foundfv.get() : null;
-								if(fv != null && fv.isSelected() != true){
-									fv.setSelected(true);
-								}
-								document.addStringField(field.getFieldName(), codeValue);
-							}														
-						}						
-					}					
+					IATIProcessorHelper.processListElementType(document, element, field);
 					break;
-				case RECIPIENT_COUNTRY:	
+				case RECIPIENT_COUNTRY:
 					Field filtersField = filterFieldList.stream().filter(n -> {
 						return field.getFieldName().equals(n.getFieldName());
 					}).findFirst().get();
-					
-					fieldNodeList = element.getElementsByTagName(field.getFieldName());					
+
+					fieldNodeList = element.getElementsByTagName(field.getFieldName());
 					List<FieldValue> recipients = new ArrayList<FieldValue>();
 					for (int j = 0; j < fieldNodeList.getLength(); j++) {
 						Element fieldElement = (Element) fieldNodeList.item(j);
-						FieldValue recipient = new FieldValue();	
-						String code = fieldElement.getAttribute("code");	
+						FieldValue recipient = new FieldValue();
+						String code = fieldElement.getAttribute("code");
 						boolean includeCountry = includedByFilter(filtersField.getFilters(), code);
 						if(includeCountry){
 							recipient.setCode(code);
@@ -510,24 +459,14 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 							if(fieldValue.isPresent()){
 								recipient.setValue(fieldValue.get().getValue());
 							}
-							recipient.setPercentage(fieldElement.getAttribute("percentage"));	
+							recipient.setPercentage(fieldElement.getAttribute("percentage"));
 							recipients.add(recipient);
 						}
-					}					
-					document.addRecepientCountryFields(field.getFieldName(), recipients);					
+					}
+					document.addRecepientCountryFields(field.getFieldName(), recipients);
 					break;
 				case STRING:
-					String stringValue = "";
-					fieldNodeList = element.getElementsByTagName(field.getFieldName());
-					if (fieldNodeList.getLength() > 0 && fieldNodeList.getLength() == 1) {
-						Element fieldElement = (Element) fieldNodeList.item(0);
-						if (fieldElement.getChildNodes().getLength() == 1) {
-							stringValue = fieldElement.getChildNodes().item(0).getNodeValue();
-						} else {
-							stringValue = "";
-						}
-					}					
-					document.addStringField(field.getFieldName(), stringValue);
+					IATIProcessorHelper.processStringElementType(document, element, field);
 					break;
 				case ORGANIZATION:
 					fieldNodeList = element.getElementsByTagName(field.getFieldName());
@@ -717,7 +656,9 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 		}		
 		return list;
 	}
-	
+
+
+
 	private Boolean includedByFilter(List<String> filters, String codeValue) {
 		if (filters.size() == 0)
 			return true;

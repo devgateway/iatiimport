@@ -94,6 +94,9 @@ public class ImportService {
 		project.setTitle(result.getMessage());
 		project.setNotes(result.getOperation());
 		project.setStatus(result.getStatus());
+		project.setProjectIdentifier(result.getSourceProjectIdentifier());
+			project.setGroupingCriteria(result.getSourceGroupingCriteria());
+		project.setLastSyncedOn(new Date());
 		projectRepository.save(project);
 	}
 	

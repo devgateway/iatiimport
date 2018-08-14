@@ -39,7 +39,7 @@ import org.xml.sax.SAXException;
 
 @Component("IATI2X")
 @Scope("session")
-public class IATI2XProcessor implements ISourceProcessor {
+public class IATI2XProcessor extends IATIProcessor {
 
 	private static final String ISO_DATE = "yyyy-MM-dd";
 
@@ -50,7 +50,7 @@ public class IATI2XProcessor implements ISourceProcessor {
 	private List<Field> filterFieldList = new ArrayList<Field>();
 	private List<String> languageList = null;
 	// Field names on the source document that hold key information
-	private String DEFAULT_ID_FIELD = "iati-identifier";
+
 	private String DEFAULT_TITLE_FIELD = "title";
 	protected String PROCESSOR_VERSION = "";
 	private String defaultLanguage = "";
@@ -105,21 +105,7 @@ public class IATI2XProcessor implements ISourceProcessor {
 	}
 
 
-	// Map that holds information about how the field names map to code lists
-	private static Map<String, String> mappingNameFile = new HashMap<String, String>();
-	static {
-		mappingNameFile.put("activity-status", "ActivityStatus");
-		mappingNameFile.put("activity-scope", "ActivityScope");
-		mappingNameFile.put("collaboration-type", "CollaborationType");
-		mappingNameFile.put("recipient-country", "Country");
-		mappingNameFile.put("recipient-region", "Region");
-		mappingNameFile.put("default-aid-type", "AidType");
-		mappingNameFile.put("default-finance-type", "FinanceType");
-		mappingNameFile.put("default-flow-type", "FlowType");
-		mappingNameFile.put("default-tied-status", "TiedStatus");
-		mappingNameFile.put("policy-marker", "PolicyMarker");
-		mappingNameFile.put("sector", "Sector");
-	}
+
 
 	//TODO: Extract from codelists
 	private static Map<String, String> transactionTypes = new HashMap<String, String>();
@@ -218,7 +204,7 @@ public class IATI2XProcessor implements ISourceProcessor {
 				Locale tmp = new Locale(lang);
 				listLanguages.add(new Language(tmp.getLanguage(), tmp.getDisplayLanguage()));
 			});
-			this.setFilterLanguages(listLanguages);			
+			this.setFilterLanguages(listLanguages);
 		}
 		return this.filterLanguages;
 	}
@@ -323,7 +309,7 @@ public class IATI2XProcessor implements ISourceProcessor {
 	}
 
 	private List<FieldValue> getCodeListValues(String codeListName, Boolean concatenate) {
-		String standardFieldName = mappingNameFile.get(codeListName);
+		String standardFieldName = IATIProcessorHelper.mappingNameFile.get(codeListName);
 		List<FieldValue> possibleValues = new ArrayList<FieldValue>();
 		InputStream is = this.getClass().getResourceAsStream(this.getCodelistPath() + standardFieldName + ".xml");
 		if (is != null) {
@@ -366,35 +352,35 @@ public class IATI2XProcessor implements ISourceProcessor {
 		return possibleValues;
 	}
 	
-	private NodeList getActivities() throws XPathExpressionException{		
+	private NodeList getActivities() throws XPathExpressionException{
 		XPath xPath = XPathFactory.newInstance().newXPath();
-		final StringBuilder query = new StringBuilder("/iati-activities/iati-activity[");		
+		final StringBuilder query = new StringBuilder("/iati-activities/iati-activity[");
 		Field countryField = this.getFields().stream().filter(f -> {
 			return f.getType().equals(FieldType.RECIPIENT_COUNTRY);
 		}).findFirst().get();
-		
+
 		Field countryFilters = filterFieldList.stream().filter(n -> {
 			return countryField.getFieldName().equals(n.getFieldName());
 		}).findFirst().get();
-		
+
 		if(countryFilters.getFilters().size() > 0){
 			String selectedCountry  = countryFilters.getFilters().get(0);
 			query.append("recipient-country[@code='"+ selectedCountry +"']");
-		}	
-		
-		
-		this.getFields().forEach(field -> {			
-			if(field.getType().equals(FieldType.LIST)){				
+		}
+
+
+		this.getFields().forEach(field -> {
+			if(field.getType().equals(FieldType.LIST)){
 				Optional<Field> optFilter = filterFieldList.stream().filter(n -> {
 					return field.getFieldName().equals(n.getFieldName());
 				}).findFirst();
-				
+
 				Field filter = optFilter.isPresent() ? optFilter.get() : null;
-				if(filter != null && filter.getFilters().size() > 0){		
-					if(!("/iati-activities/iati-activity[".equals(query.toString()))){					
-						query.append(" and ");	
+				if(filter != null && filter.getFilters().size() > 0){
+					if(!("/iati-activities/iati-activity[".equals(query.toString()))){
+						query.append(" and ");
 					}
-					
+
 					//Some filters need relative paths
 					String fieldName = getFieldName(field.getFieldName());
 					query.append(fieldName + "[");
@@ -404,18 +390,18 @@ public class IATI2XProcessor implements ISourceProcessor {
 							query.append(" or ");
 						}
 						query.append("@code='" + value + "'");
-					}					
+					}
 					query.append("]");
-				}	
-			}			
-			
-		});		
-		if(!("/iati-activities/iati-activity[".equals(query.toString()))){					
-			query.append("]");	
+				}
+			}
+
+		});
+		if(!("/iati-activities/iati-activity[".equals(query.toString()))){
+			query.append("]");
 		}else{
 			query.setLength(query.length() - 1);
 		}
-		
+
 		NodeList activities = (NodeList)xPath.compile(query.toString()).evaluate(this.getDoc(), XPathConstants.NODESET);
 		return activities;
 	 }
@@ -433,7 +419,8 @@ public class IATI2XProcessor implements ISourceProcessor {
 
 	private List<InternalDocument> extractDocuments(Document doc) throws Exception {
 		// Extract global values
-
+		Integer id = 0 ;
+		id = id + 1;
 		XPath xPath = XPathFactory.newInstance().newXPath();		
 		NodeList nodeList = getActivities();
 		List<InternalDocument> list = new ArrayList<InternalDocument>();
@@ -442,7 +429,11 @@ public class IATI2XProcessor implements ISourceProcessor {
 		for (int i = 0; i < nodeList.getLength(); i++) {
 			actionStatus.incrementProcessed();
 			InternalDocument document = new InternalDocument();
+
 			Element element = (Element) nodeList.item(i);
+			//we set the grouping criteria
+			document.setGrouping(IATIProcessorHelper.getStringFromElement(element,DEFAULT_GROUPING_FIELD,"ref"));
+
 			String currency = !("".equals(element.getAttribute("default-currency"))) ? element.getAttribute("default-currency") : this.defaultCurrency;			
 			document.addStringField("default-currency", currency);
 			String defaultLanguageCode = !("".equals(element.getAttribute("xml:lang"))) ? element.getAttribute("xml:lang") : this.defaultLanguage;
@@ -479,42 +470,7 @@ public class IATI2XProcessor implements ISourceProcessor {
 					}
 					break;
 				case LIST:
-					if (field.isMultiple()) {
-						fieldNodeList = element.getElementsByTagName(field.getFieldName());						
-						List <String> codes = new ArrayList<String>(); 
-						for (int j = 0; j < fieldNodeList.getLength(); j++) {
-							Element fieldElement = (Element) fieldNodeList.item(j);
-							String code = fieldElement.getAttribute("code");								
-							if(!code.isEmpty()){
-								codes.add(code);
-								Optional<FieldValue> foundfv = field.getPossibleValues().stream().filter( n -> {return n.getCode().equals(code);}).findFirst();
-								FieldValue fv  = foundfv.isPresent() ? foundfv.get() : null;
-								if(fv != null && fv.isSelected() != true){
-									fv.setSelected(true);
-								}
-							}				
-						}
-						if(!codes.isEmpty()){
-							String[] codeValues = codes.stream().toArray(String[]::new);						
-							document.addStringMultiField(field.getFieldName(), codeValues);
-						}
-					} else {						
-						fieldNodeList = element.getElementsByTagName(field.getFieldName());
-						if (fieldNodeList.getLength() > 0 && fieldNodeList.getLength() == 1) {							
-							Element fieldElement = (Element) fieldNodeList.item(0);
-							String codeValue = fieldElement.getAttribute("code");							
-							if(!codeValue.isEmpty()){
-								Optional<FieldValue> foundfv = field.getPossibleValues().stream().filter( n -> {
-									return n.getCode().equals(codeValue);
-								}).findFirst();
-								FieldValue fv  = foundfv.isPresent() ? foundfv.get() : null;
-								if(fv != null && fv.isSelected() != true){
-									fv.setSelected(true);
-								}
-								document.addStringField(field.getFieldName(), codeValue);
-							}														
-						}						
-					}
+					IATIProcessorHelper.processListElementType(document, element, field);
 					break;
 				case RECIPIENT_COUNTRY:
 					Field filtersField = filterFieldList.stream().filter(n -> {
@@ -541,17 +497,7 @@ public class IATI2XProcessor implements ISourceProcessor {
 					document.addRecepientCountryFields(field.getFieldName(), recipients);					
 					break;
 				case STRING:
-					String stringValue = "";
-					fieldNodeList = element.getElementsByTagName(field.getFieldName());
-					if (fieldNodeList.getLength() > 0 && fieldNodeList.getLength() == 1) {
-						Element fieldElement = (Element) fieldNodeList.item(0);
-						if (fieldElement.getChildNodes().getLength() == 1) {
-							stringValue = fieldElement.getChildNodes().item(0).getNodeValue();
-						} else {
-							stringValue = "";
-						}
-					}
-					document.addStringField(field.getFieldName(), stringValue);
+					IATIProcessorHelper.processStringElementType(document, element, field);
 					break;
 				case ORGANIZATION:				
 					fieldNodeList = element.getElementsByTagName(field.getFieldName());										
@@ -726,14 +672,14 @@ public class IATI2XProcessor implements ISourceProcessor {
 				default:
 					break;
 				}
-			}			
+			}
+
 			list.add(document);			
 		}
 
 		return list;
 	}
 
-	
 	private String extractNarrative(Element e, String string) {
 		Node node = e.getElementsByTagName(string).item(0);
 		if(node != null && node.getChildNodes().getLength() > 0) {
