@@ -476,3 +476,8 @@ tbody.scrollablebody td, thead.scrollablebody th {
 .glyphicon-remove-custom{
 	margin-top:5px !important;
 }
+
+.glyphicon-custom {
+	margin-left: 20px;
+	font-size: 18px;
+}

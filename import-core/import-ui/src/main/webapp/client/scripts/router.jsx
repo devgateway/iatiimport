@@ -16,9 +16,11 @@ var MapValues = require('./components/wizard/map-values');
 var MapValuesTab = require('./components/wizard/map-values-table');
 var Import = require('./components/wizard/review-import');
 var Reports = require('./components/reports/index');
+var Admin = require('./components/admin/index');
 var ImportList = require('./components/reports/import-list');
 var ImportLog = require('./components/reports/import-log');
 var WorkflowList = require('./components/reports/workflow-list');
+var DataSource = require('./components/admin/data-source');
 var ErrorPage = require('./components/error-page')
 
 var routes = (
@@ -38,8 +40,10 @@ var routes = (
 		   <Route name="previousimports" path="previousimports" handler={ImportList}/>" +
 		   <Route name="workflowlist" path="workflowlist" handler={WorkflowList}/>
 		   <Route name="importlog" path="importlog/:id" handler={ImportLog}/>
-		</Route>
-			
+        </Route>
+        <Route path="admin" handler = {Admin}>        
+          <Route name="datasource" path="datasource" handler={DataSource}/>
+        </Route>			
 	</Route>
 );
 

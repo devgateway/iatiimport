@@ -13,6 +13,7 @@ module.exports = {
 								'reports' : ' Reports ',
 								'close' : ' Close ',
 								'language_selector' : ' Language',
+								'admin': 'Admin',
 								'submenu' : {
 									'iati101': 'IATI 1.01 to AMP',
 									'iati103' : 'IATI 1.03 to AMP',
@@ -25,9 +26,9 @@ module.exports = {
 									'previous_imports' : 'Previous Imports',
 									'en' : 'English ',
 									'fr' : 'French ',
-									 'es': 'Spanish',
-									'workflow_list' : 'Workflow List'
-
+									'es': 'Spanish',
+									'workflow_list' : 'Workflow List',
+									'data_source' : 'Data Source Manager'									
 								}
 							}
 						}
@@ -189,7 +190,7 @@ module.exports = {
 							'status': 'Status',
 							'message': 'Message/Project Title',
 							'close': 'Close'
-						}
+						}						
 					},
 				  'server_messages': {
 					  101: 'Extracting project __processed__ of __total__',
@@ -214,6 +215,20 @@ module.exports = {
 						'destination': 'Destination Processor',
 						'description': 'Description',
 						'enabled': 'Enabled'
+					},
+					'data_source': {
+						'title': 'Data Source Management',
+						'default_url': 'Default URL',
+						'add_custom_data_source': 'Add Exception',
+						'save': 'Save',
+						'exception_url': 'URL',
+						'reporting_org': 'Reporting Organization',
+						'update': 'Update',
+						'cancel': 'Cancel',
+						'validation_default_url_required': 'Default URL is required',
+						'validation_reporting_org_required': 'Reporting Organization is required',
+						'actions':'Actions',
+						'validation_invalid_url': 'Invalid URL'
 					}
 				}
 			},
@@ -230,6 +245,7 @@ module.exports = {
 								'reports' : ' Reportes ',
 								'close' : ' Cerrar ',
 								'language_selector' : ' Idioma',
+								'admin': 'Admin',
 								'submenu' : {
 									'iati101': 'IATI 1.01 hacia AMP',
 									'iati103' : 'IATI 1.03 hacia AMP',
@@ -243,7 +259,8 @@ module.exports = {
 									'en' : 'Inglés ',
 									'fr' : 'Francés ',
 									'es':'Spanish ',
-									'workflow_list' : 'Lista de Flujos de Trabajo'
+									'workflow_list' : 'Lista de Flujos de Trabajo',
+									'data_source' : 'Data Source Manager'
 
 								}
 							}
@@ -431,6 +448,20 @@ module.exports = {
 						'destination': 'Procesador de destino',
 						'description': 'Descripción',
 						'enabled': 'Habilitado'
+					},
+					'data_source': {
+						'title': 'Data Source Management',
+						'default_url': 'Default URL',
+						'add_custom_data_source': 'Add Exception',
+						'save': 'Save',
+						'exception_url': 'URL',
+						'reporting_org': 'Reporting Organization',
+						'update': 'Update',
+						'cancel': 'Cancel',
+						'validation_default_url_required': 'Default URL is required',
+						'validation_reporting_org_required': 'Reporting Organization is required',
+						'actions':'Actions',
+						'validation_invalid_url': 'Invalid URL'
 					}
 				}
 			},
@@ -447,6 +478,7 @@ module.exports = {
 								'reports' : ' Rapports ',
 								'close' : ' Fermer ',
 								'language_selector' : ' Langue',
+								'admin': 'Admin',
 								'submenu' : {
 									'iati101': 'IATI 1.01 vers AMP',
 									'iati103' : 'IATI 1.03 vers AMP',
@@ -460,7 +492,8 @@ module.exports = {
 									'en' : 'English ',
 									'fr' : 'Français ',
 									'es': 'Spanish',
-									'workflow_list' : 'Flux de téléchargement'
+									'workflow_list' : 'Flux de téléchargement',
+									'data_source' : 'Data Source Manager'
 
 								}
 							}
@@ -647,6 +680,20 @@ module.exports = {
 							'destination': 'Destination Processor',
 							'description': 'Description',
 							'enabled': 'Enabled'
+						},
+						'data_source': {
+							'title': 'Data Source Management',
+							'default_url': 'Default URL',
+							'add_custom_data_source': 'Add Exception',
+							'save': 'Save',
+							'exception_url': 'URL',
+							'reporting_org': 'Reporting Organization',
+							'update': 'Update',
+							'cancel': 'Cancel',
+							'validation_default_url_required': 'Default URL is required',
+							'validation_reporting_org_required': 'Reporting Organization is required',
+							'actions':'Actions',
+							'validation_invalid_url': 'Invalid URL'
 						}
 				}
 			}
