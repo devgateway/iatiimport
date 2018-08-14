@@ -17,10 +17,8 @@ public class CustomDataSource {
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	@Column(name = "id", unique = true, nullable = false)
-	private Long id;
-	
-	@Lob
-	@Column(name = "url")
+	private Long id;	
+	@Column(name = "url", length = 512)
 	private String url;	
 	
 	@Column(name = "reporting_org_id")

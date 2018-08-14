@@ -1,5 +1,6 @@
 package org.devgateway.importtool.services;
 
+
 import org.apache.commons.lang.StringUtils;
 import org.devgateway.importtool.dao.DataSourceRepository;
 import org.devgateway.importtool.model.CustomDataSource;
@@ -11,7 +12,10 @@ public class DataSourceService {
 	@Autowired
 	private DataSourceRepository dataSourceRepository;	
 	public DataSource save(DataSource ds) {
-		return dataSourceRepository.save(ds);
+		DataSource dataSource = getDataSource();
+		dataSource.setCustomDataSources(ds.getCustomDataSources());		
+		dataSource.setDefaultUrl(ds.getDefaultUrl());
+		return dataSourceRepository.save(dataSource);
 	}
 	
 	public String getDataSourceURL(String reportingOrgId) {
@@ -34,5 +38,17 @@ public class DataSourceService {
 		}
 		
 		return url;			
+	}
+	
+	public DataSource getDataSource() {
+		DataSource ds = null;	
+        Iterable<DataSource> dataSources = dataSourceRepository.findAll();		
+		if (dataSources.iterator().hasNext()) {
+			ds = dataSources.iterator().next();
+		} else {
+			ds = new DataSource();
+		}
+		
+		return ds;			
 	}
 }
