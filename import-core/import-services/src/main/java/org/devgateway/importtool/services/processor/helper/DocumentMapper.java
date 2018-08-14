@@ -122,7 +122,8 @@ public class DocumentMapper implements IDocumentMapper {
 		default:
 			break;
 		}
-
+		result.setSourceProjectIdentifier(source.getIdentifier());
+		result.setSourceGroupingCriteria(source.getGrouping());
 		return result;
 	}
 

@@ -69,20 +69,27 @@ public class IATIProcessorHelper {
         String stringValue = getStringFromElement(element, field.getFieldName());
         document.addStringField(field.getFieldName(), stringValue);
     }
-
-    public static String getStringFromElement(Element element, String field) {
+    public static String getStringFromElement(Element element, String field){
+        return getStringFromElement(element, field, null);
+    }
+    public static String getStringFromElement(Element element, String field,String attribute) {
         NodeList fieldNodeList;
-        String stringValue = "";
+        String returnValue = "";
         fieldNodeList = element.getElementsByTagName(field);
         if (fieldNodeList.getLength() > 0 && fieldNodeList.getLength() == 1) {
             Element fieldElement = (Element) fieldNodeList.item(0);
-            if (fieldElement.getChildNodes().getLength() == 1) {
-                stringValue = fieldElement.getChildNodes().item(0).getNodeValue();
+            if (attribute == null) { //we are getting the first element text value
+                if (fieldElement.getChildNodes().getLength() == 1) {
+                    returnValue = fieldElement.getChildNodes().item(0).getNodeValue();
+                } else {
+                    returnValue = "";
+                }
             } else {
-                stringValue = "";
+                //we are getting the attribute value
+                returnValue = fieldElement.getAttribute(attribute);
             }
         }
-        return stringValue;
+        return returnValue;
     }
 
 }

@@ -86,7 +86,7 @@ class ImportController  {
 		IDestinationProcessor destProcessor = (IDestinationProcessor) request.getSession().getAttribute(DESTINATION_PROCESSOR);
 		destProcessor.setAuthenticationToken(authenticationToken);
 
-		return new ResponseEntity<>(null, HttpStatus.OK);
+		return new ResponseEntity<>( HttpStatus.OK);
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/uploaded")
@@ -205,7 +205,8 @@ class ImportController  {
 
 	@RequestMapping(method = RequestMethod.GET, value = "/fetch/{reportingOrgId}")
 	ResponseEntity<List<String>> fetch(HttpServletRequest request) {
-		dataFetchService.fetch("http://datastore.iatistandard.org/api/1/access/activity.xml?recipient-country=TZ&reporting-org=FI-3&offset=0&limit=50");
+		dataFetchService.fetchResult("http://datastore.iatistandard.org/api/1/access/activity" +
+				".xml?recipient-country=TZ&reporting-org=FI-3&offset=0&limit=50");
 		return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
 	}
 }

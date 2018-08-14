@@ -39,7 +39,7 @@ import org.xml.sax.SAXException;
 
 @Component("IATI2X")
 @Scope("session")
-public class IATI2XProcessor implements ISourceProcessor {
+public class IATI2XProcessor extends IATIProcessor {
 
 	private static final String ISO_DATE = "yyyy-MM-dd";
 
@@ -50,7 +50,7 @@ public class IATI2XProcessor implements ISourceProcessor {
 	private List<Field> filterFieldList = new ArrayList<Field>();
 	private List<String> languageList = null;
 	// Field names on the source document that hold key information
-	private String DEFAULT_ID_FIELD = "iati-identifier";
+
 	private String DEFAULT_TITLE_FIELD = "title";
 	protected String PROCESSOR_VERSION = "";
 	private String defaultLanguage = "";
@@ -419,7 +419,8 @@ public class IATI2XProcessor implements ISourceProcessor {
 
 	private List<InternalDocument> extractDocuments(Document doc) throws Exception {
 		// Extract global values
-
+		Integer id = 0 ;
+		id = id + 1;
 		XPath xPath = XPathFactory.newInstance().newXPath();		
 		NodeList nodeList = getActivities();
 		List<InternalDocument> list = new ArrayList<InternalDocument>();
@@ -430,6 +431,9 @@ public class IATI2XProcessor implements ISourceProcessor {
 			InternalDocument document = new InternalDocument();
 
 			Element element = (Element) nodeList.item(i);
+			//we set the grouping criteria
+			document.setGrouping(IATIProcessorHelper.getStringFromElement(element,DEFAULT_GROUPING_FIELD,"ref"));
+
 			String currency = !("".equals(element.getAttribute("default-currency"))) ? element.getAttribute("default-currency") : this.defaultCurrency;			
 			document.addStringField("default-currency", currency);
 			String defaultLanguageCode = !("".equals(element.getAttribute("xml:lang"))) ? element.getAttribute("xml:lang") : this.defaultLanguage;

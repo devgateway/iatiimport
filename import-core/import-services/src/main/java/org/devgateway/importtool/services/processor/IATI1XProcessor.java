@@ -42,7 +42,7 @@ import org.xml.sax.SAXException;
 
 @Component("IATI1X")
 @Scope("session")
-abstract public class IATI1XProcessor  implements ISourceProcessor {
+abstract public class IATI1XProcessor  extends IATIProcessor {
 
 	protected static final String ISO_DATE = "yyyy-MM-dd";
 
@@ -53,7 +53,6 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 	protected List<Field> filterFieldList = new ArrayList<Field>();
 
 	// Field names on the source document that hold key information
-	protected String DEFAULT_ID_FIELD = "iati-identifier";
 	protected String DEFAULT_TITLE_FIELD = "title";
 	protected String PROCESSOR_VERSION = "";
 
