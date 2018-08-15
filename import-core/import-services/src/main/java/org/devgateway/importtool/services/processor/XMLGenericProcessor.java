@@ -33,13 +33,17 @@ public class XMLGenericProcessor implements ISourceProcessor {
 	private Log log = LogFactory.getLog(getClass());
 	private String descriptiveName = "XML Generic";
 	private Document doc;
-	
+
 
 	@Override
 	public void setInput(InputStream input) {
 		this.input = input;
 	}
 
+	@Override
+	public void setInput(Document input) {
+		this.doc = input;
+	}
 	@Override
 	public List<Field> getFields() {
 		List<Field> fieldList = new ArrayList<Field>();
