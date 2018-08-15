@@ -53,8 +53,6 @@ public class IATI2XProcessor extends IATIProcessor {
 
 	private String DEFAULT_TITLE_FIELD = "title";
 	protected String PROCESSOR_VERSION = "";
-	private String defaultLanguage = "";
-	private String defaultCurrency = "";	
 	protected String descriptiveName = "";
 	protected String codelistPath = "";
 	public String getCodelistPath() {
@@ -66,23 +64,7 @@ public class IATI2XProcessor extends IATIProcessor {
 		this.codelistPath = codelistPath;
 	}
 
-
-	public String getPropertiesFile() {
-		return propertiesFile;
-	}
-
-
-	public void setPropertiesFile(String propertiesFile) {
-		this.propertiesFile = propertiesFile;
-	}
-
-
-	protected String propertiesFile = "";
-
 	private List<Language> filterLanguages = new ArrayList<Language>();
-	
-	// XML Document that will hold the entire imported file
-	private Document doc;
 	
 	private ActionStatus actionStatus;
 
@@ -90,11 +72,6 @@ public class IATI2XProcessor extends IATIProcessor {
 	    
 	}
 
-	public Document getDoc() {
-		return doc;
-	}
-	
-	
 	public ActionStatus getActionStatus() {
 		return actionStatus;
 	}
@@ -120,20 +97,6 @@ public class IATI2XProcessor extends IATIProcessor {
 		dateTypes.put("start-actual", "2");
 		dateTypes.put("end-planned", "3");
 		dateTypes.put("end-actual", "4");
-	}
-		
-	
-	
-	protected void configureDefaults(){
-		InputStream propsStream = this.getClass().getResourceAsStream(this.getPropertiesFile());
-		Properties properties = new Properties();		
-		try {
-			properties.load(propsStream);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}		
-		defaultLanguage = properties.getProperty("default_language");
-		defaultCurrency = properties.getProperty("default_currency");
 	}
 
 	@Override
@@ -434,9 +397,11 @@ public class IATI2XProcessor extends IATIProcessor {
 			//we set the grouping criteria
 			document.setGrouping(IATIProcessorHelper.getStringFromElement(element,DEFAULT_GROUPING_FIELD,"ref"));
 
-			String currency = !("".equals(element.getAttribute("default-currency"))) ? element.getAttribute("default-currency") : this.defaultCurrency;			
+			String currency = !("".equals(element.getAttribute("default-currency"))) ? element.getAttribute
+					("default-currency") : this.getDefaultCurrency();
 			document.addStringField("default-currency", currency);
-			String defaultLanguageCode = !("".equals(element.getAttribute("xml:lang"))) ? element.getAttribute("xml:lang") : this.defaultLanguage;
+			String defaultLanguageCode = !("".equals(element.getAttribute("xml:lang"))) ? element.getAttribute
+					("xml:lang") : this.getDefaultLanguage();
 			NodeList fieldNodeList;			
 			for (Field field : getFields()) {
 				switch (field.getType()) {
