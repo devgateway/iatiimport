@@ -11,6 +11,7 @@ var DataSourceStore = Reflux.createStore({
   init: function() {
     this.listenTo(formActions.loadDataSource, this.handleLoadDataSource);
     this.listenTo(formActions.updateDataSource, this.handleUpdateDataSource);
+    this.listenTo(formActions.loadReportingOrganizations, this.handleLoadReportingOrganizations);
   },
   handleUpdateDataSource: function(data) {
     var self = this;
@@ -44,7 +45,21 @@ var DataSourceStore = Reflux.createStore({
         },
         type: 'GET'
      }); 
-  }
+  },
+  handleLoadReportingOrganizations: function() {
+	    var self = this;    
+	    $.ajax({
+	        url: '/importer/data-source/reporting-orgs',        
+	        error: function() {        	
+	        	formActions.loadReportingOrganizations.failed();
+	        },
+	        dataType: 'json',
+	        success: function(data) {        	
+	        	formActions.loadReportingOrganizations.completed(data);
+	        },
+	        type: 'GET'
+	     }); 
+	  }
 });
 
 module.exports = DataSourceStore;

@@ -76,13 +76,13 @@ var CustomDataSourceForm = React.createClass({
                          </div> 
                         }
                           <label for="reportingOrgId">{window.i18nLib.t('data_source.reporting_org')}</label>
+                          
                           <select id="reportingOrgId" className="form-control" onChange={this.updateField.bind(this, 'reportingOrgId')} value={this.props.customDataSource.reportingOrgId}> 
                            <option value="" >Select Reporting Org</option>
-                           <option value="03991">Org 1 </option>
-                           <option value="03992">Org 1 </option>
-                           <option value="03993">Org 1 </option>
-                           <option value="03994">Org 1 </option>
-                           <option value="03995">Org 1 </option>
+                           {this.props.reportingOrgs.map(function(org){
+                               return (<option value={org.orgId}>{org.name} </option>)
+                           })                               
+                           }
                           </select>
                            <br/>
                           <label for="exceptionUrl">{window.i18nLib.t('data_source.exception_url')}</label>

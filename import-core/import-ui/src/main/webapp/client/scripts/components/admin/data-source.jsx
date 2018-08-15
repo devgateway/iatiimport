@@ -21,20 +21,31 @@ var DataSource = React.createClass({
   getInitialState: function() {
     return {     
       dataSource: {},
-      dsValidationErrors:[]
+      dsValidationErrors:[],
+      reportingOrgs: []
     };
   },  
-   componentWillMount: function () {
-     this.listenTo(DataSourceStore, this.updateDataSource);             
+  componentWillMount: function () {
+     this.listenTo(DataSourceStore, this.updateDataSource);     
      this.loadData();
-    },
+  },
   updateDataSource: function (data) {  
         this.setState({
             dataSource: data, 
             customDataSource: null
         });
    }, 
+   updateReportingOrgs: function (data) {        
+       this.setState({reportingOrgs: data})
+   },       
   loadData: function(){    
+      
+      formActions.loadReportingOrganizations().then(function(data) {   
+          this.updateReportingOrgs(data);                
+        }.bind(this))["catch"](function(err) {       
+          console.log('Error loading reporting orgs');
+       }.bind(this));
+      
        formActions.loadDataSource().then(function(data) {                                       
         this.updateDataSource(data);                
       }.bind(this))["catch"](function(err) {       
@@ -118,7 +129,7 @@ var DataSource = React.createClass({
       this.setState({dataSource: ds});       
   },
  
-  render: function() {    
+  render: function() {   
     return (
      <div className="container " >
        <h2>{window.i18nLib.t('data_source.title')}</h2> 
@@ -139,12 +150,12 @@ var DataSource = React.createClass({
        </div>       
      </div>
           
-     <CustomDataSourceForm customDataSource={this.state.customDataSource} cancel={this.cancel} 
+     <CustomDataSourceForm customDataSource={this.state.customDataSource} reportingOrgs = {this.state.reportingOrgs} cancel={this.cancel} 
          updateField={this.updateField} 
          updateCutomDataSource={this.updateCutomDataSource}
          cancel = {this.cancel}
          closeDialog = {this.closeDialog}/>      
-     <CustomDataSourceList dataSource={this.state.dataSource} remove={this.remove} edit={this.edit}/>     
+     <CustomDataSourceList dataSource={this.state.dataSource} reportingOrgs = {this.state.reportingOrgs} remove={this.remove} edit={this.edit}/>     
      <div className="buttons">
            <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.save} >{window.i18nLib.t('data_source.save')}</button>
       </div>               

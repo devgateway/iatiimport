@@ -1,6 +1,7 @@
 var React = require('react');
 var Reflux = require('reflux');
 var Router = require('react-router');
+var _ = require('lodash/dist/lodash.underscore');
 
 var CustomDataSourceList = React.createClass({ 
   mixins: [
@@ -16,6 +17,14 @@ var CustomDataSourceList = React.createClass({
   },
   remove: function(reportingOrgId, event) {
       this.props.remove(reportingOrgId);       
+  },
+  getName(id) {
+     var name = '';
+     var org = _.find(this.props.reportingOrgs, {'orgId': id});
+     if (org) {
+         name = org.name;
+     }
+     return name;
   },
   render: function() {    
     return (
@@ -37,7 +46,7 @@ var CustomDataSourceList = React.createClass({
                      </thead>
                      <tbody>
                      {this.props.dataSource.customDataSources.map(function(ds, i) {                                 
-                         return(<tr key={i}><td>{ds.reportingOrgId}</td><td>{ds.url}</td><td>                         
+                         return(<tr key={i}><td>{this.getName(ds.reportingOrgId)}</td><td>{ds.url}</td><td>                         
                          <span className="glyphicon glyphicon-edit glyphicon-custom" title="Edit" onClick={this.edit.bind(this, ds.reportingOrgId)} ></span>
                          <span className="glyphicon glyphicon-remove glyphicon-custom" title="Delete" onClick={this.remove.bind(this, ds.reportingOrgId)}></span>
                          </td></tr>)}.bind(this))
