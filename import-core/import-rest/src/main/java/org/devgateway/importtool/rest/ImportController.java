@@ -23,6 +23,7 @@ import org.devgateway.importtool.model.File;
 import org.devgateway.importtool.model.ImportSummary;
 import org.devgateway.importtool.security.ImportSessionToken;
 import org.devgateway.importtool.services.DataFetchService;
+import org.devgateway.importtool.services.DataSourceService;
 import org.devgateway.importtool.services.ImportService;
 import org.devgateway.importtool.services.processor.helper.DocumentMapper;
 import org.devgateway.importtool.services.processor.helper.IDestinationProcessor;
@@ -60,6 +61,9 @@ class ImportController  {
 	
 	@Autowired
 	private DataFetchService dataFetchService;
+	
+	@Autowired
+	private DataSourceService dataSourceService;
 	
 	private Log log = LogFactory.getLog(getClass());
 
@@ -128,6 +132,13 @@ class ImportController  {
 		} else {				
 			return new ResponseEntity<>(EPMessages.ERROR_UPLOADING_FILE.toString(), HttpStatus.OK);
 		}
+	}	
+	
+	@RequestMapping(method = RequestMethod.GET, value = "/fetch/{reportingOrgId}")
+	public ResponseEntity<String> handleDataFetch(@PathVariable String reportingOrgId, HttpServletRequest request) {		
+		String url = dataSourceService.getDataSourceURL(reportingOrgId);
+		dataFetchService.fetchResult(url);
+		return new ResponseEntity<>("{}", HttpStatus.OK);
 	}	
 	 
 	@RequestMapping(method = RequestMethod.POST, value = "/filter")
@@ -203,10 +214,5 @@ class ImportController  {
 		return new ResponseEntity<>(importService.getSummary(documentMapper, importSessionToken, processor), HttpStatus.OK);
 	}	
 
-	@RequestMapping(method = RequestMethod.GET, value = "/fetch/{reportingOrgId}")
-	ResponseEntity<List<String>> fetch(HttpServletRequest request) {
-		dataFetchService.fetchResult("http://datastore.iatistandard.org/api/1/access/activity" +
-				".xml?recipient-country=TZ&reporting-org=FI-3&offset=0&limit=50");
-		return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
-	}
+	
 }
