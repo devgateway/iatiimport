@@ -34,7 +34,7 @@ var Wizard = React.createClass({
 			this.initImportSession(nextProps.params.src, nextProps.params.dst);
 		}
 	},
-	componentDidMount  : function() {
+	componentDidMount: function() {
 	    if (this.props.params.src !== constants.IMPORT_TYPE_AUTOMATIC) {
 	        this.initManualImport();
 	    }
@@ -254,7 +254,7 @@ var Wizard = React.createClass({
         
         return src;
 	},	
-	initAutomaticImport() {	   
+	initAutomaticImport: function() {	   
 	    var sourceProcessor = this.props.params.src;
         var destinationProcessor = this.props.params.dst;       
         appActions.initDestinationSession.triggerPromise().then(function(data) {

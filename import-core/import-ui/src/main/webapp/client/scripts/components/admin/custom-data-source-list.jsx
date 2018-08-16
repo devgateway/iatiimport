@@ -18,7 +18,7 @@ var CustomDataSourceList = React.createClass({
   remove: function(reportingOrgId, event) {
       this.props.remove(reportingOrgId);       
   },
-  getName(id) {
+  getName: function(id) {
      var name = '';
      var org = _.find(this.props.reportingOrgs, {'orgId': id});
      if (org) {

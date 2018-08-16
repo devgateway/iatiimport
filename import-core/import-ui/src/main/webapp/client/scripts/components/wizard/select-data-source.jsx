@@ -18,7 +18,7 @@ var SelectDataSource = React.createClass({
            reportingOrgId: null
        };
     },
-    updateReportingOrgs: function (data) {        
+    updateReportingOrgs: function(data) {        
        this.setState({reportingOrgs: data})
     },       
    loadData: function(){       
@@ -32,10 +32,10 @@ var SelectDataSource = React.createClass({
         this.props.eventHandlers.updateCurrentStep(constants.SELECT_DATASOURCE);
         this.loadData();
     },  
-    onReportingOrgChange(event) {
+    onReportingOrgChange: function(event) {
       this.setState({reportingOrgId: event.target.value});  
     },
-    handleNext: function () {
+    handleNext: function() {
         this.props.eventHandlers.fetchData(this.state.reportingOrgId);
     },
     render: function() {      

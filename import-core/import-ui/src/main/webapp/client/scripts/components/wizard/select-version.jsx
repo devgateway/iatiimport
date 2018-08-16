@@ -18,7 +18,7 @@ var SelectVersion = React.createClass({
     componentDidMount: function() {  
         this.props.eventHandlers.updateCurrentStep(constants.SELECT_VERSION);
     }, 
-    handleNext: function () {
+    handleNext: function() {
         this.props.eventHandlers.initAutomaticImport();
     },
     render: function() {      
@@ -29,11 +29,11 @@ var SelectVersion = React.createClass({
                 {this.props.versions &&
                     <div>
                      <label>{this.props.i18nLib.t('select_version.currently_importing')} {this.props.currentVersion}</label> <br/>  
-                      {this.props.versions.filter(v => v != this.props.currentVersion).length > 0 &&
+                      {this.props.versions.filter(function(v){ return v != this.props.currentVersion}).length > 0 &&
                           <div>
                           <label>{this.props.i18nLib.t('select_version.other_versions_available')}</label> <br/>                    
                            <ul className="list-unstyled workflow-selector">
-                               {this.props.versions.filter(v => v != this.props.currentVersion).map(function(version){
+                               {this.props.versions.filter(function(v){ return v != this.props.currentVersion}).map(function(version){
                                   return (<li className="workflow-link">{version}</li>);  
                                })}
                            </ul>      
