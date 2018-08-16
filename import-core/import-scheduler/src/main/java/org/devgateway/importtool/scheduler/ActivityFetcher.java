@@ -47,8 +47,7 @@ public class ActivityFetcher {
     private DataFetchService dataFetchService;
     @Autowired
     private ProjectRepository projectRepository;
-    @Autowired
-    private DataSourceService dataSourceService;
+
     //to be scheduled with cron like syntax
     @Scheduled(fixedRate = 500000)
     public void checkForUpdates() {
@@ -56,15 +55,10 @@ public class ActivityFetcher {
 
         StringBuilder query = new StringBuilder(IATIProcessor.DEFAULT_PATH_API);
         getIatiIdentifiers().forEach((String reportingOrg, List<String> iatiIdentifiers) -> {
-            List<Param> params = new ArrayList<>();
-            //SN should be taken from AMP
-            params.add(new Param(DataFetchServiceConstants.RECIPIENT_COUNTRY_PARAMETER, "SN"));
-            params.add(new Param(DataFetchServiceConstants.REPORTING_ORGANISATION_PARAMETER, reportingOrg));
+            List<Param> params = DataFetchServiceConstants.getCommonParams(reportingOrg);
             params.add(new Param(DataFetchServiceConstants.IATI_IDENTIFIER_PARAMETER, iatiIdentifiers));
-
-            String customUrl = dataSourceService.getDataSourceURL(reportingOrg);
-            Document doc = dataFetchService.fetch((customUrl != null) ? customUrl : DataFetchServiceConstants
-                    .DEFAULT_URL, params);
+            //we could fetch the last sync date for a reporting org to limit the result we are getting
+            Document doc = dataFetchService.fetch(reportingOrg, params);
             NodeList activities;
             try {
                 activities = (NodeList) xPath.compile(query.toString()).evaluate(doc, XPathConstants.NODESET);
@@ -77,10 +71,12 @@ public class ActivityFetcher {
                             IATIProcessor.DEFAULT_ID_FIELD));
                 }
             } catch (Exception e) {
+                //TODO properly handle errors
                 log.error("Cannot fetch activities", e);
             }
         });
     }
+
     private  Map<String, List<String>> getIatiIdentifiers() {
         List<Project> p = projectRepository.findProjectLastSyncedDate();
         return p.stream()

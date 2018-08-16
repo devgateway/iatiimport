@@ -3,22 +3,31 @@ package org.devgateway.importtool.rest;
 import static org.devgateway.importtool.services.processor.helper.Constants.CURRENT_FILE_ID;
 import static org.devgateway.importtool.services.processor.helper.Constants.DESTINATION_PROCESSOR;
 import static org.devgateway.importtool.services.processor.helper.Constants.DOCUMENT_MAPPER;
+import static org.devgateway.importtool.services.processor.helper.Constants.IATI_STORE_ACTIVITIES;
 import static org.devgateway.importtool.services.processor.helper.Constants.SESSION_TOKEN;
 import static org.devgateway.importtool.services.processor.helper.Constants.SOURCE_PROCESSOR;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.dao.FileRepository;
 import org.devgateway.importtool.dao.ProjectRepository;
+import org.devgateway.importtool.endpoint.DataFetchServiceConstants;
 import org.devgateway.importtool.endpoint.EPConstants;
 import org.devgateway.importtool.endpoint.EPMessages;
+import org.devgateway.importtool.endpoint.Param;
+import org.devgateway.importtool.model.FetchResult;
 import org.devgateway.importtool.model.File;
 import org.devgateway.importtool.model.ImportSummary;
 import org.devgateway.importtool.security.ImportSessionToken;
@@ -45,6 +54,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.ls.DOMImplementationLS;
+import org.w3c.dom.ls.LSSerializer;
 
 
 @RestController
@@ -119,28 +132,33 @@ class ImportController  {
 	@RequestMapping(method = RequestMethod.POST, value = "/upload")
 	public ResponseEntity<String> handleFileUpload(@RequestParam("file_data") MultipartFile file, HttpServletRequest request) {
 		if (!file.isEmpty()) {
-			try {				
+			try {
 				ISourceProcessor srcProcessor = (ISourceProcessor) request.getSession().getAttribute(SOURCE_PROCESSOR);
-				ImportSessionToken authToken = (ImportSessionToken) request.getSession().getAttribute(SESSION_TOKEN);
-				File uploadedFile = importService.uploadFile(file, srcProcessor, authToken);				
-				request.getSession().setAttribute(CURRENT_FILE_ID, uploadedFile.getId());
+				InputStream is = new ByteArrayInputStream(file.getBytes());
+				srcProcessor.setInput(is);
+				processFile(file.getOriginalFilename(), request,srcProcessor);
 				return new ResponseEntity<>("{}", HttpStatus.OK);
 			} catch (Exception e) {
-				e.printStackTrace();			
-				return new ResponseEntity<>(EPMessages.ERROR_UPLOADING_FILE_CHECK_INITIAL_STEPS.toString(), HttpStatus.OK);
+				log.error(e);
+				return new ResponseEntity<>(EPMessages.ERROR_UPLOADING_FILE_CHECK_INITIAL_STEPS.toString(),
+						HttpStatus.OK);
 			}
 		} else {				
 			return new ResponseEntity<>(EPMessages.ERROR_UPLOADING_FILE.toString(), HttpStatus.OK);
 		}
 	}	
 	
-	@RequestMapping(method = RequestMethod.GET, value = "/fetch/{reportingOrgId}")
-	public ResponseEntity<String> handleDataFetch(@PathVariable String reportingOrgId, HttpServletRequest request) {		
-		String url = dataSourceService.getDataSourceURL(reportingOrgId);
-		dataFetchService.fetchResult(url);
-		return new ResponseEntity<>("{}", HttpStatus.OK);
-	}	
-	 
+	
+	private void processFile(String fileName, HttpServletRequest request, ISourceProcessor srcProcessor)
+			throws IOException {
+
+		ImportSessionToken authToken = (ImportSessionToken) request.getSession().getAttribute(SESSION_TOKEN);
+		File uploadedFile = importService.uploadFile(fileName ,srcProcessor, authToken);
+		request.getSession().setAttribute(CURRENT_FILE_ID, uploadedFile.getId());
+	}
+
+
+	
 	@RequestMapping(method = RequestMethod.POST, value = "/filter")
 	ResponseEntity<ImportSessionToken> filter(@PathVariable String authenticationToken) {
 		ImportSessionToken authObject = new ImportSessionToken(authenticationToken, "", new Date(), "", null);
@@ -215,4 +233,17 @@ class ImportController  {
 	}	
 
 	
+	@RequestMapping(method = RequestMethod.GET, value = "/fetch/{reportingOrgId}")
+	ResponseEntity<Set<String>> fetch(HttpServletRequest request, @PathVariable("reportingOrgId") String
+            reportingOrgId) {
+        try {
+            List<Param> params = DataFetchServiceConstants.getCommonParams(reportingOrgId);
+            FetchResult activitiesFromDataStore = dataFetchService.fetchResult(reportingOrgId, params);
+            request.getSession().setAttribute(IATI_STORE_ACTIVITIES,activitiesFromDataStore.getActivities());
+            return new ResponseEntity<>(activitiesFromDataStore.getVersions(), HttpStatus.OK);
+        } catch (Exception e) {
+            log.error(e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
