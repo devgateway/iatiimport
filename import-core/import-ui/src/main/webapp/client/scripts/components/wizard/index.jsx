@@ -170,16 +170,18 @@ var Wizard = React.createClass({
 	},
 	//fetch data from iati datastore
 	fetchData: function(reportingOrgId) {
+	    $(this.refs.loadingIcon.getDOMNode()).show();
 	    var self = this;
 	    $.ajax({
             url: '/importer/import/fetch/' + reportingOrgId,
             success: function(data) {
+                 
                 if (data && data.length > 0) {
-                    console.log(data)
                     self.setState({versions: data, currentVersion: data[0]});
                     self.transitionTo('selectversion', self.props.params); 
                 }
-                
+                $(self.refs.loadingIcon.getDOMNode()).hide();
+                              
             },
             type: 'GET'
          });
