@@ -14,7 +14,10 @@ var WizardSteps = React.createClass({
         <div className=" col-sm-2 col-md-2">
           <ul className="wizard-steps nav-pills nav-stacked" role="tablist">
 	        {this.props.params.src == constants.IMPORT_TYPE_AUTOMATIC &&
-	            <li role="presentation"  className = {stepsOrder.indexOf(constants.SELECT_DATASOURCE) <= indexOfCurrent ?  '' : 'disabled not-active'}><Link to="selectdatasource" params={this.props.params} aria-controls="file" ><div className="glyphicon glyphicon-file"></div>Select DataSource<span className="sr-only">(current)</span></Link></li>
+	            <li role="presentation"  className = {stepsOrder.indexOf(constants.SELECT_DATASOURCE) <= indexOfCurrent ?  '' : 'disabled not-active'}><Link to="selectdatasource" params={this.props.params} aria-controls="file" ><div className="glyphicon glyphicon-file"></div>{this.props.i18nLib.t('wizard.steps.select_data_source')}<span className="sr-only">(current)</span></Link></li>
+	        }
+	        {this.props.params.src == constants.IMPORT_TYPE_AUTOMATIC &&
+	            <li role="presentation"  className = {stepsOrder.indexOf(constants.SELECT_VERSION) <= indexOfCurrent ?  '' : 'disabled not-active'}><Link to="selectversion" params={this.props.params} aria-controls="file" ><div className="glyphicon glyphicon-option-vertical"></div>{this.props.i18nLib.t('wizard.steps.select_version')}<span className="sr-only">(current)</span></Link></li>
 	        }
 	        {this.props.params.src != constants.IMPORT_TYPE_AUTOMATIC &&
              <li role="presentation"  className = {stepsOrder.indexOf(constants.UPLOAD_FILE) <= indexOfCurrent ?  '' : 'disabled not-active'}><Link to="upload" params={this.props.params} aria-controls="file" ><div className="glyphicon glyphicon-file"></div> {this.props.i18nLib.t('wizard.steps.upload_files')}<span className="sr-only">(current)</span></Link></li>

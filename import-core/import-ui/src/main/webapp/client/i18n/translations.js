@@ -37,6 +37,8 @@ module.exports = {
 						'import_process' : 'Import Process',
 						'steps' : {
 							'upload_files' : ' Upload File(s)',
+							'select_data_source': ' Select DataSource',
+							'select_version': 'Select Version',
 							'filter_data' : ' Filter Data',
 							'choose_projects' : ' Choose Projects',
 							'choose_fields' : ' Choose Fields',
@@ -239,8 +241,13 @@ module.exports = {
 						'validation_invalid_url': 'Invalid URL',
 						'select_data_source': 'Select Data Source',
 						'select_data_reporting_org': 'Select the reporting organization to import from:',
-						'next': 'Next'
-						
+						'next': 'Next'						
+					},
+					'select_version': {
+						'title': 'Select Version',
+						'currently_importing': 'You are about to process data for version',
+						'other_versions_available': 'This publisher also has data for the following versions:',
+						'import_will_repeat': 'The import process will be repeated for each version.'
 					}
 				}
 			},
@@ -460,20 +467,6 @@ module.exports = {
 						'destination': 'Procesador de destino',
 						'description': 'Descripción',
 						'enabled': 'Habilitado'
-					},
-					'data_source': {
-						'title': 'Data Source Management',
-						'default_url': 'Default URL',
-						'add_custom_data_source': 'Add Exception',
-						'save': 'Save',
-						'exception_url': 'URL',
-						'reporting_org': 'Reporting Organization',
-						'update': 'Update',
-						'cancel': 'Cancel',
-						'validation_default_url_required': 'Default URL is required',
-						'validation_reporting_org_required': 'Reporting Organization is required',
-						'actions':'Actions',
-						'validation_invalid_url': 'Invalid URL'
 					}
 				}
 			},

@@ -15,7 +15,6 @@ var Cookies = require('js-cookie');
 var constants = require('./../../utils/constants');
 var destinationSessionStore = require('./../../stores/DestinationSessionStore');
 
-
 var Wizard = React.createClass({
 	mixins: [Navigation],
 	setIntervalId: null,
@@ -25,6 +24,8 @@ var Wizard = React.createClass({
 			results: [],
 			currentStep: this.props.params.src == constants.IMPORT_TYPE_AUTOMATIC ? constants.SELECT_DATASOURCE : constants.UPLOAD_FILE,
 			completedSteps: [],
+			versions:[],
+			currentVersion: null,
 			statusMessage: ""
 		};
 	},
@@ -34,29 +35,33 @@ var Wizard = React.createClass({
 		}
 	},
 	componentDidMount  : function() {
-		var sourceProcessor = this.props.params.src;
-		var destinationProcessor = this.props.params.dst;		
-		appActions.initDestinationSession.triggerPromise().then(function(data) {
-			  appConfig.DESTINATION_AUTH_TOKEN = data.token;
-		    appConfig.DESTINATION_USERNAME = data['user-name'];
-				appConfig.DESTINATION_AUTH_TOKEN_EXPIRATION =  data["token-expiration"] || (new Date).getTime() + (30*60*1000);
-		    Cookies.set("DESTINATION_AUTH_TOKEN", data.token);
-		    Cookies.set("DESTINATION_USERNAME", data['user-name']);
-		    // Added true always for now, the API returns wrong value
-		    Cookies.set("CAN_ADD_ACTIVITY", true || data['add-activity']);
-		    Cookies.set("WORKSPACE", data['team']);
+	    if (this.props.params.src !== constants.IMPORT_TYPE_AUTOMATIC) {
+	        this.initManualImport();
+	    }
+	},
+	initManualImport: function() {
+	    var sourceProcessor = this.props.params.src;
+        var destinationProcessor = this.props.params.dst;       
+        appActions.initDestinationSession.triggerPromise().then(function(data) {
+              appConfig.DESTINATION_AUTH_TOKEN = data.token;
+            appConfig.DESTINATION_USERNAME = data['user-name'];
+                appConfig.DESTINATION_AUTH_TOKEN_EXPIRATION =  data["token-expiration"] || (new Date).getTime() + (30*60*1000);
+            Cookies.set("DESTINATION_AUTH_TOKEN", data.token);
+            Cookies.set("DESTINATION_USERNAME", data['user-name']);
+            // Added true always for now, the API returns wrong value
+            Cookies.set("CAN_ADD_ACTIVITY", true || data['add-activity']);
+            Cookies.set("WORKSPACE", data['team']);
 
-				this.initImportSession(sourceProcessor, destinationProcessor);
+                this.initImportSession(sourceProcessor, destinationProcessor);
 
-				// Timer for token expiration
-				var self = this;
-				self.setIntervalTokenId = setInterval(function(){
-					self.checkTokenStatus();
-				}, 1000);
+                // Timer for token expiration
+                var self = this;
+                self.setIntervalTokenId = setInterval(function(){
+                    self.checkTokenStatus();
+                }, 1000);
 
-	      }.bind(this))["catch"](function(err) {
-	      }.bind(this));
-
+          }.bind(this))["catch"](function(err) {
+          }.bind(this));  
 	},
 	checkTokenStatus: function() {
 		var currentTime = (new Date).getTime();
@@ -169,7 +174,12 @@ var Wizard = React.createClass({
 	    $.ajax({
             url: '/importer/import/fetch/' + reportingOrgId,
             success: function(data) {
-                self.transitionTo('filter', self.props.params);
+                if (data && data.length > 0) {
+                    console.log(data)
+                    self.setState({versions: data, currentVersion: data[0]});
+                    self.transitionTo('selectversion', self.props.params); 
+                }
+                
             },
             type: 'GET'
          });
@@ -236,13 +246,47 @@ var Wizard = React.createClass({
             },
 	        type: 'GET'
 	     });
-	}
-	,
+	},
+	getSourceProcessor: function(src) {
+        if (src === constants.IMPORT_TYPE_AUTOMATIC && this.state.currentVersion) {
+            return "IATI" + this.state.currentVersion.replace(".", "")
+        }
+        
+        return src;
+	},	
+	initAutomaticImport() {	   
+	    var sourceProcessor = this.props.params.src;
+        var destinationProcessor = this.props.params.dst;       
+        appActions.initDestinationSession.triggerPromise().then(function(data) {
+              appConfig.DESTINATION_AUTH_TOKEN = data.token;
+            appConfig.DESTINATION_USERNAME = data['user-name'];
+                appConfig.DESTINATION_AUTH_TOKEN_EXPIRATION =  data["token-expiration"] || (new Date).getTime() + (30*60*1000);
+            Cookies.set("DESTINATION_AUTH_TOKEN", data.token);
+            Cookies.set("DESTINATION_USERNAME", data['user-name']);
+            // Added true always for now, the API returns wrong value
+            Cookies.set("CAN_ADD_ACTIVITY", true || data['add-activity']);
+            Cookies.set("WORKSPACE", data['team']);
+
+                this.initImportSession(sourceProcessor, destinationProcessor).then(function(){
+                   console.log('initialized'); 
+                   this.transitionTo('filter', this.props.params);
+                }.bind(this))
+
+                // Timer for token expiration
+                var self = this;
+                self.setIntervalTokenId = setInterval(function(){
+                    self.checkTokenStatus();
+                }, 1000);
+
+          }.bind(this))["catch"](function(err) {
+          }.bind(this));        
+	    
+	},
 	initImportSession: function(sourceProcessor, destinationProcessor) {
-		this.showLoadingIcon();
+	    this.showLoadingIcon();
 		var compiledURL = _.template(appConfig.TOOL_START_ENDPOINT);
 		var url = compiledURL({
-			'sourceProcessor': sourceProcessor,
+			'sourceProcessor': this.getSourceProcessor(sourceProcessor),
 			'destinationProcessor': destinationProcessor,
 			'authenticationToken': Cookies.get("DESTINATION_AUTH_TOKEN"),
 			'username': Cookies.get("DESTINATION_USERNAME"),
@@ -250,7 +294,7 @@ var Wizard = React.createClass({
 		});
 
 		var self = this;
-		$.ajax({
+		return $.ajax({
 	        url: url,
 	        timeout:appConfig.REQUEST_TIMEOUT,
 	        error: function(result) {
@@ -297,6 +341,7 @@ var Wizard = React.createClass({
     eventHandlers.navigateBack  = this.navigateBack;
     eventHandlers.goHome = this.goHome;
     eventHandlers.fetchData = this.fetchData;
+    eventHandlers.initAutomaticImport = this.initAutomaticImport;
 
     var error;
     if(Cookies.get("DESTINATION_AUTH_TOKEN") == "null" || Cookies.get("DESTINATION_AUTH_TOKEN") == "undefined"){
@@ -321,7 +366,7 @@ var Wizard = React.createClass({
          <span ref="message"></span>
        </div>
       <div className="loading-icon" ref="loadingIcon"></div>
-      <RouteHandler eventHandlers={eventHandlers} {...this.props} statusMessage = {this.state.statusMessage}/>
+      <RouteHandler eventHandlers={eventHandlers} {...this.props} statusMessage = {this.state.statusMessage} versions = {this.state.versions} currentVersion = {this.state.currentVersion}/>
       </div>
       </div>
       </div>

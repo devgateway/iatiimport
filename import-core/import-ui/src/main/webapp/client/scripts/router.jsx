@@ -11,6 +11,7 @@ var Wizard = require('./components/wizard');
 
 var UploadFile = require('./components/wizard/upload-file');
 var SelectDataSource = require('./components/wizard/select-data-source');
+var SelectVersion = require('./components/wizard/select-version');
 var FilterData = require('./components/wizard/filter-data');
 var ChooseProjects = require('./components/wizard/choose-projects');
 var ChooseFields = require('./components/wizard/choose-fields');
@@ -33,6 +34,7 @@ var routes = (
 		<Route path="wizard/:src/:dst" handler={Wizard}>	
 			<Route name="upload" handler={UploadFile}/>        
             <Route name="selectdatasource" path="selectdatasource" handler={SelectDataSource}/>
+            <Route name="selectversion" path="selectversion" handler={SelectVersion}/>        
 			<Route name="filter" path="filter" handler={FilterData}/>
 			<Route name="projects" path="projects" handler={ChooseProjects}/>
 			<Route name="fields" path="fields" handler={ChooseFields}/>
