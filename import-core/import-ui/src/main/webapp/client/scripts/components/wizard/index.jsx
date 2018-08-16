@@ -15,14 +15,15 @@ var Cookies = require('js-cookie');
 var constants = require('./../../utils/constants');
 var destinationSessionStore = require('./../../stores/DestinationSessionStore');
 
+
 var Wizard = React.createClass({
 	mixins: [Navigation],
 	setIntervalId: null,
 	getInitialState: function() {
-		return {
+	    return {
 			info: {},
 			results: [],
-			currentStep: constants.UPLOAD_FILE,
+			currentStep: this.props.params.src == constants.IMPORT_TYPE_AUTOMATIC ? constants.SELECT_DATASOURCE : constants.UPLOAD_FILE,
 			completedSteps: [],
 			statusMessage: ""
 		};
@@ -34,7 +35,7 @@ var Wizard = React.createClass({
 	},
 	componentDidMount  : function() {
 		var sourceProcessor = this.props.params.src;
-		var destinationProcessor = this.props.params.dst;
+		var destinationProcessor = this.props.params.dst;		
 		appActions.initDestinationSession.triggerPromise().then(function(data) {
 			  appConfig.DESTINATION_AUTH_TOKEN = data.token;
 		    appConfig.DESTINATION_USERNAME = data['user-name'];
@@ -131,8 +132,6 @@ var Wizard = React.createClass({
 		}.bind(this));
 	},
 
-
-
 	chooseProjects: function(data,direction) {
 		formActions.updateSelectedProjects(data).then(function() {
 			if(constants.DIRECTION_NEXT === direction){
@@ -163,6 +162,17 @@ var Wizard = React.createClass({
 				this.transitionTo('fields', this.props.params);
 			}
 		}.bind(this));
+	},
+	//fetch data from iati datastore
+	fetchData: function(reportingOrgId) {
+	    var self = this;
+	    $.ajax({
+            url: '/importer/import/fetch/' + reportingOrgId,
+            success: function(data) {
+                self.transitionTo('filter', self.props.params);
+            },
+            type: 'GET'
+         });
 	},
 	navigateBack: function(){
 		if(this.setIntervalId){
@@ -272,7 +282,7 @@ var Wizard = React.createClass({
 
 	},
 
-  render: function() {
+  render: function() {   
     var eventHandlers = {};
     eventHandlers.uploadFile          = this.uploadFile;
     eventHandlers.filterData          = this.filterData;
@@ -286,6 +296,7 @@ var Wizard = React.createClass({
     eventHandlers.updateCurrentStep = this.updateCurrentStep;
     eventHandlers.navigateBack  = this.navigateBack;
     eventHandlers.goHome = this.goHome;
+    eventHandlers.fetchData = this.fetchData;
 
     var error;
     if(Cookies.get("DESTINATION_AUTH_TOKEN") == "null" || Cookies.get("DESTINATION_AUTH_TOKEN") == "undefined"){

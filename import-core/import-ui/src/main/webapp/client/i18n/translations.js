@@ -216,6 +216,14 @@ module.exports = {
 						'description': 'Description',
 						'enabled': 'Enabled'
 					},
+					'import_type':{
+					    'select_import_type': 'Please select the import type:',
+						'manual': 'Manual',
+						'automatic': 'Automated',
+						'next': 'Next',
+						'description_manual': 'Follow the manual process if you have a valid IATI file that you want to upload.',
+						'description_automatic': 'Follow the automated process if you want to search for available IATI data and pull it directly from the IATI datastore.',
+					},
 					'data_source': {
 						'title': 'Data Source Management',
 						'default_url': 'Default URL',
@@ -228,7 +236,11 @@ module.exports = {
 						'validation_default_url_required': 'Default URL is required',
 						'validation_reporting_org_required': 'Reporting Organization is required',
 						'actions':'Actions',
-						'validation_invalid_url': 'Invalid URL'
+						'validation_invalid_url': 'Invalid URL',
+						'select_data_source': 'Select Data Source',
+						'select_data_reporting_org': 'Select the reporting organization to import from:',
+						'next': 'Next'
+						
 					}
 				}
 			},

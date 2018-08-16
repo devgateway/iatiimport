@@ -5,10 +5,12 @@ var DefaultRoute = Router.DefaultRoute;
 
 var Layout = require('./components/layout');
 var Home = require('./components/home');
-var Content = require('./components/content');
+var ManualProcess = require('./components/content');
+var LandingPage = require('./components/landing-page');
 var Wizard = require('./components/wizard');
 
 var UploadFile = require('./components/wizard/upload-file');
+var SelectDataSource = require('./components/wizard/select-data-source');
 var FilterData = require('./components/wizard/filter-data');
 var ChooseProjects = require('./components/wizard/choose-projects');
 var ChooseFields = require('./components/wizard/choose-fields');
@@ -25,10 +27,12 @@ var ErrorPage = require('./components/error-page')
 
 var routes = (
 	<Route name="layout" path="/" handler={Home}>
-		<DefaultRoute handler={Content} />	
-		<Route name="error" path="error" handler={ErrorPage} />
+		<DefaultRoute handler={LandingPage} />	
+        <Route name="error" path="error" handler={ErrorPage} />
+		<Route name="manual" path="manual" handler={ManualProcess} />
 		<Route path="wizard/:src/:dst" handler={Wizard}>	
-			<DefaultRoute name="upload" handler={UploadFile}/>
+			<Route name="upload" handler={UploadFile}/>        
+            <Route name="selectdatasource" path="selectdatasource" handler={SelectDataSource}/>
 			<Route name="filter" path="filter" handler={FilterData}/>
 			<Route name="projects" path="projects" handler={ChooseProjects}/>
 			<Route name="fields" path="fields" handler={ChooseFields}/>

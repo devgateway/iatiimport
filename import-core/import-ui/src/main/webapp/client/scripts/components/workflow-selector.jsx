@@ -28,7 +28,7 @@ var WorkflowSelector = React.createClass({
     	if (this.state.workflowData) {    		
             $.map(this.state.workflowData, function(workflow, i) { 
             	if(workflow.enabled){            		
-            		var link  = <li className="workflow-link"><a  href={"#/wizard/" + workflow.sourceProcessor.name + "/" + workflow.destinationProcessor.name} >{window.i18nLib.t(workflow.translationKey)}</a></li>;
+            		var link  = <li className="workflow-link"><a  href={"#/wizard/" + workflow.sourceProcessor.name + "/" + workflow.destinationProcessor.name + '/upload'} >{window.i18nLib.t(workflow.translationKey)}</a></li>;
             		links.push(link);	
             	}            	
             }.bind(this));

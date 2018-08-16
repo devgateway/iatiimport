@@ -481,3 +481,7 @@ tbody.scrollablebody td, thead.scrollablebody th {
 	margin-left: 20px;
 	font-size: 18px;
 }
+
+.import-type-select, .reporting-org-select{
+	width: 40%;
+}
