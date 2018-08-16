@@ -2,6 +2,7 @@ package org.devgateway.importtool.services.processor.helper;
 
 public class Constants {
 	public static final String SOURCE_PROCESSOR = "SOURCE_PROCESSOR";
+	public static final String IATI_STORE_ACTIVITIES = "IATI_STORE_ACTIVITIES";
 	public static final String DESTINATION_PROCESSOR = "DESTINATION_PROCESSOR";
 	public static final String DOCUMENT_MAPPER = "DOCUMENT_MAPPER";
 	public static final String CURRENT_FILE_ID = "CURRENT_FILE_ID";

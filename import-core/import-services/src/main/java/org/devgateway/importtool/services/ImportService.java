@@ -73,13 +73,14 @@ public class ImportService {
 		return importSummmary;
 	}
 
-	public File uploadFile(MultipartFile file, ISourceProcessor srcProcessor, ImportSessionToken authToken) throws IOException{
-		InputStream is = new ByteArrayInputStream(file.getBytes());
-		srcProcessor.setInput(is);
+	public File uploadFile(String fileOriginalFileName, ISourceProcessor srcProcessor,
+						   ImportSessionToken authToken) throws
+			IOException{
+
 		File uploadedFile = new File();
 		//uploadedFile.setData(file.getBytes());
 		uploadedFile.setCreatedDate(new Date());
-		uploadedFile.setFileName(file.getOriginalFilename());
+		uploadedFile.setFileName(fileOriginalFileName);
 		uploadedFile.setAuthor(authToken.getAuthenticationToken());
 		uploadedFile.setSessionId(authToken.getImportTokenSessionId());
 		uploadedFile.setValid(srcProcessor.isValidInput());
