@@ -38,7 +38,6 @@ import org.devgateway.importtool.services.processor.helper.DocumentMapper;
 import org.devgateway.importtool.services.processor.helper.IDestinationProcessor;
 import org.devgateway.importtool.services.processor.helper.IDocumentMapper;
 import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
-import org.devgateway.importtool.services.processor.helper.JsonBean;
 import org.devgateway.importtool.services.request.ImportRequest;
 import org.devgateway.importtool.services.response.DocumentMappingResponse;
 import org.devgateway.importtool.services.response.ImportExecuteResponse;
@@ -54,10 +53,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.ls.DOMImplementationLS;
-import org.w3c.dom.ls.LSSerializer;
 
 
 @RestController
@@ -74,9 +69,6 @@ class ImportController  {
 	
 	@Autowired
 	private DataFetchService dataFetchService;
-	
-	@Autowired
-	private DataSourceService dataSourceService;
 	
 	private Log log = LogFactory.getLog(getClass());
 

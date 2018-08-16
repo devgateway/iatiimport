@@ -47,6 +47,7 @@ public class DataFetchService {
 
 		String customUrl = dataSourceService.getDataSourceURL(reportingOrg);
 		customUrl = (customUrl != null) ? customUrl : DataFetchServiceConstants.DEFAULT_URL;
+		
 		return customUrl;
 	}
 
@@ -56,7 +57,9 @@ public class DataFetchService {
 
 		 RestTemplate restTemplate = new RestTemplate();
 		 //TODO: iterate - pulling data in batches of 50 and adding to results object
-
+		 log.info(getUrlForReportingOrg(reportingOrg) +
+				 getParameters(parameters));
+		 
 		 String responseText = restTemplate.getForObject(getUrlForReportingOrg(reportingOrg) +
 				 getParameters(parameters), String.class);
 
@@ -109,6 +112,7 @@ public class DataFetchService {
 				NodeList iatiVersions = (NodeList) xPath.compile(iatiVersionXPatch.toString()).evaluate(doc,
 						XPathConstants.NODESET);
 				for (int i = 0; i < iatiVersions.getLength(); i++) {
+					log.info((iatiVersions.item(i).getNodeValue()));
 					result.getVersions().add(iatiVersions.item(i).getNodeValue());
 				}
 				Node iatiNode = (Node) xPath.compile("/result/iati-activities").evaluate(doc, XPathConstants.NODE);

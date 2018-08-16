@@ -34,15 +34,13 @@ class DataSourceController {
 	@RequestMapping(method = RequestMethod.GET, value="reporting-orgs")
 	ResponseEntity<List<ReportingOrganization>> getOrganizations(HttpServletRequest request) {	
 		List<ReportingOrganization> orgs = new ArrayList<>();
-		ReportingOrganization org1 = new ReportingOrganization("01", "Organization 1");
+		ReportingOrganization org1 = new ReportingOrganization("FI-3", "Ministry for Foreign Affairs of Finland");
 		orgs.add(org1);
-		ReportingOrganization org2 = new ReportingOrganization("02", "Organization 2");
+		ReportingOrganization org2 = new ReportingOrganization("30001", "Global Alliance for Improved Nutrition");
 		orgs.add(org2);
-		ReportingOrganization org3 = new ReportingOrganization("03", "Organization 3");
+		ReportingOrganization org3 = new ReportingOrganization("41119", "United Nations Population Fund");
 		orgs.add(org3);
-		ReportingOrganization org4 = new ReportingOrganization("04", "Organization 4");
-		orgs.add(org4);
-		
+			
 		return new ResponseEntity<>(orgs, HttpStatus.OK);	
 	}
 	
