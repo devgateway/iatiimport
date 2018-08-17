@@ -1,30 +1,10 @@
 package org.devgateway.importtool.rest;
 
-import static org.devgateway.importtool.services.processor.helper.Constants.CURRENT_FILE_ID;
-import static org.devgateway.importtool.services.processor.helper.Constants.DESTINATION_PROCESSOR;
-import static org.devgateway.importtool.services.processor.helper.Constants.DOCUMENT_MAPPER;
-import static org.devgateway.importtool.services.processor.helper.Constants.IATI_STORE_ACTIVITIES;
-import static org.devgateway.importtool.services.processor.helper.Constants.SESSION_TOKEN;
-import static org.devgateway.importtool.services.processor.helper.Constants.SOURCE_PROCESSOR;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.dao.FileRepository;
 import org.devgateway.importtool.dao.ProjectRepository;
 import org.devgateway.importtool.endpoint.DataFetchServiceConstants;
-import org.devgateway.importtool.endpoint.EPConstants;
 import org.devgateway.importtool.endpoint.EPMessages;
 import org.devgateway.importtool.endpoint.Param;
 import org.devgateway.importtool.model.FetchResult;
@@ -32,7 +12,6 @@ import org.devgateway.importtool.model.File;
 import org.devgateway.importtool.model.ImportSummary;
 import org.devgateway.importtool.security.ImportSessionToken;
 import org.devgateway.importtool.services.DataFetchService;
-import org.devgateway.importtool.services.DataSourceService;
 import org.devgateway.importtool.services.ImportService;
 import org.devgateway.importtool.services.processor.helper.DocumentMapper;
 import org.devgateway.importtool.services.processor.helper.IDestinationProcessor;
@@ -53,6 +32,22 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+
+import static org.devgateway.importtool.services.processor.helper.Constants.CURRENT_FILE_ID;
+import static org.devgateway.importtool.services.processor.helper.Constants.DESTINATION_PROCESSOR;
+import static org.devgateway.importtool.services.processor.helper.Constants.DOCUMENT_MAPPER;
+import static org.devgateway.importtool.services.processor.helper.Constants.IATI_STORE_ACTIVITIES;
+import static org.devgateway.importtool.services.processor.helper.Constants.SESSION_TOKEN;
+import static org.devgateway.importtool.services.processor.helper.Constants.SOURCE_PROCESSOR;
 
 
 @RestController
@@ -81,11 +76,17 @@ class ImportController  {
 		request.getSession().removeAttribute(SESSION_TOKEN);
 		request.getSession().removeAttribute(DOCUMENT_MAPPER);
 		ISourceProcessor srcProcessor = importService.getSourceProcessor(sourceProcessorName);
-		request.getSession().setAttribute(SOURCE_PROCESSOR, srcProcessor);
 		IDestinationProcessor destProcessor = importService.getDestinationProcessor(destinationProcessorName, authenticationToken);
 		request.getSession().setAttribute(DESTINATION_PROCESSOR, destProcessor);
 		ImportSessionToken importSessionToken = new ImportSessionToken(authenticationToken, userName, new Date(), srcProcessor.getDescriptiveName(), destProcessor.getDescriptiveName());
 		request.getSession().setAttribute(SESSION_TOKEN, importSessionToken);
+		if(request.getSession().getAttribute("IATI_STORE_ACTIVITIES")!= null) {
+            FetchResult fr = (FetchResult)
+                    request.getSession().getAttribute("IATI_STORE_ACTIVITIES");
+            srcProcessor.setFromDataStore(true);
+            srcProcessor.setInput(fr.getActivities());
+        }
+		request.getSession().setAttribute(SOURCE_PROCESSOR, srcProcessor);
 		return new ResponseEntity<>(importSessionToken, HttpStatus.OK);
 	}
 	@RequestMapping(method = RequestMethod.GET, value = "/refresh/{authenticationToken}")
@@ -151,7 +152,7 @@ class ImportController  {
 
 
 	
-	@RequestMapping(method = RequestMethod.POST, value = "/filter")
+	@RequestMapping(method = RequestMethod.POST, value = "/fetch")
 	ResponseEntity<ImportSessionToken> filter(@PathVariable String authenticationToken) {
 		ImportSessionToken authObject = new ImportSessionToken(authenticationToken, "", new Date(), "", null);
 		// TODO: Execute the filters
@@ -231,7 +232,7 @@ class ImportController  {
         try {
             List<Param> params = DataFetchServiceConstants.getCommonParams(reportingOrgId);
             FetchResult activitiesFromDataStore = dataFetchService.fetchResult(reportingOrgId, params);
-            request.getSession().setAttribute(IATI_STORE_ACTIVITIES,activitiesFromDataStore.getActivities());
+            request.getSession().setAttribute(IATI_STORE_ACTIVITIES,activitiesFromDataStore);
             return new ResponseEntity<>(activitiesFromDataStore.getVersions(), HttpStatus.OK);
         } catch (Exception e) {
             log.error(e);

@@ -115,16 +115,9 @@ public class DataFetchService {
 					log.info((iatiVersions.item(i).getNodeValue()));
 					result.getVersions().add(iatiVersions.item(i).getNodeValue());
 				}
-				Node iatiNode = (Node) xPath.compile("/result/iati-activities").evaluate(doc, XPathConstants.NODE);
-				Document newXmlDocument = DocumentBuilderFactory.newInstance()
-						.newDocumentBuilder().newDocument();
-				newXmlDocument.appendChild(newXmlDocument.importNode(iatiNode, true));
-				result.setActivities(newXmlDocument);
+				result.setActivities(doc);
 
 			} catch (XPathExpressionException e) {
-				//TODO properly handle errors
-				log.error(e);
-			} catch (ParserConfigurationException e) {
 				//TODO properly handle errors
 				log.error(e);
 			}

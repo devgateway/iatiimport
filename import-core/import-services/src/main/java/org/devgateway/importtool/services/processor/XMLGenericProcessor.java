@@ -196,4 +196,9 @@ public class XMLGenericProcessor implements ISourceProcessor {
 		return null;
 	}
 
+	@Override
+	public void setFromDataStore(boolean fromDatastore) {
+
+	}
+
 }

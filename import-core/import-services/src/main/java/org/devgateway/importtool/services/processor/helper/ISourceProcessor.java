@@ -37,6 +37,7 @@ public interface ISourceProcessor {
 	public void setActionStatus(ActionStatus documentMappingStatus);
 
 	public ActionStatus getActionStatus();
-	
-	
+
+
+	void setFromDataStore(boolean fromDatastore);
 }
