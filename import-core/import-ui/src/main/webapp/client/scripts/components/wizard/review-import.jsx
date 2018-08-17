@@ -53,14 +53,20 @@ var ReviewImport = React.createClass({
      } else {
        this.props.eventHandlers.launchImport(this.state.importOption);
      }       
-    },    
+    },  
+    hasMoreVersions: function() {
+        return this.props.versions &&  this.props.processedVersions && (this.props.processedVersions < this.props.versions);
+    },
+    processNextVersion: function() {
+      this.props.eventHandlers.processNextVersion();  
+    },
     render: function () {
     	var statusMessage = this.props.statusMessage.length > 0 ? <div className="alert alert-info" role="alert">{this.props.statusMessage}</div> : "";
         return (
             <div className="panel panel-default">
                 <div className="panel-heading"><strong>{this.props.i18nLib.t('wizard.review_import.review_import')}</strong></div>
                 <div className="panel-body">
-                   {statusMessage}
+                   {statusMessage}                  
                     <div className="row">
                         <div className="col-sm-6 col-md-6">
                          <div className="panel panel-default panel-body">
@@ -110,7 +116,10 @@ var ReviewImport = React.createClass({
                        <button ref="previousButton"   className="btn btn-success navbar-btn btn-custom btn-previous" type="button" onClick={this.handlePrevious}>{this.props.i18nLib.t('wizard.review_import.previous')}</button>
                      </div>
                    <div className="col-md-6">                
-                   <button className="btn btn-warning navbar-btn btn-custom" type="button" onClick={this.goHome}>{this.props.i18nLib.t('wizard.review_import.restart')}</button>&nbsp;
+                       {this.hasMoreVersions() &&
+                           <button className="btn btn-warning navbar-btn btn-custom" type="button" onClick={this.processNextVersion}>{this.props.i18nLib.t('wizard.review_import.process_next_version')}</button>
+                       }
+                    &nbsp;<button className="btn btn-warning navbar-btn btn-custom" type="button" onClick={this.goHome}>{this.props.i18nLib.t('wizard.review_import.restart')}</button>&nbsp;
                    <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.import}>{this.props.i18nLib.t('wizard.review_import.proceed_import')}</button>               
                    </div>
                    </div>                        

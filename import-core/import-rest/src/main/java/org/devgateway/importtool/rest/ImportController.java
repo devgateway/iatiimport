@@ -119,6 +119,7 @@ class ImportController  {
 		request.getSession().removeAttribute(DESTINATION_PROCESSOR);
 		request.getSession().removeAttribute(SESSION_TOKEN);
 		request.getSession().removeAttribute(DOCUMENT_MAPPER);
+		request.getSession().removeAttribute("IATI_STORE_ACTIVITIES");
 		return new ResponseEntity<>("{'error': ''}", HttpStatus.OK);
 	}
 

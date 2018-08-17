@@ -25,6 +25,7 @@ var Wizard = React.createClass({
 			currentStep: this.props.params.src == constants.IMPORT_TYPE_AUTOMATIC ? constants.SELECT_DATASOURCE : constants.UPLOAD_FILE,
 			completedSteps: [],
 			versions:[],
+			processedVersions: [],
 			currentVersion: null,
 			statusMessage: ""
 		};
@@ -36,8 +37,12 @@ var Wizard = React.createClass({
 	},
 	componentDidMount: function() {
 	    if (this.props.params.src !== constants.IMPORT_TYPE_AUTOMATIC) {
+	        this.resetSession();
 	        this.initManualImport();
 	    }
+	},
+	resetSession: function() {
+	      $.get('/importer/import/wipeall', function(){}); 
 	},
 	initManualImport: function() {
 	    var sourceProcessor = this.props.params.src;
@@ -174,17 +179,28 @@ var Wizard = React.createClass({
 	    var self = this;
 	    $.ajax({
             url: '/importer/import/fetch/' + reportingOrgId,
-            success: function(data) {
-                 
-                if (data && data.length > 0) {
-                    self.setState({versions: data, currentVersion: data[0]});
+            success: function(data) {                 
+                if (data && data.length > 0) {                   
+                    self.setState({versions: data, currentVersion: data[0], processedVersions:[data[0]]});
                     self.transitionTo('selectversion', self.props.params); 
                 }
-                $(self.refs.loadingIcon.getDOMNode()).hide();
-                              
+                $(self.refs.loadingIcon.getDOMNode()).hide();                              
             },
             type: 'GET'
          });
+	},
+	processNextVersion: function() {
+	    var processedVersions = this.state.processedVersions;
+	    var currentIndex = this.state.versions.indexOf(this.state.currentVersion);
+	   
+	    var nextIndex = currentIndex + 1;
+	    if (nextIndex <= this.state.versions.length - 1){
+	        var nextVersion = this.state.versions[nextIndex]; 
+	        processedVersions.push(nextVersion);
+	        this.setState({currentVersion: nextVersion, processedVersions: processedVersions})
+	    }	
+	    
+	    this.transitionTo('selectversion', this.props.params);
 	},
 	navigateBack: function(){
 		if(this.setIntervalId){
@@ -344,6 +360,7 @@ var Wizard = React.createClass({
     eventHandlers.goHome = this.goHome;
     eventHandlers.fetchData = this.fetchData;
     eventHandlers.initAutomaticImport = this.initAutomaticImport;
+    eventHandlers.processNextVersion = this.processNextVersion;
 
     var error;
     if(Cookies.get("DESTINATION_AUTH_TOKEN") == "null" || Cookies.get("DESTINATION_AUTH_TOKEN") == "undefined"){
@@ -356,9 +373,13 @@ var Wizard = React.createClass({
 
     return (
       <div>
-      <div className="wizard-container" >
-      <h2>{this.props.i18nLib.t('wizard.import_process')}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      <small>{this.state.info.sourceProcessorName} {window.i18nLib.t('header.nav.menu.submenu.to')} {this.state.info.destinationProcessorName} </small></h2>
+      <div className="wizard-container" > 
+     <h2>{this.props.i18nLib.t('wizard.import_process')}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      {this.state.info.sourceProcessorName && this.state.info.destinationProcessorName &&
+          
+          <small>{this.state.info.sourceProcessorName} {window.i18nLib.t('header.nav.menu.submenu.to')} {this.state.info.destinationProcessorName} </small> 
+      }      
+      </h2>
       <div className="row">
       <WizardSteps {...this.props} currentStep = {this.state.currentStep} completedSteps= {this.state.completedSteps} />
       <div className="col-sm-10 col-md-10 main " >
@@ -368,7 +389,7 @@ var Wizard = React.createClass({
          <span ref="message"></span>
        </div>
       <div className="loading-icon" ref="loadingIcon"></div>
-      <RouteHandler eventHandlers={eventHandlers} {...this.props} statusMessage = {this.state.statusMessage} versions = {this.state.versions} currentVersion = {this.state.currentVersion}/>
+      <RouteHandler eventHandlers={eventHandlers} {...this.props} statusMessage = {this.state.statusMessage} versions = {this.state.versions} currentVersion = {this.state.currentVersion} processedVersions = {this.state.processedVersions}/>
       </div>
       </div>
       </div>

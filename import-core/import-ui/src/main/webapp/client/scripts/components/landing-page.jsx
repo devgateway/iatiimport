@@ -9,6 +9,12 @@ var LandingPage = React.createClass({
     getInitialState: function() {
 		return {importType: null};
 	}, 
+    componentDidMount: function() {
+	   this.resetSession();	   
+	},
+	resetSession: function() {
+	    $.get('/importer/import/wipeall', function(){}); 
+	},
 	onChange: function(event) {    
 	   this.setState({importType: event.target.value});	   
 	},

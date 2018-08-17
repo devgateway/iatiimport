@@ -21,12 +21,13 @@ var SelectVersion = React.createClass({
     handleNext: function() {
         this.props.eventHandlers.initAutomaticImport();
     },
-    render: function() {      
+    render: function() {
+        console.log(this.props);
         return (
             <div className="panel panel-default">
                 <div className="panel-heading"><strong>{this.props.i18nLib.t('select_version.title')}</strong></div>
                 <div className="panel-body">
-                {this.props.versions &&
+                {this.props.versions.length &&
                     <div>
                      <label>{this.props.i18nLib.t('select_version.currently_importing')} {this.props.currentVersion}</label> <br/>  
                       {this.props.versions.filter(function(v){ return v != this.props.currentVersion}.bind(this)).length > 0 &&
@@ -34,8 +35,11 @@ var SelectVersion = React.createClass({
                           <label>{this.props.i18nLib.t('select_version.other_versions_available')}</label> <br/>                    
                            <ul className="list-unstyled workflow-selector">
                                {this.props.versions.filter(function(v){ return v != this.props.currentVersion}.bind(this)).map(function(version){
-                                  return (<li className="workflow-link">{version}</li>);  
-                               })}
+                                  return (<li className="workflow-link">{version} 
+                                  {this.props.processedVersions.indexOf(version) != -1 &&
+                                     <span>&nbsp; {this.props.i18nLib.t('select_version.imported')}</span>
+                                  }</li>);  
+                               }.bind(this))}
                            </ul>      
                             <br/>
                            {this.props.i18nLib.t('select_version.import_will_repeat')}                            
@@ -43,6 +47,8 @@ var SelectVersion = React.createClass({
                       }                     
                     </div>
                 }
+                
+               
                 </div>
                 <div className="buttons">
                     <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.handleNext}>{this.props.i18nLib.t('data_source.next')}</button>

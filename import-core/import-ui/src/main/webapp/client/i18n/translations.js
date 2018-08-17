@@ -170,7 +170,8 @@ module.exports = {
 							'import_option_add_missing_explanation':'Only adds new funding information to the project. Existing funding information is not overwritten',
 							'import_option_replace': 'Replace funding information',
 							'import_option_replace_explanation': 'Replaces funding information in the AMP project with funding information from the IATI file. This is done per donor. Data for donors that are not reporting is not affected.',
-							'import_option_replace_prompt': 'You have selected the "Replace funding information" Import option. This option updates existing activities by overwriting the fundings for donors that have data in the IATI file. Do you want to proceed? '
+							'import_option_replace_prompt': 'You have selected the "Replace funding information" Import option. This option updates existing activities by overwriting the fundings for donors that have data in the IATI file. Do you want to proceed? ',
+							'process_next_version' :'Process Next Version'
 						},
 						'mappings_dropdown' : {
 							'confirm_delete' : 'Are you sure you want to delete  __templateName__ ?'
@@ -247,7 +248,9 @@ module.exports = {
 						'title': 'Select Version',
 						'currently_importing': 'You are about to process data for version',
 						'other_versions_available': 'This publisher also has data for the following versions:',
-						'import_will_repeat': 'The import process will be repeated for each version.'
+						'import_will_repeat': 'The import process will be repeated for each version.',
+						'imported': '(IMPORTED)',
+						'all_versions_imported': 'All versions have been imported'
 					}
 				}
 			},
