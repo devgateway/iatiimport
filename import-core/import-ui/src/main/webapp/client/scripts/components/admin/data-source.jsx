@@ -136,7 +136,7 @@ var DataSource = React.createClass({
        <br/>        
        {this.state.dsValidationErrors.length > 0 &&
            <div className="alert alert-danger " role="alert" ref="messageBox">
-            <span className="sr-only">Error:</span>
+            <span className="sr-only">{window.i18nLib.t('data_source.error')}</span>
              {this.state.dsValidationErrors.map(function(key) {
                  return <span ref="message"> {window.i18nLib.t(key)}</span>
              })}               

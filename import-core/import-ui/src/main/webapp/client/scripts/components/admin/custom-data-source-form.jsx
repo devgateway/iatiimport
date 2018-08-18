@@ -69,16 +69,15 @@ var CustomDataSourceForm = React.createClass({
                          <div className="modal-body">   
                         {this.state.validationErrors.length > 0 &&
                          <div className="alert alert-danger " role="alert" ref="messageBox">
-                          <span className="sr-only">Error:</span>
+                          <span className="sr-only">{window.i18nLib.t('data_source.error')}</span>
                           {this.state.validationErrors.map(function(key) {
                             return <div> {window.i18nLib.t(key)}</div>
                           })}               
                          </div> 
                         }
-                          <label for="reportingOrgId">{window.i18nLib.t('data_source.reporting_org')}</label>
-                          
+                        <label for="reportingOrgId">{window.i18nLib.t('data_source.reporting_org')}</label>                          
                           <select id="reportingOrgId" className="form-control" onChange={this.updateField.bind(this, 'reportingOrgId')} value={this.props.customDataSource.reportingOrgId}> 
-                           <option value="" >Select Reporting Org</option>
+                           <option value="" >{window.i18nLib.t('data_source.select_reporting_org')}</option>
                            {this.props.reportingOrgs.map(function(org){
                                return (<option value={org.orgId}>{org.name} </option>)
                            })                               

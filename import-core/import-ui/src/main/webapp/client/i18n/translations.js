@@ -37,7 +37,7 @@ module.exports = {
 						'import_process' : 'Import Process',
 						'steps' : {
 							'upload_files' : ' Upload File(s)',
-							'select_data_source': ' Select DataSource',
+							'select_data_source': ' Select Data Source',
 							'select_version': 'Select Version',
 							'filter_data' : ' Filter Data',
 							'choose_projects' : ' Choose Projects',
@@ -234,6 +234,7 @@ module.exports = {
 						'save': 'Save',
 						'exception_url': 'URL',
 						'reporting_org': 'Reporting Organization',
+						'select_reporting_org': 'Select Reporting Organization',
 						'update': 'Update',
 						'cancel': 'Cancel',
 						'validation_default_url_required': 'Default URL is required',
@@ -242,7 +243,8 @@ module.exports = {
 						'validation_invalid_url': 'Invalid URL',
 						'select_data_source': 'Select Data Source',
 						'select_data_reporting_org': 'Select the reporting organization to import from:',
-						'next': 'Next'						
+						'next': 'Next',
+						'error': 'Error:'
 					},
 					'select_version': {
 						'title': 'Select Version',
