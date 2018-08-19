@@ -19,6 +19,7 @@ import org.devgateway.importtool.services.processor.helper.IDocumentMapper;
 import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
 import org.devgateway.importtool.services.request.ImportRequest;
 import org.devgateway.importtool.services.response.DocumentMappingResponse;
+import org.devgateway.importtool.services.response.ImportConfiguration;
 import org.devgateway.importtool.services.response.ImportExecuteResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -68,7 +69,7 @@ class ImportController  {
 	private Log log = LogFactory.getLog(getClass());
 
 	@RequestMapping(method = RequestMethod.GET, value = "/new/{sourceProcessorName}/{destinationProcessorName}/{authenticationToken}/{userName}")
-	ResponseEntity<ImportSessionToken> initiateImport(@PathVariable String sourceProcessorName, @PathVariable String destinationProcessorName, @PathVariable String authenticationToken, @PathVariable String userName,
+	ResponseEntity<ImportConfiguration> initiateImport(@PathVariable String sourceProcessorName, @PathVariable String destinationProcessorName, @PathVariable String authenticationToken, @PathVariable String userName,
 			HttpServletRequest request) {
 		log.debug("Initialized import");
 		request.getSession().removeAttribute(SOURCE_PROCESSOR);
@@ -87,7 +88,8 @@ class ImportController  {
             srcProcessor.setInput(fr.getActivities());
         }
 		request.getSession().setAttribute(SOURCE_PROCESSOR, srcProcessor);
-		return new ResponseEntity<>(importSessionToken, HttpStatus.OK);
+		ImportConfiguration importConfig = new ImportConfiguration(importSessionToken, srcProcessor.getFields());
+			return new ResponseEntity<>(importConfig, HttpStatus.OK);
 	}
 	@RequestMapping(method = RequestMethod.GET, value = "/refresh/{authenticationToken}")
 	public ResponseEntity<List<File>> refreshToken(@PathVariable String authenticationToken, HttpServletRequest request) {
@@ -119,7 +121,8 @@ class ImportController  {
 		request.getSession().removeAttribute(DESTINATION_PROCESSOR);
 		request.getSession().removeAttribute(SESSION_TOKEN);
 		request.getSession().removeAttribute(DOCUMENT_MAPPER);
-		request.getSession().removeAttribute("IATI_STORE_ACTIVITIES");
+		//TODO we should now wipe this here since its created in the previous step
+		//request.getSession().removeAttribute("IATI_STORE_ACTIVITIES");
 		return new ResponseEntity<>("{'error': ''}", HttpStatus.OK);
 	}
 

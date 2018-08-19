@@ -10,6 +10,9 @@ public class Field {
 	private FieldType type;
 	private String fieldName;
 	private String displayName;
+	//Description will hold the tooltip
+
+	private List<FieldDescription> description;
 	private Map<String, String> attributes;
 	private Map<String, String> multiLangDisplayName;
 	private List<Field> childFields;
@@ -32,9 +35,16 @@ public class Field {
 	private String subTypeCode = "";
 
 	public Field() {
+		FieldDescription fr =  new FieldDescription("FR","tooltip in fr");
+		FieldDescription en =  new FieldDescription("EN","tooltip in fr");
+		description = new ArrayList<>();
+		description.add(fr);
+		description.add(en);
+
 	}
 
 	public Field(String displayName, String fieldName, FieldType type) {
+		this();
 		this.displayName = displayName;
 		this.fieldName = fieldName;
 		this.type = type;
@@ -120,7 +130,13 @@ public class Field {
 	public void setDisplayName(String displayName) {
 		this.displayName = displayName;
 	}
+	public List<FieldDescription> getDescription() {
+		return description;
+	}
 
+	public void setDescription(List<FieldDescription> description) {
+		this.description = description;
+	}
 	public boolean isMappable() {
 		return isMappable;
 	}
