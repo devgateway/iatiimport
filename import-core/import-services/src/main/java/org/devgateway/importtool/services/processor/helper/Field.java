@@ -1,6 +1,7 @@
 package org.devgateway.importtool.services.processor.helper;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -11,8 +12,7 @@ public class Field {
 	private String fieldName;
 	private String displayName;
 	//Description will hold the tooltip
-
-	private List<FieldDescription> description;
+	private Map<String,String> description = new HashMap<>();;
 	private Map<String, String> attributes;
 	private Map<String, String> multiLangDisplayName;
 	private List<Field> childFields;
@@ -35,12 +35,8 @@ public class Field {
 	private String subTypeCode = "";
 
 	public Field() {
-		FieldDescription fr =  new FieldDescription("FR","tooltip in fr");
-		FieldDescription en =  new FieldDescription("EN","tooltip in fr");
-		description = new ArrayList<>();
-		description.add(fr);
-		description.add(en);
-
+		description.put("EN","tooltip for eng");
+		description.put("FR","tooltip for FR");
 	}
 
 	public Field(String displayName, String fieldName, FieldType type) {
@@ -130,11 +126,11 @@ public class Field {
 	public void setDisplayName(String displayName) {
 		this.displayName = displayName;
 	}
-	public List<FieldDescription> getDescription() {
+	public Map<String,String> getDescription() {
 		return description;
 	}
 
-	public void setDescription(List<FieldDescription> description) {
+	public void setDescription (Map<String,String> description) {
 		this.description = description;
 	}
 	public boolean isMappable() {

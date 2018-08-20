@@ -10,6 +10,8 @@ public class IATI202Processor extends IATI2XProcessor {
 		PROCESSOR_VERSION = "2.02";
 		descriptiveName = "IATI 2.02";
 		codelistPath = "IATI202/codelist/";
+		codelistPath = "IATI202/schema/";
+		activtySchemaName = "iati-activities-schema.xsd";
 		propertiesFile = "IATI202/IATI202Processor.properties";
 		configureDefaults();
 		instantiateStaticFields();

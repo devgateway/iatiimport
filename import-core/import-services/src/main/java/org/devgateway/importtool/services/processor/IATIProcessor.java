@@ -8,7 +8,11 @@ import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -38,7 +42,9 @@ public abstract class IATIProcessor implements ISourceProcessor {
     public static String DEFAULT_GROUPING_FIELD = "reporting-org";
 
     protected String PROCESSOR_VERSION = "";
-
+    protected String codelistPath = "";
+    protected String schemaPath = "";
+    protected String activtySchemaName = null;
     // XML Document that will hold the entire imported file
     protected Document doc;
     protected String propertiesFile = "";
@@ -212,4 +218,38 @@ public abstract class IATIProcessor implements ISourceProcessor {
         return "@*[name()='iati-extra:version']='"+ PROCESSOR_VERSION +"']";
     }
 
+    protected Document getDocument(String fileName) throws ParserConfigurationException, SAXException, IOException {
+        InputStream is = this.getClass().getResourceAsStream(fileName);
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setValidating(false);
+        factory.setIgnoringElementContentWhitespace(true);
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        return builder.parse(is);
+    }
+
+    protected Map<String,String>  buildTooltipsFields() throws IOException, SAXException,
+            ParserConfigurationException ,XPathExpressionException{
+
+        XPath xPath = XPathFactory.newInstance().newXPath();
+
+        String descriptionXPath ="//xsd:element[@name='%s']/xsd:annotation/xsd:documentation";
+
+        Document doc = getDocument(this.schemaPath + this.activtySchemaName );
+
+
+        Map<String,String> xPaths = new HashMap<>();
+        this.fieldList.stream().forEach(field -> {
+
+            try {
+                NodeList activities = (NodeList) xPath.compile(String.format(descriptionXPath, field.getFieldName())).
+                        evaluate(this.getDoc(), XPathConstants.NODESET);
+                System.out.println(activities.getLength());
+            } catch (XPathExpressionException e) {
+                e.printStackTrace();
+            }
+
+        });
+
+        return xPaths;
+    }
 }

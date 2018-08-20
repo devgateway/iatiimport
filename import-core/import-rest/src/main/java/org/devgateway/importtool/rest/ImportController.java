@@ -19,7 +19,6 @@ import org.devgateway.importtool.services.processor.helper.IDocumentMapper;
 import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
 import org.devgateway.importtool.services.request.ImportRequest;
 import org.devgateway.importtool.services.response.DocumentMappingResponse;
-import org.devgateway.importtool.services.response.ImportConfiguration;
 import org.devgateway.importtool.services.response.ImportExecuteResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -69,7 +68,7 @@ class ImportController  {
 	private Log log = LogFactory.getLog(getClass());
 
 	@RequestMapping(method = RequestMethod.GET, value = "/new/{sourceProcessorName}/{destinationProcessorName}/{authenticationToken}/{userName}")
-	ResponseEntity<ImportConfiguration> initiateImport(@PathVariable String sourceProcessorName, @PathVariable String destinationProcessorName, @PathVariable String authenticationToken, @PathVariable String userName,
+	ResponseEntity<ImportSessionToken> initiateImport(@PathVariable String sourceProcessorName, @PathVariable String destinationProcessorName, @PathVariable String authenticationToken, @PathVariable String userName,
 			HttpServletRequest request) {
 		log.debug("Initialized import");
 		request.getSession().removeAttribute(SOURCE_PROCESSOR);
@@ -88,8 +87,7 @@ class ImportController  {
             srcProcessor.setInput(fr.getActivities());
         }
 		request.getSession().setAttribute(SOURCE_PROCESSOR, srcProcessor);
-		ImportConfiguration importConfig = new ImportConfiguration(importSessionToken, srcProcessor.getFields());
-			return new ResponseEntity<>(importConfig, HttpStatus.OK);
+			return new ResponseEntity<>(importSessionToken, HttpStatus.OK);
 	}
 	@RequestMapping(method = RequestMethod.GET, value = "/refresh/{authenticationToken}")
 	public ResponseEntity<List<File>> refreshToken(@PathVariable String authenticationToken, HttpServletRequest request) {
@@ -243,4 +241,14 @@ class ImportController  {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/translation-files")
+	ResponseEntity<String> generateTranslationFiles(HttpServletRequest request) {
+
+
+		ISourceProcessor srcProcessor = importService.getSourceProcessor("IATI202");
+
+		return new ResponseEntity<>("{}", HttpStatus.OK);
+	}
+
 }
