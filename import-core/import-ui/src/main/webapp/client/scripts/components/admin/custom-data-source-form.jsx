@@ -54,7 +54,20 @@ var CustomDataSourceForm = React.createClass({
       this.setState({validationErrors: validationErrors});      
       return validationErrors.length == 0;
   },
-  render: function() {    
+  render: function() { 
+    var sortedOrgs = this.props.reportingOrgs.sort(function(org1, org2) {
+        var name1 = org1.name.toUpperCase();
+        var name2 = org2.name.toUpperCase();
+        if (name1 < name2) {
+          return -1;
+        }
+        if (name1 > name2) {
+          return 1;
+        }
+
+        return 0;
+      });
+    
     return (
      <div>       
            
@@ -78,7 +91,7 @@ var CustomDataSourceForm = React.createClass({
                         <label for="reportingOrgId">{window.i18nLib.t('data_source.reporting_org')}</label>                          
                           <select id="reportingOrgId" className="form-control" onChange={this.updateField.bind(this, 'reportingOrgId')} value={this.props.customDataSource.reportingOrgId}> 
                            <option value="" >{window.i18nLib.t('data_source.select_reporting_org')}</option>
-                           {this.props.reportingOrgs.map(function(org){
+                           {sortedOrgs.map(function(org){
                                return (<option value={org.orgId}>{org.name} </option>)
                            })                               
                            }

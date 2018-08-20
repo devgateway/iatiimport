@@ -8,28 +8,47 @@ var SubMenu = require('./sub-menu');
 var ImportProcessMenu = require('./workflow-menu');
 var Router = require('react-router');
 var Link = Router.Link;
+var Cookies = require('js-cookie');
+var appActions = require('./../../actions');
 var Menu = React.createClass({
     mixins              : [
-        reactAsync.Mixin, Reflux.ListenerMixin
+        Reflux.ListenerMixin
     ],
+    getInitialState: function() {
+        return {};
+    },
     componentDidMount   : function () {
         this.listenTo(menuStore, this.updateMenu);
+        this.loadData();
+        
     },
-    getInitialStateAsync: function () {
-        appActions.loadMenuData();
+    loadData: function () {
+        appActions.initDestinationSession.triggerPromise().then(function(data) {
+            Cookies.set("IS_ADMIN", data['is-admin']);  
+            appActions.loadMenuData();
+          }.bind(this))["catch"](function(err) {
+          }.bind(this));        
+        
     },
     updateMenu          : function (data) {
         this.setState({
             menuData: data.menuData
         });
     },
-    render              : function () {
+    isAllowed: function(item) {        
+        if (item.name == 'admin'){
+            return Cookies.get("IS_ADMIN") == 'true' || Cookies.get("IS_ADMIN") == true;
+        }
+        
+        return true;        
+    },
+    render: function () {      
         var menusLeft = [];
         var menusRight = [];
         var self = this;
         if (this.state.menuData) {
-            this.state.menuData.forEach(function (item) {
-                if (item && item.enabled) {
+            this.state.menuData.forEach(function (item) {                
+                if (item && item.enabled && this.isAllowed(item)) {
                     var iconClass = 'glyphicon ';
                     if (item.iconClass) {
                         iconClass += item.iconClass;
@@ -65,7 +84,7 @@ var Menu = React.createClass({
                         </li>);
                     }
                 }
-            });
+            }.bind(this));
         }
         menusLeft.splice(1, 0, <ImportProcessMenu {...self.props} />);
         return (
