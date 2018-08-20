@@ -48,13 +48,14 @@ var Wizard = React.createClass({
 	    var sourceProcessor = this.props.params.src;
         var destinationProcessor = this.props.params.dst;       
         appActions.initDestinationSession.triggerPromise().then(function(data) {
-              appConfig.DESTINATION_AUTH_TOKEN = data.token;
+            appConfig.DESTINATION_AUTH_TOKEN = data.token;
             appConfig.DESTINATION_USERNAME = data['user-name'];
-                appConfig.DESTINATION_AUTH_TOKEN_EXPIRATION =  data["token-expiration"] || (new Date).getTime() + (30*60*1000);
+            appConfig.DESTINATION_AUTH_TOKEN_EXPIRATION =  data["token-expiration"] || (new Date).getTime() + (30*60*1000);
             Cookies.set("DESTINATION_AUTH_TOKEN", data.token);
             Cookies.set("DESTINATION_USERNAME", data['user-name']);
             // Added true always for now, the API returns wrong value
             Cookies.set("CAN_ADD_ACTIVITY", true || data['add-activity']);
+            Cookies.set("IS_ADMIN", data['is-admin']);
             Cookies.set("WORKSPACE", data['team']);
 
                 this.initImportSession(sourceProcessor, destinationProcessor);
@@ -83,7 +84,8 @@ var Wizard = React.createClass({
 			    // Added true always for now, the API returns wrong value
 			    Cookies.set("CAN_ADD_ACTIVITY", true || data['add-activity']);
 			    Cookies.set("WORKSPACE", data['team']);
-					$.get(appConfig.TOOL_REST_PATH + '/refresh/' + data.token, function(){});
+			    Cookies.set("IS_ADMIN", data['is-admin']);
+				$.get(appConfig.TOOL_REST_PATH + '/refresh/' + data.token, function(){});
 
 		      }.bind(this))["catch"](function(err) {
 		      }.bind(this));
@@ -286,7 +288,6 @@ var Wizard = React.createClass({
             Cookies.set("WORKSPACE", data['team']);
 
                 this.initImportSession(sourceProcessor, destinationProcessor).then(function(){
-                   console.log('initialized'); 
                    this.transitionTo('filter', this.props.params);
                 }.bind(this))
 
