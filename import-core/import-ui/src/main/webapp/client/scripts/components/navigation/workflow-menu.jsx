@@ -30,7 +30,7 @@ var WorkflowMenu = React.createClass({
             $.map(this.state.workflowData, function(workflow, i) { 
             	if(workflow.enabled){
             		var label = this.props.i18nLib.t(workflow.translationKey)
-                	items.push({name: workflow.label, url: "#/wizard/" + workflow.sourceProcessor.name + "/" + workflow.destinationProcessor.name, label: label, type: "workflow-selector-item"});	
+                	items.push({name: workflow.label, url: "#/wizard/" + workflow.sourceProcessor.name + "/" + workflow.destinationProcessor.name + '/upload', label: label, type: "workflow-selector-item"});	
             	}            	
             }.bind(this));
             
