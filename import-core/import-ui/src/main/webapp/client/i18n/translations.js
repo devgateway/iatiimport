@@ -295,6 +295,8 @@ module.exports = {
 						'steps' : {
 							'upload_files' : ' Cargar Archivo(s)',
 							'filter_data' : ' Filtrar Datos',
+							'select_data_source': ' Select Data Source',
+							'select_version': 'Select Version',
 							'choose_projects' : ' Seleccionar Proyectos',
 							'choose_fields' : ' Seleccionar Campos',
 							'map_values' : ' Mapeo de Valores',
@@ -425,7 +427,9 @@ module.exports = {
 							'import_option_add_missing_explanation':'Only adds new funding information to the project. Existing funding information is not overwritten',
 							'import_option_replace': 'Replace funding information',
 							'import_option_replace_explanation': 'Replaces funding information in the AMP project with funding information from the IATI file. This is done per donor. Data for donors that are not reporting is not affected.',
-							'import_option_replace_prompt': 'You have selected the "Replace funding information" Import option. This option updates existing activities by overwriting the fundings for donors that have data in the IATI file. Do you want to proceed? '
+							'import_option_replace_prompt': 'You have selected the "Replace funding information" Import option. This option updates existing activities by overwriting the fundings for donors that have data in the IATI file. Do you want to proceed? ',
+							'import_option_replace_prompt': 'You have selected the "Replace funding information" Import option. This option updates existing activities by overwriting the fundings for donors that have data in the IATI file. Do you want to proceed? ',
+							'process_next_version' :'Process Next Version'
 						},
 						'mappings_dropdown' : {
 							'confirm_delete' : 'Está seguro de eliminar  __templateName__ ?'
@@ -472,6 +476,42 @@ module.exports = {
 						'destination': 'Procesador de destino',
 						'description': 'Descripción',
 						'enabled': 'Habilitado'
+					},
+
+					'import_type':{
+					    'select_import_type': 'Please select the import type:',
+						'manual': 'Manual',
+						'automatic': 'Automated',
+						'next': 'Next',
+						'description_manual': 'Follow the manual process if you have a valid IATI file that you want to upload.',
+						'description_automatic': 'Follow the automated process if you want to search for available IATI data and pull it directly from the IATI datastore.',
+					},
+					'data_source': {
+						'title': 'Data Source Management',
+						'default_url': 'Default URL',
+						'add_custom_data_source': 'Add Exception',
+						'save': 'Save',
+						'exception_url': 'URL',
+						'reporting_org': 'Reporting Organization',
+						'select_reporting_org': 'Select Reporting Organization',
+						'update': 'Update',
+						'cancel': 'Cancel',
+						'validation_default_url_required': 'Default URL is required',
+						'validation_reporting_org_required': 'Reporting Organization is required',
+						'actions':'Actions',
+						'validation_invalid_url': 'Invalid URL',
+						'select_data_source': 'Select Data Source',
+						'select_data_reporting_org': 'Select the reporting organization to import from:',
+						'next': 'Next',
+						'error': 'Error:'
+					},
+					'select_version': {
+						'title': 'Select Version',
+						'currently_importing': 'You are about to process data for version',
+						'other_versions_available': 'This publisher also has data for the following versions:',
+						'import_will_repeat': 'The import process will be repeated for each version.',
+						'imported': '(IMPORTED)',
+						'all_versions_imported': 'All versions have been imported'
 					}
 				}
 			},
@@ -514,6 +554,8 @@ module.exports = {
 						'steps' : {
 							'upload_files' : ' Télécharger le(s)fichier(s)',
 							'filter_data' : ' Filtrer les données',
+							'select_data_source': ' Select Data Source',
+							'select_version': 'Select Version',
 							'choose_projects' : ' Choisir les projets',
 							'choose_fields' : ' Choisir les champs',
 							'map_values' : ' Faire correspondre les valeurs',
@@ -643,7 +685,9 @@ module.exports = {
 							'import_option_add_missing_explanation': "N'ajoute que les nouvelles informations de financement au projet. Les informations de financement existantes restent inchangées",
 							'import_option_replace': 'Remplacer les informations de financement',
 							'import_option_replace_explanation': "Remplace les informations de financement dans le projet AMP avec des informations de financement provenant du fichier IATI. Ceci est fait par donateur. Les données des donateurs ni figurant pas dans le fichier IATI ne seront pas affectées.",
-							'import_option_replace_prompt': "Vous avez sélectionné l'option d'import Remplacer les informations de financement. Cette option met à jour les activités existantes en écrasant toutes les transactions financières des donateurs qui sont inclus dans le fichier de l'IATI. Voulez-vous continuer?"
+							'import_option_replace_prompt': "Vous avez sélectionné l'option d'import Remplacer les informations de financement. Cette option met à jour les activités existantes en écrasant toutes les transactions financières des donateurs qui sont inclus dans le fichier de l'IATI. Voulez-vous continuer?",
+							'import_option_replace_prompt': 'You have selected the "Replace funding information" Import option. This option updates existing activities by overwriting the fundings for donors that have data in the IATI file. Do you want to proceed? ',
+							'process_next_version' :'Process Next Version'
 						},
 						'mappings_dropdown' : {
 							'confirm_delete' : ' Etes - vous sûr(e)de vouloir supprimer __templateName__ ? '
@@ -691,6 +735,14 @@ module.exports = {
 							'description': 'Description',
 							'enabled': 'Enabled'
 						},
+						'import_type':{
+						    'select_import_type': 'Please select the import type:',
+							'manual': 'Manual',
+							'automatic': 'Automated',
+							'next': 'Next',
+							'description_manual': 'Follow the manual process if you have a valid IATI file that you want to upload.',
+							'description_automatic': 'Follow the automated process if you want to search for available IATI data and pull it directly from the IATI datastore.',
+						},
 						'data_source': {
 							'title': 'Data Source Management',
 							'default_url': 'Default URL',
@@ -698,12 +750,25 @@ module.exports = {
 							'save': 'Save',
 							'exception_url': 'URL',
 							'reporting_org': 'Reporting Organization',
+							'select_reporting_org': 'Select Reporting Organization',
 							'update': 'Update',
 							'cancel': 'Cancel',
 							'validation_default_url_required': 'Default URL is required',
 							'validation_reporting_org_required': 'Reporting Organization is required',
 							'actions':'Actions',
-							'validation_invalid_url': 'Invalid URL'
+							'validation_invalid_url': 'Invalid URL',
+							'select_data_source': 'Select Data Source',
+							'select_data_reporting_org': 'Select the reporting organization to import from:',
+							'next': 'Next',
+							'error': 'Error:'
+						},
+						'select_version': {
+							'title': 'Select Version',
+							'currently_importing': 'You are about to process data for version',
+							'other_versions_available': 'This publisher also has data for the following versions:',
+							'import_will_repeat': 'The import process will be repeated for each version.',
+							'imported': '(IMPORTED)',
+							'all_versions_imported': 'All versions have been imported'
 						}
 				}
 			}
