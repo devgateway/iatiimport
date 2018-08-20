@@ -52,7 +52,6 @@ public class IATI2XProcessor extends IATIProcessor {
 
 	private String DEFAULT_TITLE_FIELD = "title";
 	protected String descriptiveName = "";
-	protected String codelistPath = "";
 	public String getCodelistPath() {
 		return codelistPath;
 	}

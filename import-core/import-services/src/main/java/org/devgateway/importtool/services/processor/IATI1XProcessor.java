@@ -51,7 +51,6 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 	protected String DEFAULT_TITLE_FIELD = "title";
 
 	protected String descriptiveName = "";
-	protected String codelistPath = "";
 
 	protected ActionStatus actionStatus;
 
@@ -240,14 +239,8 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 	private List<FieldValue> getCodeListValues(String codeListName, Boolean concatenate) {
 		String standardFieldName = IATIProcessorHelper.mappingNameFile.get(codeListName);
 		List<FieldValue> possibleValues = new ArrayList<FieldValue>();
-		InputStream is = this.getClass().getResourceAsStream(this.getCodelistPath() + standardFieldName + ".xml");
-		if (is != null) {
 			try {
-				DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-				factory.setValidating(false);
-				factory.setIgnoringElementContentWhitespace(true);
-				DocumentBuilder builder = factory.newDocumentBuilder();
-				Document doc = builder.parse(is);
+                Document doc = getDocument(this.getCodelistPath() + standardFieldName + ".xml");
 				NodeList nodeList = doc.getElementsByTagName(standardFieldName);
 				if (nodeList.getLength() == 0) {
 					nodeList = doc.getElementsByTagName("codelist-item");
@@ -278,11 +271,10 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 			} catch (ParserConfigurationException | SAXException | IOException e) {
 				log.error("IOException Parsing Source File: " + e);
 			}
-		}
 		return possibleValues;
 	}
 
-	private String getFieldName(String fieldName) {
+    private String getFieldName(String fieldName) {
 		String name = fieldName;
 		switch(fieldName) {
 		case "sector":
