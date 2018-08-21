@@ -102,6 +102,14 @@ public abstract class IATIProcessor implements ISourceProcessor {
         this.filterFieldList = filterFieldList;
     }
 
+    public boolean isFromDatastore() {
+        return fromDatastore;
+    }
+
+    public void setFromDatastore(boolean fromDatastore) {
+        this.fromDatastore = fromDatastore;
+    }
+
     @Override
     public List<Field> getFields() {
         return fieldList;
@@ -228,28 +236,30 @@ public abstract class IATIProcessor implements ISourceProcessor {
     }
 
     protected Map<String,String>  buildTooltipsFields() throws IOException, SAXException,
-            ParserConfigurationException ,XPathExpressionException{
+            ParserConfigurationException ,XPathExpressionException {
+        String descriptionXPath = "//xsd:element[@name='%s']/xsd:annotation/xsd:documentation";
 
-        XPath xPath = XPathFactory.newInstance().newXPath();
-
-        String descriptionXPath ="//xsd:element[@name='%s']/xsd:annotation/xsd:documentation";
-
-        Document doc = getDocument(this.schemaPath + this.activtySchemaName );
+        Document doc = getDocument(this.schemaPath + this.activtySchemaName);
 
 
-        Map<String,String> xPaths = new HashMap<>();
+        Map<String, String> xPaths = new HashMap<>();
         this.fieldList.stream().forEach(field -> {
 
-            try {
-                NodeList activities = (NodeList) xPath.compile(String.format(descriptionXPath, field.getFieldName())).
-                        evaluate(this.getDoc(), XPathConstants.NODESET);
-                System.out.println(activities.getLength());
-            } catch (XPathExpressionException e) {
-                e.printStackTrace();
-            }
-
+            NodeList activities = getNodeListFromXpath(this.doc, String.format(descriptionXPath, field.getFieldName
+                    ()));
+            System.out.println(activities.getLength());
         });
-
         return xPaths;
+    }
+
+    protected NodeList getNodeListFromXpath(Document xDoc, String xpath)  {
+
+        XPath xPath = XPathFactory.newInstance().newXPath();
+        try {
+            return (NodeList) xPath.compile(xpath).evaluate(xDoc, XPathConstants.NODESET);
+        } catch (XPathExpressionException e) {
+            log.error("Cannot evaluete xpath", e);
+            return null;
+        }
     }
 }

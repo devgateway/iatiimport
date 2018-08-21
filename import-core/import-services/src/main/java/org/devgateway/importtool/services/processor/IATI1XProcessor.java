@@ -150,70 +150,73 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 		Document doc = this.doc;
 		if (doc == null)
 			return getFilterFieldList();
-
-		// List<Field> getFilterFieldList()Reduced = new ArrayList<Field>();
 		for (Field field : getFilterFieldList()) {
-			NodeList nodeList = doc.getElementsByTagName(field.getFieldName());
+			String xPath = "//"+ field.getFieldName() + (this.isFromDatastore()?"[ancestor::iati-activity[@*[name()" +
+					"='iati-extra:version']='"+ PROCESSOR_VERSION +"']]":"");
+			NodeList nodeList = this.getNodeListFromXpath(this.doc , xPath);
+
 			List<FieldValue> reducedPossibleValues = new ArrayList<FieldValue>();
-			switch (field.getType()) {
-			case ORGANIZATION:
-				if (field.getPossibleValues() == null) {
-					field.setPossibleValues(new ArrayList<FieldValue>());
-				}
-				if (nodeList.getLength() > 0) {					
-					for (int i = 0; i < nodeList.getLength(); i++) {
-						Element fieldElement = (Element) nodeList.item(i);
-						final String orgCode = fieldElement.getAttribute("value");
-						Optional<FieldValue> fieldValue = field.getPossibleValues().stream().filter(n -> {
-							return n.getCode().equals(orgCode);
-						}).findFirst();
-						if(!fieldValue.isPresent()) {
-							FieldValue newfv = new FieldValue();
-							final String name = fieldElement.getTextContent();
-							newfv.setCode(orgCode);
-							newfv.setValue(name);							
-							newfv.setIndex(field.getPossibleValues().size());
-							field.getPossibleValues().add(newfv);
+			if(nodeList != null) {
+				switch (field.getType()) {
+					case ORGANIZATION:
+						if (field.getPossibleValues() == null) {
+							field.setPossibleValues(new ArrayList<FieldValue>());
 						}
-					}
-				}
-				break;
-			case LOCATION:
-			case RECIPIENT_COUNTRY:
-			case LIST:
-				if (nodeList.getLength() > 0) {					
-					for (int i = 0; i < nodeList.getLength(); i++) {
-						Element fieldElement = (Element) nodeList.item(i);
-						final String codeValue = fieldElement.getAttribute("code");
-						Optional<FieldValue> fieldValue = field.getPossibleValues().stream().filter(n -> {
-							return n.getCode().equals(codeValue);
-						}).findFirst();
-						
-						if(!fieldValue.isPresent() && !codeValue.isEmpty()){
-							FieldValue newfv = new FieldValue();
-							final String name = fieldElement.getTextContent();
-							newfv.setCode(codeValue);
-							newfv.setValue(name);							
-							newfv.setIndex(field.getPossibleValues().size());
-							field.getPossibleValues().add(newfv);							
-							if (!reducedPossibleValues.stream().filter(n -> {
-								return n.getCode().equals(newfv.getCode());
-							}).findFirst().isPresent()) {
-								reducedPossibleValues.add(newfv);
+						if (nodeList.getLength() > 0) {
+							for (int i = 0; i < nodeList.getLength(); i++) {
+								Element fieldElement = (Element) nodeList.item(i);
+								final String orgCode = fieldElement.getAttribute("value");
+								Optional<FieldValue> fieldValue = field.getPossibleValues().stream().filter(n -> {
+									return n.getCode().equals(orgCode);
+								}).findFirst();
+								if (!fieldValue.isPresent()) {
+									FieldValue newfv = new FieldValue();
+									final String name = fieldElement.getTextContent();
+									newfv.setCode(orgCode);
+									newfv.setValue(name);
+									newfv.setIndex(field.getPossibleValues().size());
+									field.getPossibleValues().add(newfv);
+								}
 							}
 						}
-						
-						if (fieldValue.isPresent() && !reducedPossibleValues.stream().filter(n -> {
-							return n.getCode().equals(fieldValue.get().getCode());
-						}).findFirst().isPresent()) {
-							reducedPossibleValues.add(fieldValue.get());
+						break;
+					case LOCATION:
+					case RECIPIENT_COUNTRY:
+					case LIST:
+						if (nodeList.getLength() > 0) {
+							for (int i = 0; i < nodeList.getLength(); i++) {
+								Element fieldElement = (Element) nodeList.item(i);
+								final String codeValue = fieldElement.getAttribute("code");
+								Optional<FieldValue> fieldValue = field.getPossibleValues().stream().filter(n -> {
+									return n.getCode().equals(codeValue);
+								}).findFirst();
+
+								if (!fieldValue.isPresent() && !codeValue.isEmpty()) {
+									FieldValue newfv = new FieldValue();
+									final String name = fieldElement.getTextContent();
+									newfv.setCode(codeValue);
+									newfv.setValue(name);
+									newfv.setIndex(field.getPossibleValues().size());
+									field.getPossibleValues().add(newfv);
+									if (!reducedPossibleValues.stream().filter(n -> {
+										return n.getCode().equals(newfv.getCode());
+									}).findFirst().isPresent()) {
+										reducedPossibleValues.add(newfv);
+									}
+								}
+
+								if (fieldValue.isPresent() && !reducedPossibleValues.stream().filter(n -> {
+									return n.getCode().equals(fieldValue.get().getCode());
+								}).findFirst().isPresent()) {
+									reducedPossibleValues.add(fieldValue.get());
+								}
+							}
 						}
-					}
+						field.setPossibleValues(reducedPossibleValues);
+						break;
+					default:
+						break;
 				}
-				field.setPossibleValues(reducedPossibleValues);
-				break;
-			default:
-				break;
 			}
 		}
 		return getFilterFieldList();
