@@ -31,7 +31,7 @@ var TabbedArea = React.createClass({
     renderTabs: function() {
         return this.props.paneModels.map(function(panePojo, idx) {
             return (
-                <Tab key={idx} name={panePojo.tabName}                   
+                <Tab key={idx} name={panePojo.tabName}   tooltip={panePojo.tooltip} i18nLib={this.props.i18nLib}              
                     onClick={this.handleClick.bind(this, idx)}
                     isActive={idx === this.props.activeTab}
                 />
