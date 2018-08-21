@@ -198,7 +198,7 @@ public abstract class IATIProcessor implements ISourceProcessor {
         String name = fieldName;
         switch(fieldName) {
             case "sector":
-                name = "transaction/sector";
+                name = "//sector";
                 break;
         }
         return name;

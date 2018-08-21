@@ -38,7 +38,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-
+import org.springframework.util.DigestUtils;
 @Component("IATI2X")
 @Scope("session")
 public class IATI2XProcessor extends IATIProcessor {
@@ -400,31 +400,42 @@ public class IATI2XProcessor extends IATIProcessor {
 							if (fieldElement.getAttribute("role").equals(field.getSubType()) || fieldElement.getAttribute("role").equals(field.getSubTypeCode())) {
 								final String stringOrgValue = fieldElement.getElementsByTagName("narrative").item(0) != null ? fieldElement.getElementsByTagName("narrative").item(0).getTextContent() : "";
 								final String ref = fieldElement.getAttribute("ref");
-								Map<String, String> orgFields = new HashMap<String, String>();
-								orgFields.put("value", stringOrgValue);
-								orgFields.put("role", field.getSubType());
-								orgFields.put("ref", ref);
-								orgFields.put("type", fieldElement.getAttribute("type"));
-								FieldValue fv = new FieldValue();
-								if(stringOrgValue != null && !stringOrgValue.isEmpty() ){
-									fv.setCode(stringOrgValue);
-									fv.setValue(stringOrgValue);
-								}else{
-									fv.setCode(ref);
-									fv.setValue(ref);
-								}
-								fv.setSelected(true);
-								int index = field.getPossibleValues() == null ? 0 : field.getPossibleValues().size();
-								fv.setIndex(index);
-								if (field.getPossibleValues() == null) {
-									field.setPossibleValues(new ArrayList<FieldValue>());
-								}
-								if(!field.getPossibleValues().stream().anyMatch(n->{ return n.getCode().equals(stringOrgValue);})) {
-									field.getPossibleValues().add(fv);
-								}
-								document.addOrganizationField(field.getFieldName() + "_" + field.getSubType() + "_" + index, orgFields);
+								
+								if ((stringOrgValue != null && !stringOrgValue.trim().isEmpty())
+										|| (ref != null && !ref.trim().isEmpty())) {
+
+									Map<String, String> orgFields = new HashMap<String, String>();
+									orgFields.put("value", stringOrgValue);
+									orgFields.put("role", field.getSubType());
+									orgFields.put("ref", ref);
+									orgFields.put("type", fieldElement.getAttribute("type"));
+									FieldValue fv = new FieldValue();
+									if (stringOrgValue != null && !stringOrgValue.isEmpty()) {
+										fv.setCode(stringOrgValue);
+									fv.setValue(stringOrgValue);	
+									} else {
+										fv.setCode(ref);
+										fv.setValue(ref);
+									}
+									fv.setSelected(true);
+									int index = field.getPossibleValues() == null ? 0
+											: field.getPossibleValues().size();
+									fv.setIndex(index);
+									if (field.getPossibleValues() == null) {
+										field.setPossibleValues(new ArrayList<FieldValue>());
+									}
+									if (!field.getPossibleValues().stream().anyMatch(n -> {
+										return n.getCode().equals(stringOrgValue);
+									})) {
+										field.getPossibleValues().add(fv);
+									}
+
+									document.addOrganizationField(field.getFieldName() + "_" + field.getSubType() + "_"
+											+ DigestUtils.md5DigestAsHex(fv.getValue().getBytes()), orgFields);
+
+								}				
 							}
-						}
+						}							
 					}
 					break;
 				case MULTILANG_STRING:

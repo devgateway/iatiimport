@@ -143,8 +143,9 @@ var ChooseProjects = React.createClass({
 	        url: '/importer/data/destination/project',
 	        dataType: 'json',
 	        success: function(result) {
-	        	self.setState({destinationProjects: result});
-	        	self.forceUpdate();
+	            self.setState({destinationProjects: result},  function() {
+                    self.forceUpdate();
+                });                
 	        },
 	        type: 'GET'
 	     });
@@ -191,8 +192,10 @@ var ChooseProjects = React.createClass({
                         <td>
                             {this.getTitle(item.sourceDocument.multilangFields)}
                         </td>
-                        <td className="no-right-padding">
-                          <AutoComplete context={constants.CHOOSE_PROJECTS} options={this.state.destinationProjects} display="title" language={language} placeholder="" refId="destSearch" onSelect={this.handleAutocompleteToggle.bind(this, item)} value={item.destinationDocument ? this.getTitle(item.destinationDocument.multilangFields) : ''}/>
+                        <td className="no-right-padding">                            
+                            {(this.state.destinationProjects && this.state.destinationProjects.length > 0) &&
+                                <AutoComplete context={constants.CHOOSE_PROJECTS} options={this.state.destinationProjects} display="title" language={language} placeholder="" refId="destSearch" onSelect={this.handleAutocompleteToggle.bind(this, item)} value={item.destinationDocument ? this.getTitle(item.destinationDocument.multilangFields) : ''}/>
+                            }                          
                        </td>
                         <td className="no-left-padding"><span className="glyphicon glyphicon-remove glyphicon-remove-custom" data-id={item.id} onClick={this.resetMapping}></span></td>
                         <td>
