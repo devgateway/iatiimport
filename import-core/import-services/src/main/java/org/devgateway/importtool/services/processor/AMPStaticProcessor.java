@@ -874,7 +874,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		}).findFirst().get();
 
 		Optional<FieldValue> foundCurrency = currency.getPossibleValues().stream().filter(n -> {
-			return n.getValue().equals(currencyCode);
+			return n.getValue().equalsIgnoreCase(currencyCode);
 		}).findFirst();
 
 		FieldValue currencyValue;
