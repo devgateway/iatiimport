@@ -61,6 +61,9 @@ var SaveMappingsDialog = React.createClass({
 	     box.show();
 	     box.fadeOut({duration:10000});
     },
+    isValidName: function() {
+        return this.state.name &&  this.state.name.trim().length > 0;
+       },
     render: function () {
     return (
           <div className="modal fade" id="saveMapValues" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2" aria-hidden="true" >
@@ -79,9 +82,8 @@ var SaveMappingsDialog = React.createClass({
 			        Mapping Name: <input ref="mappingsName" type="text" onChange = {this.handleNameChange}  value={this.state.name}/>
 			      </div>
 			      <div className="modal-footer">
-			        <button type="button" className="btn btn-default btn-warning" data-dismiss="modal">{this.props.i18nLib.t('wizard.save_value_mappings_dlg.close')}</button>
-			        <button type="button" className="btn btn-primary" onClick={this.saveMappings}>{this.props.i18nLib.t('wizard.save_value_mappings_dlg.save_mapping')}</button>
-              <button type="button" className="btn btn-primary" onClick={this.saveMappingsCopy}>{this.props.i18nLib.t('wizard.save_value_mappings_dlg.save_as_copy')}</button>
+                    <button type="button" className="btn btn-default btn-warning" data-dismiss="modal">{this.props.i18nLib.t('wizard.save_value_mappings_dlg.close')}</button>
+			        <button type="button" disabled = {this.isValidName() ? "" : "disabled"} className="btn btn-primary" onClick={this.saveMappings}>{this.props.i18nLib.t('wizard.save_value_mappings_dlg.save_mapping')}</button>              
 			      </div>
 			    </div>
 			  </div>
