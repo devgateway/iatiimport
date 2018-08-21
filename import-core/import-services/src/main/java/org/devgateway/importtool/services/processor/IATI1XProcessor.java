@@ -372,7 +372,6 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 					}
 					//Some filters need relative paths
 					String fieldName = getFieldName(field.getFieldName());
-
 					query.append(fieldName + "[");
 					for (int i = 0;i < filter.getFilters().size(); i++) {
 						String value = filter.getFilters().get(i);
@@ -392,6 +391,7 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 		}else{
 			query.setLength(query.length() - 1);
 		}
+		
 		NodeList activities = (NodeList)xPath.compile(query.toString()).evaluate(this.getDoc(), XPathConstants.NODESET);
 		return activities;
 	}
@@ -400,7 +400,7 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 		String name = fieldName;
 		switch(fieldName) {
 		case "sector":
-			name = "transaction/sector";
+			name = "//sector";
 			break;
 		}
 		return name;
