@@ -148,6 +148,7 @@ var MapValues = React.createClass({
       if (mapping.sourceField && mapping.destinationField && mapping.sourceField.fieldName && mapping.destinationField.fieldName && (mapping.sourceField.type == "LIST" || mapping.sourceField.type == "ORGANIZATION" || mapping.sourceField.type == "LOCATION")) {
         sourceFields.push({
           tabName : mapping.sourceField.displayName,
+          tooltip: mapping.sourceField.description,
           children: [<MappingTableSimple key={i} mapping={mapping} handleUpdates={this.updateValueMappings} {...this.props}/>],
           classes : {}
         });
@@ -160,7 +161,7 @@ var MapValues = React.createClass({
         <div className="panel-body">
          <FieldMappingsDropdown {...this.props} mappingTemplatesData = {this.state.mappingTemplatesData} deleteMappingTemplate = {this.deleteMappingTemplate} loadMappingTemplate = {this.loadMappingTemplate} />
           {message}
-          <TabbedArea activeTab={this.state.activeTab} paneModels={sourceFields} switchTab={this.switchTab}/>
+          <TabbedArea activeTab={this.state.activeTab} paneModels={sourceFields} switchTab={this.switchTab} i18nLib={this.props.i18nLib} />
         </div>
         <div className="buttons">
 

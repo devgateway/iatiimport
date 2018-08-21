@@ -8,6 +8,7 @@ var _ = require('lodash/dist/lodash.underscore');
 var languageStore = require('./../../stores/LanguageStore');
 var filterStore = require('./../../stores/FilterStore');
 var constants = require('./../../utils/constants');
+var Tooltip = require('./tooltip');
 
 var FilterData = React.createClass({
 	mixins: [Reflux.ListenerMixin],
@@ -167,7 +168,7 @@ var FilterData = React.createClass({
                     }
                     filters.push(
                         <div className="panel panel-warning filter-group">
-                            <div className="panel-heading filter-group-header"><span className="filter-group-title">{filter.displayName} {filter.filterRequired ? "*" : ""}</span>{groupSelector}</div>
+                            <div className="panel-heading filter-group-header"><Tooltip i18nLib={this.props.i18nLib} tooltip={filter.description}/><span className="filter-group-title">{filter.displayName} {filter.filterRequired ? "*" : ""}</span>{groupSelector}</div>
                             <div className="panel-body">
                                 {filterValues}
                             </div>

@@ -485,3 +485,14 @@ tbody.scrollablebody td, thead.scrollablebody th {
 .import-type-select, .reporting-org-select{
 	width: 40%;
 }
+
+.glyphicon-info-sign-custom1 {
+	color: #337ab7;
+	font-size: 14px;
+	margin-right:10px;
+}
+
+.glyphicon-info-sign-custom2{
+	font-size: 14px;
+	margin-right:10px;
+}
