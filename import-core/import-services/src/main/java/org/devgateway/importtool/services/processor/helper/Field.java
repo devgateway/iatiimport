@@ -35,8 +35,8 @@ public class Field {
 	private String subTypeCode = "";
 
 	public Field() {
-		description.put("EN","tooltip for eng");
-		description.put("FR","tooltip for FR");
+		description.put("en","tooltip for eng");
+		description.put("fr","tooltip for FR");
 	}
 
 	public Field(String displayName, String fieldName, FieldType type) {
