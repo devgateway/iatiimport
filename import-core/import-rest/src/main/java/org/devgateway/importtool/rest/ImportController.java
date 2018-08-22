@@ -1,5 +1,6 @@
 package org.devgateway.importtool.rest;
 
+import com.sun.corba.se.spi.ior.iiop.IIOPAddress;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.dao.FileRepository;
@@ -13,6 +14,7 @@ import org.devgateway.importtool.model.ImportSummary;
 import org.devgateway.importtool.security.ImportSessionToken;
 import org.devgateway.importtool.services.DataFetchService;
 import org.devgateway.importtool.services.ImportService;
+import org.devgateway.importtool.services.processor.IATIProcessor;
 import org.devgateway.importtool.services.processor.helper.DocumentMapper;
 import org.devgateway.importtool.services.processor.helper.IDestinationProcessor;
 import org.devgateway.importtool.services.processor.helper.IDocumentMapper;
@@ -32,14 +34,19 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.xml.sax.SAXException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.devgateway.importtool.services.processor.helper.Constants.CURRENT_FILE_ID;
@@ -243,12 +250,19 @@ class ImportController  {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/translation-files")
-	ResponseEntity<String> generateTranslationFiles(HttpServletRequest request) {
+	ResponseEntity<Map<String,List<String>>> generateTranslationFiles(HttpServletRequest request) {
+	    Map<String,List<String>> missingVersions = new HashMap<String,List<String>>();
 
-
-		ISourceProcessor srcProcessor = importService.getSourceProcessor("IATI202");
-
-		return new ResponseEntity<>("{}", HttpStatus.OK);
+        IATIProcessor.IMPLEMENTED_VERSIONS.stream().forEach(version->{
+            String versionName = "IATI" + version.replace(".", "");
+            try {
+                ISourceProcessor srcProcessor = importService.getSourceProcessor(versionName);
+                missingVersions.put(versionName, srcProcessor.buildTooltipsFields());
+            }catch (Exception ex){
+                log.error("cannot process for version " + versionName,ex);
+            }
+        });
+		return new ResponseEntity<>(missingVersions, HttpStatus.OK);
 	}
 
 }

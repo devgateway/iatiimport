@@ -1,10 +1,16 @@
 package org.devgateway.importtool.services.processor.helper;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 
 import org.devgateway.importtool.model.Language;
 import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
 
 public interface ISourceProcessor {
 	public String getDescriptiveName();
@@ -40,4 +46,7 @@ public interface ISourceProcessor {
 
 
 	void setFromDataStore(boolean fromDatastore);
+
+	 List<String> buildTooltipsFields() throws IOException, SAXException,
+			 ParserConfigurationException,XPathExpressionException;
 }

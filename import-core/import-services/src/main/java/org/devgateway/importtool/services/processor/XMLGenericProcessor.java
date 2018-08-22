@@ -10,6 +10,7 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -199,6 +200,12 @@ public class XMLGenericProcessor implements ISourceProcessor {
 	@Override
 	public void setFromDataStore(boolean fromDatastore) {
 
+	}
+
+	@Override
+	public List<String> buildTooltipsFields() throws IOException, SAXException, ParserConfigurationException,
+            XPathExpressionException {
+		return null;
 	}
 
 }

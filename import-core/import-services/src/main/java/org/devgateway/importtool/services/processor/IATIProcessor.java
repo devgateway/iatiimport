@@ -13,13 +13,25 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -35,16 +47,17 @@ import java.util.Set;
 public abstract class IATIProcessor implements ISourceProcessor {
 
     private Log log = LogFactory.getLog(getClass());
-
     public static final String DEFAULT_ID_FIELD = "iati-identifier";
     public static final String LAST_UPDATED_DATE = "last-updated-datetime";
     public static final String DEFAULT_PATH_API = "/results/iati-activities/iati-activity";
     public static String DEFAULT_GROUPING_FIELD = "reporting-org";
-
     protected String PROCESSOR_VERSION = "";
     protected String codelistPath = "";
     protected String schemaPath = "";
     protected String activtySchemaName = null;
+    protected String fieldsTooltipsLocation = null;
+    protected String fieldsTooltipsFileName = null;
+
     // XML Document that will hold the entire imported file
     protected Document doc;
     protected String propertiesFile = "";
@@ -56,6 +69,9 @@ public abstract class IATIProcessor implements ISourceProcessor {
     // Global Lists for fields and the filters
     private List<Field> fieldList = new ArrayList<Field>();
     private boolean fromDatastore = false;
+    public final static Set<String> IMPLEMENTED_VERSIONS = new HashSet
+            (Arrays.asList("1.01", "1.03", "1.04", "1.05",
+            "2.01", "2.02"));
 
     @Override
     public  void setFromDataStore(boolean fromDatastore) {
@@ -235,28 +251,57 @@ public abstract class IATIProcessor implements ISourceProcessor {
         return builder.parse(is);
     }
 
-    protected Map<String,String>  buildTooltipsFields() throws IOException, SAXException,
-            ParserConfigurationException ,XPathExpressionException {
-        String descriptionXPath = "//xsd:element[@name='%s']/xsd:annotation/xsd:documentation";
+    public List<String>  buildTooltipsFields() {
+        try {
+            List<String> missing = new ArrayList<>();
+            String descriptionXPath = "/*[name()='xsd:schema']/*[name()='xsd:element'][@name='%s']/*[name()='xsd:annotation']/*[name()" +
+                    "='xsd:documentation']";
+            Properties prop = new Properties();
 
-        Document doc = getDocument(this.schemaPath + this.activtySchemaName);
+            // InputStream propsStream = this.getClass().getResourceAsStream(this.getPropertiesFile());
 
+            URL url = this.getClass().getResource(this.fieldsTooltipsLocation);
+            File fileObject = new File(url.toURI());
 
-        Map<String, String> xPaths = new HashMap<>();
-        this.fieldList.stream().forEach(field -> {
+            FileOutputStream out = new FileOutputStream(fileObject);
 
-            NodeList activities = getNodeListFromXpath(this.doc, String.format(descriptionXPath, field.getFieldName
-                    ()));
-            System.out.println(activities.getLength());
-        });
-        return xPaths;
+            //OutputStream output = new FileOutputStream(this.fieldsTooltipsLocation);
+
+            Document doc = getDocument(this.schemaPath + this.activtySchemaName);
+            this.fieldList.stream().forEach(field -> {
+                String fieldXPath = String.format(descriptionXPath, field.getFieldName());
+                NodeList descriptionList = getNodeListFromXpath(doc, fieldXPath);
+                if (descriptionList.getLength() == 1) {
+                    prop.setProperty(field.getFieldName(), descriptionList.item(0).getFirstChild().getNodeValue());
+                } else {
+                    missing.add(field.getFieldName());
+                }
+            });
+            prop.store(out, null);
+
+            return missing;
+
+        } catch (Exception ex) {
+            log.error("Cannot generate tooltips", ex);
+            return null;
+        }
+    }
+    public static final void prettyPrint(Document xml) throws Exception {
+
+        Transformer tf = TransformerFactory.newInstance().newTransformer();
+        tf.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+        tf.setOutputProperty(OutputKeys.INDENT, "yes");
+        Writer out = new StringWriter();
+        tf.transform(new DOMSource(xml), new StreamResult(out));
+        System.out.println(out.toString());
     }
 
-    protected NodeList getNodeListFromXpath(Document xDoc, String xpath)  {
+    public NodeList getNodeListFromXpath(Document xDoc, String xPathExpresion)  {
 
         XPath xPath = XPathFactory.newInstance().newXPath();
         try {
-            return (NodeList) xPath.compile(xpath).evaluate(xDoc, XPathConstants.NODESET);
+            Node node= (Node)xPath.compile(xPathExpresion).evaluate(xDoc,XPathConstants.NODE);
+            return (NodeList) xPath.compile(xPathExpresion).evaluate(xDoc, XPathConstants.NODESET);
         } catch (XPathExpressionException e) {
             log.error("Cannot evaluete xpath", e);
             return null;
