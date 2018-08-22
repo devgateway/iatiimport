@@ -242,6 +242,8 @@ class ImportController  {
             List<Param> params = DataFetchServiceConstants.getCommonParams(reportingOrgId);
             FetchResult activitiesFromDataStore = dataFetchService.fetchResult(reportingOrgId, params);
             request.getSession().setAttribute(IATI_STORE_ACTIVITIES,activitiesFromDataStore);
+			activitiesFromDataStore.getVersions().
+					retainAll(IATIProcessor.IMPLEMENTED_VERSIONS);
             return new ResponseEntity<>(activitiesFromDataStore.getVersions(), HttpStatus.OK);
         } catch (Exception e) {
             log.error(e);
