@@ -1,0 +1,79 @@
+<codelist name="FlowType" xml:lang="en" complete="1">
+    <metadata>
+        <name>
+            <narrative>Flow Type</narrative>
+        </name>
+        <description>
+            <narrative>DAC/CRS distinction between ODA (official development assistance) and other types of resource flow.</narrative>
+        </description>
+        <url>http://www.oecd.org/dac/stats/dacandcrscodelists.htm</url>
+    </metadata>
+    <codelist-items>
+        <codelist-item>
+            <code>10</code>
+            <name>
+                <narrative>ODA</narrative>
+                <narrative xml:lang="fr">APD</narrative>
+            </name>
+            <description>
+                <narrative>Official Development Assistance</narrative>
+                <narrative xml:lang="fr">Aide Publique au Développement</narrative>
+            </description>
+        </codelist-item>
+        <codelist-item>
+            <code>20</code>
+            <name>
+                <narrative>OOF</narrative>
+                <narrative xml:lang="fr">AASP</narrative>
+            </name>
+            <description>
+                <narrative>Other Official Flows</narrative>
+                <narrative xml:lang="fr">Autres Apports du Secteur Public</narrative>
+            </description>
+        </codelist-item>
+        <codelist-item>
+            <code>30</code>
+            <name>
+                <narrative>Private grants</narrative>
+                <narrative xml:lang="fr">Dons privés</narrative>
+            </name>
+            <description>
+                <narrative>made by NGOs and other civil society organisations (e.e. philantropic foundations) based in the reporting DAC country</narrative>
+                <narrative xml:lang="fr">Dons fournis par les ONG et autres organismes privés (par exemple fondations philantropiques) résidents dans le pays donneur</narrative>
+            </description>
+        </codelist-item>
+        <codelist-item>
+            <code>35</code>
+            <name>
+                <narrative>Private Market</narrative>
+                <narrative xml:lang="fr">Apports privés aux conditions du marché</narrative>
+            </name>
+            <description>
+                <narrative>Private market</narrative>
+                <narrative xml:lang="fr">Apports privés aux conditions du marché</narrative>
+            </description>
+        </codelist-item>
+        <codelist-item>
+            <code>40</code>
+            <name>
+                <narrative>Non flow</narrative>
+                <narrative xml:lang="fr">non apports</narrative>
+            </name>
+            <description>
+                <narrative>e.g. GNI</narrative>
+                <narrative xml:lang="fr">ex : RNB</narrative>
+            </description>
+        </codelist-item>
+        <codelist-item>
+            <code>50</code>
+            <name>
+                <narrative>Other flows</narrative>
+                <narrative xml:lang="fr">Autres apports</narrative>
+            </name>
+            <description>
+                <narrative>e.g. non-ODA component of peacebuilding operations)</narrative>
+                <narrative xml:lang="fr">ex : élément non APD des opérations de maintien de la paix</narrative>
+            </description>
+        </codelist-item>
+    </codelist-items>
+</codelist>
