@@ -259,8 +259,17 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 
 						Element nameElement = (Element) element.getElementsByTagName("name").item(0);
 						String name = nameElement.getChildNodes().item(0).getNodeValue();
-
+						Element descriptionElement = (Element)element.getElementsByTagName("description").item(0);
+						String description = null;
+						if (descriptionElement != null && descriptionElement.getChildNodes().getLength() > 0) {
+							 description = descriptionElement.getChildNodes().item(0).getNodeValue();
+						}
 						FieldValue fv = new FieldValue();
+
+						fv.setDescription(new HashMap<>());
+						if(description!=null) {
+							fv.getDescription().put("en", description);
+						}
 						fv.setIndex(index++);
 						fv.setCode(code);
 						if (concatenate) {
