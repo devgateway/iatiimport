@@ -19,7 +19,9 @@ import java.util.Date;
 @NamedQuery(name="Project.findProjectLastSyncedDate",
         query="SELECT p FROM Project  p WHERE p.lastSyncedOn = ( select max(p1.lastSyncedOn) from " +
                 " Project p1 where p1.projectIdentifier = p.projectIdentifier) and p.projectIdentifier is not" +
-                " null and p.status='OK' and p.groupingCriteria is not null" )
+                " null and p.status='OK' and p.groupingCriteria is not null" ),
+		@NamedQuery(name="Project.findProjectUpdated",
+				query="SELECT p FROM Project  p WHERE p.lastUpdatedOn > p.lastSyncedOn ")
 })
 public class Project implements Identifiable<Long>, Serializable {
 

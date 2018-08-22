@@ -11,6 +11,7 @@ import org.devgateway.importtool.endpoint.Param;
 import org.devgateway.importtool.model.FetchResult;
 import org.devgateway.importtool.model.File;
 import org.devgateway.importtool.model.ImportSummary;
+import org.devgateway.importtool.rest.dto.FetchOrganisationDetails;
 import org.devgateway.importtool.security.ImportSessionToken;
 import org.devgateway.importtool.services.DataFetchService;
 import org.devgateway.importtool.services.ImportService;
@@ -236,7 +237,7 @@ class ImportController  {
 
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/fetch/{reportingOrgId}")
-	ResponseEntity<Set<String>> fetch(HttpServletRequest request, @PathVariable("reportingOrgId") String
+	ResponseEntity<FetchOrganisationDetails> fetch(HttpServletRequest request, @PathVariable("reportingOrgId") String
             reportingOrgId) {
         try {
             List<Param> params = DataFetchServiceConstants.getCommonParams(reportingOrgId);
@@ -244,7 +245,10 @@ class ImportController  {
             request.getSession().setAttribute(IATI_STORE_ACTIVITIES,activitiesFromDataStore);
 			activitiesFromDataStore.getVersions().
 					retainAll(IATIProcessor.IMPLEMENTED_VERSIONS);
-            return new ResponseEntity<>(activitiesFromDataStore.getVersions(), HttpStatus.OK);
+			FetchOrganisationDetails o = new FetchOrganisationDetails();
+			o.setVersions(activitiesFromDataStore.getVersions());
+			o.setProjectWithUpdates(projectRepository.findProjectUpdated());
+            return new ResponseEntity<>(o, HttpStatus.OK);
         } catch (Exception e) {
             log.error(e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

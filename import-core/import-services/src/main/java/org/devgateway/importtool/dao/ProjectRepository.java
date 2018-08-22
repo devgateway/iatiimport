@@ -21,4 +21,5 @@ public interface ProjectRepository extends PagingAndSortingRepository<Project, L
 			"p1.lastSyncedOn from Project p1 where p1.projectIdentifier = p.projectIdentifier)")
 	@Transactional
 	void updateLastUpdatedDateByProjectIdentifier(Date lastUpdatedOn, String projectIdentifier);
+	List<Project> findProjectUpdated();
 }
