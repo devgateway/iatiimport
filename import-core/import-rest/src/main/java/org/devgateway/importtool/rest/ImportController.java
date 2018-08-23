@@ -1,6 +1,5 @@
 package org.devgateway.importtool.rest;
 
-import com.sun.corba.se.spi.ior.iiop.IIOPAddress;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.dao.FileRepository;
@@ -11,7 +10,7 @@ import org.devgateway.importtool.endpoint.Param;
 import org.devgateway.importtool.model.FetchResult;
 import org.devgateway.importtool.model.File;
 import org.devgateway.importtool.model.ImportSummary;
-import org.devgateway.importtool.rest.dto.FetchOrganisationDetails;
+import org.devgateway.importtool.rest.dto.FetchOrganizationDetails;
 import org.devgateway.importtool.security.ImportSessionToken;
 import org.devgateway.importtool.services.DataFetchService;
 import org.devgateway.importtool.services.ImportService;
@@ -35,11 +34,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.xml.sax.SAXException;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathExpressionException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,7 +44,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static org.devgateway.importtool.services.processor.helper.Constants.CURRENT_FILE_ID;
 import static org.devgateway.importtool.services.processor.helper.Constants.DESTINATION_PROCESSOR;
@@ -237,7 +232,7 @@ class ImportController  {
 
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/fetch/{reportingOrgId}")
-	ResponseEntity<FetchOrganisationDetails> fetch(HttpServletRequest request, @PathVariable("reportingOrgId") String
+	ResponseEntity<FetchOrganizationDetails> fetch(HttpServletRequest request, @PathVariable("reportingOrgId") String
             reportingOrgId) {
         try {
             List<Param> params = DataFetchServiceConstants.getCommonParams(reportingOrgId);
@@ -245,10 +240,10 @@ class ImportController  {
             request.getSession().setAttribute(IATI_STORE_ACTIVITIES,activitiesFromDataStore);
 			activitiesFromDataStore.getVersions().
 					retainAll(IATIProcessor.IMPLEMENTED_VERSIONS);
-			FetchOrganisationDetails o = new FetchOrganisationDetails();
-			o.setVersions(activitiesFromDataStore.getVersions());
-			o.setProjectWithUpdates(projectRepository.findProjectUpdated());
-            return new ResponseEntity<>(o, HttpStatus.OK);
+			FetchOrganizationDetails organizationDetails = new FetchOrganizationDetails();
+			organizationDetails.setVersions(activitiesFromDataStore.getVersions());
+			organizationDetails.setProjectWithUpdates(projectRepository.findProjectUpdated());
+            return new ResponseEntity<>(organizationDetails, HttpStatus.OK);
         } catch (Exception e) {
             log.error(e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

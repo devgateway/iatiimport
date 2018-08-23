@@ -5,7 +5,7 @@ import org.devgateway.importtool.model.Project;
 import java.util.List;
 import java.util.Set;
 
-public class FetchOrganisationDetails {
+public class FetchOrganizationDetails {
     Set<String> versions;
     List<Project> projectWithUpdates;
 
