@@ -9,6 +9,8 @@ public class IATI104Processor extends IATI1XProcessor {
 		descriptiveName = "IATI 1.04";
 		codelistPath = "IATI104/codelist/";
 		propertiesFile = "IATI104/IATI104Processor.properties";
+		schemaPath = "IATI104/schema/";
+		fieldsTooltipsLocation = "IATI104/tooltips/fields/tooltips";
 		configureDefaults();
 		instantiateStaticFields();
 	}	

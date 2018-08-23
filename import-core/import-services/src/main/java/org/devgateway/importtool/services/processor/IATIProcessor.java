@@ -26,7 +26,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URL;
@@ -54,10 +53,8 @@ public abstract class IATIProcessor implements ISourceProcessor {
     protected String PROCESSOR_VERSION = "";
     protected String codelistPath = "";
     protected String schemaPath = "";
-    protected String activtySchemaName = null;
+    protected String activtySchemaName = "iati-activities-schema.xsd";
     protected String fieldsTooltipsLocation = null;
-    protected String fieldsTooltipsFileName = null;
-
     // XML Document that will hold the entire imported file
     protected Document doc;
     protected String propertiesFile = "";
@@ -72,6 +69,8 @@ public abstract class IATIProcessor implements ISourceProcessor {
     public final static Set<String> IMPLEMENTED_VERSIONS = new HashSet
             (Arrays.asList("1.01", "1.03", "1.04", "1.05",
             "2.01", "2.02"));
+    private final static Set<String> SUPPORTED_LOCALES= new HashSet<>(Arrays.asList("en","fr"));
+    protected final static Map<String,Map<String,Map<String,String>> >descriptionTooltipsMap = new HashMap();
 
     @Override
     public  void setFromDataStore(boolean fromDatastore) {
@@ -244,6 +243,9 @@ public abstract class IATIProcessor implements ISourceProcessor {
 
     protected Document getDocument(String fileName) throws ParserConfigurationException, SAXException, IOException {
         InputStream is = this.getClass().getResourceAsStream(fileName);
+        if(is == null){
+            System.out.println("this field name is null:" + fileName);
+        }
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setValidating(false);
         factory.setIgnoringElementContentWhitespace(true);
@@ -306,5 +308,37 @@ public abstract class IATIProcessor implements ISourceProcessor {
             log.error("Cannot evaluete xpath", e);
             return null;
         }
+    }
+
+    public Map<String, String>getTranslationForField(String field){
+        return getTranslationsForVersion(this.PROCESSOR_VERSION).get(field);
+    }
+    public  Map<String, Map<String, String>> getTranslationsForVersion(String version) {
+        if (descriptionTooltipsMap.get(version) == null) {
+            //map that will hold the translation pack for a version
+            Map<String, Map<String, String>> mapForVersion = new HashMap<>();
+            SUPPORTED_LOCALES.stream().forEach(lang -> {
+                try {
+                    Properties properties = new Properties();
+                    properties.load(this.getClass().getResourceAsStream(this.fieldsTooltipsLocation +
+                            "_" + lang + ".properties"));
+                    properties.stringPropertyNames().stream().forEach(property -> {
+                        if (mapForVersion.get(property) == null) {
+                            mapForVersion.put(property, new HashMap<String, String>() {{
+                                put(lang,properties.getProperty(property));
+                            }});
+                        } else {
+                            mapForVersion.get(property).put(lang, properties.getProperty(property));
+                        }
+
+                    });
+                } catch (IOException ex) {
+                    log.error("Cannot process properties file " + this.fieldsTooltipsLocation +
+                            "_" + lang + ".properties");
+                }
+            });
+            descriptionTooltipsMap.put(version, mapForVersion);
+        }
+        return descriptionTooltipsMap.get(version);
     }
 }

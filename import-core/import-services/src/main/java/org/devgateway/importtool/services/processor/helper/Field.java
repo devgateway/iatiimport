@@ -12,7 +12,7 @@ public class Field {
 	private String fieldName;
 	private String displayName;
 	//Description will hold the tooltip
-	private Map<String,String> description = new HashMap<>();;
+	private Map<String,String> description;
 	private Map<String, String> attributes;
 	private Map<String, String> multiLangDisplayName;
 	private List<Field> childFields;
@@ -35,8 +35,7 @@ public class Field {
 	private String subTypeCode = "";
 
 	public Field() {
-		description.put("en","tooltip for eng");
-		description.put("fr","tooltip for FR");
+
 	}
 
 	public Field(String displayName, String fieldName, FieldType type) {
@@ -45,10 +44,14 @@ public class Field {
 		this.fieldName = fieldName;
 		this.type = type;
 	}
-
 	public Field(String displayName, String fieldName, FieldType type, boolean isMappable) {
+		this(displayName,fieldName, type,isMappable,null);
+	}
+	public Field(String displayName, String fieldName, FieldType type, boolean isMappable,Map<String,String>
+			description) {
 		this(displayName, fieldName, type);
 		this.isMappable = isMappable;
+		this.description = description;
 	}
 
 	public String getFieldName() {

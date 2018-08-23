@@ -1115,7 +1115,6 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		// Fixed fields
 
 		fieldList.add(new Field("IATI Identifier", "iati-identifier", FieldType.STRING, false));
-
 		if (destinationFieldsList.contains("project_title")) {
 			Field projectTitle = new Field("Project Title", "project_title",
 					getFieldType(fieldProps.get("project_title")), false);

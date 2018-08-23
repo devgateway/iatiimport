@@ -9,10 +9,8 @@ public class FieldValue {
 	private String value;
 	private boolean selected = false;
 	private String percentage = "";
-	private Map<String,String> description;
 	private Properties properties;
 
-	
 	public FieldValue() {
 		 this.properties = new Properties();
 	}
@@ -58,11 +56,5 @@ public class FieldValue {
 		this.properties = properties;
 	}
 
-	public Map<String, String> getDescription() {
-		return description;
-	}
 
-	public void setDescription(Map<String, String> description) {
-		this.description = description;
-	}
 }

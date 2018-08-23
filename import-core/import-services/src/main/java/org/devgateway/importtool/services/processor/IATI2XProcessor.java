@@ -641,125 +641,150 @@ public class IATI2XProcessor extends IATIProcessor {
 
 	protected void instantiateStaticFields() {
 		// Text fields
-        getFields().add(new Field("IATI Identifier", "iati-identifier", FieldType.STRING, false));
-        getFields().add(new Field("Title", "title", FieldType.MULTILANG_STRING, false));
-        getFields().add(new Field("Description", "description", FieldType.MULTILANG_STRING, true));
+		getFields().add(new Field("IATI Identifier", "iati-identifier", FieldType.STRING,
+				false, getTranslationForField("iati-identifier")));
+		getFields().add(new Field("Title", "title", FieldType.MULTILANG_STRING, false,
+				getTranslationForField("title")));
+		getFields().add(new Field("Description", "description", FieldType.MULTILANG_STRING,
+				true, getTranslationForField("description")));
 
 		// Code Lists
-		Field activityStatus = new Field("Activity Status", "activity-status", FieldType.LIST, true);
+		Field activityStatus = new Field("Activity Status", "activity-status", FieldType.LIST,
+				true, getTranslationForField("activity-status"));
 		activityStatus.setPossibleValues(getCodeListValues("activity-status"));
-        getFields().add(activityStatus);
+		getFields().add(activityStatus);
 		getFilterFieldList().add(activityStatus);
 
-		Field activityScope = new Field("Activity Scope", "activity-scope", FieldType.LIST, true);
+		Field activityScope = new Field("Activity Scope", "activity-scope", FieldType.LIST,
+				true, getTranslationForField("activity-scope"));
 		activityScope.setPossibleValues(getCodeListValues("activity-scope"));
-        getFields().add(activityScope);
+		getFields().add(activityScope);
 		getFilterFieldList().add(activityScope);
 
-		Field aidType = new Field("Aid Type", "default-aid-type", FieldType.LIST, true);
+		Field aidType = new Field("Aid Type", "default-aid-type", FieldType.LIST, true,
+				getTranslationForField("default-aid-type"));
 		aidType.setPossibleValues(getCodeListValues("default-aid-type"));
-        getFields().add(aidType);
+		getFields().add(aidType);
 		getFilterFieldList().add(aidType);
 
-		Field financeType = new Field("Finance Type", "default-finance-type", FieldType.LIST, true);
+		Field financeType = new Field("Finance Type", "default-finance-type", FieldType.LIST,
+				true, getTranslationForField("default-finance-type"));
 		financeType.setPossibleValues(getCodeListValues("default-finance-type"));
-        getFields().add(financeType);
+		getFields().add(financeType);
 		getFilterFieldList().add(financeType);
 
-		Field flowType = new Field("Flow Type", "default-flow-type", FieldType.LIST, true);
+		Field flowType = new Field("Flow Type", "default-flow-type", FieldType.LIST,
+				true, getTranslationForField("default-flow-type"));
 		flowType.setPossibleValues(getCodeListValues("default-flow-type"));
-        getFields().add(flowType);
+		getFields().add(flowType);
 		getFilterFieldList().add(flowType);
 
-		Field tiedStatus = new Field("Tied Status", "default-tied-status", FieldType.LIST, true);
+		Field tiedStatus = new Field("Tied Status", "default-tied-status", FieldType.LIST,
+				true, getTranslationForField("default-tied-status"));
 		tiedStatus.setPossibleValues(getCodeListValues("default-tied-status"));
-        getFields().add(tiedStatus);
+		getFields().add(tiedStatus);
 		getFilterFieldList().add(tiedStatus);
 
-		Field policyMarker = new Field("PolicyMarker", "policy-marker", FieldType.LIST, true);
+		Field policyMarker = new Field("PolicyMarker", "policy-marker", FieldType.LIST,
+				true, getTranslationForField("policy-marker"));
 		policyMarker.setPossibleValues(getCodeListValues("policy-marker"));
-        getFields().add(policyMarker);
+		getFields().add(policyMarker);
 		getFilterFieldList().add(policyMarker);
 
-		Field recipientCountry = new Field("Recipient Country", "recipient-country", FieldType.RECIPIENT_COUNTRY, true);
+		Field recipientCountry = new Field("Recipient Country", "recipient-country",
+				FieldType.RECIPIENT_COUNTRY, true, getTranslationForField("recipient-country"));
 		recipientCountry.setPossibleValues(getCodeListValues("recipient-country"));
 		recipientCountry.setExclusive(true);
 		recipientCountry.setFilterRequired(true);
-        getFields().add(recipientCountry);
+		getFields().add(recipientCountry);
 		getFilterFieldList().add(recipientCountry);
 
-		Field sector = new Field("Sector", "sector", FieldType.LIST, true);
+		Field sector = new Field("Sector", "sector", FieldType.LIST, true,
+				getTranslationForField("sector"));
 		sector.setPossibleValues(getCodeListValues("sector"));
 		sector.setMultiple(true);
 		sector.setPercentage(true);
-        getFields().add(sector);
+		getFields().add(sector);
 		getFilterFieldList().add(sector);
 
-		Field location = new Field("Location", "location", FieldType.LOCATION, true);
+		Field location = new Field("Location", "location", FieldType.LOCATION, true,
+				getTranslationForField("location"));
 		location.setPossibleValues(new ArrayList<FieldValue>());
 		location.setMultiple(true);
 		location.setPercentage(true);
-        getFields().add(location);
+		getFields().add(location);
 
 		// Dates
-		Field activityDateStartPlanned = new Field("Activity Date Start Planned", "activity-date", FieldType.DATE, true);
+		Field activityDateStartPlanned = new Field("Activity Date Start Planned",
+				"activity-date", FieldType.DATE, true, getTranslationForField("activity-date"));
 		activityDateStartPlanned.setSubType("start-planned");
-        getFields().add(activityDateStartPlanned);
+		getFields().add(activityDateStartPlanned);
 
-		Field activityDateEndPlanned = new Field("Activity Date End Planned", "activity-date", FieldType.DATE, true);
-        getFields().add(activityDateEndPlanned);
+		Field activityDateEndPlanned = new Field("Activity Date End Planned", "activity-date",
+				FieldType.DATE, true, getTranslationForField("activity-date"));
+		getFields().add(activityDateEndPlanned);
 		activityDateEndPlanned.setSubType("end-planned");
 
-		Field activityDateStartActual = new Field("Activity Date Start Actual", "activity-date", FieldType.DATE, true);
+		Field activityDateStartActual = new Field("Activity Date Start Actual", "activity-date",
+				FieldType.DATE, true, getTranslationForField("activity-date"));
 		activityDateStartActual.setSubType("start-actual");
-        getFields().add(activityDateStartActual);
+		getFields().add(activityDateStartActual);
 
-		Field activityDateEndActual = new Field("Activity Date End Actual", "activity-date", FieldType.DATE, true);
-        getFields().add(activityDateEndActual);
+		Field activityDateEndActual = new Field("Activity Date End Actual", "activity-date",
+				FieldType.DATE, true, getTranslationForField("activity-date"));
+		getFields().add(activityDateEndActual);
 		activityDateEndActual.setSubType("end-actual");
 
 		// Transaction Fields
-		Field commitments = new Field("Commitments", "transaction", FieldType.TRANSACTION, true);
+		Field commitments = new Field("Commitments", "transaction", FieldType.TRANSACTION,
+				true, getTranslationForField("transaction"));
 		commitments.setSubType("C");
 		commitments.setSubTypeCode("2");
-        getFields().add(commitments);
+		getFields().add(commitments);
 
-		Field disbursements = new Field("Disbursements", "transaction", FieldType.TRANSACTION, true);
+		Field disbursements = new Field("Disbursements", "transaction", FieldType.TRANSACTION,
+				true, getTranslationForField("transaction"));
 		disbursements.setSubType("D");
 		disbursements.setSubTypeCode("3");
-        getFields().add(disbursements);
+		getFields().add(disbursements);
 
-		Field expenditure = new Field(Constants.EXPENDITURES, "transaction", FieldType.TRANSACTION, true);
+		Field expenditure = new Field(Constants.EXPENDITURES, "transaction", FieldType.TRANSACTION,
+				true, getTranslationForField("transaction"));
 		expenditure.setSubType("E");
 		expenditure.setSubTypeCode("4");
-        getFields().add(expenditure);
+		getFields().add(expenditure);
 
 
 		// Organization Fields
-		Field participatingOrg = new Field("Funding Organization", "participating-org", FieldType.ORGANIZATION, true);
+		Field participatingOrg = new Field("Funding Organization", "participating-org",
+				FieldType.ORGANIZATION, true, getTranslationForField("participating-org"));
 		participatingOrg.setSubType("Funding");
 		participatingOrg.setSubTypeCode("1");
-        getFields().add(participatingOrg);
+		getFields().add(participatingOrg);
 
-		Field accountableOrg = new Field("Accountable Organization", "participating-org", FieldType.ORGANIZATION, true);
+		Field accountableOrg = new Field("Accountable Organization", "participating-org",
+				FieldType.ORGANIZATION, true, getTranslationForField("participating-org"));
 		accountableOrg.setSubType("Accountable");
 		accountableOrg.setSubTypeCode("2");
-        getFields().add(accountableOrg);
+		getFields().add(accountableOrg);
 
-		Field extendingOrg = new Field("Extending Organization", "participating-org", FieldType.ORGANIZATION, true);
+		Field extendingOrg = new Field("Extending Organization", "participating-org",
+				FieldType.ORGANIZATION, true, getTranslationForField("participating-org"));
 		extendingOrg.setSubType("Extending");
 		extendingOrg.setSubTypeCode("3");
-        getFields().add(extendingOrg);
+		getFields().add(extendingOrg);
 
-		Field implementingOrg = new Field("Implementing Organization", "participating-org", FieldType.ORGANIZATION, true);
+		Field implementingOrg = new Field("Implementing Organization", "participating-org",
+				FieldType.ORGANIZATION, true, getTranslationForField("participating-org"));
 		implementingOrg.setSubType("Implementing");
 		implementingOrg.setSubTypeCode("4");
-        getFields().add(implementingOrg);
+		getFields().add(implementingOrg);
 
 // Provider Organization, within Transactions
-		Field providerOrg = new Field("Provider Organization - transactions", "provider-org", FieldType.ORGANIZATION, false);
+		Field providerOrg = new Field("Provider Organization - transactions", "provider-org",
+				FieldType.ORGANIZATION, false, getTranslationForField("provider-org"));
 		providerOrg.setSubType("Provider");
-        getFields().add(providerOrg);
+		getFields().add(providerOrg);
 		getFilterFieldList().add(providerOrg);
 
 	}
