@@ -22,7 +22,6 @@ var SelectVersion = React.createClass({
         this.props.eventHandlers.initAutomaticImport();
     },
     render: function() {
-        console.log(this.props);
         return (
             <div className="panel panel-default">
                 <div className="panel-heading"><strong>{this.props.i18nLib.t('select_version.title')}</strong></div>

@@ -26,6 +26,7 @@ var Wizard = React.createClass({
 			completedSteps: [],
 			versions:[],
 			processedVersions: [],
+			projectWithUpdates:[],
 			currentVersion: null,
 			statusMessage: ""
 		};
@@ -57,14 +58,13 @@ var Wizard = React.createClass({
             Cookies.set("CAN_ADD_ACTIVITY", true || data['add-activity']);
             Cookies.set("IS_ADMIN", data['is-admin']);
             Cookies.set("WORKSPACE", data['team']);
-
-                this.initImportSession(sourceProcessor, destinationProcessor);
-
-                // Timer for token expiration
-                var self = this;
-                self.setIntervalTokenId = setInterval(function(){
-                    self.checkTokenStatus();
-                }, 1000);
+            this.initImportSession(sourceProcessor, destinationProcessor);
+            
+            // Timer for token expiration
+            var self = this;
+            self.setIntervalTokenId = setInterval(function(){
+                 self.checkTokenStatus();
+            }, 1000);
 
           }.bind(this))["catch"](function(err) {
           }.bind(this));  
@@ -182,8 +182,8 @@ var Wizard = React.createClass({
 	    $.ajax({
             url: '/importer/import/fetch/' + reportingOrgId,
             success: function(data) {                 
-                if (data && data.length > 0) {                   
-                    self.setState({versions: data, currentVersion: data[0], processedVersions:[data[0]]});
+                if (data) {                    
+                    self.setState({versions: data.versions, currentVersion: data.versions[0], processedVersions: [data.versions[0]], projectWithUpdates: data.projectWithUpdates});
                     self.transitionTo('selectversion', self.props.params); 
                 }
                 $(self.refs.loadingIcon.getDOMNode()).hide();                              
@@ -390,7 +390,7 @@ var Wizard = React.createClass({
          <span ref="message"></span>
        </div>
       <div className="loading-icon" ref="loadingIcon"></div>
-      <RouteHandler eventHandlers={eventHandlers} {...this.props} statusMessage = {this.state.statusMessage} versions = {this.state.versions} currentVersion = {this.state.currentVersion} processedVersions = {this.state.processedVersions}/>
+      <RouteHandler eventHandlers={eventHandlers} {...this.props}  {...this.state}/>
       </div>
       </div>
       </div>

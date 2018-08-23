@@ -506,5 +506,8 @@ tbody.scrollablebody td, thead.scrollablebody th {
 
 .landing-page-right {
 	padding: 40px;
+}
 
+.updated-project {
+	background: #ffff80;
 }
