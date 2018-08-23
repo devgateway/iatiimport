@@ -5,13 +5,12 @@ var request = require('superagent');
 var appConfig = require('./../conf');
 var formActions = require('./../actions/form');
 
-
 var DataSourceStore = Reflux.createStore({
-
   init: function() {
     this.listenTo(formActions.loadDataSource, this.handleLoadDataSource);
     this.listenTo(formActions.updateDataSource, this.handleUpdateDataSource);
     this.listenTo(formActions.loadReportingOrganizations, this.handleLoadReportingOrganizations);
+    this.listenTo(formActions.loadReportingOrgsWithUpdates, this.handleLoadReportingOrgsWithUpdates);
   },
   handleUpdateDataSource: function(data) {
     var self = this;
@@ -59,7 +58,21 @@ var DataSourceStore = Reflux.createStore({
 	        },
 	        type: 'GET'
 	     }); 
-	  }
+	},
+	handleLoadReportingOrgsWithUpdates: function() {
+		    var self = this;    
+		    $.ajax({
+		        url: '/importer/data-source/reporting-orgs/with-updates',        
+		        error: function() {        	
+		        	formActions.loadReportingOrgsWithUpdates.failed();
+		        },
+		        dataType: 'json',
+		        success: function(data) {        	
+		        	formActions.loadReportingOrgsWithUpdates.completed(data);
+		        },
+		        type: 'GET'
+		     }); 
+		  }
 });
 
 module.exports = DataSourceStore;

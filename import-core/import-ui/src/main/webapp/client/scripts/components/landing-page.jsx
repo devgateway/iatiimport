@@ -1,51 +1,70 @@
 var React = require('react');
 var workflowStore = require('./../stores/WorkflowStore');
 var Reflux = require('reflux');
-var appActions = require('./../actions');
 var constants = require('./../utils/constants');
+var formActions = require('./../actions/form');
 var LandingPage = React.createClass({
     mixins: [Reflux.ListenerMixin
     ],
     getInitialState: function() {
-		return {importType: null};
+		return {
+		    reportingOrgsWithUpdates: []
+		};
 	}, 
+	updateReportingOrgsWithUpdates: function(data) {        
+	     this.setState({reportingOrgsWithUpdates: data})
+	},       
+	loadData: function(){       
+	     formActions.loadReportingOrgsWithUpdates().then(function(data) {   
+	          this.updateReportingOrgsWithUpdates(data);                
+	     }.bind(this))["catch"](function(err) {       
+	          console.log('Error loading reporting orgs');
+	     }.bind(this));      
+	},
     componentDidMount: function() {
+       this.loadData();
 	   this.resetSession();	   
 	},
 	resetSession: function() {
 	    $.get('/importer/import/wipeall', function(){}); 
 	},
-	onChange: function(event) {    
-	   this.setState({importType: event.target.value});	   
+	selectImportType: function(importType, event){
+	     if (importType === constants.IMPORT_TYPE_MANUAL) {
+	        window.location = '#/manual';
+	      } else {
+	        window.location = '#/wizard/automatic/AMP/selectdatasource';
+	      }  
 	},
-	next: function() {
-	  if (this.state.importType === constants.IMPORT_TYPE_MANUAL) {
-        window.location = '#/manual';
-      } else {
-        window.location = '#/wizard/automatic/AMP/selectdatasource';
-      }
-	},
-    render: function () {  
-      return (   <div className="container">     		
-        		  <div className="jumbotron">
-        		    <h3>{window.i18nLib.t("import_type.select_import_type")}</h3> 
-        		    <select onChange={this.onChange} className="form-control import-type-select" >
-        		        <option value=""></option>
-        		        <option value={constants.IMPORT_TYPE_MANUAL}>{this.props.i18nLib.t('import_type.manual')}</option>
-        		        <option value={constants.IMPORT_TYPE_AUTOMATIC}>{this.props.i18nLib.t('import_type.automatic')}</option>
-        		     </select>
-        		       <br/>
-        		       <br/>
-        		   {this.state.importType &&
-        		       <span>{this.props.i18nLib.t('import_type.description_' + this.state.importType)} </span> 
-        		   }    
-        		   
-        		   <div className="buttons">
-                   <button disabled = {this.state.importType ? "" : "disabled"} className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.next}>{this.props.i18nLib.t('import_type.next')}</button>
-                    </div>
-        		   
-        	      </div>                  
-        	</div>
+    render: function () {
+        return (<div className="container">        		
+        		 <div className="row">
+                 <div className="col-md-2">
+                 </div>
+                  <div className="col-md-4 landing-page-left">
+                   <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.selectImportType.bind(this, constants.IMPORT_TYPE_AUTOMATIC)}>{this.props.i18nLib.t('import_type.automatic')}</button> <br/> <br/>
+                   <span>{this.props.i18nLib.t('import_type.description_' + constants.IMPORT_TYPE_AUTOMATIC)} </span><br/>
+                   <br/>
+                   <br/>
+                   {this.state.reportingOrgsWithUpdates && this.state.reportingOrgsWithUpdates.length > 0 &&
+                       <div>                      
+                         {this.state.reportingOrgsWithUpdates.map(function(org, index){
+                             return (<span>{org.name}{index < this.state.reportingOrgsWithUpdates.length -1 ? ", " : " "}</span>)
+                            }.bind(this))
+                         }
+                         {this.props.i18nLib.t('import_type.data_updated')}                   
+                       </div>                      
+                   }
+                   
+               </div>
+               <div className="col-md-4 landing-page-right">
+                   <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.selectImportType.bind(this, constants.IMPORT_TYPE_MANUAL)}>{this.props.i18nLib.t('import_type.manual')}</button> <br/> <br/>
+               <span>{this.props.i18nLib.t('import_type.description_' + constants.IMPORT_TYPE_MANUAL)} </span> 
+               </div>
+                <div className="col-md-2">
+               </div>
+                </div>        		   
+        	  </div>          
+        	
         );
     }
 });
