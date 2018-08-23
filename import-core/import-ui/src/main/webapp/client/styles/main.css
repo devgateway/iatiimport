@@ -511,3 +511,6 @@ tbody.scrollablebody td, thead.scrollablebody th {
 .updated-project {
 	background: #ffff80;
 }
+.reporting-orgs-with-updates{
+	font-weight: bold;
+}
