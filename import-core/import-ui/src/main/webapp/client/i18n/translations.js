@@ -226,6 +226,7 @@ module.exports = {
 						'next': 'Next',
 						'description_manual': 'Follow the manual process if you have a valid IATI file that you want to upload.',
 						'description_automatic': 'Follow the automated process if you want to search for available IATI data and pull it directly from the IATI datastore.',
+						'data_updated': 'data has been updated since last sync'
 					},
 					'data_source': {
 						'title': 'Data Source Management',
@@ -485,6 +486,7 @@ module.exports = {
 						'next': 'Next',
 						'description_manual': 'Follow the manual process if you have a valid IATI file that you want to upload.',
 						'description_automatic': 'Follow the automated process if you want to search for available IATI data and pull it directly from the IATI datastore.',
+						'data_updated': 'data has been updated since last sync'
 					},
 					'data_source': {
 						'title': 'Data Source Management',
@@ -742,6 +744,7 @@ module.exports = {
 							'next': 'Next',
 							'description_manual': 'Follow the manual process if you have a valid IATI file that you want to upload.',
 							'description_automatic': 'Follow the automated process if you want to search for available IATI data and pull it directly from the IATI datastore.',
+							'data_updated': 'data has been updated since last sync'
 						},
 						'data_source': {
 							'title': 'Data Source Management',
