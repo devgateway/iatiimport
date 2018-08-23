@@ -11,6 +11,7 @@ var AutoComplete = require('./autocomplete');
 var SimilarProjectsDialog = require('./similar-projects-dlg');
 var _ = require('lodash/dist/lodash.underscore');
 var constants = require('./../../utils/constants');
+var Tooltip = require('./tooltip');
 
 var ChooseProjects = React.createClass({
     mixins: [
@@ -174,7 +175,10 @@ var ChooseProjects = React.createClass({
        projectMapping.destinationDocument = null;
        this.setState({projectData: projectData});
 	},
-    render: function () {
+	projectHasBeenUpdated: function(iatiIdentifier) {        
+	   return  _.find(this.props.projectWithUpdates, function(project) { return project.projectIdentifier === iatiIdentifier});	   
+	},
+    render: function () {        
         var newProjects = [];
         var existingProjects = [];
         var language = this.props.i18nLib.lng() || 'en';
@@ -182,7 +186,7 @@ var ChooseProjects = React.createClass({
         if (this.state.projectData) {
            $.map(this.state.projectData, function (item, i) {
                 if (item.operation == 'INSERT') {
-                    newProjects.push(<tr key={i}>
+                    newProjects.push(<tr key={i} className={this.projectHasBeenUpdated(item.sourceDocument.identifier) ? "updated-project" : ""}>
                         <td>
                            <input aria-label="Source" className="source"  type="checkbox" checked={item.selected} onChange={this.handleToggle.bind(this, item)} />
                         </td>
@@ -208,7 +212,12 @@ var ChooseProjects = React.createClass({
                          </td>
                     </tr>);
                 } else {
-                    existingProjects.push(<tr key={i} className = {item.destinationDocument.allowEdit ? "" : "warning not-active" } >
+                    var classes = item.destinationDocument.allowEdit ? "" : "warning not-active" ;
+                    if (this.projectHasBeenUpdated(item.sourceDocument.identifier)) {
+                        classes += " updated-project";
+                    }
+                    
+                    existingProjects.push(<tr key={i} className = {classes} >
                         <td>
                           <input aria-label="Source" className="source" type="checkbox" checked={item.selected} onChange={this.handleToggle.bind(this, item)} />
                         </td>
@@ -248,18 +257,18 @@ var ChooseProjects = React.createClass({
                                             {this.props.i18nLib.t('wizard.choose_projects.import')}
                                         </th>
                                          <th className="id-column-width">
-                                            {this.props.i18nLib.t('wizard.choose_projects.iati_id')}
+                                          <Tooltip i18nLib={this.props.i18nLib} tooltip={this.props.i18nLib.t('wizard.choose_projects.iati_id_tooltip')}/> {this.props.i18nLib.t('wizard.choose_projects.iati_id')}
                                         </th>
                                         <th>
-                                            {this.props.i18nLib.t('wizard.choose_projects.source_project')}
+                                          <Tooltip i18nLib={this.props.i18nLib} tooltip={this.props.i18nLib.t('wizard.choose_projects.source_project_tooltip')}/> {this.props.i18nLib.t('wizard.choose_projects.source_project')}
                                         </th>
                                         <th>
-                                            {this.props.i18nLib.t('wizard.choose_projects.destination_project')}
+                                          <Tooltip i18nLib={this.props.i18nLib} tooltip={this.props.i18nLib.t('wizard.choose_projects.destination_project_tooltip')}/> {this.props.i18nLib.t('wizard.choose_projects.destination_project')}
                                         </th>
                                         <th></th>
-                                        <th>{this.props.i18nLib.t('wizard.choose_projects.similar_titles')}</th>
+                                          <th><Tooltip i18nLib={this.props.i18nLib} tooltip={this.props.i18nLib.t('wizard.choose_projects.similar_titles_tooltip')}/>{this.props.i18nLib.t('wizard.choose_projects.similar_titles')}</th>
                                         <th>
-                                        <input type="checkbox" checked={this.overrideAll('INSERT')} onChange={this.overrideTitleAll} />
+                                        <Tooltip i18nLib={this.props.i18nLib} tooltip={this.props.i18nLib.t('wizard.choose_projects.override_title_tooltip')}/> <input type="checkbox" checked={this.overrideAll('INSERT')} onChange={this.overrideTitleAll} />
                                         {this.props.i18nLib.t('wizard.choose_projects.override_title')}
                                         </th>
                                     </tr>
@@ -282,16 +291,16 @@ var ChooseProjects = React.createClass({
                                             {this.props.i18nLib.t('wizard.choose_projects.update')}
                                         </th>
                                          <th className="id-column-width">
-                                            {this.props.i18nLib.t('wizard.choose_projects.iati_id')}
+                                            <Tooltip i18nLib={this.props.i18nLib} tooltip={this.props.i18nLib.t('wizard.choose_projects.iati_id_tooltip')}/>{this.props.i18nLib.t('wizard.choose_projects.iati_id')}
                                         </th>
                                         <th>
-                                            {this.props.i18nLib.t('wizard.choose_projects.source_project')}
+                                            <Tooltip i18nLib={this.props.i18nLib} tooltip={this.props.i18nLib.t('wizard.choose_projects.source_project_tooltip')}/> {this.props.i18nLib.t('wizard.choose_projects.source_project')}
                                         </th>
                                         <th>
-                                            {this.props.i18nLib.t('wizard.choose_projects.destination_project')}
+                                            <Tooltip i18nLib={this.props.i18nLib} tooltip={this.props.i18nLib.t('wizard.choose_projects.destination_project_tooltip')}/> {this.props.i18nLib.t('wizard.choose_projects.destination_project')}
                                         </th>
                                         <th>
-                                        <input type="checkbox" checked={this.overrideAll('UPDATE')} onChange={this.overrideTitleAll} />
+                                            <Tooltip i18nLib={this.props.i18nLib} tooltip={this.props.i18nLib.t('wizard.choose_projects.override_title_tooltip')}/><input type="checkbox" checked={this.overrideAll('UPDATE')} onChange={this.overrideTitleAll} />
                                         {this.props.i18nLib.t('wizard.choose_projects.override_title')}
                                         </th>
                                     </tr>

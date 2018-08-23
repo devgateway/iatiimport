@@ -85,7 +85,12 @@ module.exports = {
 							'msg_error_retrieving_projects' : ' Error retrieving filters.',
 							'msg_error_select_project' : ' Please select at least one project to proceed',
 						    'msg_project_not_editable':'Projects marked with an * and highlighted are not editable because they are not in the current workspace.',
-						    'similar_titles': '# of Similar Titles'
+						    'similar_titles': '# of Similar Titles',
+                            'iati_id_tooltip': 'IATI ID - A globally unique identifier for the project.',
+                            'source_project_tooltip': 'The title of the project extracted from IATI data store or IATI file',
+                            'destination_project_tooltip': 'The title of the project in the destination system that will be updated',
+                            'similar_titles_tooltip': 'Click on the blue bubble to see projects with a similar title in the destination system. This also allows you to map one of the similar projects to the source project.',
+                            'override_title_tooltip': 'Selecting this will replace the title of the project in the destination with a the title from the source project'                            
 						},
 						'similar_projects_dlg': {
 							'title': 'Projects with similar title',
@@ -226,7 +231,7 @@ module.exports = {
 						'next': 'Next',
 						'description_manual': 'Follow the manual process if you have a valid IATI file that you want to upload.',
 						'description_automatic': 'Follow the automated process if you want to search for available IATI data and pull it directly from the IATI datastore.',
-						'data_updated': 'data has been updated since last sync'
+						'data_updated': 'data has been updated since last sync.'
 					},
 					'data_source': {
 						'title': 'Data Source Management',
@@ -342,7 +347,12 @@ module.exports = {
 							'msg_error_retrieving_projects' : ' Error al recuperar los filtros.',
 							'msg_error_select_project' : ' Favor seleccionar al menos un proyecto para continuar',
 						    'msg_project_not_editable':'Los proyectos marcador por un * y resaltados no pueden ser editados puesto que no encuentran en el espacio de trabajo actual.',
-						    'similar_titles': '# de títulos similares'
+						    'similar_titles': '# de títulos similares',
+						    'iati_id_tooltip': 'IATI ID - A globally unique identifier for the project.',
+                            'source_project_tooltip': 'The title of the project extracted from IATI data store or IATI file',
+                            'destination_project_tooltip': 'The title of the project in the destination system that will be updated',
+                            'similar_titles_tooltip': 'Click on the blue bubble to see projects with a similar title in the destination system. This also allows you to map one of the similar projects to the source project.',
+                            'override_title_tooltip': 'Selecting this will replace the title of the project in the destination with a the title from the source project' 
 						},
 						'similar_projects_dlg': {
 							'title': 'Proyectos con títulos similares',
@@ -486,7 +496,7 @@ module.exports = {
 						'next': 'Next',
 						'description_manual': 'Follow the manual process if you have a valid IATI file that you want to upload.',
 						'description_automatic': 'Follow the automated process if you want to search for available IATI data and pull it directly from the IATI datastore.',
-						'data_updated': 'data has been updated since last sync'
+						'data_updated': 'data has been updated since last sync.'
 					},
 					'data_source': {
 						'title': 'Data Source Management',
@@ -602,7 +612,12 @@ module.exports = {
 							'previous' : ' << Précédent ',
 							'msg_error_retrieving_projects' : ' Erreur dans la recherche des Filtres.',
 							'msg_error_select_project' : ' Veuillez sélectionner au moins un projet pour continuer ',
-							'similar_titles': 'Nbre de titres similaires'
+							'similar_titles': 'Nbre de titres similaires',
+						    'iati_id_tooltip': 'IATI ID - A globally unique identifier for the project.',
+                            'source_project_tooltip': 'The title of the project extracted from IATI data store or IATI file',
+                            'destination_project_tooltip': 'The title of the project in the destination system that will be updated',
+                            'similar_titles_tooltip': 'Click on the blue bubble to see projects with a similar title in the destination system. This also allows you to map one of the similar projects to the source project.',
+                            'override_title_tooltip': 'Selecting this will replace the title of the project in the destination with a the title from the source project' 
 						},
 						'similar_projects_dlg': {
 							'title': 'Projets ayant un titre similaire',
@@ -744,7 +759,7 @@ module.exports = {
 							'next': 'Next',
 							'description_manual': 'Follow the manual process if you have a valid IATI file that you want to upload.',
 							'description_automatic': 'Follow the automated process if you want to search for available IATI data and pull it directly from the IATI datastore.',
-							'data_updated': 'data has been updated since last sync'
+							'data_updated': 'data has been updated since last sync.'
 						},
 						'data_source': {
 							'title': 'Data Source Management',

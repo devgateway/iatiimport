@@ -46,7 +46,7 @@ var LandingPage = React.createClass({
                    <br/>
                    <br/>
                    {this.state.reportingOrgsWithUpdates && this.state.reportingOrgsWithUpdates.length > 0 &&
-                       <div>                      
+                       <div className="reporting-orgs-with-updates">                      
                          {this.state.reportingOrgsWithUpdates.map(function(org, index){
                              return (<span>{org.name}{index < this.state.reportingOrgsWithUpdates.length -1 ? ", " : " "}</span>)
                             }.bind(this))

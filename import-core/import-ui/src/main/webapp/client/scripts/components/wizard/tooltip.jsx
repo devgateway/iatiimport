@@ -1,4 +1,5 @@
 var React = require('react');
+var DEFAULT_LANGUAGE_CODE = 'en';
 var Tooltip = React.createClass({   
     getInitialState: function() {
        return {};
@@ -21,8 +22,8 @@ var Tooltip = React.createClass({
         if (typeof tooltip === 'string' || tooltip instanceof String) {
              return tooltip;
         } else {
-             var currentLanguage = this.props.i18nLib.lng().toUpperCase();
-             return tooltip[currentLanguage] || tooltip["EN"] || "";  
+             var currentLanguage = this.props.i18nLib.lng();
+             return tooltip[currentLanguage] || tooltip[DEFAULT_LANGUAGE_CODE] || "";  
         }       
     },
     render: function() {           
