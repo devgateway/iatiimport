@@ -9,48 +9,34 @@ var appConfig = require('./../../conf');
 var DataSourceStore = require('./../../stores/DataSourceStore');
 var constants = require('./../../utils/constants');
 var formActions = require('./../../actions/form');
+var AutoComplete = require('./autocomplete');
+
 var SelectDataSource = React.createClass({
     mixins: [Reflux.ListenerMixin
     ],
     getInitialState: function() {
        return {
-           reportingOrgs: [],
-           reportingOrgId: null
+           reportingOrgId: null,
+           reportingOrgName: null,
        };
     },
-    updateReportingOrgs: function(data) {        
-       this.setState({reportingOrgs: data})
-    },       
-   loadData: function(){       
-       formActions.loadReportingOrganizations().then(function(data) {   
-          this.updateReportingOrgs(data);                
-        }.bind(this))["catch"](function(err) {       
-          console.log('Error loading reporting orgs');
-       }.bind(this));      
-    },
     componentDidMount: function() {  
-        this.props.eventHandlers.updateCurrentStep(constants.SELECT_DATASOURCE);
-        this.loadData();
-    },  
-    onReportingOrgChange: function(event) {
-      this.setState({reportingOrgId: event.target.value});  
-    },
+        this.props.eventHandlers.updateCurrentStep(constants.SELECT_DATASOURCE);       
+    },      
     handleNext: function() {
         this.props.eventHandlers.fetchData(this.state.reportingOrgId);
     },
+    onReportingOrgSelect: function(datum) {        
+       this.setState({reportingOrgId: datum.orgId, reportingOrgName:datum.name });        
+    },
     render: function() {      
+        var language = this.props.i18nLib.lng() || 'en';
         return (
             <div className="panel panel-default">
                 <div className="panel-heading"><strong>{this.props.i18nLib.t('data_source.select_data_source')}</strong></div>
                 <div className="panel-body">
-                <label> {this.props.i18nLib.t('data_source.select_data_reporting_org')}</label>                              
-                <select id="reportingOrgId" className="form-control reporting-org-select" onChange={this.onReportingOrgChange}> 
-                 <option value="" ></option>
-                   {this.state.reportingOrgs.map(function(org){
-                     return (<option value={org.orgId}>{org.name} </option>)
-                   })                               
-                 }
-                </select>                    
+                <label> {this.props.i18nLib.t('data_source.select_data_reporting_org')}</label>   
+                <AutoComplete context={constants.SELECT_DATASOURCE} options={[]} display="title" language={language} placeholder={this.props.i18nLib.t('data_source.reporting_org_placeholder')} refId="reportingOrgSearch" onSelect={this.onReportingOrgSelect.bind(this)} value={this.state.reportingOrgName ? this.state.reportingOrgName : ''}/>                                  
                 </div>
                 <br /><br /><br />
                 <div className="buttons">

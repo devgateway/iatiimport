@@ -250,7 +250,8 @@ module.exports = {
 						'select_data_source': 'Select Data Source',
 						'select_data_reporting_org': 'Select the reporting organization to import from:',
 						'next': 'Next',
-						'error': 'Error:'
+						'error': 'Error:',
+						'reporting_org_placeholder': 'Start typing the reporting organization name'
 					},
 					'select_version': {
 						'title': 'Select Version',
@@ -515,7 +516,8 @@ module.exports = {
 						'select_data_source': 'Select Data Source',
 						'select_data_reporting_org': 'Select the reporting organization to import from:',
 						'next': 'Next',
-						'error': 'Error:'
+						'error': 'Error:',
+						'reporting_org_placeholder': 'Start typing the reporting organization name'
 					},
 					'select_version': {
 						'title': 'Select Version',
@@ -778,7 +780,8 @@ module.exports = {
 							'select_data_source': 'Select Data Source',
 							'select_data_reporting_org': 'Select the reporting organization to import from:',
 							'next': 'Next',
-							'error': 'Error:'
+							'error': 'Error:',
+							'reporting_org_placeholder': 'Start typing the reporting organization name'
 						},
 						'select_version': {
 							'title': 'Select Version',

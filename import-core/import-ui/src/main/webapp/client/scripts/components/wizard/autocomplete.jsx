@@ -5,7 +5,9 @@ var AutoComplete = React.createClass({
     componentDidMount: function () {
      if(this.props.context == constants.CHOOSE_PROJECTS){
     	 this.initializeProjectsAutocomplete();
-     } else{
+     } else if(this.props.context == constants.SELECT_DATASOURCE) {
+         this.initializeRemoteAutocomplete();
+     }  else{
     	 this.initializeValuesAutocomplete();
      }
     },
@@ -97,6 +99,62 @@ var AutoComplete = React.createClass({
     	   $el.val('');
     	}
 
+    },
+    initializeRemoteAutocomplete: function(){
+        var $el = $(this.refs[this.props.refId].getDOMNode());
+        var bloodhound = new Bloodhound({
+        limit: 100,
+        datumTokenizer: function(item) {
+                  return Bloodhound.tokenizers.whitespace(item.name);
+         },
+            queryTokenizer: Bloodhound.tokenizers.whitespace,
+            remote: {
+                url: '/importer/data-source/reporting-orgs/%QUERY',
+                wildcard: '%QUERY'
+              }
+        });
+
+
+        bloodhound.initialize();
+        $el.typeahead({
+            hint: true,
+            highlight: true,
+            minLength: 4
+        },
+        {
+            name: 'autocomplete',
+            displayKey: function(item) {
+                return item.name;
+            },
+            source: bloodhound.ttAdapter(),
+            templates: {
+                empty: [
+                        '<div class="noitems">',
+                        ' No Items Found',
+                        '</div>'
+                        ].join('\n')
+            }
+        });
+
+        var self = this;
+
+      $el.bind('typeahead:selected', function (obj, datum, name) {
+            self.props.onSelect(datum);
+      });
+      $el.bind('typeahead:autocompleted', function (obj, datum, name) {
+        self.props.onSelect(datum);
+       });
+
+
+        $el.bind("paste", $.proxy(function(e){
+           e.preventDefault();
+         }, this));
+
+        if (this.props.value) {
+            $el.val(this.props.value);
+        } else {
+           $el.val('');
+        }
     },
     componentDidUpdate: function(prevProps, prevState){
     	var $el = $(this.refs[this.props.refId].getDOMNode());
