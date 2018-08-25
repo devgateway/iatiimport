@@ -1,5 +1,6 @@
 package org.devgateway.importtool.services.processor;
 
+import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -23,6 +24,7 @@ import org.devgateway.importtool.exceptions.CurrencyNotFoundException;
 import org.devgateway.importtool.services.processor.helper.*;
 import org.devgateway.importtool.services.request.ImportRequest;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
@@ -200,9 +202,11 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	}
 
 	private RestTemplate getRestTemplate() {
-		if (template == null)
+		if (template == null) {
 			template = new RestTemplate();
-		template.setInterceptors(this.interceptors);
+		    template.getMessageConverters().add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
+		    template.setInterceptors(this.interceptors);
+		}
 		return template;
 	}
 
