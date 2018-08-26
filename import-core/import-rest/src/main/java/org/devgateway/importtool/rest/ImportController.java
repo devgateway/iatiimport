@@ -12,7 +12,7 @@ import org.devgateway.importtool.model.File;
 import org.devgateway.importtool.model.ImportSummary;
 import org.devgateway.importtool.rest.dto.FetchOrganizationDetails;
 import org.devgateway.importtool.security.ImportSessionToken;
-import org.devgateway.importtool.services.DataFetchService;
+import org.devgateway.importtool.services.ActivityFetchService;
 import org.devgateway.importtool.services.ImportService;
 import org.devgateway.importtool.services.processor.IATIProcessor;
 import org.devgateway.importtool.services.processor.helper.DocumentMapper;
@@ -66,7 +66,7 @@ class ImportController  {
 	private ImportService importService;
 	
 	@Autowired
-	private DataFetchService dataFetchService;
+	private ActivityFetchService activityFetchService;
 	
 	private Log log = LogFactory.getLog(getClass());
 
@@ -236,7 +236,7 @@ class ImportController  {
             reportingOrgId) {
         try {
             List<Param> params = DataFetchServiceConstants.getCommonParams(reportingOrgId);
-            FetchResult activitiesFromDataStore = dataFetchService.fetchResult(reportingOrgId, params);
+            FetchResult activitiesFromDataStore = activityFetchService.fetchResult(reportingOrgId, params);
             request.getSession().setAttribute(IATI_STORE_ACTIVITIES,activitiesFromDataStore);
 			activitiesFromDataStore.getVersions().
 					retainAll(IATIProcessor.IMPLEMENTED_VERSIONS);

@@ -5,9 +5,8 @@ import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.dao.ProjectRepository;
 import org.devgateway.importtool.endpoint.Param;
 import org.devgateway.importtool.model.Project;
-import org.devgateway.importtool.services.DataFetchService;
+import org.devgateway.importtool.services.ActivityFetchService;
 import org.devgateway.importtool.endpoint.DataFetchServiceConstants;
-import org.devgateway.importtool.services.DataSourceService;
 import org.devgateway.importtool.services.processor.IATIProcessor;
 import org.devgateway.importtool.services.processor.helper.IATIProcessorHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,19 +14,12 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -44,7 +36,7 @@ public class ActivityFetcher {
     private static final SimpleDateFormat ISO8601_DATE_FORMAT_PARSER = new SimpleDateFormat(ISO8601_DATE_FORMAT);
 
     @Autowired
-    private DataFetchService dataFetchService;
+    private ActivityFetchService activityFetchService;
     @Autowired
     private ProjectRepository projectRepository;
 
@@ -58,7 +50,7 @@ public class ActivityFetcher {
             List<Param> params = DataFetchServiceConstants.getCommonParams(reportingOrg);
             params.add(new Param(DataFetchServiceConstants.IATI_IDENTIFIER_PARAMETER, iatiIdentifiers));
             //we could fetch the last sync date for a reporting org to limit the result we are getting
-            Document doc = dataFetchService.fetch(reportingOrg, params);
+            Document doc = activityFetchService.fetch(reportingOrg, params);
             NodeList activities;
             try {
                 activities = (NodeList) xPath.compile(query.toString()).evaluate(doc, XPathConstants.NODESET);
