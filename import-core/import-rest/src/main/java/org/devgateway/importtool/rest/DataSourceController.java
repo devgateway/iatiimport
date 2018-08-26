@@ -42,7 +42,7 @@ class DataSourceController {
 																 @PathVariable Optional<String> orgName) {
 		List<ReportingOrganization> reportingOrganizations;
 		if (orgName.isPresent()) {
-			reportingOrganizations = reportingOrgRepository.findByNameStartingWith(orgName.get());
+			reportingOrganizations = reportingOrgRepository.findByNameStartingWithIgnoreCase(orgName.get());
 		} else {
 			reportingOrganizations = reportingOrgRepository.findAll();
 		}
