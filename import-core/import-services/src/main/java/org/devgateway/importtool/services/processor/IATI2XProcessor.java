@@ -1,5 +1,6 @@
 package org.devgateway.importtool.services.processor;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.model.Language;
@@ -221,7 +222,11 @@ public class IATI2XProcessor extends IATIProcessor {
 							FieldValue newfv = new FieldValue();
 							final String name = fieldElement.getElementsByTagName("narrative").item(0) != null ? fieldElement.getElementsByTagName("narrative").item(0).getTextContent() : "";
 							newfv.setCode(codeValue);
-							newfv.setValue(name);
+							if (StringUtils.isEmpty(name) ) {
+								newfv.setValue(codeValue);
+							} else {										
+								newfv.setValue(name);	
+							}								
 							newfv.setIndex(field.getPossibleValues().size());
 							field.getPossibleValues().add(newfv);
 							if (!reducedPossibleValues.stream().filter(n -> {

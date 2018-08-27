@@ -1,5 +1,6 @@
 package org.devgateway.importtool.services.processor;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.model.Language;
@@ -163,23 +164,27 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 						if (field.getPossibleValues() == null) {
 							field.setPossibleValues(new ArrayList<FieldValue>());
 						}
-						if (nodeList.getLength() > 0) {
-							for (int i = 0; i < nodeList.getLength(); i++) {
-								Element fieldElement = (Element) nodeList.item(i);
-								final String orgCode = fieldElement.getAttribute("value");
-								Optional<FieldValue> fieldValue = field.getPossibleValues().stream().filter(n -> {
-									return n.getCode().equals(orgCode);
-								}).findFirst();
-								if (!fieldValue.isPresent()) {
-									FieldValue newfv = new FieldValue();
-									final String name = fieldElement.getTextContent();
-									newfv.setCode(orgCode);
+					if (nodeList.getLength() > 0) {
+						for (int i = 0; i < nodeList.getLength(); i++) {
+							Element fieldElement = (Element) nodeList.item(i);
+							final String orgCode = fieldElement.getAttribute("value");
+							Optional<FieldValue> fieldValue = field.getPossibleValues().stream().filter(n -> {
+								return n.getCode().equals(orgCode);
+							}).findFirst();
+							if (!fieldValue.isPresent()) {
+								final String name = fieldElement.getTextContent();
+								FieldValue newfv = new FieldValue();
+								newfv.setCode(orgCode);
+								if (StringUtils.isEmpty(name)) {
+									newfv.setValue(orgCode);
+								} else {
 									newfv.setValue(name);
+								}
 									newfv.setIndex(field.getPossibleValues().size());
 									field.getPossibleValues().add(newfv);
-								}
-							}
+								}							
 						}
+					}
 						break;
 					case LOCATION:
 					case RECIPIENT_COUNTRY:
@@ -195,8 +200,12 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 								if (!fieldValue.isPresent() && !codeValue.isEmpty()) {
 									FieldValue newfv = new FieldValue();
 									final String name = fieldElement.getTextContent();
-									newfv.setCode(codeValue);
-									newfv.setValue(name);
+									newfv.setCode(codeValue);									
+									if (StringUtils.isEmpty(name) ) {
+										newfv.setValue(codeValue);
+									} else {										
+										newfv.setValue(name);	
+									}									
 									newfv.setIndex(field.getPossibleValues().size());
 									field.getPossibleValues().add(newfv);
 									if (!reducedPossibleValues.stream().filter(n -> {
