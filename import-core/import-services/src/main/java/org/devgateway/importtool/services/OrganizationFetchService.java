@@ -53,6 +53,6 @@ public class OrganizationFetchService {
     }
 
     private ReportingOrganization getOrgFromJson(ResultEntry entry) {
-        return new ReportingOrganization(entry.getPublisherIatiId(), entry.getName());
+        return new ReportingOrganization(entry.getPublisherIatiId(), entry.getTitle());
     }
 }
