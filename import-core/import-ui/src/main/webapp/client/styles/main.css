@@ -497,6 +497,11 @@ tbody.scrollablebody td, thead.scrollablebody th {
 	margin-right:10px;
 }
 
+.glyphicon-eye-open-custom {
+	font-size: 16px;
+	margin:5px;
+}
+
 .landing-page-left {
 	border-right-color: #e7e7e7;
     border-right-width: 2px;

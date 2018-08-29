@@ -178,6 +178,15 @@ var ChooseProjects = React.createClass({
 	projectHasBeenUpdated: function(iatiIdentifier) {        
 	   return  _.find(this.props.projectWithUpdates, function(project) { return project.projectIdentifier === iatiIdentifier});	   
 	},
+	openDestinationProject: function(event) {
+	    var projectMapping = _.find(this.state.projectData, function(m) { return m.id === event.target.dataset.id});
+	    if (projectMapping.destinationDocument) {
+	        console.log(projectMapping.destinationDocument.stringFields.id);
+	        var win = window.open(appConfig.AMP_ACTIVITY_URL + '~activityId=' + projectMapping.destinationDocument.stringFields.id, '_blank');
+	        win.focus();
+	    }
+	    
+	},
     render: function () {        
         var newProjects = [];
         var existingProjects = [];
@@ -196,16 +205,22 @@ var ChooseProjects = React.createClass({
                         <td>
                             {this.getTitle(item.sourceDocument.multilangFields)}
                         </td>
+                            <td className="no-left-padding">
+                            {item.destinationDocument &&
+                               <span className="glyphicon glyphicon-eye-open glyphicon-eye-open-custom" data-id={item.id} onClick={this.openDestinationProject}></span>
+                            }                           
+                            </td>
                         <td className="no-right-padding">                            
                             {(this.state.destinationProjects && this.state.destinationProjects.length > 0) &&
                                 <AutoComplete context={constants.CHOOSE_PROJECTS} options={this.state.destinationProjects} display="title" language={language} placeholder="" refId="destSearch" onSelect={this.handleAutocompleteToggle.bind(this, item)} value={item.destinationDocument ? this.getTitle(item.destinationDocument.multilangFields) : ''}/>
-                            }                          
+                            }                               
                        </td>
+                        
                         <td className="no-left-padding"><span className="glyphicon glyphicon-remove glyphicon-remove-custom" data-id={item.id} onClick={this.resetMapping}></span></td>
                         <td>
-                        { item.projectsWithSimilarTitles && item.projectsWithSimilarTitles.length > 0 &&
+                           { item.projectsWithSimilarTitles && item.projectsWithSimilarTitles.length > 0 &&
                             <span className="badge" onClick={this.showSimilarProjectsDialog} data-id={item.id} data-toggle="modal" data-target="#similarProjects">{item.projectsWithSimilarTitles.length}</span>
-                        }
+                           }                       
                         </td>
                         <td>
                             <input aria-label="override-title" className="override-title"  type="checkbox" checked={item.overrideTitle} onChange={this.handleOverrideTitle.bind(this, item)} />
@@ -227,6 +242,11 @@ var ChooseProjects = React.createClass({
                         <td>{item.destinationDocument.allowEdit ? "" : " * " }
                             {this.getTitle(item.sourceDocument.multilangFields)}
                         </td>
+                        <td>
+                            {item.destinationDocument &&
+                                <span className="glyphicon glyphicon-eye-open glyphicon-eye-open-custom" data-id={item.id} onClick={this.openDestinationProject}></span>
+                             } 
+                        </td>                             
                         <td>
                             {item.destinationDocument.multilangFields.title[language]}
                         </td>
@@ -262,9 +282,10 @@ var ChooseProjects = React.createClass({
                                         <th>
                                           <Tooltip i18nLib={this.props.i18nLib} tooltip={this.props.i18nLib.t('wizard.choose_projects.source_project_tooltip')}/> {this.props.i18nLib.t('wizard.choose_projects.source_project')}
                                         </th>
+                                          <th></th>
                                         <th>
                                           <Tooltip i18nLib={this.props.i18nLib} tooltip={this.props.i18nLib.t('wizard.choose_projects.destination_project_tooltip')}/> {this.props.i18nLib.t('wizard.choose_projects.destination_project')}
-                                        </th>
+                                        </th>                                      
                                         <th></th>
                                           <th><Tooltip i18nLib={this.props.i18nLib} tooltip={this.props.i18nLib.t('wizard.choose_projects.similar_titles_tooltip')}/>{this.props.i18nLib.t('wizard.choose_projects.similar_titles')}</th>
                                         <th>
@@ -296,6 +317,7 @@ var ChooseProjects = React.createClass({
                                         <th>
                                             <Tooltip i18nLib={this.props.i18nLib} tooltip={this.props.i18nLib.t('wizard.choose_projects.source_project_tooltip')}/> {this.props.i18nLib.t('wizard.choose_projects.source_project')}
                                         </th>
+                                         <th></th>
                                         <th>
                                             <Tooltip i18nLib={this.props.i18nLib} tooltip={this.props.i18nLib.t('wizard.choose_projects.destination_project_tooltip')}/> {this.props.i18nLib.t('wizard.choose_projects.destination_project')}
                                         </th>
