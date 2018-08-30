@@ -34,8 +34,8 @@ public class OrganizationFetchService {
             reportingOrgRepository.deleteAll();
             IatiOrganizationsOutput response;
             do {
-                //Uncomment the following line to fetch the organizations 200 at a time
-                //at the moment of testing it was faster to fetch them all together
+                //Uncomment the following line to fetchFetchFromDataStore the organizations 200 at a time
+                //at the moment of testing it was faster to fetchFetchFromDataStore them all together
                 String finalUrl = DataFetchServiceConstants.IATI_ORGANIZATIONS_DEFAULT_URL;  // + "&limit=" +
                 // PAGE_SIZE + "&offset=" + offSet;
                 response = restTemplate.getForObject(finalUrl, IatiOrganizationsOutput.class);
