@@ -12,6 +12,7 @@ public class DataFetchServiceConstants {
     public static final String REPORTING_ORGANISATION_PARAMETER="reporting-org";
     public static final String IATI_IDENTIFIER_PARAMETER="iati-identifier";
     public static final String IATI_EXTRA_VERSION ="iati-extra:version";
+    public static final String ACTIVITIES_FILES_STORE = "ActivityFetcher.fileStore";
     public static final String ORGANIZATIONS_ENDPOINT="";
     public static List<Param> getCommonParams(String reportingOrg) {
         List<Param> params = new ArrayList<>();

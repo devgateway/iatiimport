@@ -1,8 +1,15 @@
 package org.devgateway.importtool.services;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.OpenOption;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -35,32 +42,51 @@ public class ActivityFetchService {
 
 	private Log log = LogFactory.getLog(getClass());
 
-	public FetchResult fetchResult(String reportingOrg,List<Param>parameters) {
-		Document doc = fetch(reportingOrg, parameters);
-		return buildResult(doc);
-	}
+	public FetchResult fetchResult(String reportingOrg,List<Param>parameters) throws FileNotFoundException {
+
+        File f = new File(getFileName(reportingOrg));
+        Document doc;
+        if (f.exists()) {
+            InputStream fileInputStream = new FileInputStream(f);
+            doc = this.createXMLDocument(fileInputStream);
+        } else {
+            doc = this.createXMLDocument(fetch(reportingOrg, parameters));
+        }
+        return this.buildResult(doc);
+    }
+
+    /**
+     * If we have a custom datasource for the reporting org, fetch it, if not return the default one
+     * @param reportingOrg
+     * @return
+     */
 	private String getUrlForReportingOrg(String reportingOrg) {
 
 		String customUrl = dataSourceService.getDataSourceURL(reportingOrg);
-		customUrl = (customUrl != null) ? customUrl : DataFetchServiceConstants.IATI_DATASTORE_DEFAULT_URL;
-		
+        customUrl = customUrl != null ? customUrl : DataFetchServiceConstants.IATI_DATASTORE_DEFAULT_URL;
 		return customUrl;
 	}
 
-	public Document fetch(String reportingOrg, List<Param> parameters ) {
-		 Integer total = 0;
-		 Integer offset = 0;
+	public Document fetchFetchFromDataStore(String reportingOrg, List<Param> parameters ) {
+		return this.createXMLDocument(fetchFetchFromDataStoreAsString(reportingOrg, parameters));
+	}
 
-		 RestTemplate restTemplate = new RestTemplate();
-		 //TODO: iterate - pulling data in batches of 50 and adding to results object
-		 log.info(getUrlForReportingOrg(reportingOrg) +
-				 getParameters(parameters));
-		 
-		 String responseText = restTemplate.getForObject(getUrlForReportingOrg(reportingOrg) +
-				 getParameters(parameters), String.class);
+	public String fetchFetchFromDataStoreAsString(String reportingOrg, List<Param> parameters ) {
 
-		Document doc = this.createXMLDocument(responseText);
-		 return doc;
+		RestTemplate restTemplate = new RestTemplate();
+
+		if (parameters == null) {
+			parameters = new ArrayList<>();
+		}
+		getDefaultParametersForReportingOrg(parameters);
+		String url = getUrlForReportingOrg(reportingOrg) + getParameters(parameters);
+		log.info(url);
+		String responseText = restTemplate.getForObject(url, String.class);
+		return responseText;
+	}
+
+	private void getDefaultParametersForReportingOrg(List<Param> parameters) {
+		parameters.add(new Param("stream","true"));
 	}
 
 	private String getParameters(List<Param> parameters) {
@@ -78,15 +104,46 @@ public class ActivityFetchService {
 		return params.toString();
 	}
 
+	public String fetch(String reportingOrg) {
+		return fetch(reportingOrg, DataFetchServiceConstants.getCommonParams(reportingOrg));
+	}
+	/**
+	 * Saves and return in case its being called online
+	 * @param reportingOrg
+	 * @return
+	 */
+	public String fetch(String reportingOrg, List<Param> params) {
+		String fileName = getFileName(reportingOrg);
+		String responseText = fetchFetchFromDataStoreAsString(reportingOrg, params);
+		try {
+			Files.write(Paths.get(fileName), responseText.getBytes("UTF-8"));
+		} catch (IOException e) {
+			log.error("cannot save file ", e);
+		}
+		return responseText;
+	}
+
+
+	private String getFileName(String reportingOrg) {
+		return System.getProperty(DataFetchServiceConstants.ACTIVITIES_FILES_STORE) + File.separator +
+				reportingOrg + ".xml";
+	}
+
 	private Document createXMLDocument(String responseText) {
+		InputStream inputStream = new ByteArrayInputStream(responseText.getBytes());
+		return createXMLDocument(inputStream);
+
+	}
+
+	private Document createXMLDocument(InputStream inputStream ) {
 		Document doc = null;
-		if (responseText != null) {
+		if (inputStream != null) {
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			factory.setValidating(false);
 			factory.setIgnoringElementContentWhitespace(true);
 			try {
 				DocumentBuilder builder = factory.newDocumentBuilder();
-				InputStream inputStream = new ByteArrayInputStream(responseText.getBytes());			
+
 				doc = builder.parse(inputStream);
 			} catch (ParserConfigurationException | SAXException | IOException e) {
 				//TODO properly handle errors
