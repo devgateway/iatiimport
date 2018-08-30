@@ -19,5 +19,11 @@ module.exports = {
   ONLY_ADD_NEW_FUNDING: 'ONLY_ADD_NEW_FUNDING',
   REPLACE_DONOR_FUNDING: 'REPLACE_DONOR_FUNDING',
   IMPORT_TYPE_MANUAL: 'manual',
-  IMPORT_TYPE_AUTOMATIC: 'automatic'
+  IMPORT_TYPE_AUTOMATIC: 'automatic',  
+  FIELD_NAMES: {
+	  IATI_ID: 'iati-identifier',
+	  TITLE: 'title',
+	  DESCRIPTION: 'description',
+      ACTIVITY_STATUS: 'activity-status'
+  }
 };

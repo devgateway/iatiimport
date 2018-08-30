@@ -9,8 +9,10 @@ var Router = require('react-router');
 var Link = Router.Link;
 var AutoComplete = require('./autocomplete');
 var SimilarProjectsDialog = require('./similar-projects-dlg');
+var ProjectPreview = require('./project-preview/main');
 var _ = require('lodash/dist/lodash.underscore');
 var constants = require('./../../utils/constants');
+var sourceFieldsStore = require('./../../stores/SourceFieldsStore');
 var Tooltip = require('./tooltip');
 
 var ChooseProjects = React.createClass({
@@ -18,7 +20,14 @@ var ChooseProjects = React.createClass({
         Reflux.ListenerMixin
     ],
     getInitialState: function() {
-       return {projectData: [], destinationProjects: [], statusMessage: "", showSimilarProjects: false, projectMapping: null};
+       return {projectData: [], 
+           destinationProjects: [], 
+           statusMessage: "", 
+           showSimilarProjects: false, 
+           projectMapping: null,
+           showSourceProjectPreview: false,
+           sourceFieldsData:[]
+          };
     },
     initializeFailed:false,
     componentWillMount: function () {
@@ -28,6 +37,7 @@ var ChooseProjects = React.createClass({
      this.resetMapping = this.resetMapping.bind(this);
      this.props.eventHandlers.updateCurrentStep(constants.CHOOSE_PROJECTS);
      this.listenTo(projectStore, this.updateProject);
+     this.listenTo(sourceFieldsStore, this.updateSourceFields);
      this.loadData();
     },
     updateProject: function (data) {
@@ -35,13 +45,25 @@ var ChooseProjects = React.createClass({
             projectData: data
         });
     },
+    updateSourceFields: function(data) {
+        this.setState({
+            sourceFieldsData: data
+        });
+    },
     loadData: function(){
       self = this;
-    	this.props.eventHandlers.showLoadingIcon();
+      this.props.eventHandlers.showLoadingIcon();
+      appActions.loadSourceFieldsData.triggerPromise().then(function(data) {
+          this.updateSourceFields(data);          
+      }.bind(this))["catch"](function(err) {
+          this.props.eventHandlers.displayError(this.props.i18nLib.t('wizard.map_fields.msg_error_retrieving_source_fields'));
+      }.bind(this));
+      
       appActions.initializeMapping.triggerPromise().then(function(data) {
         self.loadSourceProjects();
       });
-    	this.loadProjects();
+      
+      this.loadProjects();
     },
     selectAll: function(){
     },
@@ -178,16 +200,23 @@ var ChooseProjects = React.createClass({
 	projectHasBeenUpdated: function(iatiIdentifier) {        
 	   return  _.find(this.props.projectWithUpdates, function(project) { return project.projectIdentifier === iatiIdentifier});	   
 	},
+	openProjectPreview: function(event) {
+	    var projectMapping = _.find(this.state.projectData, function(m) { return m.id === event.target.dataset.id});
+	    if (projectMapping.sourceDocument) {
+	        this.setState({showSourceProjectPreview: !this.state.showSourceProjectPreview, projectMapping: projectMapping}); 
+        }	    
+	},
+	closeProjectPreview: function() {
+	    this.setState({showSourceProjectPreview: false, projectMapping: null});
+	},
 	openDestinationProject: function(event) {
 	    var projectMapping = _.find(this.state.projectData, function(m) { return m.id === event.target.dataset.id});
 	    if (projectMapping.destinationDocument) {
-	        console.log(projectMapping.destinationDocument.stringFields.id);
 	        var win = window.open(appConfig.AMP_ACTIVITY_URL + '~activityId=' + projectMapping.destinationDocument.stringFields.id, '_blank');
 	        win.focus();
-	    }
-	    
+	    }	    
 	},
-    render: function () {        
+    render: function () {          
         var newProjects = [];
         var existingProjects = [];
         var language = this.props.i18nLib.lng() || 'en';
@@ -198,6 +227,9 @@ var ChooseProjects = React.createClass({
                     newProjects.push(<tr key={i} className={this.projectHasBeenUpdated(item.sourceDocument.identifier) ? "updated-project" : ""}>
                         <td>
                            <input aria-label="Source" className="source"  type="checkbox" checked={item.selected} onChange={this.handleToggle.bind(this, item)} />
+                        </td>
+                        <td>
+                            <span className="glyphicon glyphicon-eye-open glyphicon-eye-open-custom" data-id={item.id} onClick={this.openProjectPreview}></span> 
                         </td>
                         <td>
                         {item.sourceDocument.identifier}
@@ -236,6 +268,9 @@ var ChooseProjects = React.createClass({
                         <td>
                           <input aria-label="Source" className="source" type="checkbox" checked={item.selected} onChange={this.handleToggle.bind(this, item)} />
                         </td>
+                         <td>
+                            <span className="glyphicon glyphicon-eye-open glyphicon-eye-open-custom" data-id={item.id} onClick={this.openProjectPreview}></span> 
+                        </td>
                         <td>
                         {item.sourceDocument.identifier}
                         </td>
@@ -260,8 +295,7 @@ var ChooseProjects = React.createClass({
 
         return (
            <div>
-
-            <div className="panel panel-default">
+             <div className="panel panel-default">
                 <div className="panel-heading"><strong>{this.props.i18nLib.t('wizard.choose_projects.choose_projects')}</strong></div>
                 <div className="panel-body">
                     {statusMessage}
@@ -269,13 +303,17 @@ var ChooseProjects = React.createClass({
                         <div className="panel-heading">{this.props.i18nLib.t('wizard.choose_projects.new_projects')} <i>({this.state.destinationProjects.length} {this.props.i18nLib.t('wizard.choose_projects.choose_projects')})</i></div>
                         <div className="panel-body">
                          <SimilarProjectsDialog projectMapping={this.state.projectMapping} getTitle={this.getTitle} mapProject={this.mapProject} {...this.props} />
-                            <table className="table">
+                         {this.state.showSourceProjectPreview && this.state.projectMapping &&
+                            <ProjectPreview closeProjectPreview={this.closeProjectPreview.bind(this)} project={this.state.projectMapping.sourceDocument} i18nLib = {this.props.i18nLib} sourceFieldsData = {this.state.sourceFieldsData} /> 
+                         } 
+                         <table className="table">
                                 <thead>
                                     <tr>
                                         <th>
                                             <input type="checkbox" checked={this.checkAll('INSERT')} onChange={this.selectAllNew} />
                                             {this.props.i18nLib.t('wizard.choose_projects.import')}
                                         </th>
+                                         <th></th>
                                          <th className="id-column-width">
                                           <Tooltip i18nLib={this.props.i18nLib} tooltip={this.props.i18nLib.t('wizard.choose_projects.iati_id_tooltip')}/> {this.props.i18nLib.t('wizard.choose_projects.iati_id')}
                                         </th>
@@ -311,6 +349,7 @@ var ChooseProjects = React.createClass({
                                             <input type="checkbox" checked={this.checkAll('UPDATE')} onChange={this.selectAllExisting} />
                                             {this.props.i18nLib.t('wizard.choose_projects.update')}
                                         </th>
+                                        <th> </th>
                                          <th className="id-column-width">
                                             <Tooltip i18nLib={this.props.i18nLib} tooltip={this.props.i18nLib.t('wizard.choose_projects.iati_id_tooltip')}/>{this.props.i18nLib.t('wizard.choose_projects.iati_id')}
                                         </th>

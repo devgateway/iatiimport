@@ -519,3 +519,8 @@ tbody.scrollablebody td, thead.scrollablebody th {
 .reporting-orgs-with-updates{
 	font-weight: bold;
 }
+
+.projectPreview {
+ width: 70% !important;
+ min-height: 600px !important;
+}

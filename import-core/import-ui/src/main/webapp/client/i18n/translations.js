@@ -260,6 +260,12 @@ module.exports = {
 						'import_will_repeat': 'The import process will be repeated for each version.',
 						'imported': '(IMPORTED)',
 						'all_versions_imported': 'All versions have been imported'
+					},
+					'project_preview':{
+						'title': 'Project Preview',
+						'close': 'Close Preview',
+						 'identification': 'Identification'
+						
 					}
 				}
 			},
