@@ -6,8 +6,8 @@ module.exports = {
   getMultilangString: function(multilangFields, field, i18nLib){
 	  var language = i18nLib.lng() || 'en';
 	  var fieldData = multilangFields[field];
-	  var result = fieldData[language];
-	  if(result === null || result.length === 0){
+	  var result = fieldData[language] ? fieldData[language] : null;
+	  if(result === null){
 	     for (var key in multilangFields[result]) {
            if (multilangFields[field].hasOwnProperty(key)) {
               if(result === null || result.length === 0){
@@ -38,9 +38,12 @@ module.exports = {
 	  });
 	  
 	  if (field && field.possibleValues && field.possibleValues.length > 0) {
-		  name = _.find(field.possibleValues, function(value) { 
+		  var foundItem = _.find(field.possibleValues, function(value) { 
 			  return value.code === code;
-		  }).value;		  
+		  });
+		  if (foundItem) {
+			  name = foundItem.value;
+		  }		 		  
 	  }
 	  
 	  return name; 
