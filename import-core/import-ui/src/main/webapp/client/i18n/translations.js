@@ -81,7 +81,16 @@ module.exports = {
 							'previous' : '<< Previous',
 							'msg_error_retrieving_projects' : ' Error retrieving filters.',
 							'msg_error_select_project' : ' Please select at least one project to proceed',
-						  'msg_project_not_editable':'Projects marked with an * and highlighted are not editable because they are not in the current workspace.',
+						    'msg_project_not_editable':'Projects marked with an * and highlighted are not editable because they are not in the current workspace.',
+						    'similar_titles': '# of Similar Titles'
+						},
+						'similar_projects_dlg': {
+							'title': 'Projects with similar title',
+							'close': 'Close',
+							'select_project': 'Map Selected Project',
+							'iati_id': 'IATI ID',
+							'project_title': 'Project Title',
+						   'msg_project_not_editable':'Projects marked with an * and highlighted are not editable because they are not in the current workspace.',
 							'message': 'projects in the destination system'
 						},
 						'map_fields' : {
@@ -124,16 +133,15 @@ module.exports = {
 						'save_field_mappings_dlg' : {
 							'msg_error_saving' : 'Error saving template',
 							'title' : 'Save Field Mappings',
-							'close' : 'close',
+							'close' : 'Close',
 							'save_mapping' : 'Save Mapping',
 							'save_as_copy' : 'Save as Copy',
 							'mapping_exists' : 'Mapping name already exists'
-
 						},
 						'save_value_mappings_dlg' : {
 							'msg_error_saving' : 'Error saving template',
 							'title' : 'Save Value Mappings',
-							'close' : 'close',
+							'close' : 'Close',
 							'save_mapping' : 'Save Mapping',
 							'save_as_copy' : 'Save as Copy',
 							'mapping_exists' : 'Mapping name already exists'
@@ -274,7 +282,6 @@ module.exports = {
 							'previous' : '<< Anterior',
 							'msg_error_retrieving_languages' : 'Error al recuperar los idiomas.',
 							'msg_error_retrieving_filters' : ' Error al recuperar los filtros.'
-
 						},
 						'choose_projects' : {
 							'choose_projects' : 'Seleccionar Proyectos',
@@ -290,9 +297,17 @@ module.exports = {
 							'previous' : '<< Anterior',
 							'msg_error_retrieving_projects' : ' Error al recuperar los filtros.',
 							'msg_error_select_project' : ' Favor seleccionar al menos un proyecto para continuar',
-					    'msg_project_not_editable':'Los proyectos marcador por un * y resaltados no pueden ser editados puesto que no encuentran en el espacio de trabajo actual.',
+						    'msg_project_not_editable':'Los proyectos marcador por un * y resaltados no pueden ser editados puesto que no encuentran en el espacio de trabajo actual.',
+						    'similar_titles': '# de títulos similares'
+						},
+						'similar_projects_dlg': {
+							'title': 'Proyectos con títulos similares',
+							'close': 'Cerrar',
+							'select_project': 'Mapear los proyectos seleccionados',
+							'iati_id': 'IATI ID',
+							'project_title': 'Título del proyecto',
+					        'msg_project_not_editable':'Los proyectos marcador por un * y resaltados no pueden ser editados puesto que no encuentran en el espacio de trabajo actual.',
 							'message': 'proyectos en el sistema destino'
-
 						},
 						'map_fields' : {
 							'choose_map_fields' : 'Seleccionar y mapear los campos',
@@ -335,7 +350,7 @@ module.exports = {
 						'save_field_mappings_dlg' : {
 							'msg_error_saving' : 'Error al guardar la plantilla',
 							'title' : 'Guardar el Mapeo de los Campos',
-							'close' : 'cerrar',
+							'close' : 'Cerrar',
 							'save_mapping' : 'Guardar Mapeo',
 							'save_as_copy' : 'Save as Copy',
 							'mapping_exists' : 'Mapeo existente'
@@ -343,7 +358,7 @@ module.exports = {
 						'save_value_mappings_dlg' : {
 							'msg_error_saving' : 'Error al guardar la plantilla',
 							'title' : 'Guardar los Valores de Mapeo',
-							'close' : 'cerrar',
+							'close' : 'Cerrar',
 							'save_mapping' : 'Guardar Mapeo',
 							'save_as_copy' : 'Save as Copy',
 							'mapping_exists' : 'Mapeo existente'
@@ -500,6 +515,14 @@ module.exports = {
 							'previous' : ' << Précédent ',
 							'msg_error_retrieving_projects' : ' Erreur dans la recherche des Filtres.',
 							'msg_error_select_project' : ' Veuillez sélectionner au moins un projet pour continuer ',
+							'similar_titles': 'Nbre de titres similaires'
+						},
+						'similar_projects_dlg': {
+							'title': 'Projets ayant un titre similaire',
+							'close': 'Fermer',
+							'select_project': 'Maintenir la version du projet',
+							'iati_id': 'IATI ID',
+							'project_title': 'Titre du projet ',
 							'message' : ' projets dans le système de destination'
 						},
 						'map_fields' : {

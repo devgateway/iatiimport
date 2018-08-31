@@ -33,6 +33,7 @@ import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
 import org.devgateway.importtool.services.processor.helper.InternalDocument;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.util.DigestUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -309,6 +310,9 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 				DocumentBuilder builder = factory.newDocumentBuilder();
 				Document doc = builder.parse(is);
 				NodeList nodeList = doc.getElementsByTagName(standardFieldName);
+				if (nodeList.getLength() == 0) {
+					nodeList = doc.getElementsByTagName("codelist-item");
+				}
 				int index = 0;
 				for (int i = 0; i < nodeList.getLength(); i++) {
 					Node node = nodeList.item(i);
@@ -369,7 +373,6 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 					}
 					//Some filters need relative paths
 					String fieldName = getFieldName(field.getFieldName());
-
 					query.append(fieldName + "[");
 					for (int i = 0;i < filter.getFilters().size(); i++) {
 						String value = filter.getFilters().get(i);
@@ -389,6 +392,7 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 		}else{
 			query.setLength(query.length() - 1);
 		}
+		
 		NodeList activities = (NodeList)xPath.compile(query.toString()).evaluate(this.getDoc(), XPathConstants.NODESET);
 		return activities;
 	}
@@ -397,7 +401,7 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 		String name = fieldName;
 		switch(fieldName) {
 		case "sector":
-			name = "transaction/sector";
+			name = "//sector";
 			break;
 		}
 		return name;
@@ -534,31 +538,40 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 							if (fieldElement.getAttribute("role").equals(field.getSubType())) {
 								final String stringOrgValue = fieldElement.getTextContent();
 								final String ref = fieldElement.getAttribute("ref");
-								Map<String, String> orgFields = new HashMap<String, String>();
-								orgFields.put("value", stringOrgValue);
-								orgFields.put("role", field.getSubType());
-								orgFields.put("ref", ref);
-								orgFields.put("type", fieldElement.getAttribute("type"));
-								FieldValue fv = new FieldValue();
-								if(stringOrgValue != null && !stringOrgValue.isEmpty() ){
-									fv.setCode(stringOrgValue);
-									fv.setValue(stringOrgValue);	
-								}else{
-									fv.setCode(ref);
-									fv.setValue(ref);
-								}								
-								fv.setSelected(true);
-								int index = field.getPossibleValues() == null ? 0 : field.getPossibleValues().size();
-								fv.setIndex(index);
-								if (field.getPossibleValues() == null) {
-									field.setPossibleValues(new ArrayList<FieldValue>());
-								}
-								if(!field.getPossibleValues().stream().anyMatch(n->{ return n.getCode().equals(stringOrgValue);})) {									
-									field.getPossibleValues().add(fv);
+								if ((stringOrgValue != null && !stringOrgValue.trim().isEmpty())
+										|| (ref != null && !ref.trim().isEmpty())) {
+									Map<String, String> orgFields = new HashMap<String, String>();
+									orgFields.put("value", stringOrgValue);
+									orgFields.put("role", field.getSubType());
+									orgFields.put("ref", ref);
+									orgFields.put("type", fieldElement.getAttribute("type"));
+									FieldValue fv = new FieldValue();
+									if (stringOrgValue != null && !stringOrgValue.isEmpty()) {
+										fv.setCode(stringOrgValue);
+										fv.setValue(stringOrgValue);
+									} else {
+										fv.setCode(ref);
+										fv.setValue(ref);
+									}
+									fv.setSelected(true);
+									int index = field.getPossibleValues() == null ? 0
+											: field.getPossibleValues().size();
+									fv.setIndex(index);
+
+									if (field.getPossibleValues() == null) {
+										field.setPossibleValues(new ArrayList<FieldValue>());
+									}
+
+									if (!field.getPossibleValues().stream().anyMatch(n -> {
+										return n.getCode().equals(stringOrgValue);
+									})) {
+										field.getPossibleValues().add(fv);
+									}
+
+									document.addOrganizationField(field.getFieldName() + "_" + field.getSubType() + "_"
+											+ DigestUtils.md5DigestAsHex(fv.getValue().getBytes()), orgFields);
 								}
 								
-								
-								document.addOrganizationField(field.getFieldName() + "_" + field.getSubType() + "_" + index, orgFields);
 							}
 						}
 					}
@@ -566,7 +579,7 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 					break;
 				case MULTILANG_STRING:					
 					Map<String, String> mlv = new HashMap<String, String>();
-					fieldNodeList = element.getElementsByTagName(field.getFieldName());
+					fieldNodeList = (NodeList) xPath.evaluate(field.getFieldName(), element, XPathConstants.NODESET);
 					for (int k = 0; k < fieldNodeList.getLength(); ++k) {
 						Element fieldElement = (Element) fieldNodeList.item(k);
 						if (fieldElement.getChildNodes().getLength() == 1) {

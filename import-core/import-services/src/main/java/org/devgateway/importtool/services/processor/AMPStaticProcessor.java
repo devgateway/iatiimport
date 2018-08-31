@@ -39,20 +39,15 @@ import org.springframework.util.StringUtils;
 // TODO: Better error handling to the end user. Friendlier user messages, specially when referencing a missing dependency
 
 public class AMPStaticProcessor implements IDestinationProcessor {
-	private static final String DEFAULT_LANGUAGE = "en";
 	private String descriptiveName = "AMP";
-
 	static final String BASEURL_PROPERTY = "AMPStaticProcessor.baseURL";
 	static final String BASEURL_DEFAULT_VALUE = "http://localhost:8081";
-
 	static final String AMP_IATI_ID_FIELD_PROPERTY = "AMPStaticProcessor.ampIatiIdField";
 	static final String AMP_IATI_ID_FIELD_DEFAULT_VALUE = "project_code";
-
-	static final String AMP_IMPLEMENTATION_LEVEL_ID_FIELD_PROPERTY = "AMPStaticProcessor.implementationLevel";
-	static final Integer AMP_IMPLEMENTATION_LEVEL_ID_DEFAULT_VALUE = 70; // Coming form common AMP configuration
-
-	private Log log = LogFactory.getLog(getClass());
-
+	private static final String DEFAULT_LANGUAGE_CODE = "en";
+	static final String AMP_IMPLEMENTATION_LEVEL_ID_FIELD_PROPERTY= "AMPStaticProcessor.implementationLevel";
+	static final Integer AMP_IMPLEMENTATION_LEVEL_ID_DEFAULT_VALUE = 70; //Coming form common AMP configuration
+    private Log log = LogFactory.getLog(getClass());
 	// AMP Configuration Details
 	private String DEFAULT_ID_FIELD = "amp-identifier";
 	private String DEFAULT_TITLE_FIELD = "project_title";
@@ -197,8 +192,9 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			Entry<String, JsonNode> entry = it.next();
 			languages.put(entry.getKey(), entry.getValue().asText());
 		}
-		if (languages.size() == 0) {
-			languages.put(DEFAULT_LANGUAGE, jsonNode.asText());
+		
+		if (languages.isEmpty()) {
+			languages.put(DEFAULT_LANGUAGE_CODE, jsonNode.asText());
 		}
 		return languages;
 	}
@@ -256,8 +252,12 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				Optional<FieldValueMapping> optValueMappingLocation = valueMappings.stream().filter(n -> {
 					return n.getSourceField().getFieldName().equals(mapping.getSourceField().getFieldName());
 				}).findFirst();
-				project.set(destinationField.getFieldName(),
-						getCodesFromList(source, optValueMappingLocation.get(), false));
+				
+				List<JsonBean> locations = getCodesFromList(source, optValueMappingLocation.get(), false);
+				if (locations != null) {
+					project.set(destinationField.getFieldName(), locations);
+				}
+				
 				Properties props = getExtraInfo(source, optValueMappingLocation.get(), false);
 				if (props != null) {
 					@SuppressWarnings("unchecked")
@@ -275,9 +275,17 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 						return n.getSourceField().getFieldName().equals(mapping.getSourceField().getFieldName());
 					}).findFirst();
 					if (optValueMapping.isPresent() && sourceField.isMultiple()) {
-						project.set(destinationField.getFieldName(), getCodesFromList(source, optValueMapping.get()));
+						List<JsonBean> values = getCodesFromList(source, optValueMapping.get());
+						if (values != null) {
+							project.set(destinationField.getFieldName(), values);
+						}
+						
 					} else {
-						project.set(destinationField.getFieldName(), getCodeFromList(source, optValueMapping.get()));
+						Integer value = getCodeFromList(source, optValueMapping.get());
+						if (value != null) {
+							project.set(destinationField.getFieldName(), value);
+						}
+						
 					}
 				}
 				break;
@@ -520,8 +528,12 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				Optional<FieldValueMapping> optValueMappingLocation = valueMappings.stream().filter(n -> {
 					return n.getSourceField().getFieldName().equals(mapping.getSourceField().getFieldName());
 				}).findFirst();
-				project.set(destinationField.getFieldName(),
-						getCodesFromList(source, optValueMappingLocation.get(), false));
+				
+				List<JsonBean> locations = getCodesFromList(source, optValueMappingLocation.get(), false);
+				if (locations != null) {
+					project.set(destinationField.getFieldName(), locations);
+				}
+				
 				Properties props = getExtraInfo(source, optValueMappingLocation.get(), false);
 				if (props != null) {
 					@SuppressWarnings("unchecked")
@@ -539,9 +551,15 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 						return n.getSourceField().getFieldName().equals(mapping.getSourceField().getFieldName());
 					}).findFirst();
 					if (optValueMapping.isPresent() && sourceField.isMultiple()) {
-						project.set(destinationField.getFieldName(), getCodesFromList(source, optValueMapping.get()));
+						List<JsonBean> values = getCodesFromList(source, optValueMapping.get());
+						if (values != null) {
+							project.set(destinationField.getFieldName(), values);
+						}						
 					} else {
-						project.set(destinationField.getFieldName(), getCodeFromList(source, optValueMapping.get()));
+						Integer value = getCodeFromList(source, optValueMapping.get());
+						if (value != null) {
+							project.set(destinationField.getFieldName(), value);
+						}						
 					}
 				}
 				break;
@@ -682,15 +700,22 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			List<JsonBean> fundingDetails = providerFundingDetails.get(entry.getValue().get("value"));
 			if (fundingDetails != null) {
 				JsonBean funding = new JsonBean();
-				int donorId = getIdFromList(entry.getValue().get("value"), "participating-org", fieldMappings,
+				Integer donorId = getIdFromList(entry.getValue().get("value"), "participating-org", fieldMappings,
 						valueMappings, false);
-				funding.set("donor_organization_id", donorId);
+				
+				if (donorId != null) {
+				   funding.set("donor_organization_id", donorId);
+				}				
 
 				try {
 					String typeOfAssistance = source.getStringFields().get("default-finance-type");
 					if (typeOfAssistance != null) {
-						funding.set("type_of_assistance", getIdFromList(typeOfAssistance, "default-finance-type",
-								fieldMappings, valueMappings, true));
+						Integer typeOfAssistanceValue =  getIdFromList(typeOfAssistance, "default-finance-type",
+								fieldMappings, valueMappings, true);
+						if (typeOfAssistanceValue != null) {
+							funding.set("type_of_assistance", typeOfAssistanceValue);
+						}
+						
 					}
 				} catch (ValueMappingException e) {
 					log.debug("Dependent field not loaded: default-finance-type");
@@ -699,8 +724,11 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				try {
 					if (source.getStringFields().get("default-aid-type") != null) {
 						String financingInstrument = source.getStringFields().get("default-aid-type");
-						funding.set("financing_instrument", getIdFromList(financingInstrument, "default-aid-type",
-								fieldMappings, valueMappings, true));
+						Integer financingInstrumentValue = getIdFromList(financingInstrument, "default-aid-type",
+								fieldMappings, valueMappings, true);
+						if (financingInstrumentValue != null) {
+							funding.set("financing_instrument", financingInstrumentValue);
+						}						
 					}
 				} catch (ValueMappingException e) {
 					log.debug("Dependent field not loaded: default-aid-type");
@@ -878,7 +906,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		}).findFirst().get();
 
 		Optional<FieldValue> foundCurrency = currency.getPossibleValues().stream().filter(n -> {
-			return n.getValue().equals(currencyCode);
+			return n.getValue().equalsIgnoreCase(currencyCode);
 		}).findFirst();
 
 		FieldValue currencyValue;
@@ -895,17 +923,17 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		return (amountValue * percentage) / 100;
 	}
 
-	private int getIdFromList(String fieldValue, String sourceField, List<FieldMapping> fieldMappings,
+	private Integer getIdFromList(String fieldValue, String sourceField, List<FieldMapping> fieldMappings,
 			List<FieldValueMapping> valueMappings, Boolean useCode) throws ValueMappingException {
 		Optional<FieldValueMapping> optVm = valueMappings.stream().filter(n -> {
 			return n.getSourceField().getFieldName().equals(sourceField);
 		}).findFirst();
 
-		if (!optVm.isPresent()) {
-			throw new ValueMappingException(sourceField + " not found.");
+		if ((!optVm.isPresent()) || (optVm.get().getSourceField().getPossibleValues() == null)) {
+			throw new ValueMappingException("The mapping for " + sourceField + " is invalid. No source values were found." );						
 		}
+		
 		FieldValueMapping vm = optVm.get();
-
 		FieldValue fvs = vm.getSourceField().getPossibleValues().stream().filter(n -> {
 			if (useCode) {
 				return n.getCode().equals(fieldValue);
@@ -916,7 +944,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		Integer sourceValueIndex = fvs.getIndex();
 		Integer destinationValueIndex = vm.getValueIndexMapping().get(sourceValueIndex);
 		FieldValue fvd = vm.getDestinationField().getPossibleValues().stream().filter(n -> {
-			return n.getIndex() == destinationValueIndex;
+			return destinationValueIndex != null && n.getIndex() == destinationValueIndex;
 		}).findFirst().get();
 		return Integer.parseInt(fvd.getCode());
 	}
@@ -978,7 +1006,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		return langString;
 	}
 
-	private List<JsonBean> getCodesFromList(InternalDocument source, FieldValueMapping mapping) {
+	private List<JsonBean> getCodesFromList(InternalDocument source, FieldValueMapping mapping) throws ValueMappingException {
 		return getCodesFromList(source, mapping, true);
 	}
 
@@ -987,7 +1015,6 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		Map<Integer, Integer> valueMapIndex = mapping.getValueIndexMapping();
 		List<FieldValue> sourcePossibleValues = mapping.getSourceField().getPossibleValues();
 		String[] stringValues = (String[]) value;
-		HashMap<Integer, Integer> uniqueValues = new HashMap<Integer, Integer>();
 
 		for (int i = 0; i < stringValues.length; i++) {
 			final int stringValueIndex = i;
@@ -1003,13 +1030,21 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		return null;
 	}
 
-	private List<JsonBean> getCodesFromList(InternalDocument source, FieldValueMapping mapping, Boolean suffix) {
+	private List<JsonBean> getCodesFromList(InternalDocument source, FieldValueMapping mapping, Boolean suffix) throws ValueMappingException {
 		Object value = source.getStringMultiFields().get(mapping.getSourceField().getFieldName());
 		Map<Integer, Integer> valueMapIndex = mapping.getValueIndexMapping();
 		List<FieldValue> sourcePossibleValues = mapping.getSourceField().getPossibleValues();
 		String[] stringValues = (String[]) value;
 		HashMap<Integer, Integer> uniqueValues = new HashMap<Integer, Integer>();
 
+		if (stringValues == null) {
+			if (mapping.getDestinationField().isRequired()) {
+				throw new ValueMappingException("The mapping for " + mapping.getSourceField().getDisplayName() + " is invalid. No source values were found." );
+			} else {
+				return null;
+			}			
+		}
+		
 		for (int i = 0; i < stringValues.length; i++) {
 			final int stringValueIndex = i;
 			Optional<FieldValue> optSourceValueIndex = sourcePossibleValues.stream().filter(n -> {
@@ -1045,7 +1080,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		return beanList;
 	}
 
-	private Integer getCodeFromList(InternalDocument source, FieldValueMapping mapping) {
+	private Integer getCodeFromList(InternalDocument source, FieldValueMapping mapping) throws ValueMappingException {
 		Object value = source.getStringFields().get(mapping.getSourceField().getFieldName());
 		Map<Integer, Integer> valueMapIndex = mapping.getValueIndexMapping();
 		List<FieldValue> sourcePossibleValues = mapping.getSourceField().getPossibleValues();
@@ -1053,6 +1088,15 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		Optional<FieldValue> optSourceValueIndex = sourcePossibleValues.stream().filter(n -> {
 			return n.getCode().equals(stringValue);
 		}).findAny();
+		
+		if (!optSourceValueIndex.isPresent()) {
+			if (mapping.getDestinationField().isRequired()) {
+				throw new ValueMappingException("The mapping for " + mapping.getSourceField().getDisplayName() + " is invalid. No source values were found." );
+			} else {
+				return null;
+			}			
+		}
+		
 		Integer sourceValueIndex = optSourceValueIndex.get().getIndex();
 		Integer destinationValueIndex = valueMapIndex.get(sourceValueIndex);
 		List<FieldValue> destinationPossibleValues = mapping.getDestinationField().getPossibleValues();

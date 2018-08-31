@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,8 +14,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
-import java.util.stream.Stream;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -31,6 +28,7 @@ import org.devgateway.importtool.model.Language;
 import org.devgateway.importtool.services.processor.helper.*;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.util.DigestUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -424,7 +422,7 @@ public class IATI2XProcessor implements ISourceProcessor {
 		String name = fieldName;
 		switch(fieldName) {
 		case "sector":
-			name = "transaction/sector";
+			name = "//sector";
 			break;
 		}
 		return name;
@@ -561,39 +559,49 @@ public class IATI2XProcessor implements ISourceProcessor {
 							if (fieldElement.getAttribute("role").equals(field.getSubType()) || fieldElement.getAttribute("role").equals(field.getSubTypeCode())) {							
 								final String stringOrgValue = fieldElement.getElementsByTagName("narrative").item(0) != null ? fieldElement.getElementsByTagName("narrative").item(0).getTextContent() : "";
 								final String ref = fieldElement.getAttribute("ref");
-								Map<String, String> orgFields = new HashMap<String, String>();
-								orgFields.put("value", stringOrgValue);
-								orgFields.put("role", field.getSubType());
-								orgFields.put("ref", ref);
-								orgFields.put("type", fieldElement.getAttribute("type"));
-								FieldValue fv = new FieldValue();
-								if(stringOrgValue != null && !stringOrgValue.isEmpty() ){
-									fv.setCode(stringOrgValue);
-									fv.setValue(stringOrgValue);	
-								}else{
-									fv.setCode(ref);
-									fv.setValue(ref);
-								}
-								fv.setSelected(true);
-								int index = field.getPossibleValues() == null ? 0 : field.getPossibleValues().size();
-								fv.setIndex(index);
-								if (field.getPossibleValues() == null) {
-									field.setPossibleValues(new ArrayList<FieldValue>());
-								}
-								if(!field.getPossibleValues().stream().anyMatch(n->{ return n.getCode().equals(stringOrgValue);})) {									
-									field.getPossibleValues().add(fv);
-								}
-								document.addOrganizationField(field.getFieldName() + "_" + field.getSubType() + "_" + index, orgFields);
+								
+								if ((stringOrgValue != null && !stringOrgValue.trim().isEmpty())
+										|| (ref != null && !ref.trim().isEmpty())) {
+
+									Map<String, String> orgFields = new HashMap<String, String>();
+									orgFields.put("value", stringOrgValue);
+									orgFields.put("role", field.getSubType());
+									orgFields.put("ref", ref);
+									orgFields.put("type", fieldElement.getAttribute("type"));
+									FieldValue fv = new FieldValue();
+									if (stringOrgValue != null && !stringOrgValue.isEmpty()) {
+										fv.setCode(stringOrgValue);
+										fv.setValue(stringOrgValue);
+									} else {
+										fv.setCode(ref);
+										fv.setValue(ref);
+									}
+									fv.setSelected(true);
+									int index = field.getPossibleValues() == null ? 0
+											: field.getPossibleValues().size();
+									fv.setIndex(index);
+									if (field.getPossibleValues() == null) {
+										field.setPossibleValues(new ArrayList<FieldValue>());
+									}
+									if (!field.getPossibleValues().stream().anyMatch(n -> {
+										return n.getCode().equals(stringOrgValue);
+									})) {
+										field.getPossibleValues().add(fv);
+									}
+
+									document.addOrganizationField(field.getFieldName() + "_" + field.getSubType() + "_"
+											+ DigestUtils.md5DigestAsHex(fv.getValue().getBytes()), orgFields);
+
+								}				
 							}
-						}
+						}							
 					}
 					break;
 				case MULTILANG_STRING:
-
 					String mlStringValue = "";
 					NodeList narrativeNodeList;
 					Map<String, String> mlv = new HashMap<String, String>();
-					fieldNodeList = element.getElementsByTagName(field.getFieldName());
+					fieldNodeList = (NodeList) xPath.evaluate(field.getFieldName(), element, XPathConstants.NODESET);
 					if (fieldNodeList.getLength() > 0) {
 						List<Element> titles = new ArrayList<Element>();
 						for (int j = 0; j < fieldNodeList.getLength(); j++) {
