@@ -23,6 +23,7 @@ import org.devgateway.importtool.services.request.ImportRequest;
 import org.devgateway.importtool.services.response.DocumentMappingResponse;
 import org.devgateway.importtool.services.response.ImportExecuteResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -69,6 +70,9 @@ class ImportController  {
 	private ActivityFetchService activityFetchService;
 	
 	private Log log = LogFactory.getLog(getClass());
+
+	@Value("${IATIProcessor.default_country}")
+	private String defaultCountry;
 
 	@RequestMapping(method = RequestMethod.GET, value = "/new/{sourceProcessorName}/{destinationProcessorName}/{authenticationToken}/{userName}")
 	ResponseEntity<ImportSessionToken> initiateImport(@PathVariable String sourceProcessorName, @PathVariable String destinationProcessorName, @PathVariable String authenticationToken, @PathVariable String userName,
@@ -235,7 +239,7 @@ class ImportController  {
 	ResponseEntity<FetchOrganizationDetails> fetch(HttpServletRequest request, @PathVariable("reportingOrgId") String
             reportingOrgId) {
         try {
-            List<Param> params = DataFetchServiceConstants.getCommonParams(reportingOrgId);
+            List<Param> params = DataFetchServiceConstants.getCommonParams(reportingOrgId, defaultCountry);
             FetchResult activitiesFromDataStore = activityFetchService.fetchResult(reportingOrgId, params);
             request.getSession().setAttribute(IATI_STORE_ACTIVITIES,activitiesFromDataStore);
 			activitiesFromDataStore.getVersions().

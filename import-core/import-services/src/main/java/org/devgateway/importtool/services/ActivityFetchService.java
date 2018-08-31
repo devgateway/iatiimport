@@ -7,7 +7,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.nio.file.OpenOption;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +25,7 @@ import org.devgateway.importtool.endpoint.DataFetchServiceConstants;
 import org.devgateway.importtool.endpoint.Param;
 import org.devgateway.importtool.model.FetchResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.client.RestTemplate;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -36,9 +36,11 @@ import org.xml.sax.SAXException;
 
 @org.springframework.stereotype.Service
 public class ActivityFetchService {
-	private static Integer LIMIT = 50;
+
 	@Autowired
 	private DataSourceService dataSourceService;
+    @Value("${IATIProcessor.default_country}")
+    private String defaultCountry;
 
 	private Log log = LogFactory.getLog(getClass());
 
@@ -78,14 +80,14 @@ public class ActivityFetchService {
 		if (parameters == null) {
 			parameters = new ArrayList<>();
 		}
-		getDefaultParametersForReportingOrg(parameters);
+		setDefaultParametersForReportingOrg(parameters);
 		String url = getUrlForReportingOrg(reportingOrg) + getParameters(parameters);
 		log.info(url);
-		String responseText = restTemplate.getForObject(url, String.class);
-		return responseText;
+
+		return restTemplate.getForObject(url, String.class);
 	}
 
-	private void getDefaultParametersForReportingOrg(List<Param> parameters) {
+	private void setDefaultParametersForReportingOrg(List<Param> parameters) {
 		parameters.add(new Param("stream","true"));
 	}
 
@@ -105,7 +107,7 @@ public class ActivityFetchService {
 	}
 
 	public String fetch(String reportingOrg) {
-		return fetch(reportingOrg, DataFetchServiceConstants.getCommonParams(reportingOrg));
+		return fetch(reportingOrg, DataFetchServiceConstants.getCommonParams(reportingOrg, defaultCountry));
 	}
 	/**
 	 * Saves and return in case its being called online
@@ -118,6 +120,7 @@ public class ActivityFetchService {
 		try {
 			Files.write(Paths.get(fileName), responseText.getBytes("UTF-8"));
 		} catch (IOException e) {
+		    //if the file could not be sent, we return all the same the string so it can be processed online
 			log.error("cannot save file ", e);
 		}
 		return responseText;
@@ -126,7 +129,7 @@ public class ActivityFetchService {
 
 	private String getFileName(String reportingOrg) {
 		return System.getProperty(DataFetchServiceConstants.ACTIVITIES_FILES_STORE) + File.separator +
-				reportingOrg + ".xml";
+                reportingOrg + ".xml";
 	}
 
 	private Document createXMLDocument(String responseText) {
