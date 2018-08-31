@@ -40,7 +40,7 @@ public class ActivityFetcher {
     private static final String ISO8601_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
     private static final SimpleDateFormat ISO8601_DATE_FORMAT_PARSER = new SimpleDateFormat(ISO8601_DATE_FORMAT);
 
-    @Value("${server.default_country}")
+    @Value("${IATIProcessor.default_country}")
     private String defaultCountry;
     @Autowired
     private ActivityFetchService activityFetchService;

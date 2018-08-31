@@ -71,7 +71,7 @@ class ImportController  {
 	
 	private Log log = LogFactory.getLog(getClass());
 
-	@Value("${server.default_country}")
+	@Value("${IATIProcessor.default_country}")
 	private String defaultCountry;
 
 	@RequestMapping(method = RequestMethod.GET, value = "/new/{sourceProcessorName}/{destinationProcessorName}/{authenticationToken}/{userName}")

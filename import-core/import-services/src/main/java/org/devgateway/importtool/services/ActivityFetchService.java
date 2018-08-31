@@ -39,7 +39,7 @@ public class ActivityFetchService {
 
 	@Autowired
 	private DataSourceService dataSourceService;
-    @Value("${server.default_country}")
+    @Value("${IATIProcessor.default_country}")
     private String defaultCountry;
 
 	private Log log = LogFactory.getLog(getClass());
