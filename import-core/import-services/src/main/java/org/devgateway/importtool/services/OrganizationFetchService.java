@@ -21,37 +21,29 @@ public class OrganizationFetchService {
 
     @Autowired
     ReportingOrgRepository reportingOrgRepository;
-    private static Integer PAGE_SIZE = 200;
 
     @Transactional
     public void fetch() {
-        StopWatch elapsedTimer = new StopWatch();
-
         try {
             RestTemplate restTemplate = new RestTemplate();
             Integer offSet = 0;
-            elapsedTimer.start();
             reportingOrgRepository.deleteAll();
             IatiOrganizationsOutput response;
-            do {
+            //Integer PAGE_SIZE = 200;
+            //do {
                 //Uncomment the following line to fetchFetchFromDataStore the organizations 200 at a time
                 //at the moment of testing it was faster to fetchFetchFromDataStore them all together
                 String finalUrl = DataFetchServiceConstants.IATI_ORGANIZATIONS_DEFAULT_URL;  // + "&limit=" +
                 // PAGE_SIZE + "&offset=" + offSet;
                 response = restTemplate.getForObject(finalUrl, IatiOrganizationsOutput.class);
-                offSet += PAGE_SIZE;
-                response.getResult().stream().forEach(r -> {
-                    reportingOrgRepository.save(getOrgFromJson(r));
-                });
-            } while (response.getResult().size() == PAGE_SIZE);
-            elapsedTimer.stop();
-            log.error("Elapsed time " + elapsedTimer.prettyPrint());
+                //offSet += PAGE_SIZE;
+                response.getResult().stream().forEach(r ->  reportingOrgRepository.save(getOrgFromJson(r)));
+            //} while (response.getResult().size() == PAGE_SIZE);
         } catch (RestClientException ex) {
-            log.error("Cannot get organization ", ex);
+            log.error("Cannot get organizations from datastore", ex);
             throw new RuntimeException(ex);
         }
     }
-
     private ReportingOrganization getOrgFromJson(ResultEntry entry) {
         return new ReportingOrganization(entry.getPublisherIatiId(), entry.getTitle());
     }

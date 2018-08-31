@@ -13,11 +13,11 @@ public class DataFetchServiceConstants {
     public static final String IATI_IDENTIFIER_PARAMETER="iati-identifier";
     public static final String IATI_EXTRA_VERSION ="iati-extra:version";
     public static final String ACTIVITIES_FILES_STORE = "ActivityFetcher.fileStore";
-    public static final String ORGANIZATIONS_ENDPOINT="";
-    public static List<Param> getCommonParams(String reportingOrg) {
+
+    public static List<Param> getCommonParams(String reportingOrg,String defaultCountry) {
         List<Param> params = new ArrayList<>();
         //SN should be taken from AMP
-        params.add(new Param(DataFetchServiceConstants.RECIPIENT_COUNTRY_PARAMETER, "SN"));
+        params.add(new Param(DataFetchServiceConstants.RECIPIENT_COUNTRY_PARAMETER, defaultCountry));
         params.add(new Param(DataFetchServiceConstants.REPORTING_ORGANISATION_PARAMETER, reportingOrg));
         return params;
     }

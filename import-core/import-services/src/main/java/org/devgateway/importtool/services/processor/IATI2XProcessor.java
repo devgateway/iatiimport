@@ -62,8 +62,6 @@ public class IATI2XProcessor extends IATIProcessor {
 		this.codelistPath = codelistPath;
 	}
 
-	private List<Language> filterLanguages = new ArrayList<Language>();
-	
 	private ActionStatus actionStatus;
 
     public IATI2XProcessor(){
@@ -150,23 +148,6 @@ public class IATI2XProcessor extends IATIProcessor {
 		languageList = list;
 
 		return list;
-	}
-
-	@Override
-	public List<Language> getFilterLanguages() {
-		if(this.filterLanguages.size() == 0){
-			List<Language> listLanguages = new ArrayList<Language>();
-			this.getLanguages().stream().forEach(lang -> {
-				Locale tmp = new Locale(lang);
-				listLanguages.add(new Language(tmp.getLanguage(), tmp.getDisplayLanguage()));
-			});
-			this.setFilterLanguages(listLanguages);
-		}
-		return this.filterLanguages;
-	}
-	@Override
-	public void setFilterLanguages(List<Language> filterLanguages) {
-		this.filterLanguages = filterLanguages;
 	}
 
 	@Override

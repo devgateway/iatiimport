@@ -11,6 +11,7 @@ import org.devgateway.importtool.endpoint.DataFetchServiceConstants;
 import org.devgateway.importtool.services.processor.IATIProcessor;
 import org.devgateway.importtool.services.processor.helper.IATIProcessorHelper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
@@ -20,7 +21,9 @@ import org.w3c.dom.NodeList;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +40,8 @@ public class ActivityFetcher {
     private static final String ISO8601_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
     private static final SimpleDateFormat ISO8601_DATE_FORMAT_PARSER = new SimpleDateFormat(ISO8601_DATE_FORMAT);
 
+    @Value("${server.default_country}")
+    private String defaultCountry;
     @Autowired
     private ActivityFetchService activityFetchService;
     @Autowired
@@ -45,15 +50,14 @@ public class ActivityFetcher {
     @Autowired
     private ReportingOrgRepository reportingOrgRepository;
 
-    @Scheduled(cron = "0 00 3 * * *")
+    @Scheduled(cron = "${ActivityFetcher.checkForUpdates.cron}")
     public void checkForUpdates() {
         XPath xPath = XPathFactory.newInstance().newXPath();
 
         StringBuilder query = new StringBuilder(IATIProcessor.DEFAULT_PATH_API);
         getIatiIdentifiers().forEach((String reportingOrg, List<String> iatiIdentifiers) -> {
-            List<Param> params = DataFetchServiceConstants.getCommonParams(reportingOrg);
+            List<Param> params = DataFetchServiceConstants.getCommonParams(reportingOrg, defaultCountry);
             params.add(new Param(DataFetchServiceConstants.IATI_IDENTIFIER_PARAMETER, iatiIdentifiers));
-            //we could fetchFetchFromDataStore the last sync date for a reporting org to limit the result we are getting
             Document doc = activityFetchService.fetchFetchFromDataStore(reportingOrg, params);
             NodeList activities;
             try {
@@ -66,9 +70,8 @@ public class ActivityFetcher {
                             lastUpdatedDateTime),IATIProcessorHelper.getStringFromElement(element,
                             IATIProcessor.DEFAULT_ID_FIELD));
                 }
-            } catch (Exception e) {
-                //TODO properly handle errors
-                log.error("Cannot fetchFetchFromDataStore activities", e);
+            } catch (XPathExpressionException | ParseException e) {
+                log.error("Cannot fetch activities due to a malformed XPATH", e);
             }
         });
     }
@@ -79,7 +82,7 @@ public class ActivityFetcher {
                 .collect(groupingBy(Project::getGroupingCriteria, mapping(Project::getProjectIdentifier,
                         Collectors.toList())));
     }
-    @Scheduled(cron = "0 59 23 * * *")
+    @Scheduled(cron = "${ActivityFetcher.fetchActivitiesForSyncedReportingOrgs.cron}")
     public void fetchActivitiesForSyncedReportingOrgs(){
         StopWatch elapsedTimer = new StopWatch("Activity batch fetcher");
         elapsedTimer.start();
@@ -87,6 +90,5 @@ public class ActivityFetcher {
         gropingCriteriaList.stream().forEach(reportingOrg ->activityFetchService.fetch(reportingOrg));
         elapsedTimer.stop();
         log.info(elapsedTimer.prettyPrint());
-
     }
 }

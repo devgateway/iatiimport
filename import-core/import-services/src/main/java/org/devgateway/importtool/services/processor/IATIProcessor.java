@@ -2,6 +2,7 @@ package org.devgateway.importtool.services.processor;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.devgateway.importtool.model.Language;
 import org.devgateway.importtool.services.processor.helper.Field;
 import org.devgateway.importtool.services.processor.helper.FieldType;
 import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
@@ -34,6 +35,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
@@ -65,6 +67,9 @@ public abstract class IATIProcessor implements ISourceProcessor {
 
     // Global Lists for fields and the filters
     private List<Field> fieldList = new ArrayList<Field>();
+    private List<Language> filterLanguages = new ArrayList<Language>();
+
+
     private boolean fromDatastore = false;
     public final static Set<String> IMPLEMENTED_VERSIONS = new HashSet
             (Arrays.asList("1.01", "1.03", "1.04", "1.05",
@@ -123,6 +128,11 @@ public abstract class IATIProcessor implements ISourceProcessor {
 
     public void setFromDatastore(boolean fromDatastore) {
         this.fromDatastore = fromDatastore;
+    }
+
+    @Override
+    public void setFilterLanguages(List<Language> filterLanguages) {
+        this.filterLanguages = filterLanguages;
     }
 
     @Override
@@ -313,6 +323,20 @@ public abstract class IATIProcessor implements ISourceProcessor {
     public Map<String, String>getTranslationForField(String field){
         return getTranslationsForVersion(this.PROCESSOR_VERSION).get(field);
     }
+
+    @Override
+    public List<Language> getFilterLanguages() {
+        if(this.filterLanguages.size() == 0){
+            List<Language> listLanguages = new ArrayList<Language>();
+            this.getLanguages().stream().forEach(lang -> {
+                Locale tmp = new Locale(lang);
+                listLanguages.add(new Language(tmp.getLanguage(), tmp.getDisplayLanguage()));
+            });
+            this.setFilterLanguages(listLanguages);
+        }
+        return this.filterLanguages;
+    }
+
     public  Map<String, Map<String, String>> getTranslationsForVersion(String version) {
         if (descriptionTooltipsMap.get(version) == null) {
             //map that will hold the translation pack for a version

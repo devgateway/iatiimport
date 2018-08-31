@@ -9,9 +9,8 @@ import org.springframework.stereotype.Component;
 public class ReportingOrganizationFetcher {
     @Autowired
     private OrganizationFetchService organizationFetchService;
-    //They will be fetched once evey week we dont expect
-    //new reporting orgs.
-    //@Scheduled(initialDelay=1000, fixedRate=3600000)
+    //Every friday at 5 am
+    @Scheduled(cron="${ReportingOrganizationFetcher.fetchReportingOrganizations.cron}")
     public void fetchReportingOrganizations() {
         organizationFetchService.fetch();
 

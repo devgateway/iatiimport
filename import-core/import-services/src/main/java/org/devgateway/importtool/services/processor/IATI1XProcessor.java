@@ -66,8 +66,6 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 	}
 
 
-	protected List<Language> filterLanguages = new ArrayList<Language>();
-
 	public String getCodelistPath() {
 		return codelistPath;
 	}
@@ -130,22 +128,7 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 		return list;
 	}
 	
-	@Override
-	public List<Language> getFilterLanguages() {
-		if(this.filterLanguages.size() == 0){
-			List<Language> listLanguages = new ArrayList<Language>();
-			this.getLanguages().stream().forEach(lang -> {
-				Locale tmp = new Locale(lang);
-				listLanguages.add(new Language(tmp.getLanguage(), tmp.getDisplayLanguage()));
-			});
-			this.setFilterLanguages(listLanguages);			
-		}
-		return this.filterLanguages;
-	}
-	@Override
-	public void setFilterLanguages(List<Language> filterLanguages) {
-		this.filterLanguages = filterLanguages;
-	}
+
 
 	@Override
 	public List<Field> getFilterFields() {
