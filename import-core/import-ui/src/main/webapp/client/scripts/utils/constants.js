@@ -28,6 +28,7 @@ module.exports = {
       COMMITMENTS: 'transaction_C',
       DISBURSEMENTS: 'transaction_D',
       EXPENDITURE:'transaction_E',
-      TRANSACTION: 'transaction'
+      TRANSACTION: 'transaction',
+      TRANSACTION_FIELDS: 'transactionFields'
   }
 };

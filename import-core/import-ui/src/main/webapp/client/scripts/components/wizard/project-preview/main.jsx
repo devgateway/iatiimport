@@ -4,6 +4,7 @@ var Header = require('./header');
 var Identification = require('./identification');
 var FundingSummary = require('./funding-summary');
 var ParticipatingOrgs = require('./participating-orgs');
+var Transactions = require('./transactions');
 var ProjectPreview = React.createClass({
     getInitialState: function() {
        return {selectedProject: null};
@@ -28,10 +29,11 @@ var ProjectPreview = React.createClass({
 			        <div className="container-fluid">
                      <div className="row">
 			        
-			           <div className="col-md-9">	
+			           <div className="col-md-9 left-column">	
 			              <div className="main_group_container">
 			               <Identification {...this.props}/>			        
-			               <ParticipatingOrgs {...this.props}/>		        
+			               <ParticipatingOrgs {...this.props}/>	
+			               <Transactions {...this.props}/>   
 			              </div>
 			           </div>
 			        

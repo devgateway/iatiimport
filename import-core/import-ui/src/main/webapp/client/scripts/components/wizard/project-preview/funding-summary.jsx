@@ -9,9 +9,9 @@ var FundingSummary = React.createClass({
                 var transaction = this.props.project.transactionFields[key]
                 var transactionType = constants.FIELD_NAMES.TRANSACTION + '_' + transaction.subtype;
                 if (result[transactionType]) {
-                    result[transactionType] += transaction.value;
+                    result[transactionType] += transaction.value ? parseFloat(transaction.value) : 0;
                 } else {
-                    result[transactionType] = transaction.value;
+                    result[transactionType] = transaction.value ? parseFloat(transaction.value) : 0;
                 }                
             }
         }
@@ -31,17 +31,17 @@ var FundingSummary = React.createClass({
                 
                 <div className="block">
                 <div className="summary_field_name block">{this.props.i18nLib.t('project_preview.total_commitments')}</div>
-                <div className="section_field_value block">{totalCommitments}</div>
+                <div className="section_field_value block">{this.props.project.stringFields['default-currency']} {totalCommitments}</div>
                 </div>
                 
                 <div className="block">
                 <div className="summary_field_name block">{this.props.i18nLib.t('project_preview.total_disbursements')}</div>
-                <div className="section_field_value block">{totalDisbursements}</div>
+                <div className="section_field_value block">{this.props.project.stringFields['default-currency']} {totalDisbursements}</div>
                  </div>
                 
                 <div className="block">
                 <div className="summary_field_name block">{this.props.i18nLib.t('project_preview.total_expenditure')}</div>
-                <div className="section_field_value block">{totalExpenditure}</div>
+                <div className="section_field_value block">{this.props.project.stringFields['default-currency']} {totalExpenditure}</div>
                  </div>              
                 
                </div>);

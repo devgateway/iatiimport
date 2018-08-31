@@ -270,9 +270,17 @@ module.exports = {
 						 'total_disbursements': 'Total Disbursements', 
 						 'total_expenditure':'Total Expenditure',
 						 'participating_orgs': 'Participating Organizations',
-					      'org': 'Organization',
-					      'role': 'Roles'
-						
+					     'org': 'Organization',
+					     'role': 'Roles',
+					     'transactions': 'Transactions',
+					     'transaction_date': 'Date',
+					     'transaction_provider': 'Provider',
+					     'transaction_type': 'Transaction Type',
+					     'transaction_currency': 'Currency',
+					     'transaction_value': 'Value',
+					     'transaction_C': 'Commitments',
+					     'transaction_D': 'Disbursements',
+					     'transaction_E': 'Expenditure'					
 					}
 				}
 			},
