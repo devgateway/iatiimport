@@ -37,7 +37,7 @@ module.exports = {
 		  return sourceField.uniqueFieldName === fieldName;
 	  });
 	  
-	  if (field && field.possibleValues) {
+	  if (field && field.possibleValues && field.possibleValues.length > 0) {
 		  name = _.find(field.possibleValues, function(value) { 
 			  return value.code === code;
 		  }).value;		  

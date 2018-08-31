@@ -33,6 +33,11 @@ module.exports = {
       ACTUAL_START_DATE: 'activity-date_start-actual',
       PLANNED_START_DATE: 'activity-date_start-planned',
       ACTUAL_END_DATE: 'activity-date_end-actual',
-      PLANNED_END_DATE: 'activity-date_end-planned'
+      PLANNED_END_DATE: 'activity-date_end-planned',
+      ACTIVITY_SCOPE:'activity-scope',
+      DEFAULT_AID_TYPE:'default-aid-type',
+      DEFAULT_FINANCE_TYPE:'default-finance-type',
+      DEFAULT_FLOW_TYPE:'default-flow-type',
+      DEFAULT_TIED_STATUS:'default-tied-status'
   }
 };
