@@ -1,5 +1,6 @@
 'use strict';
 var _ = require('lodash/dist/lodash.underscore');
+var moment = require('moment');
 
 module.exports = {
   getMultilangString: function(multilangFields, field, i18nLib){
@@ -50,6 +51,11 @@ module.exports = {
 	 	    return n.replace(/\d(?=(?:\d{3})+(?:\.|$))/g, function($0, i){
 	 	        return p<0 || i<p ? ($0+',') : $0;
 	 	    });	 	 }
-	    }
-	   
+ },
+ formatDate: function(date) {
+	 if (date) {
+		 return moment(date).format('YYYY-MM-DD');
+	 }
+	 
+ }   
 };

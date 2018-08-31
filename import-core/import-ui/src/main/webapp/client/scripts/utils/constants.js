@@ -29,6 +29,10 @@ module.exports = {
       DISBURSEMENTS: 'transaction_D',
       EXPENDITURE:'transaction_E',
       TRANSACTION: 'transaction',
-      TRANSACTION_FIELDS: 'transactionFields'
+      TRANSACTION_FIELDS: 'transactionFields',
+      ACTUAL_START_DATE: 'activity-date_start-actual',
+      PLANNED_START_DATE: 'activity-date_start-planned',
+      ACTUAL_END_DATE: 'activity-date_end-actual',
+      PLANNED_END_DATE: 'activity-date_end-planned'
   }
 };

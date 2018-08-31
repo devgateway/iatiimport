@@ -5,6 +5,7 @@ var Identification = require('./identification');
 var FundingSummary = require('./funding-summary');
 var ParticipatingOrgs = require('./participating-orgs');
 var Transactions = require('./transactions');
+var Planning = require('./planning')
 var ProjectPreview = React.createClass({
     getInitialState: function() {
        return {selectedProject: null};
@@ -31,12 +32,12 @@ var ProjectPreview = React.createClass({
 			        
 			           <div className="col-md-9 left-column">	
 			              <div className="main_group_container">
-			               <Identification {...this.props}/>			        
+			               <Identification {...this.props}/>
+			               <Planning {...this.props}/>
 			               <ParticipatingOrgs {...this.props}/>	
 			               <Transactions {...this.props}/>   
 			              </div>
-			           </div>
-			        
+			           </div>			        
 			            <div className="preview_summary col-md-offset-9"> 
 			              <div className="summary_container">
 			                <FundingSummary {...this.props}/>

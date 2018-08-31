@@ -280,7 +280,10 @@ module.exports = {
 					     'transaction_value': 'Value',
 					     'transaction_C': 'Commitments',
 					     'transaction_D': 'Disbursements',
-					     'transaction_E': 'Expenditure'					
+					     'transaction_E': 'Expenditure',
+					     'planning': 'Planning',
+					     'no_data': 'No Data'
+					     
 					}
 				}
 			},
