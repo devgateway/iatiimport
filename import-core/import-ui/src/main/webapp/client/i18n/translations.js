@@ -282,7 +282,8 @@ module.exports = {
 					     'transaction_D': 'Disbursements',
 					     'transaction_E': 'Expenditure',
 					     'planning': 'Planning',
-					     'no_data': 'No Data'
+					     'no_data': 'No Data',
+					     'sectors': 'Sectors'
 					     
 					}
 				}

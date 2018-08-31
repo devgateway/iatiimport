@@ -38,6 +38,7 @@ module.exports = {
       DEFAULT_AID_TYPE:'default-aid-type',
       DEFAULT_FINANCE_TYPE:'default-finance-type',
       DEFAULT_FLOW_TYPE:'default-flow-type',
-      DEFAULT_TIED_STATUS:'default-tied-status'
+      DEFAULT_TIED_STATUS:'default-tied-status',
+      SECTOR: 'sector'
   }
 };

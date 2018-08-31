@@ -5,7 +5,8 @@ var Identification = require('./identification');
 var FundingSummary = require('./funding-summary');
 var ParticipatingOrgs = require('./participating-orgs');
 var Transactions = require('./transactions');
-var Planning = require('./planning')
+var Planning = require('./planning');
+var Sectors = require('./sectors');
 var ProjectPreview = React.createClass({
     getInitialState: function() {
        return {selectedProject: null};
@@ -34,7 +35,8 @@ var ProjectPreview = React.createClass({
 			              <div className="main_group_container">
 			               <Identification {...this.props}/>
 			               <Planning {...this.props}/>
-			               <ParticipatingOrgs {...this.props}/>	
+			               <ParticipatingOrgs {...this.props}/>
+			                <Sectors {...this.props}/>
 			               <Transactions {...this.props}/>   
 			              </div>
 			           </div>			        
