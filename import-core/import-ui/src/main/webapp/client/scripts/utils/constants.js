@@ -24,6 +24,10 @@ module.exports = {
 	  IATI_ID: 'iati-identifier',
 	  TITLE: 'title',
 	  DESCRIPTION: 'description',
-      ACTIVITY_STATUS: 'activity-status'
+      ACTIVITY_STATUS: 'activity-status',
+      COMMITMENTS: 'transaction_C',
+      DISBURSEMENTS: 'transaction_D',
+      EXPENDITURE:'transaction_E',
+      TRANSACTION: 'transaction'
   }
 };

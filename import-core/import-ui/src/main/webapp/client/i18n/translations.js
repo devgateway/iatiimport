@@ -263,8 +263,15 @@ module.exports = {
 					},
 					'project_preview':{
 						'title': 'Project Preview',
-						'close': 'Close Preview',
-						 'identification': 'Identification'
+						 'close': 'Close Preview',
+						 'identification': 'Identification',
+						 'funding_information': 'Funding Information',
+						 'total_commitments':'Total Commitments', 
+						 'total_disbursements': 'Total Disbursements', 
+						 'total_expenditure':'Total Expenditure',
+						 'participating_orgs': 'Participating Organizations',
+					      'org': 'Organization',
+					      'role': 'Roles'
 						
 					}
 				}
