@@ -518,6 +518,7 @@ tbody.scrollablebody td, thead.scrollablebody th {
 }
 .reporting-orgs-with-updates{
 	font-weight: bold;
+  color: red;
 }
 
 .projectPreview {
