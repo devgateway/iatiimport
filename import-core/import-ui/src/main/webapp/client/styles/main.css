@@ -525,3 +525,6 @@ tbody.scrollablebody td, thead.scrollablebody th {
  width: 70% !important;
  min-height: 600px !important;
 }
+div.tooltip{
+  word-wrap: break-word;
+}
