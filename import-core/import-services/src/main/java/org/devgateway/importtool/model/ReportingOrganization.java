@@ -22,8 +22,8 @@ import javax.persistence.Table;
 						"select max" +
 						"(p1.lastSyncedOn) from " +
 						" Project p1 where p1.projectIdentifier = p.projectIdentifier) and p.projectIdentifier is not" +
-						" null and p.status='OK' and p.groupingCriteria is not null" +
-						" and p.lastSyncedOn > p.lastUpdatedOn )")
+						" null and p.status='OK' and p.groupingCriteria is not null and p.groupingCriteria <> '' " +
+						" and p.lastUpdatedOn > p.lastSyncedOn   )")
 
 })
 public class ReportingOrganization {
