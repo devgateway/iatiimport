@@ -231,8 +231,10 @@ module.exports = {
 						'next': 'Next',
 						'description_manual': 'Follow the manual process if you have a valid IATI file that you want to upload.',
 						'description_automatic': 'Follow the automated process if you want to search for available IATI data and pull it directly from the IATI datastore.',
-						'data_updated': 'data has been updated since last sync.'
-					},
+						'data_updated': 'data has been updated since last sync.',
+            'tooltip_manual': 'Upload your own IATI compliant XML file.',
+            'tooltip_automatic': 'Select which reporting organization you wish to automatically import from IATI.'
+          },
 					'data_source': {
 						'title': 'Data Source Management',
 						'default_url': 'Default URL',
