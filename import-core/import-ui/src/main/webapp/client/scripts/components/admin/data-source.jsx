@@ -22,7 +22,8 @@ var DataSource = React.createClass({
     return {     
       dataSource: {},
       dsValidationErrors:[],
-      reportingOrgs: []
+      reportingOrgs: [],
+      infoMessage: null
     };
   },  
   componentWillMount: function () {
@@ -68,9 +69,15 @@ var DataSource = React.createClass({
      this.setState({dataSource: ds});     
   },
   save: function() {
+      this.setState({infoMessage: null});
       if (this.validateDataSource()) {
           formActions.updateDataSource(this.state.dataSource).then(function(data) {  
-              this.updateDataSource(data);                
+              this.setState({
+                  dataSource: data, 
+                  customDataSource: null,
+                  infoMessage: window.i18nLib.t('data_source.msg_saved_sucessfully')
+              });
+              
           }.bind(this))["catch"](function(err) {       
             console.log('Error loading datasource');
          }.bind(this));
@@ -141,7 +148,12 @@ var DataSource = React.createClass({
                  return <span ref="message"> {window.i18nLib.t(key)}</span>
              })}               
            </div> 
-       }       
+       }   
+       {this.state.infoMessage &&
+           <div className="alert alert-info" role="alert" ref="messageBox">
+                  <div>{this.state.infoMessage}</div>                          
+           </div> 
+          }
        <div className="form-group">
        <label for="defaultUrl">{window.i18nLib.t('data_source.default_url')}</label>
        <textarea className="form-control" rows="3" id="defaultUrl" onChange={this.onDefaultUrlChange} value={this.state.dataSource.defaultUrl}></textarea>

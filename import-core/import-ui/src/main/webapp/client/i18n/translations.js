@@ -235,7 +235,7 @@ module.exports = {
             'tooltip_manual': 'Upload your own IATI compliant XML file.',
             'tooltip_automatic': 'Select which reporting organization you wish to automatically import from IATI.'
           },
-					'data_source': {
+		  'data_source': {
 						'title': 'Data Source Management',
 						'default_url': 'Default URL',
 						'add_custom_data_source': 'Add Exception',
@@ -253,7 +253,8 @@ module.exports = {
 						'select_data_reporting_org': 'Select the reporting organization to import from:',
 						'next': 'Next',
 						'error': 'Error:',
-						'reporting_org_placeholder': 'Start typing the reporting organization name'
+						'reporting_org_placeholder': 'Start typing the reporting organization name',
+						'msg_saved_sucessfully': 'Data Source saved successfully!'
 					},
 					'select_version': {
 						'title': 'Select Version',
@@ -287,8 +288,7 @@ module.exports = {
 					     'no_data': 'No Data',
 					     'sectors': 'Sectors',
 					     'locations': 'Locations',
-					     'recipient': 'Recipient Country'
-					     
+					     'recipient': 'Recipient Country'					     
 					}
 				}
 			},
