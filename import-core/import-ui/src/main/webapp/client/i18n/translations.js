@@ -286,7 +286,8 @@ module.exports = {
 					     'planning': 'Planning',
 					     'no_data': 'No Data',
 					     'sectors': 'Sectors',
-					     'locations': 'Locations'
+					     'locations': 'Locations',
+					     'recipient': 'Recipient Country'
 					     
 					}
 				}

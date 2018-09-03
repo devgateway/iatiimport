@@ -8,6 +8,8 @@ var Transactions = require('./transactions');
 var Planning = require('./planning');
 var Sectors = require('./sectors');
 var Locations = require('./locations');
+var RecipientCountries = require('./recipient-countries');
+
 var ProjectPreview = React.createClass({
     getInitialState: function() {
        return {selectedProject: null};
@@ -26,17 +28,16 @@ var ProjectPreview = React.createClass({
 			      </div>
 			      <div className="modal-body">
 			        <div className="preview_container"> 
-			        <Header {...this.props}/>	
-			        
+			        <Header {...this.props}/>				        
 			        <div className="preview_content">
 			        <div className="container-fluid">
-                     <div className="row">
-			        
+                     <div className="row">			        
 			           <div className="col-md-9 left-column">	
 			              <div className="main_group_container">
 			               <Identification {...this.props}/>
 			               <Planning {...this.props}/>
 			               <ParticipatingOrgs {...this.props}/>
+			               <RecipientCountries {...this.props}/>
 			               <Sectors {...this.props}/>
 			               <Locations {...this.props}/>
 			               <Transactions {...this.props}/>   
