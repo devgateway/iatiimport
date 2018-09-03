@@ -20,6 +20,7 @@ module.exports = {
   REPLACE_DONOR_FUNDING: 'REPLACE_DONOR_FUNDING',
   IMPORT_TYPE_MANUAL: 'manual',
   IMPORT_TYPE_AUTOMATIC: 'automatic',  
+  ROLE_FUNDING: 'Funding',
   FIELD_NAMES: {
 	  IATI_ID: 'iati-identifier',
 	  TITLE: 'title',

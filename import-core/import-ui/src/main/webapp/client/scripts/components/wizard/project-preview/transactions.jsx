@@ -14,6 +14,24 @@ var Transactions = React.createClass({
         
         return transactions;
     },
+    getProvider: function(transaction) {
+       var provider = transaction['providing-org'];
+       if (provider) {
+           return provider;
+       } else {
+           if (this.props.project.organizationFields) {
+               for (var key in this.props.project.organizationFields) {
+                   var org = this.props.project.organizationFields[key];
+                   
+                   if (org.role === constants.ROLE_FUNDING) {
+                       provider = org.value;
+                   }                   
+               }              
+           }
+       }
+       
+       return provider;
+    },
     render: function () {         
        var transactions = this.getTransactions();
        return (<div className="section_group_class" >               
@@ -32,7 +50,7 @@ var Transactions = React.createClass({
                       {transaction.date}
                    </td>
                     <td className="box_field_value ">
-                      {transaction['providing-org']}
+                      {this.getProvider(transaction)}
                    </td>
                     <td className="box_field_value ">
                       {this.props.i18nLib.t('project_preview.transaction_' + transaction.subtype)}
