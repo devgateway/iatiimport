@@ -283,7 +283,8 @@ module.exports = {
 					     'transaction_E': 'Expenditure',
 					     'planning': 'Planning',
 					     'no_data': 'No Data',
-					     'sectors': 'Sectors'
+					     'sectors': 'Sectors',
+					     'locations': 'Locations'
 					     
 					}
 				}
