@@ -272,7 +272,7 @@ public abstract class IATIProcessor implements ISourceProcessor {
 
             // InputStream propsStream = this.getClass().getResourceAsStream(this.getPropertiesFile());
 
-            URL url = this.getClass().getResource(this.fieldsTooltipsLocation);
+            URL url = this.getClass().getResource(this.fieldsTooltipsLocation + "_en.properties");
             File fileObject = new File(url.toURI());
 
             FileOutputStream out = new FileOutputStream(fileObject);

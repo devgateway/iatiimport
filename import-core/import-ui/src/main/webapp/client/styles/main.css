@@ -518,9 +518,13 @@ tbody.scrollablebody td, thead.scrollablebody th {
 }
 .reporting-orgs-with-updates{
 	font-weight: bold;
+  color: red;
 }
 
 .projectPreview {
  width: 70% !important;
  min-height: 600px !important;
+}
+div.tooltip{
+  word-wrap: break-word;
 }

@@ -41,7 +41,13 @@ var LandingPage = React.createClass({
                  <div className="col-md-2">
                  </div>
                   <div className="col-md-4 landing-page-left">
-                   <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.selectImportType.bind(this, constants.IMPORT_TYPE_AUTOMATIC)}>{this.props.i18nLib.t('import_type.automatic')}</button> <br/> <br/>
+                   <button className="btn btn-success navbar-btn btn-custom" type="button"
+                           onClick={this.selectImportType.bind(this, constants.IMPORT_TYPE_AUTOMATIC)}
+                           data-toggle="tooltip" data-placement="bottom"
+                           title={this.props.i18nLib.t('import_type.tooltip_' + constants.IMPORT_TYPE_AUTOMATIC)}
+                   >
+                     {this.props.i18nLib.t('import_type.automatic')}</button>
+                    <br/> <br/>
                    <span>{this.props.i18nLib.t('import_type.description_' + constants.IMPORT_TYPE_AUTOMATIC)} </span><br/>
                    <br/>
                    <br/>
@@ -57,7 +63,12 @@ var LandingPage = React.createClass({
                    
                </div>
                <div className="col-md-4 landing-page-right">
-                   <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.selectImportType.bind(this, constants.IMPORT_TYPE_MANUAL)}>{this.props.i18nLib.t('import_type.manual')}</button> <br/> <br/>
+                   <button className="btn btn-success navbar-btn btn-custom" type="button"
+                           onClick={this.selectImportType.bind(this, constants.IMPORT_TYPE_MANUAL)}
+                           data-toggle="tooltip" data-placement="bottom"
+                           title={this.props.i18nLib.t('import_type.tooltip_' + constants.IMPORT_TYPE_MANUAL)}
+                   >
+                     {this.props.i18nLib.t('import_type.manual')}</button> <br/> <br/>
                <span>{this.props.i18nLib.t('import_type.description_' + constants.IMPORT_TYPE_MANUAL)} </span> 
                </div>
                 <div className="col-md-2">
