@@ -12,7 +12,7 @@ var Planning = React.createClass({
          
        return (<div className="section_group_class" >               
                  <div className="section_title_class"><span>{this.props.i18nLib.t('project_preview.planning')}</span><span></span></div>               
-                 <table className="box_table">
+                 <table className="box_table table-borders">
                   <tbody>
                   <tr>
                    <td className="box_field_value ">

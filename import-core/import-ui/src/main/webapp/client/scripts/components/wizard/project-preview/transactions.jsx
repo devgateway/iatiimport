@@ -18,7 +18,7 @@ var Transactions = React.createClass({
        var transactions = this.getTransactions();
        return (<div className="section_group_class" >               
              <div className="section_title_class"><span>{this.props.i18nLib.t('project_preview.transactions')}</span><span></span></div>               
-               <table className="box_table">
+               <table className="box_table table-borders">
                <tbody>
                <tr>
                <td className="box_field_name">{this.props.i18nLib.t('project_preview.transaction_date')}</td>
@@ -29,16 +29,16 @@ var Transactions = React.createClass({
                {transactions.map(function(transaction) {
                    return (<tr>
                    <td className="box_field_value ">
-                    {transaction.date}
+                      {transaction.date}
                    </td>
                     <td className="box_field_value ">
-                    {transaction['providing-org']}
+                      {transaction['providing-org']}
                    </td>
                     <td className="box_field_value ">
-                    {this.props.i18nLib.t('project_preview.transaction_' + transaction.subtype)}
+                      {this.props.i18nLib.t('project_preview.transaction_' + transaction.subtype)}
                     </td>
                     <td className="box_field_value ">
-                    {transaction.currency || this.props.project.stringFields['default-currency']} {common.formatNumber(transaction.value)}
+                      {transaction.currency || this.props.project.stringFields['default-currency']} {common.formatNumber(transaction.value)}
                     </td>                   
                    </tr>)
                  }.bind(this))                   

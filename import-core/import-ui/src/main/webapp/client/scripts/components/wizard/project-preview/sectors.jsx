@@ -4,7 +4,7 @@ var constants = require('./../../../utils/constants');
 var _ = require('lodash/dist/lodash.underscore');
 var Sectors = React.createClass({      
     render: function () {         
-       var sectorCodes = this.props.project.stringMultiFields ? this.props.project.stringMultiFields.sector : [];
+       var sectorCodes = (this.props.project.stringMultiFields && this.props.project.stringMultiFields.sector) ? this.props.project.stringMultiFields.sector : [];       
        return (<div className="section_group_class" >               
              <div className="section_title_class"><span>{this.props.i18nLib.t('project_preview.sectors')}</span><span></span></div>               
                <table className="box_table">

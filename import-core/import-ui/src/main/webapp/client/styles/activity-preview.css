@@ -159,6 +159,7 @@
   background-color: #f5faff;
   margin-top: 15px;
   padding-bottom: 10px;
+  padding-top: 10px;
 }
 
 .summary_field_name {
@@ -230,6 +231,10 @@
 
 .box_table tr td:nth-child(2) {
   border: 1px solid #ebebeb;
+}
+
+.table-borders tr td{
+	border: 1px solid #ebebeb !important;
 }
 
 .two_box_table {
