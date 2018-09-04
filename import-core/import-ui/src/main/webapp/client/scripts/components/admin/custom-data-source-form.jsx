@@ -35,6 +35,7 @@ var CustomDataSourceForm = React.createClass({
       if (this.props.customDataSource.url == null || this.props.customDataSource.url.length == 0) {          
           validationErrors.push('data_source.validation_default_url_required');        
       }
+      
       if (this.props.customDataSource.url) {
           if (!validationUtils.validateUrl(this.props.customDataSource.url)) {
               validationErrors.push('data_source.validation_invalid_url');  
@@ -43,13 +44,8 @@ var CustomDataSourceForm = React.createClass({
       }
       
       if (this.props.customDataSource.reportingOrgId == null || this.props.customDataSource.reportingOrgId.length == 0) {
-          if (!validationUtils.validateUrl(this.props.customDataSource.url)) {
-              validationErrors.push('data_source.validation_reporting_org_required');  
-          }
-          
+          validationErrors.push('data_source.validation_reporting_org_required');           
       }
-      
-      
       
       this.setState({validationErrors: validationErrors});      
       return validationErrors.length == 0;
