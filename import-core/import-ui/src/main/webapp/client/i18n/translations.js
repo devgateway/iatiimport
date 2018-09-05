@@ -263,7 +263,8 @@ module.exports = {
 						'import_will_repeat': 'The import process will be repeated for each version.',
 						'imported': '(IMPORTED)',
 						'all_versions_imported': 'All versions have been imported',
-						'org_has_no_data': 'This organization does not have any IATI files for this country.'
+						'org_has_no_data': 'This organization does not have any IATI files for this country.',
+						'processed': '(PROCESSED)'						
 					},
 					'project_preview':{
 						'title': 'Project Preview',
@@ -554,7 +555,7 @@ module.exports = {
 						'currently_importing': 'You are about to process data for version',
 						'other_versions_available': 'This publisher also has data for the following versions:',
 						'import_will_repeat': 'The import process will be repeated for each version.',
-						'imported': '(IMPORTED)',
+            'processed': '(PROCESSED)',
 						'all_versions_imported': 'All versions have been imported'
 					}
 				}
@@ -818,7 +819,7 @@ module.exports = {
 							'currently_importing': 'You are about to process data for version',
 							'other_versions_available': 'This publisher also has data for the following versions:',
 							'import_will_repeat': 'The import process will be repeated for each version.',
-							'imported': '(IMPORTED)',
+              'processed': '(PROCESSED)',
 							'all_versions_imported': 'All versions have been imported'
 						}
 				}
