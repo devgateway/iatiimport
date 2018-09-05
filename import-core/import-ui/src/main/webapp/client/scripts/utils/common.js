@@ -1,6 +1,7 @@
 'use strict';
 var _ = require('lodash/dist/lodash.underscore');
 var moment = require('moment');
+var Cookies = require('js-cookie');
 
 module.exports = {
   getMultilangString: function(multilangFields, field, i18nLib){
@@ -61,5 +62,9 @@ module.exports = {
 		 return moment(date).format('YYYY-MM-DD');
 	 }
 	 
- }   
+ },
+ isAdmin: function() {
+	 return Cookies.get('IS_ADMIN') === 'true' || Cookies.get('IS_ADMIN') === true;
+ }
+ 
 };

@@ -11,7 +11,7 @@ var appConfig = require('./../conf');
 var translations = require('../../i18n/translations');
 var systemInfoStore = require('./../stores/SystemInfoStore');
 var settingsStore = require('./../stores/SettingsStore');
-var Cookies = require('js-cookie');
+var common = require('./../utils/common');
 var Home = React.createClass({
    mixins: [Reflux.ListenerMixin],
    getInitialState: function() {                    
@@ -55,7 +55,7 @@ var Home = React.createClass({
   },
   closeImportTool: function(){
 	  if (confirm(this.state.i18nLib.t('header.close_window'))) {
-	      if (Cookies.get("IS_ADMIN") == 'true' || Cookies.get("IS_ADMIN") == true) {
+	      if (common.isAdmin()) {
 	          window.location.href = appConfig.AMP_ADMIN_HOME;
 	      } else {
 	          window.location.href = appConfig.AMP_DESKTOP_ENDPOINT; 
