@@ -262,7 +262,8 @@ module.exports = {
 						'other_versions_available': 'This publisher also has data for the following versions:',
 						'import_will_repeat': 'The import process will be repeated for each version.',
 						'imported': '(IMPORTED)',
-						'all_versions_imported': 'All versions have been imported'
+						'all_versions_imported': 'All versions have been imported',
+						'org_has_no_data': 'This organization does not have any IATI files for this country.'
 					},
 					'project_preview':{
 						'title': 'Project Preview',

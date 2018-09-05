@@ -26,7 +26,12 @@ var SelectVersion = React.createClass({
             <div className="panel panel-default">
                 <div className="panel-heading"><strong>{this.props.i18nLib.t('select_version.title')}</strong></div>
                 <div className="panel-body">
-                {this.props.versions.length &&
+                {this.props.versions.length == 0 &&
+                    <div>
+                      <label> {this.props.i18nLib.t('select_version.org_has_no_data')} </label>
+                    </div>
+                }
+                {this.props.versions.length > 0 &&
                     <div>
                      <label>{this.props.i18nLib.t('select_version.currently_importing')} {this.props.currentVersion}</label> <br/>  
                       {this.props.versions.filter(function(v){ return v != this.props.currentVersion}.bind(this)).length > 0 &&
