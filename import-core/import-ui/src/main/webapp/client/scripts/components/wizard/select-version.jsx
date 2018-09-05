@@ -21,6 +21,9 @@ var SelectVersion = React.createClass({
     handleNext: function() {
         this.props.eventHandlers.initAutomaticImport();
     },
+    handlePrevious: function(){
+        this.props.eventHandlers.selectDataSource();
+    },
     render: function() {
         return (
             <div className="panel panel-default">
@@ -55,7 +58,8 @@ var SelectVersion = React.createClass({
                
                 </div>
                 <div className="buttons">
-                    <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.handleNext}>{this.props.i18nLib.t('data_source.next')}</button>
+                    <div className="col-md-6"><button className="btn btn-success navbar-btn btn-custom btn-previous" type="button" onClick={this.handlePrevious}>{this.props.i18nLib.t('wizard.previous')}</button></div>
+                    <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.handleNext}>{this.props.i18nLib.t('wizard.next')}</button>
                 </div>
             </div>
             );

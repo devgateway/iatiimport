@@ -117,7 +117,12 @@ var Wizard = React.createClass({
 	uploadFile: function() {
 		this.transitionTo('filter', this.props.params);
 	},
-
+     
+	selectDataSource: function() {
+	    this.setState({completedSteps: [], versions:[], processedVersions: [], projectWithUpdates:[], currentVersion: null});        
+	    this.transitionTo('selectdatasource', this.props.params);
+	},
+	
 	filterData: function(languageData, filterData, direction) {
 		var languagesUpdated = false;
 		var filtersUpdated = false;
@@ -365,6 +370,7 @@ var Wizard = React.createClass({
     eventHandlers.fetchData = this.fetchData;
     eventHandlers.initAutomaticImport = this.initAutomaticImport;
     eventHandlers.processNextVersion = this.processNextVersion;
+    eventHandlers.selectDataSource = this.selectDataSource;
 
     var error;
     if(Cookies.get("DESTINATION_AUTH_TOKEN") == "null" || Cookies.get("DESTINATION_AUTH_TOKEN") == "undefined"){

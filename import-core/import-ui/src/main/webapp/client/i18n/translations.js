@@ -34,6 +34,8 @@ module.exports = {
 						}
 					},
 					'wizard' : {
+						'next' : 'Next >>',
+						'previous' : '<< Previous',
 						'import_process' : 'Import Process',
 						'steps' : {
 							'upload_files' : ' Upload File(s)',
@@ -329,6 +331,8 @@ module.exports = {
 						}
 					},
 					'wizard' : {
+						'next' : 'Siguiente >>',
+						'previous' : '<< Anterior',
 						'import_process' : 'Proceso de Importación',
 						'steps' : {
 							'upload_files' : ' Cargar Archivo(s)',
@@ -595,6 +599,8 @@ module.exports = {
 						}
 					},
 					'wizard' : {
+						'next' : 'Suivant >>',
+						'previous' : '<< Précédent',
 						'import_process' : 'Processus de Téléchargement',
 						'steps' : {
 							'upload_files' : ' Télécharger le(s)fichier(s)',
@@ -819,7 +825,7 @@ module.exports = {
 							'currently_importing': 'You are about to process data for version',
 							'other_versions_available': 'This publisher also has data for the following versions:',
 							'import_will_repeat': 'The import process will be repeated for each version.',
-              'processed': '(PROCESSED)',
+                             'processed': '(PROCESSED)',
 							'all_versions_imported': 'All versions have been imported'
 						}
 				}
