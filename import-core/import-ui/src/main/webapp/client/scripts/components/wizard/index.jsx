@@ -121,13 +121,16 @@ var Wizard = React.createClass({
 	filterData: function(languageData, filterData, direction) {
 		var languagesUpdated = false;
 		var filtersUpdated = false;
+		var nextStep = 'projects';
+		var previousStep = this.props.params.src !== constants.IMPORT_TYPE_AUTOMATIC ? 'upload' : 'selectversion';
+		    
 		formActions.updateLanguages.triggerPromise(languageData).then(function() {
 			languagesUpdated = true;
 			if(languagesUpdated && filtersUpdated){
 				if(constants.DIRECTION_NEXT === direction){
-					this.transitionTo('projects', this.props.params);
-				}else{
-					this.transitionTo('upload', this.props.params);
+					this.transitionTo(nextStep, this.props.params);
+				} else {
+					this.transitionTo(previousStep, this.props.params);
 				}
 			}
 		}.bind(this));
@@ -136,9 +139,9 @@ var Wizard = React.createClass({
 			filtersUpdated = true;
 			if(languagesUpdated && filtersUpdated){
 				if(constants.DIRECTION_NEXT === direction){
-					this.transitionTo('projects', this.props.params);
+					this.transitionTo(nextStep, this.props.params);
 				}else{
-					this.transitionTo('upload', this.props.params);
+					this.transitionTo(previousStep, this.props.params);
 				}
 			}
 		}.bind(this));
