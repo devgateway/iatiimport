@@ -261,7 +261,7 @@ module.exports = {
 						'currently_importing': 'You are about to process data for version',
 						'other_versions_available': 'This publisher also has data for the following versions:',
 						'import_will_repeat': 'The import process will be repeated for each version.',
-						'imported': '(IMPORTED)',
+						'processed': '(PROCESSED)',
 						'all_versions_imported': 'All versions have been imported'
 					},
 					'project_preview':{
@@ -553,7 +553,7 @@ module.exports = {
 						'currently_importing': 'You are about to process data for version',
 						'other_versions_available': 'This publisher also has data for the following versions:',
 						'import_will_repeat': 'The import process will be repeated for each version.',
-						'imported': '(IMPORTED)',
+            'processed': '(PROCESSED)',
 						'all_versions_imported': 'All versions have been imported'
 					}
 				}
@@ -817,7 +817,7 @@ module.exports = {
 							'currently_importing': 'You are about to process data for version',
 							'other_versions_available': 'This publisher also has data for the following versions:',
 							'import_will_repeat': 'The import process will be repeated for each version.',
-							'imported': '(IMPORTED)',
+              'processed': '(PROCESSED)',
 							'all_versions_imported': 'All versions have been imported'
 						}
 				}
