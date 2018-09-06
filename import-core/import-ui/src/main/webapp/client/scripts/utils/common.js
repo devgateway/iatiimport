@@ -2,6 +2,8 @@
 var _ = require('lodash/dist/lodash.underscore');
 var moment = require('moment');
 var Cookies = require('js-cookie');
+var appConfig = require('./../conf');
+var appActions = require('./../actions');
 
 module.exports = {
   getMultilangString: function(multilangFields, field, i18nLib){
@@ -65,6 +67,46 @@ module.exports = {
  },
  isAdmin: function() {
 	 return Cookies.get('IS_ADMIN') === 'true' || Cookies.get('IS_ADMIN') === true;
- }
- 
+ },
+ setAuthCookies: function(data) {
+	  appConfig.DESTINATION_AUTH_TOKEN = data.token;
+      appConfig.DESTINATION_USERNAME = data['user-name'];
+      appConfig.DESTINATION_AUTH_TOKEN_EXPIRATION =  data['token-expiration'] || (new Date()).getTime() + (30*60*1000);
+      Cookies.set('DESTINATION_AUTH_TOKEN', data.token);
+      Cookies.set('DESTINATION_USERNAME', data['user-name']);
+      // Added true always for now, the API returns wrong value
+      Cookies.set('CAN_ADD_ACTIVITY', true || data['add-activity']);
+      Cookies.set('IS_ADMIN', data['is-admin']);
+      Cookies.set('WORKSPACE', data.team);      
+ },
+ resetAuthCookies: function() {
+	  appConfig.DESTINATION_AUTH_TOKEN = null;
+      appConfig.DESTINATION_USERNAME = null;
+      Cookies.set('DESTINATION_AUTH_TOKEN', null);
+      Cookies.set('DESTINATION_USERNAME', null);
+      // Added true always for now, the API returns wrong value
+      Cookies.set('CAN_ADD_ACTIVITY', null);
+      Cookies.set('WORKSPACE', null);
+ },
+ refreshToken: function() {
+	 var self = this;
+	 self.setIntervalTokenId = setInterval(function(){
+		 self.checkTokenStatus();
+	}, 1000); 
+ },
+ checkTokenStatus: function() {
+		var currentTime = (new Date()).getTime();
+		var expirationTime = appConfig.DESTINATION_AUTH_TOKEN_EXPIRATION;
+		var secondsToExpire = (appConfig.DESTINATION_AUTH_TOKEN_EXPIRATION - currentTime)/1000;
+		
+		if (secondsToExpire < 0) {
+			appActions.refreshDestinationSession.triggerPromise().then(function(data) {
+			      this.setAuthCookies(data);			    
+			  $.get(appConfig.TOOL_REST_PATH + '/refresh/' + data.token, function(){});
+		      }.bind(this))['catch'](function(err) {
+		    	  this.resetAuthCookies();
+		      }.bind(this));
+
+		}
+	}
 };

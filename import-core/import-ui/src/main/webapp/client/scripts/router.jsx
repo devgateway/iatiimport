@@ -26,7 +26,9 @@ var WorkflowList = require('./components/reports/workflow-list');
 var DataSource = require('./components/admin/data-source');
 var ErrorPage = require('./components/error-page')
 var appActions = require('./actions');
+var common = require('./utils/common');
 var Cookies = require('js-cookie');
+
 
 var routes = (
 	<Route name="layout" path="/" handler={Home}>
@@ -57,13 +59,15 @@ var routes = (
 
 
 exports.start = function() {
-   appActions.initDestinationSession.triggerPromise().then(function(data) {       
-        Cookies.set("IS_ADMIN", data['is-admin']); 
+   appActions.initDestinationSession.triggerPromise().then(function(data) {        
+        common.setAuthCookies(data);        
         Router.run(routes, function (Handler) {
             React.render(<Handler />, document.getElementById('app-wrapper'));
-        });       
+        });
+        
+                
       }.bind(this))["catch"](function(err) {
-          Cookies.set("IS_ADMIN", null); 
+          common.resetAuthCookies();
           Router.run(routes, function (Handler) {
               React.render(<Handler />, document.getElementById('app-wrapper'));
           });

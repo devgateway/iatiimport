@@ -13,6 +13,7 @@ var Navigation = Router.Navigation;
 var formActions = require('./../../actions/form');
 var Cookies = require('js-cookie');
 var constants = require('./../../utils/constants');
+var common = require('./../../utils/common');
 var destinationSessionStore = require('./../../stores/DestinationSessionStore');
 
 var Wizard = React.createClass({
@@ -47,52 +48,42 @@ var Wizard = React.createClass({
 	},
 	initManualImport: function() {
 	    var sourceProcessor = this.props.params.src;
-        var destinationProcessor = this.props.params.dst;       
-        appActions.initDestinationSession.triggerPromise().then(function(data) {
-            appConfig.DESTINATION_AUTH_TOKEN = data.token;
-            appConfig.DESTINATION_USERNAME = data['user-name'];
-            appConfig.DESTINATION_AUTH_TOKEN_EXPIRATION =  data["token-expiration"] || (new Date).getTime() + (30*60*1000);
-            Cookies.set("DESTINATION_AUTH_TOKEN", data.token);
-            Cookies.set("DESTINATION_USERNAME", data['user-name']);
-            // Added true always for now, the API returns wrong value
-            Cookies.set("CAN_ADD_ACTIVITY", true || data['add-activity']);
-            Cookies.set("IS_ADMIN", data['is-admin']);
-            Cookies.set("WORKSPACE", data['team']);
-            this.initImportSession(sourceProcessor, destinationProcessor);
-            
-            // Timer for token expiration
-            var self = this;
-            self.setIntervalTokenId = setInterval(function(){
-                 self.checkTokenStatus();
-            }, 1000);
-
-          }.bind(this))["catch"](function(err) {
-          }.bind(this));  
+        var destinationProcessor = this.props.params.dst;    
+        appActions.refreshDestinationSession.triggerPromise().then(function(data) {
+            common.setAuthCookies(data);
+            this.initImportSession(sourceProcessor, destinationProcessor); 
+            common.refreshToken();
+        }.bind(this))["catch"](function(err) {
+            common.resetAuthCookies();
+        }.bind(this));
+           
 	},
-	checkTokenStatus: function() {
-		var currentTime = (new Date).getTime();
-		var expirationTime = appConfig.DESTINATION_AUTH_TOKEN_EXPIRATION;
-		var secondsToExpire = (appConfig.DESTINATION_AUTH_TOKEN_EXPIRATION - currentTime)/1000;
-		//console.log("Session in " + secondstoExpire);
-		if(secondsToExpire < 0) {
-			appActions.refreshDestinationSession.triggerPromise().then(function(data) {
-				  appConfig.DESTINATION_AUTH_TOKEN = data.token;
-			    appConfig.DESTINATION_USERNAME = data['user-name'];
-					appConfig.DESTINATION_AUTH_TOKEN_EXPIRATION =  data["token-expiration"] || (new Date).getTime() + (30*60*1000);
-			    Cookies.set("DESTINATION_AUTH_TOKEN", data.token);
-			    Cookies.set("DESTINATION_USERNAME", data['user-name']);
-			    // Added true always for now, the API returns wrong value
-			    Cookies.set("CAN_ADD_ACTIVITY", true || data['add-activity']);
-			    Cookies.set("WORKSPACE", data['team']);
-			    Cookies.set("IS_ADMIN", data['is-admin']);
-				$.get(appConfig.TOOL_REST_PATH + '/refresh/' + data.token, function(){});
-
-		      }.bind(this))["catch"](function(err) {
-		      }.bind(this));
-
-		}
+	getSourceProcessor: function(src) {
+	      if (src === constants.IMPORT_TYPE_AUTOMATIC && this.state.currentVersion) {
+	          return "IATI" + this.state.currentVersion.replace(".", "")
+	      }
+	        
+	      return src;
+	 },  
+	 initAutomaticImport: function() {      
+	      var sourceProcessor = this.props.params.src;
+	      var destinationProcessor = this.props.params.dst; 
+	        
+	      appActions.refreshDestinationSession.triggerPromise().then(function(data) {
+	           common.setAuthCookies(data);           
+	           this.initImportSession(sourceProcessor, destinationProcessor).then(function(){
+	                this.transitionTo('filter', this.props.params);
+	           }.bind(this));
+	            
+	           common.refreshToken();            
+	    }.bind(this))["catch"](function(err) {
+	            common.resetAuthCookies();
+	    }.bind(this));
+	        
+	                
+	        
 	},
-	updateCurrentStep : function(step){
+    updateCurrentStep : function(step){
 	  var completedSteps = this.state.completedSteps;
 	  completedSteps.push(step);
 	  this.setState({currentStep:step, completedSteps: completedSteps})
@@ -102,7 +93,6 @@ var Wizard = React.createClass({
 			$(this.refs.loadingIcon.getDOMNode()).hide();
 		}
 	},
-
 	showLoadingIcon:  function(){
 		$(this.refs.loadingIcon.getDOMNode()).show();
 	},
@@ -275,40 +265,7 @@ var Wizard = React.createClass({
 	        type: 'GET'
 	     });
 	},
-	getSourceProcessor: function(src) {
-        if (src === constants.IMPORT_TYPE_AUTOMATIC && this.state.currentVersion) {
-            return "IATI" + this.state.currentVersion.replace(".", "")
-        }
-        
-        return src;
-	},	
-	initAutomaticImport: function() {	   
-	    var sourceProcessor = this.props.params.src;
-        var destinationProcessor = this.props.params.dst;       
-        appActions.initDestinationSession.triggerPromise().then(function(data) {
-              appConfig.DESTINATION_AUTH_TOKEN = data.token;
-            appConfig.DESTINATION_USERNAME = data['user-name'];
-                appConfig.DESTINATION_AUTH_TOKEN_EXPIRATION =  data["token-expiration"] || (new Date).getTime() + (30*60*1000);
-            Cookies.set("DESTINATION_AUTH_TOKEN", data.token);
-            Cookies.set("DESTINATION_USERNAME", data['user-name']);
-            // Added true always for now, the API returns wrong value
-            Cookies.set("CAN_ADD_ACTIVITY", true || data['add-activity']);
-            Cookies.set("WORKSPACE", data['team']);
 
-                this.initImportSession(sourceProcessor, destinationProcessor).then(function(){
-                   this.transitionTo('filter', this.props.params);
-                }.bind(this))
-
-                // Timer for token expiration
-                var self = this;
-                self.setIntervalTokenId = setInterval(function(){
-                    self.checkTokenStatus();
-                }, 1000);
-
-          }.bind(this))["catch"](function(err) {
-          }.bind(this));        
-	    
-	},
 	initImportSession: function(sourceProcessor, destinationProcessor) {
 	    this.showLoadingIcon();
 		var compiledURL = _.template(appConfig.TOOL_START_ENDPOINT);
@@ -349,10 +306,7 @@ var Wizard = React.createClass({
 	        },
 	        type: 'GET'
 	     });
-
-
-	},
-
+  },
   render: function() {   
     var eventHandlers = {};
     eventHandlers.uploadFile          = this.uploadFile;
@@ -374,7 +328,7 @@ var Wizard = React.createClass({
 
     var error;
     if(Cookies.get("DESTINATION_AUTH_TOKEN") == "null" || Cookies.get("DESTINATION_AUTH_TOKEN") == "undefined"){
-    	return (<div className="container"><br/><div className="alert alert-danger server-status-message" role="alert" ><span className="glyphicon glyphicon-exclamation-sign error-box" aria-hidden="true"></span><span className="sr-only">Error:</span><span > Session information for the destination system could not be retrieved. Verify if backend services are working correctly.</span> </div></div>);
+    	return (<div className="container"><br/><div className="alert alert-danger server-status-message" role="alert" ><span className="glyphicon glyphicon-exclamation-sign error-box" aria-hidden="true"></span><span className="sr-only">Error:</span><span > {window.i18nLib.t('wizard.invalid_session')}</span> </div></div>);
     }
 
     if(Cookies.get("CAN_ADD_ACTIVITY") == "false"){
