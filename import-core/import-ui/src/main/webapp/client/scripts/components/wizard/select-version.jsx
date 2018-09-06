@@ -36,7 +36,7 @@ var SelectVersion = React.createClass({
                                {this.props.versions.filter(function(v){ return v != this.props.currentVersion}.bind(this)).map(function(version){
                                   return (<li className="workflow-link">{version} 
                                   {this.props.processedVersions.indexOf(version) != -1 &&
-                                     <span>&nbsp; {this.props.i18nLib.t('select_version.imported')}</span>
+                                     <span>&nbsp; {this.props.i18nLib.t('select_version.processed')}</span>
                                   }</li>);  
                                }.bind(this))}
                            </ul>      
