@@ -500,6 +500,7 @@ tbody.scrollablebody td, thead.scrollablebody th {
 .glyphicon-eye-open-custom {
 	font-size: 16px;
 	margin:5px;
+	pointer-events: all !important;
 }
 
 .landing-page-left {
