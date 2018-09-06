@@ -117,17 +117,25 @@ var Wizard = React.createClass({
 	uploadFile: function() {
 		this.transitionTo('filter', this.props.params);
 	},
-
+     
+	selectDataSource: function() {
+	    this.setState({completedSteps: [], versions:[], processedVersions: [], projectWithUpdates:[], currentVersion: null});        
+	    this.transitionTo('selectdatasource', this.props.params);
+	},
+	
 	filterData: function(languageData, filterData, direction) {
 		var languagesUpdated = false;
 		var filtersUpdated = false;
+		var nextStep = 'projects';
+		var previousStep = this.props.params.src !== constants.IMPORT_TYPE_AUTOMATIC ? 'upload' : 'selectversion';
+		    
 		formActions.updateLanguages.triggerPromise(languageData).then(function() {
 			languagesUpdated = true;
 			if(languagesUpdated && filtersUpdated){
 				if(constants.DIRECTION_NEXT === direction){
-					this.transitionTo('projects', this.props.params);
-				}else{
-					this.transitionTo('upload', this.props.params);
+					this.transitionTo(nextStep, this.props.params);
+				} else {
+					this.transitionTo(previousStep, this.props.params);
 				}
 			}
 		}.bind(this));
@@ -136,9 +144,9 @@ var Wizard = React.createClass({
 			filtersUpdated = true;
 			if(languagesUpdated && filtersUpdated){
 				if(constants.DIRECTION_NEXT === direction){
-					this.transitionTo('projects', this.props.params);
+					this.transitionTo(nextStep, this.props.params);
 				}else{
-					this.transitionTo('upload', this.props.params);
+					this.transitionTo(previousStep, this.props.params);
 				}
 			}
 		}.bind(this));
@@ -362,6 +370,7 @@ var Wizard = React.createClass({
     eventHandlers.fetchData = this.fetchData;
     eventHandlers.initAutomaticImport = this.initAutomaticImport;
     eventHandlers.processNextVersion = this.processNextVersion;
+    eventHandlers.selectDataSource = this.selectDataSource;
 
     var error;
     if(Cookies.get("DESTINATION_AUTH_TOKEN") == "null" || Cookies.get("DESTINATION_AUTH_TOKEN") == "undefined"){

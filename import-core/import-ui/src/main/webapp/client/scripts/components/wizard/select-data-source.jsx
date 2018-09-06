@@ -22,7 +22,10 @@ var SelectDataSource = React.createClass({
     },
     componentDidMount: function() {  
         this.props.eventHandlers.updateCurrentStep(constants.SELECT_DATASOURCE);       
-    },      
+    }, 
+    handlePrevious: function(){
+       this.props.eventHandlers.goHome();
+    },
     handleNext: function() {
         this.props.eventHandlers.fetchData(this.state.reportingOrgId);
     },
@@ -40,7 +43,8 @@ var SelectDataSource = React.createClass({
                 </div>
                 <br /><br /><br />
                 <div className="buttons">
-                    <button disabled = {this.state.reportingOrgId ? "" : "disabled"} className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.handleNext}>{this.props.i18nLib.t('data_source.next')}</button>
+                    <div className="col-md-6"><button className="btn btn-success navbar-btn btn-custom btn-previous" type="button" onClick={this.handlePrevious}>{this.props.i18nLib.t('wizard.previous')}</button></div>
+                    <button disabled = {this.state.reportingOrgId ? "" : "disabled"} className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.handleNext}>{this.props.i18nLib.t('wizard.next')}</button>
                 </div>
             </div>
             );

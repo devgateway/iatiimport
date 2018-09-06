@@ -3,6 +3,9 @@ var workflowStore = require('./../stores/WorkflowStore');
 var Reflux = require('reflux');
 var constants = require('./../utils/constants');
 var formActions = require('./../actions/form');
+var Cookies = require('js-cookie');
+var common = require('./../utils/common');
+
 var LandingPage = React.createClass({
     mixins: [Reflux.ListenerMixin
     ],
@@ -36,16 +39,19 @@ var LandingPage = React.createClass({
 	      }  
 	},
     render: function () {
+        if (common.isAdmin()) {
+           return (<div></div>);
+        }                  
+                
         return (<div className="container">        		
         		 <div className="row">
                  <div className="col-md-2">
-                 </div>
-                  <div className="col-md-4 landing-page-left">
+                 </div>               
+                   <div className="col-md-4 landing-page-left">
                    <button className="btn btn-success navbar-btn btn-custom" type="button"
                            onClick={this.selectImportType.bind(this, constants.IMPORT_TYPE_AUTOMATIC)}
                            data-toggle="tooltip" data-placement="bottom"
-                           title={this.props.i18nLib.t('import_type.tooltip_' + constants.IMPORT_TYPE_AUTOMATIC)}
-                   >
+                           title={this.props.i18nLib.t('import_type.tooltip_' + constants.IMPORT_TYPE_AUTOMATIC)}>
                      {this.props.i18nLib.t('import_type.automatic')}</button>
                     <br/> <br/>
                    <span>{this.props.i18nLib.t('import_type.description_' + constants.IMPORT_TYPE_AUTOMATIC)} </span><br/>

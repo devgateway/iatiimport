@@ -10,6 +10,7 @@ var Router = require('react-router');
 var Link = Router.Link;
 var Cookies = require('js-cookie');
 var appActions = require('./../../actions');
+var common = require('./../../utils/common');
 var Menu = React.createClass({
     mixins              : [
         Reflux.ListenerMixin
@@ -23,24 +24,28 @@ var Menu = React.createClass({
         
     },
     loadData: function () {
-        appActions.initDestinationSession.triggerPromise().then(function(data) {
-            Cookies.set("IS_ADMIN", data['is-admin']);  
-            appActions.loadMenuData();
-          }.bind(this))["catch"](function(err) {
-          }.bind(this));        
-        
+        appActions.loadMenuData();       
     },
-    updateMenu          : function (data) {
+    updateMenu: function (data) {
         this.setState({
             menuData: data.menuData
         });
     },
-    isAllowed: function(item) {        
-        if (item.name == 'admin'){
-            return Cookies.get("IS_ADMIN") == 'true' || Cookies.get("IS_ADMIN") == true;
+  
+    showMenu: function(item) {        
+        if (item.name === 'close') {
+            return true;
         }
         
-        return true;        
+        var isAdmin = common.isAdmin();
+        var showMenuItem = true;
+        if (item.name === 'admin'){
+            showMenuItem = isAdmin;
+        } else {            
+            showMenuItem = isAdmin ? false : true;         
+        }    
+        
+        return showMenuItem;
     },
     render: function () {      
         var menusLeft = [];
@@ -48,7 +53,7 @@ var Menu = React.createClass({
         var self = this;
         if (this.state.menuData) {
             this.state.menuData.forEach(function (item) {                
-                if (item && item.enabled && this.isAllowed(item)) {
+                if (item && item.enabled && this.showMenu(item)) {
                     var iconClass = 'glyphicon ';
                     if (item.iconClass) {
                         iconClass += item.iconClass;
@@ -86,7 +91,10 @@ var Menu = React.createClass({
                 }
             }.bind(this));
         }
-        menusLeft.splice(1, 0, <ImportProcessMenu {...self.props} />);
+        if (!common.isAdmin()) {
+            menusLeft.splice(1, 0, <ImportProcessMenu {...self.props} />);
+        }
+        
         return (
             <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul className='nav navbar-nav'>

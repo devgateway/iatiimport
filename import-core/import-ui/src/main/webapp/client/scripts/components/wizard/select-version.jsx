@@ -21,12 +21,20 @@ var SelectVersion = React.createClass({
     handleNext: function() {
         this.props.eventHandlers.initAutomaticImport();
     },
+    handlePrevious: function(){
+        this.props.eventHandlers.selectDataSource();
+    },
     render: function() {
         return (
             <div className="panel panel-default">
                 <div className="panel-heading"><strong>{this.props.i18nLib.t('select_version.title')}</strong></div>
                 <div className="panel-body">
-                {this.props.versions.length &&
+                {this.props.versions.length == 0 &&
+                    <div>
+                      <label> {this.props.i18nLib.t('select_version.org_has_no_data')} </label>
+                    </div>
+                }
+                {this.props.versions.length > 0 &&
                     <div>
                      <label>{this.props.i18nLib.t('select_version.currently_importing')} {this.props.currentVersion}</label> <br/>  
                       {this.props.versions.filter(function(v){ return v != this.props.currentVersion}.bind(this)).length > 0 &&
@@ -50,7 +58,8 @@ var SelectVersion = React.createClass({
                
                 </div>
                 <div className="buttons">
-                    <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.handleNext}>{this.props.i18nLib.t('data_source.next')}</button>
+                    <div className="col-md-6"><button className="btn btn-success navbar-btn btn-custom btn-previous" type="button" onClick={this.handlePrevious}>{this.props.i18nLib.t('wizard.previous')}</button></div>
+                    <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.handleNext}>{this.props.i18nLib.t('wizard.next')}</button>
                 </div>
             </div>
             );

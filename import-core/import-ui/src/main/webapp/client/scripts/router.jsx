@@ -25,6 +25,8 @@ var ImportLog = require('./components/reports/import-log');
 var WorkflowList = require('./components/reports/workflow-list');
 var DataSource = require('./components/admin/data-source');
 var ErrorPage = require('./components/error-page')
+var appActions = require('./actions');
+var Cookies = require('js-cookie');
 
 var routes = (
 	<Route name="layout" path="/" handler={Home}>
@@ -53,8 +55,20 @@ var routes = (
 	</Route>
 );
 
+
 exports.start = function() {
-  Router.run(routes, function (Handler) {
-		React.render(<Handler />, document.getElementById('app-wrapper'));
-	});
+   appActions.initDestinationSession.triggerPromise().then(function(data) {       
+        Cookies.set("IS_ADMIN", data['is-admin']); 
+        Router.run(routes, function (Handler) {
+            React.render(<Handler />, document.getElementById('app-wrapper'));
+        });       
+      }.bind(this))["catch"](function(err) {
+          Cookies.set("IS_ADMIN", null); 
+          Router.run(routes, function (Handler) {
+              React.render(<Handler />, document.getElementById('app-wrapper'));
+          });
+          
+      }.bind(this));
+
+  
 }

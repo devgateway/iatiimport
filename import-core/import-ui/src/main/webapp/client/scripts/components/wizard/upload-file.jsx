@@ -81,6 +81,9 @@ var UploadFile = React.createClass({
     		}.bind(this)); 		
     	}    	
     },
+    handlePrevious: function(){
+        this.props.eventHandlers.goHome();
+     },
     render: function() {
         var files = [];
         if (this.state.fileData && this.state.fileData.length > 0) {   
@@ -138,6 +141,7 @@ var UploadFile = React.createClass({
                 </table>
                 <br /><br /><br />
                 <div className="buttons">
+                        <div className="col-md-6"><button className="btn btn-success navbar-btn btn-custom btn-previous" type="button" onClick={this.handlePrevious}>{this.props.i18nLib.t('wizard.previous')}</button></div>
                     <button disabled = {validFiles && validFiles.length > 0 ? "" : "disabled"} className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.props.eventHandlers.uploadFile}>{this.props.i18nLib.t('wizard.upload_file.next')}</button>
                 </div>
             </div>
