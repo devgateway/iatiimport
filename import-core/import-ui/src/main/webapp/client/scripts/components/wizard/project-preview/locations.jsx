@@ -9,8 +9,8 @@ var Locations = React.createClass({
              <div className="section_title_class"><span>{this.props.i18nLib.t('project_preview.locations')}</span><span></span></div>               
              <table className="box_table">
              <tbody>            
-             {locations.map(function(location){
-                 return (<tr>
+             {locations.map(function(location, index){
+                 return (<tr key={index}>
                  <td className="box_field_value ">
                   {location}
                   </td>                   

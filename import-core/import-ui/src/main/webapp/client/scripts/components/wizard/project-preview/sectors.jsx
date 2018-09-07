@@ -10,8 +10,8 @@ var Sectors = React.createClass({
                <table className="box_table">
                <tbody>
               
-               {sectorCodes.map(function(code){
-                   return (<tr>
+               {sectorCodes.map(function(code, index){
+                   return (<tr key={index}>
                    <td className="box_field_value ">
                     {code + " - " + common.getValueName(this.props.sourceFieldsData,constants.FIELD_NAMES.SECTOR, code)}
                     </td>                   

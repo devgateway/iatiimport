@@ -32,8 +32,8 @@ var ParticipatingOrgs = React.createClass({
                <td className="box_field_name">{this.props.i18nLib.t('project_preview.org')}</td>
                <td className="box_field_name">{this.props.i18nLib.t('project_preview.role')}</td>
                </tr>
-               {orgs.map(function(org){
-                   return (<tr>
+               {orgs.map(function(org, index){
+                   return (<tr key={index}>
                    <td className="box_field_value ">
                     {org.name}
                    </td>

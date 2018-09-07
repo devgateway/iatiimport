@@ -44,8 +44,8 @@ var Transactions = React.createClass({
                <td className="box_field_name">{this.props.i18nLib.t('project_preview.transaction_type')}</td>
                <td className="box_field_name">{this.props.i18nLib.t('project_preview.transaction_value')}</td>               
                </tr>
-               {transactions.map(function(transaction) {
-                   return (<tr>
+               {transactions.map(function(transaction, index) {
+                   return (<tr key={index}>
                    <td className="box_field_value ">
                       {transaction.date}
                    </td>

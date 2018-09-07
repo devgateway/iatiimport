@@ -12,8 +12,8 @@ var RecipientCountries = React.createClass({
              <div className="section_title_class"><span>{this.props.i18nLib.t('project_preview.recipient')}</span><span></span></div>               
                <table className="box_table">
                <tbody>
-                  {countries.map(function(country){
-                   return (<tr>
+                  {countries.map(function(country, index){
+                   return (<tr key={index}>
                    <td className="box_field_value ">
                     {country.value}
                    </td>                   
