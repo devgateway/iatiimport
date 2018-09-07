@@ -653,6 +653,7 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 		Field policyMarker = new Field("PolicyMarker", "policy-marker", FieldType.LIST,
                 true, this.getTranslationForField("policy-marker"));
 		policyMarker.setPossibleValues(getCodeListValues("policy-marker"));
+		policyMarker.setMultiple(true);
 		getFields().add(policyMarker);
 		getFilterFieldList().add(policyMarker);
 

@@ -293,7 +293,8 @@ module.exports = {
 					     'no_data': 'No Data',
 					     'sectors': 'Sectors',
 					     'locations': 'Locations',
-					     'recipient': 'Recipient Country'					     
+					     'recipient': 'Recipient Country',
+					     'policy_markers': 'Policy Markers'
 					}
 				}
 			},

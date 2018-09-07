@@ -9,6 +9,7 @@ var Planning = require('./planning');
 var Sectors = require('./sectors');
 var Locations = require('./locations');
 var RecipientCountries = require('./recipient-countries');
+var PolicyMarkers = require('./policy-markers');
 
 var ProjectPreview = React.createClass({
     getInitialState: function() {
@@ -39,6 +40,7 @@ var ProjectPreview = React.createClass({
 			               <ParticipatingOrgs {...this.props}/>
 			               <RecipientCountries {...this.props}/>
 			               <Sectors {...this.props}/>
+			               <PolicyMarkers {...this.props}/>
 			               <Locations {...this.props}/>
 			               <Transactions {...this.props}/>   
 			              </div>

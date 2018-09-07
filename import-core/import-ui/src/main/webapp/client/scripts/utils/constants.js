@@ -40,6 +40,7 @@ module.exports = {
       DEFAULT_FINANCE_TYPE:'default-finance-type',
       DEFAULT_FLOW_TYPE:'default-flow-type',
       DEFAULT_TIED_STATUS:'default-tied-status',
-      SECTOR: 'sector'
+      SECTOR: 'sector',
+      POLICY_MARKER: 'policy-marker'
   }
 };
