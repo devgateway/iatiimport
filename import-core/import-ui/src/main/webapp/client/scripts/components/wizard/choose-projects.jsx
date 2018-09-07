@@ -221,6 +221,7 @@ var ChooseProjects = React.createClass({
         var existingProjects = [];
         var language = this.props.i18nLib.lng() || 'en';
         var statusMessage = this.state.statusMessage.length > 0 ? <div className="alert alert-info" role="alert">{this.state.statusMessage}</div> : "";
+
         if (this.state.projectData) {
            $.map(this.state.projectData, function (item, i) {
                 if (item.operation == 'INSERT') {
@@ -300,7 +301,7 @@ var ChooseProjects = React.createClass({
                 <div className="panel-body">
                     {statusMessage}
                     <div className="panel panel-success">
-                        <div className="panel-heading">{this.props.i18nLib.t('wizard.choose_projects.new_projects')} <i>({this.state.destinationProjects.length} {this.props.i18nLib.t('wizard.choose_projects.choose_projects')})</i></div>
+                        <div className="panel-heading">{this.props.i18nLib.t('wizard.choose_projects.new_projects')} <i>({this.state.projectData.length} {this.props.i18nLib.t('wizard.choose_projects.choose_projects')})</i></div>
                         <div className="panel-body">
                          <SimilarProjectsDialog projectMapping={this.state.projectMapping} getTitle={this.getTitle} mapProject={this.mapProject} {...this.props} />
                          {this.state.showSourceProjectPreview && this.state.projectMapping &&
