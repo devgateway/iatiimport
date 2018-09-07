@@ -19,7 +19,7 @@ var SimilarProjectsDialog = React.createClass({
     },
     render: function () {    
        var rows = [];
-       if (this.props.projectMapping){
+       if (this.props.projectMapping && this.props.projectMapping.projectsWithSimilarTitles){
           $.map(this.props.projectMapping.projectsWithSimilarTitles, function (item, i) { 
             rows.push(<tr>
                        <td>
