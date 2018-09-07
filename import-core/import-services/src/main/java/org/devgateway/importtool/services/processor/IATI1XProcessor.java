@@ -435,7 +435,7 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 				case TRANSACTION:
 					try {
 						NodeList nodes;
-						nodes = (NodeList) xPath.evaluate(="(transaction/value/parent::*)/transaction-type[@code='"+
+						nodes = (NodeList) xPath.evaluate("(transaction/value/parent::*)/transaction-type[@code='"+
 								field.getSubType() +"' or @code= '"+ field.getSubTypeCode() +"']/parent::*",element,
 								XPathConstants.NODESET);
 						for (int j = 0; j < nodes.getLength(); ++j) {
