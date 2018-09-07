@@ -34,7 +34,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -436,7 +435,9 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 				case TRANSACTION:
 					try {
 						NodeList nodes;
-						nodes = (NodeList) xPath.evaluate("transaction/transaction-type[@code='" + field.getSubType() + "' or @code= '" + field.getSubTypeCode() + "']/parent::*", element, XPathConstants.NODESET);
+						nodes = (NodeList) xPath.evaluate("(transaction/value/parent::*)/transaction-type[@code='"+
+								field.getSubType() +"' or @code= '"+ field.getSubTypeCode() +"']/parent::*",element,
+								XPathConstants.NODESET);
 						for (int j = 0; j < nodes.getLength(); ++j) {
 							String reference = "";
 							
@@ -558,8 +559,6 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 		}		
 		return list;
 	}
-
-
 
 	private Boolean includedByFilter(List<String> filters, String codeValue) {
 		if (filters.size() == 0)
