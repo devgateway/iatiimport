@@ -3,9 +3,7 @@
   font-weight: 400;
   margin-left: 30px;
   margin-right: 50px;
-  overflow-y: scroll;
-  overflow-x: hidden;
-}
+ }
 
 .preview_title {
   margin-left: 10px;
@@ -459,6 +457,12 @@
 }
 
 
-.left-column {
-	max-height: 600px !important;
+#projectPreview .modal-dialog,
+.modal-content {
+  height: 90% !important;
+}
+
+#projectPreview .modal-body {
+    max-height: calc(100% - 120px);
+    overflow-y: scroll !important;
 }

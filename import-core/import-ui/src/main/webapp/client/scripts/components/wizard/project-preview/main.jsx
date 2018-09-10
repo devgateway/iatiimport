@@ -57,10 +57,11 @@ var ProjectPreview = React.createClass({
 			        
 			        
 			        </div>				    
-			      <div className="modal-footer">
-			        <button type="button" className="btn btn-default btn-warning" data-dismiss="modal" onClick={this.onClose}>{this.props.i18nLib.t('project_preview.close')}</button>			        
-			      </div>
+			      
 			    </div>
+			        <div className="modal-footer">
+                    <button type="button" className="btn btn-default btn-warning" data-dismiss="modal" onClick={this.onClose}>{this.props.i18nLib.t('project_preview.close')}</button>                  
+                  </div>
 			  </div>
 			</div>
 			</div>
