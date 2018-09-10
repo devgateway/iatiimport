@@ -510,11 +510,11 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 				case DATE:
 					try {
 						NodeList nodes;
-						nodes = (NodeList) xPath.evaluate("//activity-date[@type='" + field.getSubType() + "']", element, XPathConstants.NODESET);
+						nodes = (NodeList) xPath.evaluate("activity-date[@type='" + field.getSubType() + "']", element, XPathConstants.NODESET);
 						for (int j = 0; j < nodes.getLength(); ++j) {
 							Element e = (Element) nodes.item(j);
 							String localDate = e.getAttribute("iso-date");
-							String format = "yyyy-MM-dd";
+							String format = "yyyy-MM-dd";						 							
 							SimpleDateFormat sdf = new SimpleDateFormat(format);
 							if(localDate != null && !localDate.isEmpty()){
 								document.addDateField(field.getUniqueFieldName(), sdf.parse(localDate));

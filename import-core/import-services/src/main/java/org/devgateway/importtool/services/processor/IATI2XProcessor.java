@@ -551,7 +551,9 @@ public class IATI2XProcessor extends IATIProcessor {
 							String localDate = e.getAttribute("iso-date");
 							String format = "yyyy-MM-dd";
 							SimpleDateFormat sdf = new SimpleDateFormat(format);
-							document.addDateField(field.getUniqueFieldName(), sdf.parse(localDate));
+							if (localDate != null && !localDate.isEmpty()){
+								document.addDateField(field.getUniqueFieldName(), sdf.parse(localDate));
+							}							
 						}
 
 					} catch (XPathExpressionException | ParseException e1) {
