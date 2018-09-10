@@ -37,7 +37,7 @@ module.exports = {
 						'next' : 'Next >>',
 						'previous' : '<< Previous',
 						'import_process' : 'Import Process',
-						'invalid_session': 'The user session has expired. Please login to access the import wizard.',
+						'invalid_session': 'Invalid user session. The user session has either expired or you have not logged in. Please login to AMP and refresh this page.',
 						'steps' : {
 							'upload_files' : ' Upload File(s)',
 							'select_data_source': ' Select Data Source',

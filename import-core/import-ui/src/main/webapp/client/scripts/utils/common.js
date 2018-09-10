@@ -87,6 +87,7 @@ module.exports = {
       // Added true always for now, the API returns wrong value
       Cookies.set('CAN_ADD_ACTIVITY', null);
       Cookies.set('WORKSPACE', null);
+      appConfig.DESTINATION_AUTH_TOKEN_EXPIRATION = null;
  },
  refreshToken: function() {
 	 var self = this;
@@ -108,5 +109,8 @@ module.exports = {
 		      }.bind(this));
 
 		}
-	}
+ },
+ hasValidSession: function() {
+	return Cookies.get('DESTINATION_USERNAME') && appConfig.DESTINATION_AUTH_TOKEN_EXPIRATION > (new Date()).getTime();
+ } 
 };

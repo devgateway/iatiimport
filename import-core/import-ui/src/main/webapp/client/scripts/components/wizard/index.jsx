@@ -55,6 +55,7 @@ var Wizard = React.createClass({
             common.refreshToken();
         }.bind(this))["catch"](function(err) {
             common.resetAuthCookies();
+            this.goHome();
         }.bind(this));
            
 	},
@@ -327,7 +328,7 @@ var Wizard = React.createClass({
     eventHandlers.selectDataSource = this.selectDataSource;
 
     var error;
-    if(Cookies.get("DESTINATION_AUTH_TOKEN") == "null" || Cookies.get("DESTINATION_AUTH_TOKEN") == "undefined"){
+    if(common.hasValidSession() == false){
     	return (<div className="container"><br/><div className="alert alert-danger server-status-message" role="alert" ><span className="glyphicon glyphicon-exclamation-sign error-box" aria-hidden="true"></span><span className="sr-only">Error:</span><span > {window.i18nLib.t('wizard.invalid_session')}</span> </div></div>);
     }
 
