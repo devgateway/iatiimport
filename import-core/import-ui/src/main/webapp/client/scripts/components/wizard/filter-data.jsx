@@ -76,13 +76,12 @@ var FilterData = React.createClass({
 	},
 	handleToggle: function(field, value, event) {        
 		var currentField = _.find(this.state.filterData, { 'fieldName': field.fieldName });
-		var filterExists = _.some(currentField.filters, function(a) { return a == value.code});
-		if(!filterExists && event.target.checked) {
-			currentField.filters.push(value.code);
-		}
-		else
-		{
-			currentField.filters = _.without(currentField.filters, value.code);
+		var filterValue = value.code ? value.code : value.value;
+		var filterExists = _.some(currentField.filters, function(a) { return a == filterValue});
+		if (!filterExists && event.target.checked) {
+			currentField.filters.push(filterValue);
+		} else	{
+			currentField.filters = _.without(currentField.filters, filterValue);
 		}
 		var currentFilterData = this.state.filterData;
 
@@ -113,9 +112,13 @@ var FilterData = React.createClass({
 		this.props.eventHandlers.filterData(this.state.languageData,this.state.filterData,constants.DIRECTION_PREVIOUS);
 	},
 	selectAll: function(field, event) {
-		if(event.target.checked) {
-			field.filters = _.pluck(field.possibleValues, 'code');
-		}else{
+		if(event.target.checked) {			
+			field.filters = [];
+			_.each(field.possibleValues, function(item) {
+			    var filterValue = item.code ? item.code : item.value;
+			    field.filters.push(filterValue);
+			 });
+		} else {
 			field.filters = [];
 		}
 		this.setState({
@@ -139,7 +142,7 @@ var FilterData = React.createClass({
             $.map(this.state.filterData, function(filter, i) {
                 var filterValues = [];                
                 $.map(filter.possibleValues, function(values, i) {
-                    var checkedValue = _.some(filter.filters, function(v){ return v == values.code});
+                    var checkedValue = _.some(filter.filters, function(v){ return v === values.code || v === values.value});
                     if(filter.exclusive){
                        filterValues.push(
                             <div className="input-group">
