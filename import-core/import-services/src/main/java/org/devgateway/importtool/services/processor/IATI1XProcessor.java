@@ -10,6 +10,7 @@ import org.devgateway.importtool.services.processor.helper.FieldType;
 import org.devgateway.importtool.services.processor.helper.FieldValue;
 import org.devgateway.importtool.services.processor.helper.IATIProcessorHelper;
 import org.devgateway.importtool.services.processor.helper.InternalDocument;
+import org.devgateway.importtool.services.processor.helper.ProviderOganizationField;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.util.DigestUtils;
@@ -135,8 +136,10 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 		if (doc == null)
 			return getFilterFieldList();
 		for (Field field : getFilterFieldList()) {
-			String xPath = "//"+ field.getFieldName() + (this.isFromDatastore()?"[ancestor::iati-activity[@*[name()" +
-					"='iati-extra:version']='"+ PROCESSOR_VERSION +"']]":"");
+			String xPath = "//"+ field.getFieldName() + (this.isFromDatastore()?"["+
+					field.getXpathFilterCondition(this.isFromDatastore()) +
+					"ancestor::iati-activity [@*[name()='iati-extra:version']='"+ PROCESSOR_VERSION +"']]":
+					"[ "+ field.getXpathFilterCondition(this.isFromDatastore()) + " ]");
 			NodeList nodeList = this.getNodeListFromXpath(this.doc , xPath);
 
 			List<FieldValue> reducedPossibleValues = new ArrayList<FieldValue>();
@@ -435,6 +438,7 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 				case TRANSACTION:
 					try {
 						NodeList nodes;
+
 						nodes = (NodeList) xPath.evaluate("(transaction/value/parent::*)/transaction-type[@code='"+
 								field.getSubType() +"' or @code= '"+ field.getSubTypeCode() +"']/parent::*",element,
 								XPathConstants.NODESET);
@@ -489,6 +493,9 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 									// transaction
 									continue;
 								}
+							}else{
+								//if we don't have provider organization we should ingore the transaction
+								continue;
 							}
 
 							Map<String, String> transactionFields = new HashMap<String, String>();
@@ -735,7 +742,7 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 		getFields().add(implementingOrg);
 		
 		// Provider Organization, within Transactions
-		Field providerOrg = new Field("Provider Organization", "provider-org",
+		Field providerOrg = new ProviderOganizationField("Provider Organization", "provider-org",
                 FieldType.ORGANIZATION, false, getTranslationForField("provider-org"));
 		providerOrg.setSubType("Provider");
 		getFields().add(providerOrg);
