@@ -493,7 +493,9 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 									// transaction
 									continue;
 								}
-							}else{
+							}
+							
+							if (StringUtils.isBlank(providingOrganization)) {
 								//if we don't have provider organization we should ingore the transaction
 								continue;
 							}
