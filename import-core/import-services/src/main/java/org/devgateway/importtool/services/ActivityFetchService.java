@@ -45,17 +45,24 @@ public class ActivityFetchService {
 
 	private Log log = LogFactory.getLog(getClass());
 
-	public FetchResult fetchResult(String reportingOrg,List<Param>parameters) throws FileNotFoundException {
-
-        File f = new File(ReportingOrganizationHelper.getFileName(reportingOrg));
-        Document doc;
-        if (f.exists()) {
-            InputStream fileInputStream = new FileInputStream(f);
-            doc = this.createXMLDocument(fileInputStream);
-        } else {
-            doc = this.createXMLDocument(fetch(reportingOrg, parameters));
-        }
-        return this.buildResult(doc);
+	public FetchResult fetchResult(String reportingOrg,List<Param>parameters) throws FileNotFoundException, IOException{
+		String fileName = ReportingOrganizationHelper.getFileName(reportingOrg);
+		try {
+			File f = new File(fileName);
+			Document doc;
+			if (f.exists()) {
+				InputStream fileInputStream = new FileInputStream(f);
+				doc = this.createXMLDocument(fileInputStream);
+			} else {
+				doc = this.createXMLDocument(fetch(reportingOrg, parameters));
+			}
+			return this.buildResult(doc);
+		}catch(RuntimeException ex) {
+			//we should probably not save it until is valid. leaving it here
+			//for simplicity
+			Files.delete(Paths.get(fileName));
+			throw ex;
+		}
     }
 
     /**
