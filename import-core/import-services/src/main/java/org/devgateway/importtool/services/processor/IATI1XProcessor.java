@@ -139,7 +139,7 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 			String xPath = "//"+ field.getFieldName() + (this.isFromDatastore()?"["+
 					field.getXpathFilterCondition(this.isFromDatastore()) +
 					"ancestor::iati-activity [@*[name()='iati-extra:version']='"+ PROCESSOR_VERSION +"']]":
-					"[ "+ field.getXpathFilterCondition(this.isFromDatastore()) + " ]");
+					 field.getXpathFilterCondition(this.isFromDatastore()) +"");
 			NodeList nodeList = this.getNodeListFromXpath(this.doc , xPath);
 
 			List<FieldValue> reducedPossibleValues = new ArrayList<FieldValue>();
