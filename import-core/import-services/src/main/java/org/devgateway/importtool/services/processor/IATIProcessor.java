@@ -183,24 +183,23 @@ public abstract class IATIProcessor implements ISourceProcessor {
                         query.append(" and ");
                     }
 
-                    //Some filters need relative paths
-                    String fieldName = getFieldName(field.getFieldName());
-                    query.append(fieldName + "[");
-                    for (int i = 0;i < filter.getFilters().size(); i++) {
-                        String value = filter.getFilters().get(i);
-                        if(i > 0){
-                            query.append(" or ");
-                        }
-                        query.append("@code='" + value + "'");
+                   if ("sector".equals(field.getFieldName())) {                    	
+                    	query.append(" (");                       
+                        query.append(buildFieldFilter("transaction/sector", filter));                        
+                        query.append(" | ");                        
+                        query.append(buildFieldFilter("sector", filter));                          
+                        query.append(") ");                        
+                    } else {
+                    	query.append(buildFieldFilter(field.getFieldName(), filter));                    	
                     }
-                    query.append("]");
+                    
                 }
             }
 
         });
         if (fromDatastore) {
             if (!(xpathExtractActivities.equals(query.toString()))) {
-                query.append("and " + getExtraQueryVersion());
+                query.append(" and " + getExtraQueryVersion());
             } else {
                 query.append(getExtraQueryVersion());
             }
@@ -219,15 +218,20 @@ public abstract class IATIProcessor implements ISourceProcessor {
         return activities;
     }
 
-    private String getFieldName(String fieldName) {
-        String name = fieldName;
-        switch(fieldName) {
-            case "sector":
-                name = "//sector";
-                break;
+    private String buildFieldFilter(String fieldName, Field filter) {
+    	final StringBuilder query = new StringBuilder("");
+        query.append(fieldName + "[");
+        for (int i = 0;i < filter.getFilters().size(); i++) {
+            String value = filter.getFilters().get(i);
+            if(i > 0){
+                query.append(" or ");
+            }
+            query.append("@code='" + value + "'");
         }
-        return name;
+        query.append("]");
+        return query.toString();
     }
+ 
     @Override
     public Boolean isValidInput() {
         NodeList nodeList = doc.getElementsByTagName("iati-activities");

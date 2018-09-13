@@ -273,17 +273,7 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 		return possibleValues;
 	}
 
-    private String getFieldName(String fieldName) {
-		String name = fieldName;
-		switch(fieldName) {
-		case "sector":
-			name = "//sector";
-			break;
-		}
-		return name;
-	}
-	
-	private List<InternalDocument> extractDocuments(Document doc) throws Exception {		
+    private List<InternalDocument> extractDocuments(Document doc) throws Exception {		
 		// Extract global values		
 		XPath xPath = XPathFactory.newInstance().newXPath();		
 		NodeList nodeList = getActivities();
