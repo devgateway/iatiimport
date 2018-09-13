@@ -305,17 +305,30 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 			for (Field field : getFields()) {
 				switch (field.getType()) {
 				case LOCATION:
-					fieldNodeList = element.getElementsByTagName(field.getFieldName());
+					NodeList locations  = (NodeList) xPath.evaluate(field.getFieldName(), element, XPathConstants.NODESET);					
 					List <String> codesLocation = new ArrayList<String>(); 
-					for (int j = 0; j < fieldNodeList.getLength(); j++) {
-						Element fieldElement = (Element) fieldNodeList.item(j);
-						String code = "code";							
-						if(!code.isEmpty()) {
-							codesLocation.add(code);
+					for (int j = 0; j < locations.getLength(); j++) {
+						Element fieldElement = (Element) locations.item(j);
+						String name = null;
+						
+						
+						if(fieldElement.getElementsByTagName("name").item(0) != null && fieldElement.getElementsByTagName("name").item(0).getChildNodes().item(0) != null){
+							name = fieldElement.getElementsByTagName("name").item(0).getChildNodes().item(0).getNodeValue();
+						}
+						
+						if (StringUtils.isBlank(name)) {
+							if(fieldElement.getElementsByTagName("description").item(0) != null && fieldElement.getElementsByTagName("description").item(0).getChildNodes().item(0) != null){
+								name = fieldElement.getElementsByTagName("description").item(0).getChildNodes().item(0).getNodeValue();
+							}							
+						}
+						
+					    		
+					    if (!StringUtils.isBlank(name)) {
+							codesLocation.add(name);
 							FieldValue fv = new FieldValue();
-							if(code != null && !code.isEmpty() ){
-								fv.setCode(code);
-								fv.setValue(code);	
+							if(name != null && !name.isEmpty() ){
+								fv.setCode(name);
+								fv.setValue(name);	
 								fv.setSelected(true);
 							}
 							int index = field.getPossibleValues() == null ? 0 : field.getPossibleValues().size();
@@ -323,7 +336,7 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 							if (field.getPossibleValues() == null) {
 								field.setPossibleValues(new ArrayList<FieldValue>());
 							}
-							if(!field.getPossibleValues().stream().anyMatch(n->{ return n.getCode().equals(code);})) {									
+							if(!field.getPossibleValues().stream().anyMatch(n->{ return n.getCode().equals(fv.getValue());})) {									
 								field.getPossibleValues().add(fv);
 							}
 						}				

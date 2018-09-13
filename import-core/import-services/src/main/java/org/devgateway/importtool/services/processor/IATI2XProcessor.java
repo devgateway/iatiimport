@@ -325,6 +325,9 @@ public class IATI2XProcessor extends IATIProcessor {
 					for (int j = 0; j < fieldNodeList.getLength(); j++) {
 						Element fieldElement = (Element) fieldNodeList.item(j);
 						String code = extractNarrative(fieldElement, "name");
+						if (StringUtils.isBlank(code)) {
+							code = extractNarrative(fieldElement, "description");
+						}
 						if(code != null && !code.isEmpty()) {
 							codesLocation.add(code);
 							FieldValue fv = new FieldValue();
@@ -338,7 +341,7 @@ public class IATI2XProcessor extends IATIProcessor {
 							if (field.getPossibleValues() == null) {
 								field.setPossibleValues(new ArrayList<FieldValue>());
 							}
-							if(!field.getPossibleValues().stream().anyMatch(n->{ return n.getCode().equals(code);})) {
+							if(!field.getPossibleValues().stream().anyMatch(n->{ return n.getCode().equals(fv.getValue());})) {
 								field.getPossibleValues().add(fv);
 							}
 						}
