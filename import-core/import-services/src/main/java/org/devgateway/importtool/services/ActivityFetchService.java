@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.endpoint.DataFetchServiceConstants;
 import org.devgateway.importtool.endpoint.Param;
 import org.devgateway.importtool.model.FetchResult;
+import org.devgateway.importtool.services.processor.helper.ReportingOrganizationHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.client.RestTemplate;
@@ -44,17 +45,24 @@ public class ActivityFetchService {
 
 	private Log log = LogFactory.getLog(getClass());
 
-	public FetchResult fetchResult(String reportingOrg,List<Param>parameters) throws FileNotFoundException {
-
-        File f = new File(getFileName(reportingOrg));
-        Document doc;
-        if (f.exists()) {
-            InputStream fileInputStream = new FileInputStream(f);
-            doc = this.createXMLDocument(fileInputStream);
-        } else {
-            doc = this.createXMLDocument(fetch(reportingOrg, parameters));
-        }
-        return this.buildResult(doc);
+	public FetchResult fetchResult(String reportingOrg,List<Param>parameters) throws FileNotFoundException, IOException{
+		String fileName = ReportingOrganizationHelper.getFileName(reportingOrg);
+		try {
+			File f = new File(fileName);
+			Document doc;
+			if (f.exists()) {
+				InputStream fileInputStream = new FileInputStream(f);
+				doc = this.createXMLDocument(fileInputStream);
+			} else {
+				doc = this.createXMLDocument(fetch(reportingOrg, parameters));
+			}
+			return this.buildResult(doc);
+		}catch(RuntimeException ex) {
+			//we should probably not save it until is valid. leaving it here
+			//for simplicity
+			Files.delete(Paths.get(fileName));
+			throw ex;
+		}
     }
 
     /**
@@ -115,7 +123,7 @@ public class ActivityFetchService {
 	 * @return
 	 */
 	public String fetch(String reportingOrg, List<Param> params) {
-		String fileName = getFileName(reportingOrg);
+		String fileName = ReportingOrganizationHelper.getFileName(reportingOrg);
 		String responseText = fetchFetchFromDataStoreAsString(reportingOrg, params);
 		try {
 			Files.write(Paths.get(fileName), responseText.getBytes("UTF-8"));
@@ -124,12 +132,6 @@ public class ActivityFetchService {
 			log.error("cannot save file ", e);
 		}
 		return responseText;
-	}
-
-
-	private String getFileName(String reportingOrg) {
-		return System.getProperty(DataFetchServiceConstants.ACTIVITIES_FILES_STORE) + File.separator +
-                reportingOrg + ".xml";
 	}
 
 	private Document createXMLDocument(String responseText) {
@@ -151,6 +153,7 @@ public class ActivityFetchService {
 			} catch (ParserConfigurationException | SAXException | IOException e) {
 				//TODO properly handle errors
 				log.error("Error parsing fetched data : " , e);
+				throw new RuntimeException("Error parsing data");
 			}	
 		}	
 		

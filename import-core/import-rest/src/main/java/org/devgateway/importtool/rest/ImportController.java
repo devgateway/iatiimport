@@ -87,9 +87,9 @@ class ImportController  {
 		request.getSession().setAttribute(DESTINATION_PROCESSOR, destProcessor);
 		ImportSessionToken importSessionToken = new ImportSessionToken(authenticationToken, userName, new Date(), srcProcessor.getDescriptiveName(), destProcessor.getDescriptiveName());
 		request.getSession().setAttribute(SESSION_TOKEN, importSessionToken);
-		if(request.getSession().getAttribute("IATI_STORE_ACTIVITIES")!= null) {
+		if(request.getSession().getAttribute(IATI_STORE_ACTIVITIES) != null) {
             FetchResult fr = (FetchResult)
-                    request.getSession().getAttribute("IATI_STORE_ACTIVITIES");
+                    request.getSession().getAttribute(IATI_STORE_ACTIVITIES);
             srcProcessor.setFromDataStore(true);
             srcProcessor.setInput(fr.getActivities());
         }
@@ -126,8 +126,7 @@ class ImportController  {
 		request.getSession().removeAttribute(DESTINATION_PROCESSOR);
 		request.getSession().removeAttribute(SESSION_TOKEN);
 		request.getSession().removeAttribute(DOCUMENT_MAPPER);
-		//TODO we should now wipe this here since its created in the previous step
-		//request.getSession().removeAttribute("IATI_STORE_ACTIVITIES");
+		request.getSession().removeAttribute(IATI_STORE_ACTIVITIES);
 		return new ResponseEntity<>("{'error': ''}", HttpStatus.OK);
 	}
 
@@ -241,7 +240,7 @@ class ImportController  {
         try {
             List<Param> params = DataFetchServiceConstants.getCommonParams(reportingOrgId, defaultCountry);
             FetchResult activitiesFromDataStore = activityFetchService.fetchResult(reportingOrgId, params);
-            request.getSession().setAttribute(IATI_STORE_ACTIVITIES,activitiesFromDataStore);
+            request.getSession().setAttribute(IATI_STORE_ACTIVITIES, activitiesFromDataStore);
 			activitiesFromDataStore.getVersions().
 					retainAll(IATIProcessor.IMPLEMENTED_VERSIONS);
 			FetchOrganizationDetails organizationDetails = new FetchOrganizationDetails();

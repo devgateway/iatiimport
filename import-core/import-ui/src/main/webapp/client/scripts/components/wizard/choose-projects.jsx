@@ -301,7 +301,7 @@ var ChooseProjects = React.createClass({
                 <div className="panel-body">
                     {statusMessage}
                     <div className="panel panel-success">
-                        <div className="panel-heading">{this.props.i18nLib.t('wizard.choose_projects.new_projects')} <i>({this.state.projectData.length} {this.props.i18nLib.t('wizard.choose_projects.choose_projects')})</i></div>
+                      <div className="panel-heading">{this.props.i18nLib.t('wizard.choose_projects.new_projects')} <i>({newProjects.length } {this.props.i18nLib.t('wizard.choose_projects.choose_projects')})</i></div>
                         <div className="panel-body">
                          <SimilarProjectsDialog projectMapping={this.state.projectMapping} getTitle={this.getTitle} mapProject={this.mapProject} {...this.props} />
                          {this.state.showSourceProjectPreview && this.state.projectMapping &&
@@ -340,7 +340,7 @@ var ChooseProjects = React.createClass({
                         </div>
                     </div>
                     <div className="panel panel-danger">
-                        <div className="panel-heading">{this.props.i18nLib.t('wizard.choose_projects.existing_projects')}</div>
+                        <div className="panel-heading">{this.props.i18nLib.t('wizard.choose_projects.existing_projects')} <i>({existingProjects.length } {this.props.i18nLib.t('wizard.choose_projects.choose_projects')})</i></div>
                         <div className="panel-body">
                               <div className="alert alert-info" role="alert">{this.props.i18nLib.t('wizard.choose_projects.msg_project_not_editable')}</div>
                             <table className="table">

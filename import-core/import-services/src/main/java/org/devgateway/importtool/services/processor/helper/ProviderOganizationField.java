@@ -11,7 +11,12 @@ public class ProviderOganizationField extends Field {
 
     @Override
     public String getXpathFilterCondition(Boolean isFormDataStore) {
-        return " not(@provider-activity-id) " + (isFormDataStore ? "and " : "");
+        String condition =  " (@ref) ";
+        if(isFormDataStore) {
+            return condition +"and ";
+        }else{
+            return "[" + condition + "]";
+        }
     }
 
 }
