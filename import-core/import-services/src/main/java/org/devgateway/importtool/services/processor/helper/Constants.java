@@ -30,5 +30,13 @@ public class Constants {
 	public static final String ACTUAL_EXPENDITURES = ACTUAL + " " + EXPENDITURES;
 	public static final String PLANNED_EXPENDITURES = PLANNED + " " + EXPENDITURES;
 
+	public static final String TRANSACTION_TYPE_ACTUAL_COMMITMENTS ="AC";
+	public static final String TRANSACTION_TYPE_PLANNED_COMMITMENTS ="PC";
+	public static final String TRANSACTION_TYPE_ACTUAL_DISBURSEMENTS ="AD";
+	public static final String TRANSACTION_TYPE_PLANNED_DISBURSEMENTS ="PD";
+	public static final String TRANSACTION_TYPE_ACTUAL_EXPENDITURES ="AE";
+	public static final String TRANSACTION_TYPE_PLANNED_EXPENDITURES ="PE";
+
+
 
 }
