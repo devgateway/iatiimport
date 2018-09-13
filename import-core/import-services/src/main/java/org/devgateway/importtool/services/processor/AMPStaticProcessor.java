@@ -417,7 +417,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			log.error("Error importing activity " + e);
 			result = new ActionResult("N/A", "ERROR", "ERROR", "Currency Not Found Exception: " + e.getMessage());
 		} catch (Exception e) {
-			log.error("Error importing activity " + e);
+			log.error("Error importing activity", e);
 			result = new ActionResult("N/A", "ERROR", "ERROR", "Error: " + e.getMessage());
 		}
 		return result;
@@ -967,17 +967,31 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		}
 		return null;
 	}
+	private boolean isTransactionTypeEnabled(String transactionTypeValue) {
+		return getTransactionTypePossibleValue(transactionTypeValue) != null;
+	}
+	private FieldValue getTransactionTypePossibleValue(String transactionTypeValue) {
+		Field transactionType = this.getFields().stream().filter(n ->
+				n.getFieldName().equals("transaction_type")).findFirst().get();
 
+		Optional<FieldValue> transactionFieldValue =
+				transactionType.getPossibleValues().stream().filter(n ->
+						n.getValue().equals(tTNameSourceMap.get(transactionTypeValue))).findFirst();
+
+		if (transactionFieldValue.isPresent()) {
+			return transactionFieldValue.get();
+		} else {
+			return null;
+		}
+	}
 	private int getTransactionType(String transactionTypeValue) {
-		Field transactionType = this.getFields().stream().filter(n -> {
-			return n.getFieldName().equals("transaction_type");
-		}).findFirst().get();
 
-		String transactionTypeId = transactionType.getPossibleValues().stream().filter(n -> {
-			return n.getValue().equals(tTNameSourceMap.get(transactionTypeValue));
-		}).findFirst().get().getCode();
+		FieldValue transactionTypeFieldValue =getTransactionTypePossibleValue(transactionTypeValue);
+		if(transactionTypeFieldValue == null){
+			throw new ValueNotEnabledException("The mapped value is not present in the destination system");
+		}
 
-		return Integer.parseInt(transactionTypeId);
+		return Integer.parseInt(transactionTypeFieldValue.getCode());
 
 	}
 
@@ -1117,7 +1131,6 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		List<Field> trnDependencies = new ArrayList<Field>();
 
 		// Fixed fields
-
 		fieldList.add(new Field("IATI Identifier", "iati-identifier", FieldType.STRING, false));
 		if (destinationFieldsList.contains("project_title")) {
 			Field projectTitle = new Field("Project Title", "project_title",
@@ -1297,42 +1310,54 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		}
 
 		// Transactions
-		Field actualCommitments = new Field("Actual Commitments", "transaction", FieldType.TRANSACTION, true);
-		actualCommitments.setSubType("AC");
-		actualCommitments.setDependencies(trnDependencies);
-		fieldList.add(actualCommitments);
-
-		Field actualDisbursements = new Field("Actual Disbursements", "transaction", FieldType.TRANSACTION, true);
-		actualDisbursements.setSubType("AD");
-		actualDisbursements.setDependencies(trnDependencies);
-		fieldList.add(actualDisbursements);
-
-		Field actualExpenditure = new Field(Constants.ACTUAL_EXPENDITURES, "transaction", FieldType.TRANSACTION,
-				true);
-		actualExpenditure.setSubType("AE");
-		actualExpenditure.setDependencies(trnDependencies);
-		fieldList.add(actualExpenditure);
-
-		Field plannedCommitments = new Field("Planned Commitments", "transaction", FieldType.TRANSACTION, true);
-		plannedCommitments.setSubType("PC");
-		plannedCommitments.setDependencies(trnDependencies);
-		fieldList.add(plannedCommitments);
-
-		Field plannedDisbursements = new Field("Planned Disbursements", "transaction", FieldType.TRANSACTION, true);
-		plannedDisbursements.setSubType("PD");
-		plannedDisbursements.setDependencies(trnDependencies);
-		fieldList.add(plannedDisbursements);
-
-		Field plannedExpenditures = new Field(Constants.PLANNED_EXPENDITURES, "transaction", FieldType.TRANSACTION, true);
-		plannedExpenditures.setSubType("PE");
-		plannedExpenditures.setDependencies(trnDependencies);
-		fieldList.add(plannedExpenditures);
-
+		//we need to find a more generic way to only enable what is enabled in amp
+		//we should refactor this clases to be able to check all fields
+		if(this.isTransactionTypeEnabled(Constants.TRANSACTION_TYPE_ACTUAL_COMMITMENTS)) {
+			Field actualCommitments = new Field("Actual Commitments", "transaction", FieldType.TRANSACTION, true);
+			actualCommitments.setSubType(Constants.TRANSACTION_TYPE_ACTUAL_COMMITMENTS);
+			actualCommitments.setDependencies(trnDependencies);
+			fieldList.add(actualCommitments);
+		}
+		if(this.isTransactionTypeEnabled(Constants.TRANSACTION_TYPE_PLANNED_COMMITMENTS)) {
+			Field plannedCommitments = new Field("Planned Commitments", "transaction", FieldType.TRANSACTION, true);
+			plannedCommitments.setSubType(Constants.TRANSACTION_TYPE_PLANNED_COMMITMENTS);
+			plannedCommitments.setDependencies(trnDependencies);
+			fieldList.add(plannedCommitments);
+		}
+		if(this.isTransactionTypeEnabled(Constants.TRANSACTION_TYPE_ACTUAL_DISBURSEMENTS)) {
+			Field actualDisbursements = new Field("Actual Disbursements", "transaction", FieldType.TRANSACTION, true);
+			actualDisbursements.setSubType(Constants.TRANSACTION_TYPE_ACTUAL_DISBURSEMENTS);
+			actualDisbursements.setDependencies(trnDependencies);
+			fieldList.add(actualDisbursements);
+		}
+		if(this.isTransactionTypeEnabled(Constants.TRANSACTION_TYPE_PLANNED_DISBURSEMENTS)) {
+			Field plannedDisbursements = new Field("Planned Disbursements", "transaction", FieldType.TRANSACTION, true);
+			plannedDisbursements.setSubType(Constants.TRANSACTION_TYPE_PLANNED_DISBURSEMENTS);
+			plannedDisbursements.setDependencies(trnDependencies);
+			fieldList.add(plannedDisbursements);
+		}
+		if(this.isTransactionTypeEnabled(Constants.TRANSACTION_TYPE_ACTUAL_EXPENDITURES)) {
+			Field actualExpenditure = new Field(Constants.ACTUAL_EXPENDITURES, "transaction", FieldType.TRANSACTION,
+					true);
+			actualExpenditure.setSubType(Constants.TRANSACTION_TYPE_ACTUAL_EXPENDITURES);
+			actualExpenditure.setDependencies(trnDependencies);
+			fieldList.add(actualExpenditure);
+		}
+		if(this.isTransactionTypeEnabled(Constants.TRANSACTION_TYPE_PLANNED_EXPENDITURES)) {
+			Field plannedExpenditures = new Field(Constants.PLANNED_EXPENDITURES, "transaction", FieldType.TRANSACTION, true);
+			plannedExpenditures.setSubType(Constants.TRANSACTION_TYPE_PLANNED_EXPENDITURES);
+			plannedExpenditures.setDependencies(trnDependencies);
+			fieldList.add(plannedExpenditures);
+		}
 		// Currency
 		Field currency = new Field("Currency Code", "currency_code", FieldType.LIST, true);
 		currency.setPossibleValues(getCodeListValues("fundings~funding_details~currency"));
 		fieldList.add(currency);
 
+	}
+
+	private boolean existFieldInAmp(String fieldName) {
+		return destinationFieldsList.stream().anyMatch(field-> field.equals(fieldName));
 	}
 
 	private int getFieldLength(Properties properties) {
