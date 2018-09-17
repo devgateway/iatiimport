@@ -40,7 +40,7 @@ import org.springframework.util.StringUtils;
 // TODO: Add default values when mappings are missing, reading them from configuration db or files
 // TODO: Better error handling to the end user. Friendlier user messages, specially when referencing a missing dependency
 
-public class AMPStaticProcessor implements IDestinationProcessor {
+public abstract class AMPStaticProcessor implements IDestinationProcessor {
 	private String descriptiveName = "AMP";
 	static final String BASEURL_PROPERTY = "AMPStaticProcessor.baseURL";
 	static final String BASEURL_DEFAULT_VALUE = "http://localhost:8081";
@@ -355,7 +355,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			if (org.isPresent()) {
 				JsonBean donorRole = new JsonBean();
 				donorRole.set("organization", funding.get("donor_organization_id"));
-				donorRole.set("role", 1);
+				addAditionalDonorInformation(donorRole);
 				listDonorOrganizations.add(donorRole);
 			}
 		}
@@ -363,6 +363,8 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		return listDonorOrganizations;
 
 	}
+
+	protected abstract void addAditionalDonorInformation(JsonBean donorRole);
 
 	private JsonBean getProject(String documentId) {
 		JsonBean projectObject = null;

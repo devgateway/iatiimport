@@ -28,6 +28,7 @@ import org.devgateway.importtool.services.processor.helper.IDocumentMapper;
 import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
 import org.devgateway.importtool.services.request.ImportRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.multipart.MultipartFile;
@@ -41,7 +42,9 @@ public class ImportService {
 
 	@Autowired
 	private WorkflowService workflowService;
-	
+
+	@Value("${AMPStaticProcessor.processor_version}")
+	private String procesorVersion;
 	private Log log = LogFactory.getLog(getClass());
 	
 	public ImportSummary getSummary(IDocumentMapper documentMapper, ImportSessionToken importSessionToken, ISourceProcessor processor){
@@ -130,7 +133,8 @@ public class ImportService {
 		   IDestinationProcessor processor = null;		  
 			List<Workflow> workflows =  workflowService.getWorkflows();
 						
-			Optional<Workflow> optional = workflows.stream().filter(w -> w.getDestinationProcessor().getName().equals(processorName)).findFirst();
+			Optional<Workflow> optional =
+					workflows.stream().filter(w -> w.getDestinationProcessor().getName().equals(processorName+ "_"+ procesorVersion)).findFirst();
 			if(optional.isPresent()){				
 				try {						
 					Constructor<?> c = Class.forName(optional.get().getDestinationProcessor().getClassName()).getDeclaredConstructor(String.class);
