@@ -144,9 +144,7 @@ public class ImportService {
 		return processor;
 	}
 	
-	//@Async
-	//I'm removing the async call so we dont have to wait aditional time in javascrip
-	// with promise we just can continue executing as soon as it ends
+	@Async
 	public void initialize(IDocumentMapper documentMapper){		
 		documentMapper.initialize();		
 	}
