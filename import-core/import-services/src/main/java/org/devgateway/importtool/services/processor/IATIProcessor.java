@@ -74,7 +74,7 @@ public abstract class IATIProcessor implements ISourceProcessor {
     public final static Set<String> IMPLEMENTED_VERSIONS = new HashSet
             (Arrays.asList("1.01", "1.03", "1.04", "1.05",
             "2.01", "2.02"));
-    private final static Set<String> SUPPORTED_LOCALES= new HashSet<>(Arrays.asList("en","fr"));
+    private final static Set<String> SUPPORTED_LOCALES= new HashSet<>(Arrays.asList("en","fr", "es"));
     protected final static Map<String,Map<String,Map<String,String>> >descriptionTooltipsMap = new HashMap();
 
     @Override
