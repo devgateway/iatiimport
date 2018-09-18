@@ -298,6 +298,7 @@ module.exports = {
 					}
 				}
 			},			
+			
 			'es' : {
 				translation : {
 					'header' : {
@@ -335,7 +336,7 @@ module.exports = {
 						'next' : 'Siguiente >>',
 						'previous' : '<< Anterior',
 						'import_process' : 'Proceso de Importación',
-						'invalid_session': 'Sesión de usuario inválida. La sesión ha expirado o usted no ha sido autenticado. Por favor ingrese a AMP yrecargue este página.',
+						'invalid_session': 'Sesión de usuario inválida. La sesión ha expirado o usted no ha sido autenticado. Por favor ingrese a AMP y recargue este página.',
 						'steps' : {
 							'upload_files' : ' Cargar Archivo(s)',
 							'filter_data' : ' Filtrar Datos',
@@ -477,7 +478,7 @@ module.exports = {
 							'import_option_replace': 'Replace funding information',
 							'import_option_replace_explanation': 'Replaces funding information in the AMP project with funding information from the IATI file. This is done per donor. Data for donors that are not reporting is not affected.',
 							'import_option_replace_prompt': 'Ha seleccionado la opción de importación: "Reemplazar información de financiamiento". Esta opción actualiza los proyectos existentes reemplazando el financiamento en aquellas organizaciones donantes que possen datos en el archivo de IATI. Desea proceder?',
-							'process_next_version' :'Procesar la siguiente versión'
+							'process_next_version': 'Procesar la siguiente versión'
 						},
 						'mappings_dropdown' : {
 							'confirm_delete' : 'Está seguro de eliminar  __templateName__ ?'
@@ -541,16 +542,16 @@ module.exports = {
 						'add_custom_data_source': 'Agregar excepción',
 						'save': 'Guardar',
 						'exception_url': 'URL',
-						'reporting_org': 'Reporting Organization',
-						'select_reporting_org': 'Select Reporting Organization',
+						'reporting_org': 'Organización declarante',
+						'select_reporting_org': 'Seleccionar organización declarante',
 						'update': 'Actualizar',
 						'cancel': 'Cancelar',
 						'validation_default_url_required': 'Se requiere una URL predeterminada',
-						'validation_reporting_org_required': 'Reporting Organization is required',
-						'actions':'Acciones',
+						'validation_reporting_org_required': 'Se requiere una organización declarante',
+						'actions': 'Acciones',
 						'validation_invalid_url': 'URL inválida',
 						'select_data_source': 'Seleccionar fuente de datos',
-						'select_data_reporting_org': 'Select the reporting organization to import from:',
+						'select_data_reporting_org': 'Seleccionar una organización declarante desde dónde importar la información:',
 						'next': 'Siguiente',
 						'error': 'Error:',
 						'reporting_org_placeholder': 'Start typing the reporting organization name',
@@ -561,8 +562,7 @@ module.exports = {
 						'currently_importing': 'Está a punto a procesar los datos para la versión',
 						'other_versions_available': 'También existen datos para las siguientes versiones:',
 						'import_will_repeat': 'El proceso de importación será repetido para cada versión.',
-                        'processed': '(PROCESSED)',
-						'all_versions_imported': 'Todas las versiones han sido importadas',
+                        'all_versions_imported': 'Todas las versiones han sido importadas',
 						'org_has_no_data': 'Esta organización no tiene ningún archivo IATI para este país.',
 						'processed': '(PROCESADA)'
 					},
@@ -576,7 +576,7 @@ module.exports = {
 						'total_expenditure':'Gastos totales',
 						'participating_orgs': 'Organizaciones participantes',
 						'org': 'Organización',
-						'role': 'Roles',
+						'role': 'Rol',
 						'transactions': 'Transacciones',
 						'transaction_date': 'Fecha',
 						'transaction_provider': 'Proveedor',
@@ -591,10 +591,10 @@ module.exports = {
 						'sectors': 'Sectores',
 						'locations': 'Ubicación',
 						'recipient': 'País receptor',
-						 'policy_markers': 'Policy Markers'				     
+						'policy_markers': 'Marcadores de políticas'				     
 					}
 				}
-			},			
+			},
 			'fr' : {
 				translation : {
 					'header' : {
