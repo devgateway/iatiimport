@@ -355,7 +355,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			if (org.isPresent()) {
 				JsonBean donorRole = new JsonBean();
 				donorRole.set("organization", funding.get("donor_organization_id"));
-				donorRole.set("role", 1);
+				//donorRole.set("role", 1);
 				listDonorOrganizations.add(donorRole);
 			}
 		}
