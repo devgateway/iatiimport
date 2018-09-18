@@ -468,15 +468,15 @@ module.exports = {
 							'restart' : 'Reiniciar',
 							'previous' : '<< Anterior',
 							'question' : 'Está seguro de reiniciar el proceso?',
-							'import_option': 'Import Option',
-							'import_option_explanation': ' (Determines how existing projects are updated)',
-							'import_option_overwrite_all': 'Overwrite all funding information',
-							'import_option_overwrite_all_explanation': 'All funding information in the project is overwritten with data from the IATI file',
-							'import_option_overwrite_prompt': 'You have selected the "Overwrite all funding information" Import option. This option updates existing activities by overwriting all fundings of the affected activities. Do you want to proceed? ',
-							'import_option_add_missing': 'Only add missing information',
-							'import_option_add_missing_explanation':'Only adds new funding information to the project. Existing funding information is not overwritten',
-							'import_option_replace': 'Replace funding information',
-							'import_option_replace_explanation': 'Replaces funding information in the AMP project with funding information from the IATI file. This is done per donor. Data for donors that are not reporting is not affected.',
+							'import_option': 'Opciones de importación',
+							'import_option_explanation': ' (Define cómo se actualizan los proyectos existentes)',
+							'import_option_overwrite_all': 'Sobrescribir toda la información de financiamiento',
+							'import_option_overwrite_all_explanation': 'Toda la información de financiamiento del proyecto es sobrescrita con datos provenientes del archivo IATI',
+							'import_option_overwrite_prompt': 'Ha seleccionado la opción de importación: "Sobrescribir toda la información de financiamiento". Esta opción actualiza los proyectos existentes sobrescribiendo todo el financiamiento de los proyectos en cuestión. Desea continuar?',
+							'import_option_add_missing': 'Agregar solamente información faltante',
+							'import_option_add_missing_explanation': 'Solo agrega información relacionada con nuevo financiamiento del proyecto. La información de financiamiento pre-existente no se modifica.',
+							'import_option_replace': 'Reemplazar información de financiamiento',
+							'import_option_replace_explanation': 'Reemplaza la información de financiamiento en el proyecto de AMP con información de financiamiento proveniente del archivo IATI. Esto se hace por cada organización donante. No se ven afectados los datos de donantes que no están declarando información.',
 							'import_option_replace_prompt': 'Ha seleccionado la opción de importación: "Reemplazar información de financiamiento". Esta opción actualiza los proyectos existentes reemplazando el financiamento en aquellas organizaciones donantes que possen datos en el archivo de IATI. Desea proceder?',
 							'process_next_version': 'Procesar la siguiente versión'
 						},
@@ -554,7 +554,7 @@ module.exports = {
 						'select_data_reporting_org': 'Seleccionar una organización declarante desde dónde importar la información:',
 						'next': 'Siguiente',
 						'error': 'Error:',
-						'reporting_org_placeholder': 'Start typing the reporting organization name',
+						'reporting_org_placeholder': 'Comience a escribir el nombre de una organización declarante',
 						'msg_saved_sucessfully': 'Fuente de datos guardada con éxito!'
 					},
 					'select_version': {
@@ -850,7 +850,7 @@ module.exports = {
 							'select_data_reporting_org': 'Sélectionner l\'organisation déclarante pour laquelle vous souhaitez importer les données:',
 							'next': 'Suivant',
 							'error': 'Erreur:',
-							'reporting_org_placeholder': 'Start typing the reporting organization name',
+							'reporting_org_placeholder': 'Commencez à saisir le nom de l’organisation',
 							'msg_saved_sucessfully': 'La source de données a été sauvegardée avec succès!'
 						},
 						'select_version': {
