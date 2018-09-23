@@ -20,5 +20,6 @@ public  interface ReportingOrgRepository extends PagingAndSortingRepository<Repo
             "FROM  Project p " +
             "where p.groupingCriteria is not null")
     List<String> getSyncedGroupingCriteria();
+    List<ReportingOrganization> findByOrgIdIgnoreCase(String orgId);
 
 }

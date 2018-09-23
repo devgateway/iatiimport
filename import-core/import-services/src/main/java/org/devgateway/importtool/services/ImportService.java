@@ -1,8 +1,6 @@
 package org.devgateway.importtool.services;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
@@ -30,7 +28,7 @@ import org.devgateway.importtool.services.request.ImportRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.web.multipart.MultipartFile;
+
 @EnableAsync
 @org.springframework.stereotype.Service
 public class ImportService {
@@ -73,21 +71,30 @@ public class ImportService {
 		return importSummmary;
 	}
 
-	public File uploadFile(String fileOriginalFileName, ISourceProcessor srcProcessor,
+	/**
+	 * 
+	 * @param name - name of file or reporting org for automate imports
+	 * @param srcProcessor - Source processor
+	 * @param authToken - authentication token
+	 * @return
+	 * @throws IOException
+	 */
+	public File logImportSession(String name, ISourceProcessor srcProcessor,
 						   ImportSessionToken authToken) throws
 			IOException{
 
 		File uploadedFile = new File();
-		//uploadedFile.setData(file.getBytes());
 		uploadedFile.setCreatedDate(new Date());
-		uploadedFile.setFileName(fileOriginalFileName);
+		uploadedFile.setFileName(name);
 		uploadedFile.setAuthor(authToken.getAuthenticationToken());
 		uploadedFile.setSessionId(authToken.getImportTokenSessionId());
-		uploadedFile.setValid(srcProcessor.isValidInput());
+		
+		Boolean isValid = srcProcessor != null ? srcProcessor.isValidInput() : true;
+		uploadedFile.setValid(isValid);		
 		fileRepository.save(uploadedFile);
 		return uploadedFile;
 	}
-
+		
 	public void insertLog(ActionResult result, Long id) {
 		Project project = new Project();
 		File file = fileRepository.findById(id);
