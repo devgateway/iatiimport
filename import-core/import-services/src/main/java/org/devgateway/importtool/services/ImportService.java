@@ -41,8 +41,6 @@ public class ImportService {
 	@Autowired
 	private WorkflowService workflowService;
 
-	@Value("${AMPStaticProcessor.processor_version}")
-	private String procesorVersion;
 	private Log log = LogFactory.getLog(getClass());
 	
 	public ImportSummary getSummary(IDocumentMapper documentMapper, ImportSessionToken importSessionToken, ISourceProcessor processor){
