@@ -26,6 +26,7 @@ import org.devgateway.importtool.services.processor.helper.IDocumentMapper;
 import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
 import org.devgateway.importtool.services.request.ImportRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 
@@ -39,7 +40,7 @@ public class ImportService {
 
 	@Autowired
 	private WorkflowService workflowService;
-	
+
 	private Log log = LogFactory.getLog(getClass());
 	
 	public ImportSummary getSummary(IDocumentMapper documentMapper, ImportSessionToken importSessionToken, ISourceProcessor processor){
@@ -137,7 +138,8 @@ public class ImportService {
 		   IDestinationProcessor processor = null;		  
 			List<Workflow> workflows =  workflowService.getWorkflows();
 						
-			Optional<Workflow> optional = workflows.stream().filter(w -> w.getDestinationProcessor().getName().equals(processorName)).findFirst();
+			Optional<Workflow> optional =
+					workflows.stream().filter(w -> w.getDestinationProcessor().getName().equals(processorName)).findFirst();
 			if(optional.isPresent()){				
 				try {						
 					Constructor<?> c = Class.forName(optional.get().getDestinationProcessor().getClassName()).getDeclaredConstructor(String.class);
