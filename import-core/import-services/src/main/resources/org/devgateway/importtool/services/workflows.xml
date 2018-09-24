@@ -179,4 +179,34 @@
 		<description>Import process for IATI 2.02 to AMP 3.x</description>
 		<translation-key>header.nav.menu.submenu.iati202_3x</translation-key>
 	</workflow>
+	<workflow>
+		<source-processor>
+			<name>IATI203</name>
+			<label>IATI 2.03</label>
+			<class-name>org.devgateway.importtool.services.processor.IATI203Processor</class-name>
+		</source-processor>
+		<destination-processor>
+			<name>AMP_2x</name>
+			<label>AMP 2.xx</label>
+			<class-name>org.devgateway.importtool.services.processor.AMP2xStaticProcessor</class-name>
+		</destination-processor>
+		<enabled>true</enabled>
+		<description>Import process for IATI 2.03 to AMP 2.x</description>
+		<translation-key>header.nav.menu.submenu.iati203_2x</translation-key>
+	</workflow>
+	<workflow>
+		<source-processor>
+			<name>IATI203</name>
+			<label>IATI 2.03</label>
+			<class-name>org.devgateway.importtool.services.processor.IATI203Processor</class-name>
+		</source-processor>
+		<destination-processor>
+			<name>AMP_3x</name>
+			<label>AMP 3.x</label>
+			<class-name>org.devgateway.importtool.services.processor.AMP3xStaticProcessor</class-name>
+		</destination-processor>
+		<enabled>true</enabled>
+		<description>Import process for IATI 2.03 to AMP 3.x</description>
+		<translation-key>header.nav.menu.submenu.iati203_3x</translation-key>
+	</workflow>
 </workflows>

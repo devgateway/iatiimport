@@ -51,18 +51,18 @@ var ChooseProjects = React.createClass({
         });
     },
     loadData: function(){
-      self = this;
+     this.loadProjects();
+      var id;
       this.props.eventHandlers.showLoadingIcon();
-      appActions.loadSourceFieldsData.triggerPromise().then(function(data) {
-          this.updateSourceFields(data);          
-      }.bind(this))["catch"](function(err) {
-          this.props.eventHandlers.displayError(this.props.i18nLib.t('wizard.map_fields.msg_error_retrieving_source_fields'));
-      }.bind(this));
-      
-      appActions.initializeMapping.triggerPromise().then(function(data) {
-        self.loadSourceProjects();
-      });
-      
+      this.initializeMapping();
+      var self = this;
+      id = setInterval(function(){
+         if(self.initializeFailed){
+            clearInterval(id);
+         }else{
+            self.loadSourceProjects(id);
+         }
+      }, 3000);
       this.loadProjects();
     },
     selectAll: function(){
@@ -139,15 +139,39 @@ var ChooseProjects = React.createClass({
     handlePrevious: function(){
     	this.props.eventHandlers.chooseProjects(this.state.projectData, constants.DIRECTION_PREVIOUS);
 	},
-	loadSourceProjects:  function(){
+	initializeMapping: function(){
+	     var self = this;
+		 $.ajax({
+		        url: '/importer/import/initialize',
+		        timeout:appConfig.REQUEST_TIMEOUT,
+		        error: function() {
+		          self.initializeFailed = true;
+		        },
+		        dataType: 'json',
+		        success: function(data) {
+		         if(data.error){
+		           self.initializeFailed = true;
+		           self.props.eventHandlers.hideLoadingIcon();
+		           self.setState({statusMessage: ""});
+		           var message = self.props.i18nLib.t('server_messages.' + data.code, data) || data.error;
+		           self.props.eventHandlers.displayError(message);
+		         }
+		        },
+		        type: 'POST'
+		     });
+
+	},
+	loadSourceProjects:  function(id){
 		appActions.loadProjectData.triggerPromise().then(function(data) {
 		    this.setState({statusMessage: ""});
     		if(data.documentMappingStatus.status == "COMPLETED"){
+    			clearInterval(id);
     			this.props.eventHandlers.hideLoadingIcon();
         		this.updateProject(data.documentMappings);
     		} else{
     		    var message = this.props.i18nLib.t('server_messages.' + data.documentMappingStatus.code, data.documentMappingStatus) || data.documentMappingStatus.message;
     		    if(data.documentMappingStatus.status === 'FAILED_WITH_ERROR'){
+    		       clearInterval(id);
     		       this.initializeFailed = true;
 		           this.props.eventHandlers.hideLoadingIcon();
 		           this.props.eventHandlers.displayError(message);
@@ -156,6 +180,7 @@ var ChooseProjects = React.createClass({
     		    }
     		}
     	}.bind(this))["catch"](function(err) {
+    	    clearInterval(id);
     		this.props.eventHandlers.hideLoadingIcon();
     		this.props.eventHandlers.displayError(this.props.i18nLib.t('wizard.choose_projects.msg_error_select_project'));
     	}.bind(this));
@@ -172,13 +197,13 @@ var ChooseProjects = React.createClass({
 	        },
 	        type: 'GET'
 	     });
-	},
+	},	
 	getTitle: function(multilangFields){
-	  var language = this.props.i18nLib.lng() || 'en';
+	  var language = this.props.i18nLib.lng() || 'en';   
 	  var title = multilangFields.title[language];
-	  if(title == null || title.length == 0){
+	  if(title == null || title.length == 0){	  
 	     for (var key in multilangFields.title) {
-           if (multilangFields.title.hasOwnProperty(key)) {
+           if (multilangFields.title.hasOwnProperty(key)) {             
               if(title == null || title.length == 0){
                   title = multilangFields.title[key];;
               }
@@ -216,7 +241,7 @@ var ChooseProjects = React.createClass({
 	        win.focus();
 	    }	    
 	},
-    render: function () {          
+	render: function () {          
         var newProjects = [];
         var existingProjects = [];
         var language = this.props.i18nLib.lng() || 'en';

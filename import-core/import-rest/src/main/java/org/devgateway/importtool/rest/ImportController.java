@@ -4,12 +4,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.dao.FileRepository;
 import org.devgateway.importtool.dao.ProjectRepository;
+import org.devgateway.importtool.dao.ReportingOrgRepository;
 import org.devgateway.importtool.endpoint.DataFetchServiceConstants;
 import org.devgateway.importtool.endpoint.EPMessages;
 import org.devgateway.importtool.endpoint.Param;
 import org.devgateway.importtool.model.FetchResult;
 import org.devgateway.importtool.model.File;
 import org.devgateway.importtool.model.ImportSummary;
+import org.devgateway.importtool.model.ReportingOrganization;
 import org.devgateway.importtool.rest.dto.FetchOrganizationDetails;
 import org.devgateway.importtool.security.ImportSessionToken;
 import org.devgateway.importtool.services.ActivityFetchService;
@@ -52,6 +54,7 @@ import static org.devgateway.importtool.services.processor.helper.Constants.DOCU
 import static org.devgateway.importtool.services.processor.helper.Constants.IATI_STORE_ACTIVITIES;
 import static org.devgateway.importtool.services.processor.helper.Constants.SESSION_TOKEN;
 import static org.devgateway.importtool.services.processor.helper.Constants.SOURCE_PROCESSOR;
+import static org.devgateway.importtool.services.processor.helper.Constants.REPORTING_ORG;
 
 
 @RestController
@@ -62,6 +65,9 @@ class ImportController  {
 	private FileRepository repository;
 	@Autowired
 	private ProjectRepository projectRepository;
+	
+	@Autowired
+	ReportingOrgRepository reportingOrgRepository;
 
 	@Autowired
 	private ImportService importService;
@@ -92,10 +98,12 @@ class ImportController  {
                     request.getSession().getAttribute(IATI_STORE_ACTIVITIES);
             srcProcessor.setFromDataStore(true);
             srcProcessor.setInput(fr.getActivities());
+            logAutomatedImport(request, srcProcessor);          
         }
 		request.getSession().setAttribute(SOURCE_PROCESSOR, srcProcessor);
 			return new ResponseEntity<>(importSessionToken, HttpStatus.OK);
 	}
+	
 	@RequestMapping(method = RequestMethod.GET, value = "/refresh/{authenticationToken}")
 	public ResponseEntity<List<File>> refreshToken(@PathVariable String authenticationToken, HttpServletRequest request) {
 		ImportSessionToken authToken = (ImportSessionToken) request.getSession().getAttribute(SESSION_TOKEN);
@@ -127,6 +135,8 @@ class ImportController  {
 		request.getSession().removeAttribute(SESSION_TOKEN);
 		request.getSession().removeAttribute(DOCUMENT_MAPPER);
 		request.getSession().removeAttribute(IATI_STORE_ACTIVITIES);
+		request.getSession().removeAttribute(REPORTING_ORG);
+		request.getSession().removeAttribute(CURRENT_FILE_ID);
 		return new ResponseEntity<>("{'error': ''}", HttpStatus.OK);
 	}
 
@@ -154,10 +164,25 @@ class ImportController  {
 			throws IOException {
 
 		ImportSessionToken authToken = (ImportSessionToken) request.getSession().getAttribute(SESSION_TOKEN);
-		File uploadedFile = importService.uploadFile(fileName ,srcProcessor, authToken);
+		File uploadedFile = importService.logImportSession(fileName ,srcProcessor, authToken);
 		request.getSession().setAttribute(CURRENT_FILE_ID, uploadedFile.getId());
 	}
 
+	private void logAutomatedImport (HttpServletRequest request, ISourceProcessor srcProcessor) {
+        try {
+            String reportingOrgId = (String)request.getSession().getAttribute(REPORTING_ORG);
+            List<ReportingOrganization> orgs = reportingOrgRepository.findByOrgIdIgnoreCase(reportingOrgId);
+            String orgName = orgs.size() > 0 ? orgs.get(0).getName() : "";
+            
+            ImportSessionToken authToken = (ImportSessionToken) request.getSession().getAttribute(SESSION_TOKEN);
+            File uploadedFile;
+                       
+            uploadedFile = importService.logImportSession(orgName + " - " + srcProcessor.getDescriptiveName()  , srcProcessor, authToken);
+            request.getSession().setAttribute(CURRENT_FILE_ID, uploadedFile.getId());
+        } catch (IOException e) {            
+            e.printStackTrace();
+        }
+    }
 
 	
 	@RequestMapping(method = RequestMethod.POST, value = "/fetch")
@@ -241,11 +266,14 @@ class ImportController  {
             List<Param> params = DataFetchServiceConstants.getCommonParams(reportingOrgId, defaultCountry);
             FetchResult activitiesFromDataStore = activityFetchService.fetchResult(reportingOrgId, params);
             request.getSession().setAttribute(IATI_STORE_ACTIVITIES, activitiesFromDataStore);
+            request.getSession().setAttribute(REPORTING_ORG, reportingOrgId);
 			activitiesFromDataStore.getVersions().
 					retainAll(IATIProcessor.IMPLEMENTED_VERSIONS);
 			FetchOrganizationDetails organizationDetails = new FetchOrganizationDetails();
 			organizationDetails.setVersions(activitiesFromDataStore.getVersions());
 			organizationDetails.setProjectWithUpdates(projectRepository.findProjectUpdated());
+			
+		        
             return new ResponseEntity<>(organizationDetails, HttpStatus.OK);
         } catch (Exception e) {
             log.error(e);

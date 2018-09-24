@@ -8,6 +8,7 @@ public class Constants {
 	public static final String CURRENT_FILE_ID = "CURRENT_FILE_ID";
 	public static final String SESSION_TOKEN = "SESSION_TOKEN";
 	public static final String WORKFLOW_LIST = "WORKFLOW_LIST";
+	public static final String REPORTING_ORG = "REPORTING_ORG";
 	
 	public static final String WORKFLOW_FILE = "workflows.xml";
 	public static final String WORKFLOW_TAG_NAME = "workflow";

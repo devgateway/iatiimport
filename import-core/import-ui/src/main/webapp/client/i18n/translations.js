@@ -303,7 +303,8 @@ module.exports = {
 					     'policy_markers': 'Policy Markers'
 					}
 				}
-			},
+			},			
+			
 			'es' : {
 				translation : {
 					'header' : {
@@ -329,18 +330,16 @@ module.exports = {
                   'iati103_3x' : 'IATI 1.03 hacia AMP 3.x',
                   'iati104_3x' : 'IATI 1.04 hacia AMP 3.x',
                   'iati105_3x' : 'IATI 1.05 hacia AMP 3.x',
-                  'iati201_3x' : 'IATI 2.01 hacia AMP 3.x',
                   'iati202_3x' : 'IATI 2.02 hacia AMP 3.x',
 
-									'to':'hacia',
+                  'to':'hacia',
 									'logs' : 'Registro',
 									'previous_imports' : 'Importaciones Previas',
 									'en' : 'Inglés ',
 									'fr' : 'Francés ',
 									'es':'Spanish ',
 									'workflow_list' : 'Lista de Flujos de Trabajo',
-									'data_source' : 'Data Source Manager'
-
+									'data_source' : 'Gestión de fuente de datos'
 								}
 							}
 						}
@@ -349,11 +348,12 @@ module.exports = {
 						'next' : 'Siguiente >>',
 						'previous' : '<< Anterior',
 						'import_process' : 'Proceso de Importación',
+						'invalid_session': 'Sesión de usuario inválida. La sesión ha expirado o usted no ha sido autenticado. Por favor ingrese a AMP y recargue este página.',
 						'steps' : {
 							'upload_files' : ' Cargar Archivo(s)',
 							'filter_data' : ' Filtrar Datos',
-							'select_data_source': ' Select Data Source',
-							'select_version': 'Select Version',
+							'select_data_source': ' Seleccionar fuente de datos',
+							'select_version': 'Seleccionar versión',
 							'choose_projects' : ' Seleccionar Proyectos',
 							'choose_fields' : ' Seleccionar Campos',
 							'map_values' : ' Mapeo de Valores',
@@ -399,11 +399,11 @@ module.exports = {
 							'msg_error_select_project' : ' Favor seleccionar al menos un proyecto para continuar',
 						    'msg_project_not_editable':'Los proyectos marcador por un * y resaltados no pueden ser editados puesto que no encuentran en el espacio de trabajo actual.',
 						    'similar_titles': '# de títulos similares',
-						    'iati_id_tooltip': 'IATI ID - A globally unique identifier for the project.',
-                            'source_project_tooltip': 'The title of the project extracted from IATI data store or IATI file',
-                            'destination_project_tooltip': 'The title of the project in the destination system that will be updated',
-                            'similar_titles_tooltip': 'Click on the blue bubble to see projects with a similar title in the destination system. This also allows you to map one of the similar projects to the source project.',
-                            'override_title_tooltip': 'Selecting this will replace the title of the project in the destination with a the title from the source project' 
+						    'iati_id_tooltip': 'ID IATI - Identificador único del proyecto',
+                            'source_project_tooltip': 'Título del proyecto extraido del repositorio de IATI o de un archivo IATI',
+                            'destination_project_tooltip': 'Título del proyecto que será actualizado en el sistema de destino',
+                            'similar_titles_tooltip': 'Haga clic en el ícono azul para ver los proyectos con títulos similares en el sistema de destino. Esto también le permite asignar uno de los proyectos similares con el proyecto de origen',
+                            'override_title_tooltip': 'Al seleccionar esta opción el título del proyecto será reemplazado con el título proveniente del archivo' 
 						},
 						'similar_projects_dlg': {
 							'title': 'Proyectos con títulos similares',
@@ -480,18 +480,17 @@ module.exports = {
 							'restart' : 'Reiniciar',
 							'previous' : '<< Anterior',
 							'question' : 'Está seguro de reiniciar el proceso?',
-							'import_option': 'Import Option',
-							'import_option_explanation': ' (Determines how existing projects are updated)',
-							'import_option_overwrite_all': 'Overwrite all funding information',
-							'import_option_overwrite_all_explanation': 'All funding information in the project is overwritten with data from the IATI file',
-							'import_option_overwrite_prompt': 'You have selected the "Overwrite all funding information" Import option. This option updates existing activities by overwriting all fundings of the affected activities. Do you want to proceed? ',
-							'import_option_add_missing': 'Only add missing information',
-							'import_option_add_missing_explanation':'Only adds new funding information to the project. Existing funding information is not overwritten',
-							'import_option_replace': 'Replace funding information',
-							'import_option_replace_explanation': 'Replaces funding information in the AMP project with funding information from the IATI file. This is done per donor. Data for donors that are not reporting is not affected.',
-							'import_option_replace_prompt': 'You have selected the "Replace funding information" Import option. This option updates existing activities by overwriting the fundings for donors that have data in the IATI file. Do you want to proceed? ',
-							'import_option_replace_prompt': 'You have selected the "Replace funding information" Import option. This option updates existing activities by overwriting the fundings for donors that have data in the IATI file. Do you want to proceed? ',
-							'process_next_version' :'Process Next Version'
+							'import_option': 'Opciones de importación',
+							'import_option_explanation': ' (Define cómo se actualizan los proyectos existentes)',
+							'import_option_overwrite_all': 'Sobrescribir toda la información de financiamiento',
+							'import_option_overwrite_all_explanation': 'Toda la información de financiamiento del proyecto es sobrescrita con datos provenientes del archivo IATI',
+							'import_option_overwrite_prompt': 'Ha seleccionado la opción de importación: "Sobrescribir toda la información de financiamiento". Esta opción actualiza los proyectos existentes sobrescribiendo todo el financiamiento de los proyectos en cuestión. Desea continuar?',
+							'import_option_add_missing': 'Agregar solamente información faltante',
+							'import_option_add_missing_explanation': 'Solo agrega información relacionada con nuevo financiamiento del proyecto. La información de financiamiento pre-existente no se modifica.',
+							'import_option_replace': 'Reemplazar información de financiamiento',
+							'import_option_replace_explanation': 'Reemplaza la información de financiamiento en el proyecto de AMP con información de financiamiento proveniente del archivo IATI. Esto se hace por cada organización donante. No se ven afectados los datos de donantes que no están declarando información.',
+							'import_option_replace_prompt': 'Ha seleccionado la opción de importación: "Reemplazar información de financiamiento". Esta opción actualiza los proyectos existentes reemplazando el financiamento en aquellas organizaciones donantes que possen datos en el archivo de IATI. Desea proceder?',
+							'process_next_version': 'Procesar la siguiente versión'
 						},
 						'mappings_dropdown' : {
 							'confirm_delete' : 'Está seguro de eliminar  __templateName__ ?'
@@ -541,41 +540,70 @@ module.exports = {
 					},
 
 					'import_type':{
-					    'select_import_type': 'Please select the import type:',
+					    'select_import_type': 'Por favor seleccione el tipo de importación::',
 						'manual': 'Manual',
-						'automatic': 'Automated',
-						'next': 'Next',
-						'description_manual': 'Follow the manual process if you have a valid IATI file that you want to upload.',
-						'description_automatic': 'Follow the automated process if you want to search for available IATI data and pull it directly from the IATI datastore.',
-						'data_updated': 'data has been updated since last sync.'
+						'automatic': 'Automático',
+						'next': 'Siguiente',
+						'description_manual': 'Utilice el proceso manual si posee un archivo de IATI válido para procesar',
+						'description_automatic': 'Utilice el proceso automático si desea buscar datos en el repositorio de IATI e importarlo directamente desde allí',
+						'data_updated': 'Los datos han sido actualizados desde la última sincronización'
 					},
 					'data_source': {
-						'title': 'Data Source Management',
-						'default_url': 'Default URL',
-						'add_custom_data_source': 'Add Exception',
-						'save': 'Save',
+						'title': 'Gestión de fuente de datos',
+						'default_url': 'URL predeterminada',
+						'add_custom_data_source': 'Agregar excepción',
+						'save': 'Guardar',
 						'exception_url': 'URL',
-						'reporting_org': 'Reporting Organization',
-						'select_reporting_org': 'Select Reporting Organization',
-						'update': 'Update',
-						'cancel': 'Cancel',
-						'validation_default_url_required': 'Default URL is required',
-						'validation_reporting_org_required': 'Reporting Organization is required',
-						'actions':'Actions',
-						'validation_invalid_url': 'Invalid URL',
-						'select_data_source': 'Select Data Source',
-						'select_data_reporting_org': 'Select the reporting organization to import from:',
-						'next': 'Next',
+						'reporting_org': 'Organización declarante',
+						'select_reporting_org': 'Seleccionar organización declarante',
+						'update': 'Actualizar',
+						'cancel': 'Cancelar',
+						'validation_default_url_required': 'Se requiere una URL predeterminada',
+						'validation_reporting_org_required': 'Se requiere una organización declarante',
+						'actions': 'Acciones',
+						'validation_invalid_url': 'URL inválida',
+						'select_data_source': 'Seleccionar fuente de datos',
+						'select_data_reporting_org': 'Seleccionar una organización declarante desde dónde importar la información:',
+						'next': 'Siguiente',
 						'error': 'Error:',
-						'reporting_org_placeholder': 'Start typing the reporting organization name'
+						'reporting_org_placeholder': 'Comience a escribir el nombre de una organización declarante',
+						'msg_saved_sucessfully': 'Fuente de datos guardada con éxito!'
 					},
 					'select_version': {
-						'title': 'Select Version',
-						'currently_importing': 'You are about to process data for version',
-						'other_versions_available': 'This publisher also has data for the following versions:',
-						'import_will_repeat': 'The import process will be repeated for each version.',
-            'processed': '(PROCESSED)',
-						'all_versions_imported': 'All versions have been imported'
+						'title': 'Seleccionar una versión',
+						'currently_importing': 'Está a punto a procesar los datos para la versión',
+						'other_versions_available': 'También existen datos para las siguientes versiones:',
+						'import_will_repeat': 'El proceso de importación será repetido para cada versión.',
+                        'all_versions_imported': 'Todas las versiones han sido importadas',
+						'org_has_no_data': 'Esta organización no tiene ningún archivo IATI para este país.',
+						'processed': '(PROCESADA)'
+					},
+					'project_preview':{
+						'title': 'Vista previa del proyecto',
+						'close': 'Cerrar vista previa',
+						'identification': 'Identificación',
+						'funding_information': 'Información de financiamiento',
+						'total_commitments':'Compromisos totales', 
+						'total_disbursements': 'Desembolsos totales', 
+						'total_expenditure':'Gastos totales',
+						'participating_orgs': 'Organizaciones participantes',
+						'org': 'Organización',
+						'role': 'Rol',
+						'transactions': 'Transacciones',
+						'transaction_date': 'Fecha',
+						'transaction_provider': 'Proveedor',
+						'transaction_type': 'Tipo de transacción',
+						'transaction_currency': 'Moneda',
+						'transaction_value': 'Valor',
+						'transaction_C': 'Compromisos',
+						'transaction_D': 'Desembolsos',
+						'transaction_E': 'Gastos',
+						'planning': 'Planificación',
+						'no_data': 'No hay datos',
+						'sectors': 'Sectores',
+						'locations': 'Ubicación',
+						'recipient': 'País receptor',
+						'policy_markers': 'Marcadores de políticas'				     
 					}
 				}
 			},
@@ -604,7 +632,6 @@ module.exports = {
                   'iati103_3x' : 'IATI 1.03 vers AMP 3.x',
                   'iati104_3x' : 'IATI 1.04 vers AMP 3.x',
                   'iati105_3x' : 'IATI 1.05 vers AMP 3.x',
-                  'iati201_3x' : 'IATI 2.01 vers AMP 3.x',
                   'iati202_3x' : 'IATI 2.02 vers AMP 3.x',
 									 'to':'vers',
 									'logs' : 'Logs',
@@ -613,7 +640,7 @@ module.exports = {
 									'fr' : 'Français ',
 									'es': 'Spanish',
 									'workflow_list' : 'Flux de téléchargement',
-									'data_source' : 'Data Source Manager'
+									'data_source' : 'Gestionnaire des sources de données'
 
 								}
 							}
@@ -623,11 +650,12 @@ module.exports = {
 						'next' : 'Suivant >>',
 						'previous' : '<< Précédent',
 						'import_process' : 'Processus de Téléchargement',
+						'invalid_session': 'Session inactive. Cette session a expiré ou vous n\'êtes pas connecté. Veuillez vous connecter à la PGA et rafraichir la page.',
 						'steps' : {
 							'upload_files' : ' Télécharger le(s)fichier(s)',
 							'filter_data' : ' Filtrer les données',
-							'select_data_source': ' Select Data Source',
-							'select_version': 'Select Version',
+							'select_data_source': ' Sélectionner la source de données',
+							'select_version': 'Sélectionner la version',
 							'choose_projects' : ' Choisir les projets',
 							'choose_fields' : ' Choisir les champs',
 							'map_values' : ' Faire correspondre les valeurs',
@@ -673,11 +701,11 @@ module.exports = {
 							'msg_error_retrieving_projects' : ' Erreur dans la recherche des Filtres.',
 							'msg_error_select_project' : ' Veuillez sélectionner au moins un projet pour continuer ',
 							'similar_titles': 'Nbre de titres similaires',
-						    'iati_id_tooltip': 'IATI ID - A globally unique identifier for the project.',
-                            'source_project_tooltip': 'The title of the project extracted from IATI data store or IATI file',
-                            'destination_project_tooltip': 'The title of the project in the destination system that will be updated',
-                            'similar_titles_tooltip': 'Click on the blue bubble to see projects with a similar title in the destination system. This also allows you to map one of the similar projects to the source project.',
-                            'override_title_tooltip': 'Selecting this will replace the title of the project in the destination with a the title from the source project' 
+						    'iati_id_tooltip': 'IATI ID - Un identifiant unique pour chaque projet.',
+                            'source_project_tooltip': 'Le titre du projet extrait de la banque de données ou du fichier IATI.',
+                            'destination_project_tooltip': 'Le titre du projet dans le système de destination qui sera mis à jour',
+                            'similar_titles_tooltip': 'Cliquez sur la bulle bleue pour afficher les projets qui ont un titre similaire dans le système de destination. Cela vous permet de sélectionner le(s) projet(s) similaire(s) à celui(ceux) d\'origine.',
+                            'override_title_tooltip': 'Si vous sélectionnez cette option, le titre du projet de destination sera remplacé par celui contenu dans le fichier' 
 						},
 						'similar_projects_dlg': {
 							'title': 'Projets ayant un titre similaire',
@@ -764,7 +792,7 @@ module.exports = {
 							'import_option_replace_explanation': "Remplace les informations de financement dans le projet AMP avec des informations de financement provenant du fichier IATI. Ceci est fait par donateur. Les données des donateurs ni figurant pas dans le fichier IATI ne seront pas affectées.",
 							'import_option_replace_prompt': "Vous avez sélectionné l'option d'import Remplacer les informations de financement. Cette option met à jour les activités existantes en écrasant toutes les transactions financières des donateurs qui sont inclus dans le fichier de l'IATI. Voulez-vous continuer?",
 							'import_option_replace_prompt': 'You have selected the "Replace funding information" Import option. This option updates existing activities by overwriting the fundings for donors that have data in the IATI file. Do you want to proceed? ',
-							'process_next_version' :'Process Next Version'
+							'process_next_version' :'Traiter la version suivante'
 						},
 						'mappings_dropdown' : {
 							'confirm_delete' : ' Etes - vous sûr(e)de vouloir supprimer __templateName__ ? '
@@ -813,44 +841,74 @@ module.exports = {
 							'enabled': 'Enabled'
 						},
 						'import_type':{
-						    'select_import_type': 'Please select the import type:',
-							'manual': 'Manual',
-							'automatic': 'Automated',
-							'next': 'Next',
-							'description_manual': 'Follow the manual process if you have a valid IATI file that you want to upload.',
-							'description_automatic': 'Follow the automated process if you want to search for available IATI data and pull it directly from the IATI datastore.',
-							'data_updated': 'data has been updated since last sync.'
+						    'select_import_type': 'Veuillez sélectionner le type d\'import::',
+							'manual': 'Manuel',
+							'automatic': 'Automatique',
+							'next': 'Suivant',
+							'description_manual': 'Veuillez sélectionner le procédé manuel si vous avez un fichier IATI valide que vous souhaitez importer.',
+							'description_automatic': 'Veuillez sélectionner le procédé automatique si vous voulez rechercher un fichier parmi ceux disponibles dans la banque de données IATI.',
+							'data_updated': 'Les données ont été mises à jour depuis la dernière synchronisation.'
 						},
 						'data_source': {
-							'title': 'Data Source Management',
-							'default_url': 'Default URL',
-							'add_custom_data_source': 'Add Exception',
-							'save': 'Save',
+							'title': 'Gestion des sources de données',
+							'default_url': 'URL par défaut',
+							'add_custom_data_source': 'Ajouter une exception',
+							'save': 'Sauvegarder',
 							'exception_url': 'URL',
-							'reporting_org': 'Reporting Organization',
-							'select_reporting_org': 'Select Reporting Organization',
-							'update': 'Update',
-							'cancel': 'Cancel',
-							'validation_default_url_required': 'Default URL is required',
-							'validation_reporting_org_required': 'Reporting Organization is required',
+							'reporting_org': 'Organisation Déclarante',
+							'select_reporting_org': 'Sélectionner l\'organisation déclarante',
+							'update': 'Mettre à jour',
+							'cancel': 'Annuler',
+							'validation_default_url_required': 'l\'URL par défaut est obligatoire',
+							'validation_reporting_org_required': 'L\'organisation déclarante est obligatoire',
 							'actions':'Actions',
-							'validation_invalid_url': 'Invalid URL',
-							'select_data_source': 'Select Data Source',
-							'select_data_reporting_org': 'Select the reporting organization to import from:',
-							'next': 'Next',
-							'error': 'Error:',
-							'reporting_org_placeholder': 'Start typing the reporting organization name'
+							'validation_invalid_url': 'URL erronné',
+							'select_data_source': 'Sélectionner la source de données',
+							'select_data_reporting_org': 'Sélectionner l\'organisation déclarante pour laquelle vous souhaitez importer les données:',
+							'next': 'Suivant',
+							'error': 'Erreur:',
+							'reporting_org_placeholder': 'Commencez à saisir le nom de l’organisation',
+							'msg_saved_sucessfully': 'La source de données a été sauvegardée avec succès!'
 						},
 						'select_version': {
-							'title': 'Select Version',
-							'currently_importing': 'You are about to process data for version',
-							'other_versions_available': 'This publisher also has data for the following versions:',
-							'import_will_repeat': 'The import process will be repeated for each version.',
-                             'processed': '(PROCESSED)',
-							'all_versions_imported': 'All versions have been imported'
+							'title': 'Sélectionner la version',
+							'currently_importing': 'Vous êtes sur le point de traiter des données de la version choisie',
+							'other_versions_available': 'Cette organisation a également des données disponibles dans les versions suivantes:',
+							'import_will_repeat': 'Le procédé d\'import sera répété pour chacune des versions.',
+                            'processed': '(PROCESSED)',
+							'all_versions_imported': 'Toutes les versions ont été importées',
+							'org_has_no_data': 'Cette organisation n\'a pas de données IATI pour ce pays.',
+							'processed': '(TRAITE)'
+						},
+						'project_preview':{
+							'title': 'Aperçu du projet',
+							'close': 'Fermer l\'aperçu',
+							'identification': 'Identification',
+							'funding_information': 'Information de Financement',
+							'total_commitments':'Total des Engagements', 
+							'total_disbursements': 'Total des Décaissements', 
+							'total_expenditure':'Total des Dépenses',
+							'participating_orgs': 'Organisations Associées',
+							'org': 'Organisation',
+							'role': 'Rôles',
+							'transactions': 'Transactions',
+							'transaction_date': 'Date',
+							'transaction_provider': 'Editeur',
+							'transaction_type': 'Type de Transaction',
+							'transaction_currency': 'Devise',
+							'transaction_value': 'Valeur',
+							'transaction_C': 'Engagements',
+							'transaction_D': 'Décaissements',
+							'transaction_E': 'Dépenses',
+							'planning': 'Planification',
+							'no_data': 'Aucune donnée',
+							'sectors': 'Secteurs',
+							'locations': 'Localisations',
+							'recipient': 'Pays Bénéficaire',
+							'policy_markers': 'Marqueurs'				     
 						}
 				}
 			}
-
+			
 		}
 };
