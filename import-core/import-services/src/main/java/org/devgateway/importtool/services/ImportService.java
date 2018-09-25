@@ -40,6 +40,8 @@ public class ImportService {
 
 	@Autowired
 	private WorkflowService workflowService;
+	@Value("${AMPStaticProcessor.processor_version}")
+	private String processorVersion;
 
 	private Log log = LogFactory.getLog(getClass());
 	
@@ -134,12 +136,14 @@ public class ImportService {
 		return processor;
 	}
 	
-	public IDestinationProcessor getDestinationProcessor(String processorName, String authenticationToken) {
+	public IDestinationProcessor getDestinationProcessor( String processorName, String authenticationToken,
+														 boolean isAutomaticProcessor) {
 		   IDestinationProcessor processor = null;		  
 			List<Workflow> workflows =  workflowService.getWorkflows();
 						
 			Optional<Workflow> optional =
-					workflows.stream().filter(w -> w.getDestinationProcessor().getName().equals(processorName)).findFirst();
+					workflows.stream().filter(w -> w.getDestinationProcessor().getName().
+							equals(processorName + (isAutomaticProcessor?("_"+processorVersion): "" ))).findFirst();
 			if(optional.isPresent()){				
 				try {						
 					Constructor<?> c = Class.forName(optional.get().getDestinationProcessor().getClassName()).getDeclaredConstructor(String.class);
