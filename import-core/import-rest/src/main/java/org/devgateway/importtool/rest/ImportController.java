@@ -21,6 +21,7 @@ import org.devgateway.importtool.services.processor.helper.DocumentMapper;
 import org.devgateway.importtool.services.processor.helper.IDestinationProcessor;
 import org.devgateway.importtool.services.processor.helper.IDocumentMapper;
 import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
+import org.devgateway.importtool.services.processor.helper.Status;
 import org.devgateway.importtool.services.request.ImportRequest;
 import org.devgateway.importtool.services.response.DocumentMappingResponse;
 import org.devgateway.importtool.services.response.ImportExecuteResponse;
@@ -261,25 +262,52 @@ class ImportController  {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}		
 		return new ResponseEntity<>(importService.getSummary(documentMapper, importSessionToken, processor), HttpStatus.OK);
-	}	
+	}
 
-	
-	@RequestMapping(method = RequestMethod.GET, value = "/fetch/{reportingOrgId}")
+
+	@RequestMapping(method = RequestMethod.GET, value = "/fetch/results")
+	ResponseEntity<FetchOrganizationDetails> fetchResult(HttpServletRequest request) {
+		FetchOrganizationDetails organizationDetails = new FetchOrganizationDetails();
+
+		FetchResult activitiesFromDataStore = (FetchResult) request.getSession().getAttribute(IATI_STORE_ACTIVITIES);
+		if (activitiesFromDataStore != null) {
+			if (activitiesFromDataStore.getStatus().equals(Status.FAILED_WITH_ERROR)
+					|| activitiesFromDataStore.getStatus().equals(Status.COMPLETED)) { //activities  have
+				if (activitiesFromDataStore.getStatus().equals(Status.COMPLETED)) {
+					if (activitiesFromDataStore.getStatus().equals(Status.COMPLETED)) {
+						activitiesFromDataStore.getVersions().retainAll(IATIProcessor.IMPLEMENTED_VERSIONS);
+						organizationDetails.setVersions(activitiesFromDataStore.getVersions());
+						organizationDetails.setProjectWithUpdates(projectRepository.findProjectUpdated());
+						request.getSession().setAttribute(IATI_STORE_ACTIVITIES, activitiesFromDataStore);
+						organizationDetails.setStatus(Status.COMPLETED);
+					} else {
+						organizationDetails.setStatus(Status.FAILED_WITH_ERROR);
+					}
+				} else {
+					organizationDetails.setStatus(Status.IN_PROGRESS);
+				}
+			}
+		}else{
+			 organizationDetails.setStatus(Status.FAILED_WITH_ERROR);
+		}
+		return new ResponseEntity<>(organizationDetails, HttpStatus.OK);
+
+	}
+
+	@RequestMapping(method = RequestMethod.GET, value = "/fetch/initialize/{reportingOrgId}")
 	ResponseEntity<FetchOrganizationDetails> fetch(HttpServletRequest request, @PathVariable("reportingOrgId") String
             reportingOrgId) {
-        try {
-            List<Param> params = DataFetchServiceConstants.getCommonParams(reportingOrgId, defaultCountry);
-            FetchResult activitiesFromDataStore = activityFetchService.fetchResult(reportingOrgId, params);
-            request.getSession().setAttribute(IATI_STORE_ACTIVITIES, activitiesFromDataStore);
-            request.getSession().setAttribute(REPORTING_ORG, reportingOrgId);
-			activitiesFromDataStore.getVersions().
-					retainAll(IATIProcessor.IMPLEMENTED_VERSIONS);
-			FetchOrganizationDetails organizationDetails = new FetchOrganizationDetails();
-			organizationDetails.setVersions(activitiesFromDataStore.getVersions());
-			organizationDetails.setProjectWithUpdates(projectRepository.findProjectUpdated());
-			
-		        
+		FetchOrganizationDetails organizationDetails = new FetchOrganizationDetails();
+
+		try {
+			FetchResult activitiesFromDataStore = new FetchResult();
+			activitiesFromDataStore.setStatus(Status.NOT_STARTED);
+        	List<Param> params = DataFetchServiceConstants.getCommonParams(reportingOrgId, defaultCountry);
+             activityFetchService.fetchResult(reportingOrgId, params, activitiesFromDataStore);
+			request.getSession().setAttribute(IATI_STORE_ACTIVITIES,activitiesFromDataStore);
+			request.getSession().setAttribute(REPORTING_ORG, reportingOrgId);
             return new ResponseEntity<>(organizationDetails, HttpStatus.OK);
+
         } catch (Exception e) {
             log.error(e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

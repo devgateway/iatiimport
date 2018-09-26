@@ -1,13 +1,20 @@
 package org.devgateway.importtool.rest.dto;
 
 import org.devgateway.importtool.model.Project;
+import org.devgateway.importtool.services.processor.helper.Status;
 
 import java.util.List;
 import java.util.Set;
 
 public class FetchOrganizationDetails {
-    Set<String> versions;
-    List<Project> projectWithUpdates;
+    private Status status;
+    private Set<String> versions;
+    private List<Project> projectWithUpdates;
+
+    public FetchOrganizationDetails(){
+        status = Status.NOT_STARTED;
+    }
+
 
     public Set<String> getVersions() {
         return versions;
@@ -23,5 +30,13 @@ public class FetchOrganizationDetails {
 
     public void setProjectWithUpdates(List<Project> projectWithUpdates) {
         this.projectWithUpdates = projectWithUpdates;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 }
