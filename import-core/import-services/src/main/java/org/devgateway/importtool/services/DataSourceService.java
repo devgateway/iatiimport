@@ -7,7 +7,6 @@ import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.dao.DataSourceRepository;
 import org.devgateway.importtool.model.CustomDataSource;
 import org.devgateway.importtool.model.DataSource;
-import org.devgateway.importtool.model.File;
 import org.devgateway.importtool.services.processor.helper.ReportingOrganizationHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -42,17 +41,14 @@ public class DataSourceService {
 	public String getDataSourceURL(String reportingOrgId) {
 		String url = null;
 		Iterable<DataSource> dataSources = dataSourceRepository.findAll();
-		
 		if (dataSources.iterator().hasNext()) {
 			DataSource ds = dataSources.iterator().next();
 			CustomDataSource cDataSource = ds.getCustomDataSources().stream().filter(customDataSource -> {
 				return reportingOrgId.equals(customDataSource.getReportingOrgId());
 			}).findFirst().orElse(null);
-			
 			if (cDataSource != null) {
 				url = cDataSource.getUrl();
 			}
-			
 			if (StringUtils.isEmpty(url)) {
 				url = ds.getDefaultUrl();
 			}

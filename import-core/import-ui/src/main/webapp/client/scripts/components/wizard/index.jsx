@@ -175,21 +175,71 @@ var Wizard = React.createClass({
 		}.bind(this));
 	},
 	//fetch data from iati datastore
-	fetchData: function(reportingOrgId) {
-	    $(this.refs.loadingIcon.getDOMNode()).show();
-	    var self = this;
-	    $.ajax({
-            url: '/importer/import/fetch/' + reportingOrgId,
-            success: function(data) {                 
-                if (data) {                    
-                    self.setState({versions: data.versions, currentVersion: data.versions[0], processedVersions: [data.versions[0]], projectWithUpdates: data.projectWithUpdates});
-                    self.transitionTo('selectversion', self.props.params); 
-                }
-                $(self.refs.loadingIcon.getDOMNode()).hide();                              
-            },
-            type: 'GET'
-         });
-	},
+  fetchData: function(reportingOrg){
+	  this.initializeFetchData(reportingOrg);
+    let id;
+    const self = this;
+    id = setInterval(function(){
+      if(self.initializeFailed){
+        clearInterval(id);
+      }else{
+        self.loadReportingOrganisation(id);
+      }
+    }, 3000);
+  },
+  /**
+   * this should probably needs to be an refulx action
+   * @param reportingOrgId
+   */
+  initializeFetchData: function(reportingOrgId) {
+    $(this.refs.loadingIcon.getDOMNode()).show();
+    var self = this;
+    $.ajax({
+      url: '/importer/import/fetch/initialize/' + reportingOrgId,
+      error: function() {
+        self.initializeFailed = true;
+      },
+      success: function(data) {
+        if(data.error){
+          self.props.eventHandlers.hideLoadingIcon();
+          self.setState({statusMessage: ""});
+          var message = self.props.i18nLib.t('server_messages.' + data.code, data) || data.error;
+          self.props.eventHandlers.displayError(message);
+        }
+      },
+      type: 'GET'
+    });
+  },
+  loadReportingOrganisation:  function(id) {
+    var self =this;
+    $.ajax({
+      url: "/importer/import/fetch/results",
+      async: false,
+      timeout:appConfig.REQUEST_TIMEOUT,
+      error: function (error) {
+        self.initializeFailed = true;
+      },
+      success: function (data) {
+        if (data) {
+          if (data.status === 'COMPLETED') {
+            clearInterval(id);
+            $(self.refs.loadingIcon.getDOMNode()).hide();
+            self.setState({
+              versions: data.versions,
+              currentVersion: data.versions[0],
+              processedVersions: [data.versions[0]],
+              projectWithUpdates: data.projectWithUpdates
+            });
+            self.transitionTo('selectversion', self.props.params);
+          } else if (data.status === 'FAILED_WITH_ERROR') {
+            $(self.refs.loadingIcon.getDOMNode()).hide();
+            self.displayError("Server Error");
+            clearInterval(id);
+          }
+        }
+      }
+    });
+  },
 	processNextVersion: function() {
 	    var processedVersions = this.state.processedVersions;
 	    var currentIndex = this.state.versions.indexOf(this.state.currentVersion);
@@ -323,6 +373,7 @@ var Wizard = React.createClass({
     eventHandlers.navigateBack  = this.navigateBack;
     eventHandlers.goHome = this.goHome;
     eventHandlers.fetchData = this.fetchData;
+    eventHandlers.initializeFetchData = this.initializeFetchData;
     eventHandlers.initAutomaticImport = this.initAutomaticImport;
     eventHandlers.processNextVersion = this.processNextVersion;
     eventHandlers.selectDataSource = this.selectDataSource;

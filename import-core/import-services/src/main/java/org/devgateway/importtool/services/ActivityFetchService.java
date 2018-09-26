@@ -25,8 +25,10 @@ import org.devgateway.importtool.endpoint.DataFetchServiceConstants;
 import org.devgateway.importtool.endpoint.Param;
 import org.devgateway.importtool.model.FetchResult;
 import org.devgateway.importtool.services.processor.helper.ReportingOrganizationHelper;
+import org.devgateway.importtool.services.processor.helper.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.client.RestTemplate;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -45,7 +47,13 @@ public class ActivityFetchService {
 
 	private Log log = LogFactory.getLog(getClass());
 
-	public FetchResult fetchResult(String reportingOrg,List<Param>parameters) throws FileNotFoundException, IOException{
+	@Async
+	public void fetchResult(String reportingOrg, List<Param>parameters, FetchResult result) throws FileNotFoundException,
+			IOException{
+		fetchResultsAsync(reportingOrg, parameters, result);
+	}
+
+	private void fetchResultsAsync(String reportingOrg, List<Param> parameters, FetchResult result) throws IOException {
 		String fileName = ReportingOrganizationHelper.getFileName(reportingOrg);
 		try {
 			File f = new File(fileName);
@@ -56,16 +64,20 @@ public class ActivityFetchService {
 			} else {
 				doc = this.createXMLDocument(fetch(reportingOrg, parameters));
 			}
-			return this.buildResult(doc);
+			FetchResult o = this.buildResult(doc);
+			result.setActivities(o.getActivities());
+			result.setVersions(o.getVersions());
+			result.setStatus(Status.COMPLETED);
 		}catch(RuntimeException ex) {
 			//we should probably not save it until is valid. leaving it here
 			//for simplicity
 			Files.delete(Paths.get(fileName));
+			result.setStatus(Status.FAILED_WITH_ERROR);
 			throw ex;
 		}
-    }
+	}
 
-    /**
+	/**
      * If we have a custom datasource for the reporting org, fetch it, if not return the default one
      * @param reportingOrg
      * @return

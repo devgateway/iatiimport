@@ -27,7 +27,7 @@ var SelectDataSource = React.createClass({
        this.props.eventHandlers.goHome();
     },
     handleNext: function() {
-        this.props.eventHandlers.fetchData(this.state.reportingOrgId);
+       this.props.eventHandlers.fetchData(this.state.reportingOrgId);
     },
     onReportingOrgSelect: function(datum) {        
        this.setState({reportingOrgId: datum.orgId, reportingOrgName:datum.name });        
