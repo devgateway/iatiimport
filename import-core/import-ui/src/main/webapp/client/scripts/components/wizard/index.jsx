@@ -177,7 +177,7 @@ var Wizard = React.createClass({
 	//fetch data from iati datastore
   fetchData: function(reportingOrg){
 	  this.initializeFetchData(reportingOrg);
-    let id;
+    var id;
     const self = this;
     id = setInterval(function(){
       if(self.initializeFailed){
