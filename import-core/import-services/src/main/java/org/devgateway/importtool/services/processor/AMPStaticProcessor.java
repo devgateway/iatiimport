@@ -139,7 +139,7 @@ public abstract class AMPStaticProcessor implements IDestinationProcessor {
 	public List<Field> getFields() {
 		return fieldList;
 	}
-
+	JsonNode jsonNode;
 	@Override
 	// Updated!
 	public List<InternalDocument> getDocuments(Boolean onlyEditable) {
@@ -149,11 +149,17 @@ public abstract class AMPStaticProcessor implements IDestinationProcessor {
 		String result = "";
 
 		try {
-			RestTemplate restTemplate = getRestTemplate();
-			result = restTemplate.getForObject(baseURL + this.getDocumentsEndpoint(), String.class);
-			ObjectMapper mapper = new ObjectMapper();
-			JsonNode jsonNode;
-			jsonNode = mapper.readTree(result);
+			if (jsonNode == null) {
+				RestTemplate restTemplate = getRestTemplate();
+
+				// we go only once to fetch docuemts since it make no sense to fetch 3k project
+				// twice. if its faster ill save the list of editable and non editable on init and will only return
+				// the list filtered
+				result = restTemplate.getForObject(baseURL + this.getDocumentsEndpoint(), String.class);
+				ObjectMapper mapper = new ObjectMapper();
+
+				jsonNode = mapper.readTree(result);
+			}
 			if (jsonNode.isArray()) {
 				jsonNode.forEach((JsonNode node) -> {
 					InternalDocument document = new InternalDocument();
