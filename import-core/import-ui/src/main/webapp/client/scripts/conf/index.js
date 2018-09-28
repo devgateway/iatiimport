@@ -8,6 +8,8 @@ module.exports = {
   DESTINATION_AUTH_TOKEN_ENDPOINT: '/rest/security/user',
   SETTINGS_ENDPOINT: '/rest/amp/settings',
   AMP_DESKTOP_ENDPOINT: '/aim/default/showDesktop.do',
+  AMP_ADMIN_HOME: '/aim/admin.do',
+  AMP_ACTIVITY_URL: '/aim/viewActivityPreview.do',
   USE_AUTHENTICATION_TOKEN: true,
   DESTINATION_AUTH_TOKEN: undefined,
   DESTINATION_USERNAME: undefined,

@@ -12,12 +12,9 @@ var DestinationSessionStore = Reflux.createStore({
     this.listenTo(appActions.initDestinationSession, this.handleInitSession);
     this.listenTo(appActions.refreshDestinationSession, this.handleRefreshSession);
 
-  },
-
+  }, 
   handleInitSession: function() {
     var self = this;
-    $.get('/importer/import/wipeall', function(){});
-
     $.ajax({
         url: appConfig.DESTINATION_API_HOST + appConfig.DESTINATION_AUTH_TOKEN_ENDPOINT,
         timeout: appConfig.REQUEST_TIMEOUT,

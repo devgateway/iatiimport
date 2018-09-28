@@ -1,5 +1,6 @@
 package org.devgateway.importtool.services.processor.helper;
 
+import java.util.Map;
 import java.util.Properties;
 
 public class FieldValue {
@@ -9,7 +10,7 @@ public class FieldValue {
 	private boolean selected = false;
 	private String percentage = "";
 	private Properties properties;
-	
+
 	public FieldValue() {
 		 this.properties = new Properties();
 	}
@@ -54,4 +55,6 @@ public class FieldValue {
 	public void setProperties(Properties properties) {
 		this.properties = properties;
 	}
+
+
 }

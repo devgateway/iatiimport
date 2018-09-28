@@ -12,11 +12,14 @@ import org.springframework.boot.context.embedded.ServletContextInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @ComponentScan({ "org.devgateway.importtool.main",
-		"org.devgateway.importtool.services", "org.devgateway.importtool.rest" })
+		"org.devgateway.importtool.services", "org.devgateway.importtool.rest," +
+		"org.devgateway.importtool.scheduler" })
 @Configuration
 @EnableAutoConfiguration
+@EnableScheduling
 public class Application extends WebMvcAutoConfiguration {
 	public static void main(String[] args) {
         System.setProperty("server.tomcat.max-threads","200");

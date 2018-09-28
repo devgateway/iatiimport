@@ -1,6 +1,7 @@
 package org.devgateway.importtool.services.processor.helper;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -10,6 +11,8 @@ public class Field {
 	private FieldType type;
 	private String fieldName;
 	private String displayName;
+	//Description will hold the tooltip
+	private Map<String,String> description;
 	private Map<String, String> attributes;
 	private Map<String, String> multiLangDisplayName;
 	private List<Field> childFields;
@@ -32,17 +35,23 @@ public class Field {
 	private String subTypeCode = "";
 
 	public Field() {
+
 	}
 
 	public Field(String displayName, String fieldName, FieldType type) {
+		this();
 		this.displayName = displayName;
 		this.fieldName = fieldName;
 		this.type = type;
 	}
-
 	public Field(String displayName, String fieldName, FieldType type, boolean isMappable) {
+		this(displayName,fieldName, type,isMappable,null);
+	}
+	public Field(String displayName, String fieldName, FieldType type, boolean isMappable,Map<String,String>
+			description) {
 		this(displayName, fieldName, type);
 		this.isMappable = isMappable;
+		this.description = description;
 	}
 
 	public String getFieldName() {
@@ -120,7 +129,13 @@ public class Field {
 	public void setDisplayName(String displayName) {
 		this.displayName = displayName;
 	}
+	public Map<String,String> getDescription() {
+		return description;
+	}
 
+	public void setDescription (Map<String,String> description) {
+		this.description = description;
+	}
 	public boolean isMappable() {
 		return isMappable;
 	}
@@ -218,4 +233,7 @@ public class Field {
 		this.length = length;
 	}
 
+	public String getXpathFilterCondition(Boolean isFormDataStore){
+		return "";
+	}
 }

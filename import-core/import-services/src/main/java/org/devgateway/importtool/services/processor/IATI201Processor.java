@@ -9,6 +9,8 @@ public class IATI201Processor extends IATI2XProcessor{
 		descriptiveName = "IATI 2.01";
 		codelistPath = "IATI201/codelist/";
 		propertiesFile = "IATI201/IATI201Processor.properties";
+		schemaPath = "IATI201/schema/";
+		fieldsTooltipsLocation = "IATI201/tooltips/fields/tooltips";
 		configureDefaults();
 		instantiateStaticFields();
 	}	

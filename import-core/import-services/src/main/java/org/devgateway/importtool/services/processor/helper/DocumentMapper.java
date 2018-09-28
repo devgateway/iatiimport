@@ -127,7 +127,8 @@ public class DocumentMapper implements IDocumentMapper {
 		default:
 			break;
 		}
-
+		result.setSourceProjectIdentifier(source.getIdentifier());
+		result.setSourceGroupingCriteria(source.getGrouping());
 		return result;
 	}
 
@@ -146,7 +147,7 @@ public class DocumentMapper implements IDocumentMapper {
 			this.sourceProcessor.setActionStatus(this.documentMappingStatus);
 			List<InternalDocument> sourceDocuments = this.sourceProcessor.getDocuments();
 			
-			//fetch destination system projects			
+			//fetchFetchFromDataStore destination system projects
 			this.updateStatus(EPMessages.FETCHING_DESTINATION_PROJECTS, Status.IN_PROGRESS);
 			this.destinationProcessor.setActionStatus(this.documentMappingStatus);			
 			List<InternalDocument> destinationDocuments = this.destinationProcessor.getDocuments(false);	

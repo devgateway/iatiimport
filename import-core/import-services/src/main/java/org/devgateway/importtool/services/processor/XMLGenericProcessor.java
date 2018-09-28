@@ -10,6 +10,7 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,13 +34,17 @@ public class XMLGenericProcessor implements ISourceProcessor {
 	private Log log = LogFactory.getLog(getClass());
 	private String descriptiveName = "XML Generic";
 	private Document doc;
-	
+
 
 	@Override
 	public void setInput(InputStream input) {
 		this.input = input;
 	}
 
+	@Override
+	public void setInput(Document input) {
+		this.doc = input;
+	}
 	@Override
 	public List<Field> getFields() {
 		List<Field> fieldList = new ArrayList<Field>();
@@ -189,6 +194,17 @@ public class XMLGenericProcessor implements ISourceProcessor {
 	@Override
 	public ActionStatus getActionStatus() {
 		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setFromDataStore(boolean fromDatastore) {
+
+	}
+
+	@Override
+	public List<String> buildTooltipsFields() throws IOException, SAXException, ParserConfigurationException,
+            XPathExpressionException {
 		return null;
 	}
 

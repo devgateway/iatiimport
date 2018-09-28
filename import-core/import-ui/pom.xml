@@ -12,7 +12,7 @@
 	<parent>
 		<groupId>org.devgateway.importtool</groupId>
 		<artifactId>importtool</artifactId>
-		<version>0.0.19-SNAPSHOT</version>
+		<version>1.0</version>
 	</parent>
 
 	<dependencies>
@@ -24,6 +24,10 @@
 		<dependency>
 			<groupId>org.devgateway.importtool</groupId>
 			<artifactId>import-services</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.devgateway.importtool</groupId>
+			<artifactId>import-scheduler</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -43,6 +47,10 @@
 			<artifactId>h2</artifactId>
 			<scope>runtime</scope>
 		</dependency>
+        <dependency>
+            <groupId>postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+        </dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-tomcat</artifactId>
@@ -61,7 +69,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
-			<!-- 
+			<!--
 			<plugin>
 				<groupId>com.github.eirslett</groupId>
 				<artifactId>frontend-maven-plugin</artifactId>

@@ -1,0 +1,136 @@
+<codelist name="FinanceType-category" xml:lang="en" complete="1">
+    <metadata>
+        <name>
+            <narrative>Finance Type (category)</narrative>
+        </name>
+        <description>
+            <narrative>This codelists exists to group the Finance Type codelist into categories. It is not used as a codelist in its own right.</narrative>
+        </description>
+        <url>http://www.oecd.org/dac/stats/dacandcrscodelists.htm</url>
+    </metadata>
+    <codelist-items>
+        <codelist-item>
+            <code>100</code>
+            <name>
+                <narrative>GRANTS</narrative>
+                <narrative xml:lang="fr">DONS</narrative>
+            </name>
+            <description>
+                <narrative>Transfers in cash or in kind for which no legal debt is incurred by the recipient.</narrative>
+            </description>
+        </codelist-item>
+        <codelist-item status="withdrawn">
+            <code>200</code>
+            <name>
+                <narrative>INTEREST SUBSIDY</narrative>
+            </name>
+            <description>
+                <narrative>Subsidies to soften the terms of private export credits, or loans or credits by the banking sector.</narrative>
+            </description>
+        </codelist-item>
+        <codelist-item status="withdrawn">
+            <code>300</code>
+            <name>
+                <narrative>CAPITAL SUBSCRIPTION</narrative>
+            </name>
+            <description>
+                <narrative>Payments to multilateral agencies in the form of notes and similar instruments, unconditionally cashable at sight by the recipient institutions.</narrative>
+            </description>
+        </codelist-item>
+        <codelist-item status="withdrawn">
+            <code>400</code>
+            <name>
+                <narrative>LOAN</narrative>
+            </name>
+            <description>
+                <narrative>Transfers in cash or in kind for which the recipient incurs legal debt.</narrative>
+            </description>
+        </codelist-item>
+        <codelist-item>
+            <code>420</code>
+            <name>
+                <narrative>DEBT INSTRUMENTS</narrative>
+                <narrative xml:lang="fr">INSTRUMENTS DE DETTE</narrative>
+            </name>
+            <description>
+                <narrative/>
+            </description>
+        </codelist-item>
+        <codelist-item>
+            <code>430</code>
+            <name>
+                <narrative>MEZZANINE FINANCE INSTRUMENTS</narrative>
+                <narrative xml:lang="fr">INSTRUMENTS FINANCIERS EN MEZZANINE</narrative>
+            </name>
+            <description>
+                <narrative/>
+            </description>
+        </codelist-item>
+        <codelist-item status="withdrawn">
+            <code>450</code>
+            <name>
+                <narrative>EXPORT CREDIT</narrative>
+            </name>
+            <description>
+                <narrative>Official or private loans which are primarily export-facilitating in purpose. They are usually tied to a specific export from the extending country and not represented by a negotiable instrument.</narrative>
+            </description>
+        </codelist-item>
+        <codelist-item>
+            <code>500</code>
+            <name>
+                <narrative>EQUITY AND SHARES IN COLLECTIVE INVESTMENT VEHICLES</narrative>
+                <narrative xml:lang="fr">ACTIONS ET PARTS DANS DES VEHICULES COLLECTIFS D'INVESTISSEMENT</narrative>
+            </name>
+            <description>
+                <narrative>Investment in a country on the DAC List of ODA Recipients that is not made to acquire a lasting interest in an enterprise.</narrative>
+            </description>
+        </codelist-item>
+        <codelist-item>
+            <code>600</code>
+            <name>
+                <narrative>DEBT RELIEF</narrative>
+                <narrative xml:lang="fr">DEBT RELIEF</narrative>
+            </name>
+            <description>
+                <narrative>Debt cancellations, debt conversions, debt rescheduling within or outside the framework of the Paris Club.</narrative>
+            </description>
+        </codelist-item>
+        <codelist-item status="withdrawn">
+            <code>700</code>
+            <name>
+                <narrative>INVESTMENT</narrative>
+            </name>
+            <description>
+                <narrative>Investment made by a private entity resident in a reporting country to acquire or add to a lasting interest(1) in an enterprise in a country on the DAC List of ODA Recipients.</narrative>
+            </description>
+        </codelist-item>
+        <codelist-item status="withdrawn">
+            <code>800</code>
+            <name>
+                <narrative>BONDS</narrative>
+            </name>
+            <description>
+                <narrative>Acquisition of bonds issued by developing countries.</narrative>
+            </description>
+        </codelist-item>
+        <codelist-item status="withdrawn">
+            <code>900</code>
+            <name>
+                <narrative>OTHER SECURITIES/CLAIMS</narrative>
+            </name>
+            <description>
+                <narrative/>
+            </description>
+        </codelist-item>
+        <codelist-item>
+            <code>1000</code>
+            <name>
+                <narrative>GUARANTEES AND OTHER UNFUNDED CONTINGENT LIABILITIES</narrative>
+                <narrative xml:lang="fr">GUARANTEES AND OTHER UNFUNDED CONTINGENT LIABILITIES</narrative>
+            </name>
+            <description>
+                <narrative/>
+            </description>
+        </codelist-item>
+    </codelist-items>
+</codelist>

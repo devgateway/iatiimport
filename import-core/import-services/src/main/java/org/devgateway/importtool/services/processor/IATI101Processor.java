@@ -10,7 +10,9 @@ public class IATI101Processor  extends IATI1XProcessor {
 		PROCESSOR_VERSION = "1.01";
 		descriptiveName = "IATI 1.01";
 		codelistPath = "IATI101/codelist/";
-		propertiesFile = "IATI101/IATI101Processor.properties";		
+		propertiesFile = "IATI101/IATI101Processor.properties";
+		schemaPath = "IATI101/schema/";
+		fieldsTooltipsLocation = "IATI101/tooltips/fields/tooltips";
 		configureDefaults();
 		instantiateStaticFields();
 	}	

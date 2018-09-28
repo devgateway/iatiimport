@@ -9,15 +9,25 @@ var Router = require('react-router');
 var Link = Router.Link;
 var AutoComplete = require('./autocomplete');
 var SimilarProjectsDialog = require('./similar-projects-dlg');
+var ProjectPreview = require('./project-preview/main');
 var _ = require('lodash/dist/lodash.underscore');
 var constants = require('./../../utils/constants');
+var sourceFieldsStore = require('./../../stores/SourceFieldsStore');
+var Tooltip = require('./tooltip');
 
 var ChooseProjects = React.createClass({
     mixins: [
         Reflux.ListenerMixin
     ],
     getInitialState: function() {
-       return {projectData: [], destinationProjects: [], statusMessage: "", showSimilarProjects: false, projectMapping: null};
+       return {projectData: [], 
+           destinationProjects: [], 
+           statusMessage: "", 
+           showSimilarProjects: false, 
+           projectMapping: null,
+           showSourceProjectPreview: false,
+           sourceFieldsData:[]
+          };
     },
     initializeFailed:false,
     componentWillMount: function () {
@@ -27,6 +37,7 @@ var ChooseProjects = React.createClass({
      this.resetMapping = this.resetMapping.bind(this);
      this.props.eventHandlers.updateCurrentStep(constants.CHOOSE_PROJECTS);
      this.listenTo(projectStore, this.updateProject);
+     this.listenTo(sourceFieldsStore, this.updateSourceFields);
      this.loadData();
     },
     updateProject: function (data) {
@@ -34,19 +45,25 @@ var ChooseProjects = React.createClass({
             projectData: data
         });
     },
+    updateSourceFields: function(data) {
+        this.setState({
+            sourceFieldsData: data
+        });
+    },
     loadData: function(){
-        var id;
-    	this.props.eventHandlers.showLoadingIcon();
-    	this.initializeMapping();
-    	var self = this;
-    	id = setInterval(function(){
-    	   if(self.initializeFailed){
-    	      clearInterval(id);
-    	   }else{
-    	      self.loadSourceProjects(id);
-    	   }
-    	}, 3000);
-    	this.loadProjects();
+     this.loadProjects();
+      var id;
+      this.props.eventHandlers.showLoadingIcon();
+      this.initializeMapping();
+      var self = this;
+      id = setInterval(function(){
+         if(self.initializeFailed){
+            clearInterval(id);
+         }else{
+            self.loadSourceProjects(id);
+         }
+      }, 3000);
+      this.loadProjects();
     },
     selectAll: function(){
     },
@@ -205,43 +222,80 @@ var ChooseProjects = React.createClass({
        projectMapping.destinationDocument = null;
        this.setState({projectData: projectData});
 	},
-    render: function () {
+	projectHasBeenUpdated: function(iatiIdentifier) {        
+	   return  _.find(this.props.projectWithUpdates, function(project) { return project.projectIdentifier === iatiIdentifier});	   
+	},
+	openProjectPreview: function(event) {
+	    var projectMapping = _.find(this.state.projectData, function(m) { return m.id === event.target.dataset.id});
+	    if (projectMapping.sourceDocument) {
+	        this.setState({showSourceProjectPreview: !this.state.showSourceProjectPreview, projectMapping: projectMapping}); 
+        }	    
+	},
+	closeProjectPreview: function() {
+	    this.setState({showSourceProjectPreview: false, projectMapping: null});
+	},
+	openDestinationProject: function(event) {
+	    var projectMapping = _.find(this.state.projectData, function(m) { return m.id === event.target.dataset.id});
+	    if (projectMapping.destinationDocument) {
+	        var win = window.open(appConfig.AMP_ACTIVITY_URL + '~activityId=' + projectMapping.destinationDocument.stringFields.id, '_blank');
+	        win.focus();
+	    }	    
+	},
+	render: function () {          
         var newProjects = [];
         var existingProjects = [];
         var language = this.props.i18nLib.lng() || 'en';
         var statusMessage = this.state.statusMessage.length > 0 ? <div className="alert alert-info" role="alert">{this.state.statusMessage}</div> : "";
+
         if (this.state.projectData) {
            $.map(this.state.projectData, function (item, i) {
                 if (item.operation == 'INSERT') {
-                    newProjects.push(<tr key={i}>
+                    newProjects.push(<tr key={i} className={this.projectHasBeenUpdated(item.sourceDocument.identifier) ? "updated-project" : ""}>
                         <td>
                            <input aria-label="Source" className="source"  type="checkbox" checked={item.selected} onChange={this.handleToggle.bind(this, item)} />
                         </td>
                         <td>
-                        {item.sourceDocument.identifier}
-                        </td>                      
-                        <td>
-                            {this.getTitle(item.sourceDocument.multilangFields)} 
+                            <span className="glyphicon glyphicon-eye-open glyphicon-eye-open-custom" data-id={item.id} onClick={this.openProjectPreview}></span> 
                         </td>
-                        <td className="no-right-padding">  
+                        <td>
+                        {item.sourceDocument.identifier}
+                        </td>
+                        <td>
+                            {this.getTitle(item.sourceDocument.multilangFields)}
+                        </td>
+                            <td className="no-left-padding">
+                            {item.destinationDocument &&
+                               <span className="glyphicon glyphicon-eye-open glyphicon-eye-open-custom" data-id={item.id} onClick={this.openDestinationProject}></span>
+                            }                           
+                            </td>
+                        <td className="no-right-padding">                            
                             {(this.state.destinationProjects && this.state.destinationProjects.length > 0) &&
                                 <AutoComplete context={constants.CHOOSE_PROJECTS} options={this.state.destinationProjects} display="title" language={language} placeholder="" refId="destSearch" onSelect={this.handleAutocompleteToggle.bind(this, item)} value={item.destinationDocument ? this.getTitle(item.destinationDocument.multilangFields) : ''}/>
-                            }                          
+                            }                               
                        </td>
+                        
                         <td className="no-left-padding"><span className="glyphicon glyphicon-remove glyphicon-remove-custom" data-id={item.id} onClick={this.resetMapping}></span></td>
-                        <td> 
-                        { item.projectsWithSimilarTitles && item.projectsWithSimilarTitles.length > 0 && 
+                        <td>
+                           { item.projectsWithSimilarTitles && item.projectsWithSimilarTitles.length > 0 &&
                             <span className="badge" onClick={this.showSimilarProjectsDialog} data-id={item.id} data-toggle="modal" data-target="#similarProjects">{item.projectsWithSimilarTitles.length}</span>
-                        }
+                           }                       
                         </td>
                         <td>
                             <input aria-label="override-title" className="override-title"  type="checkbox" checked={item.overrideTitle} onChange={this.handleOverrideTitle.bind(this, item)} />
                          </td>
                     </tr>);
                 } else {
-                    existingProjects.push(<tr key={i} className = {item.destinationDocument.allowEdit ? "" : "warning not-active" } >
+                    var classes = item.destinationDocument.allowEdit ? "" : "warning not-active" ;
+                    if (this.projectHasBeenUpdated(item.sourceDocument.identifier)) {
+                        classes += " updated-project";
+                    }
+                    
+                    existingProjects.push(<tr key={i} className = {classes} >
                         <td>
                           <input aria-label="Source" className="source" type="checkbox" checked={item.selected} onChange={this.handleToggle.bind(this, item)} />
+                        </td>
+                         <td>
+                            <span className="glyphicon glyphicon-eye-open glyphicon-eye-open-custom" data-id={item.id} onClick={this.openProjectPreview}></span> 
                         </td>
                         <td>
                         {item.sourceDocument.identifier}
@@ -249,6 +303,11 @@ var ChooseProjects = React.createClass({
                         <td>{item.destinationDocument.allowEdit ? "" : " * " }
                             {this.getTitle(item.sourceDocument.multilangFields)}
                         </td>
+                        <td>
+                            {item.destinationDocument &&
+                                <span className="glyphicon glyphicon-eye-open glyphicon-eye-open-custom" data-id={item.id} onClick={this.openDestinationProject}></span>
+                             } 
+                        </td>                             
                         <td>
                             {item.destinationDocument.multilangFields.title[language]}
                         </td>
@@ -260,37 +319,41 @@ var ChooseProjects = React.createClass({
             }.bind(this));
         };
 
-        return ( 
-           <div>         
-             
-            <div className="panel panel-default">
+        return (
+           <div>
+             <div className="panel panel-default">
                 <div className="panel-heading"><strong>{this.props.i18nLib.t('wizard.choose_projects.choose_projects')}</strong></div>
                 <div className="panel-body">
                     {statusMessage}
                     <div className="panel panel-success">
-                        <div className="panel-heading">{this.props.i18nLib.t('wizard.choose_projects.new_projects')} <i>({this.state.destinationProjects.length} {this.props.i18nLib.t('wizard.choose_projects.choose_projects')})</i></div>
+                      <div className="panel-heading">{this.props.i18nLib.t('wizard.choose_projects.new_projects')} <i>({newProjects.length } {this.props.i18nLib.t('wizard.choose_projects.choose_projects')})</i></div>
                         <div className="panel-body">
                          <SimilarProjectsDialog projectMapping={this.state.projectMapping} getTitle={this.getTitle} mapProject={this.mapProject} {...this.props} />
-                            <table className="table">
+                         {this.state.showSourceProjectPreview && this.state.projectMapping &&
+                            <ProjectPreview closeProjectPreview={this.closeProjectPreview.bind(this)} project={this.state.projectMapping.sourceDocument} i18nLib = {this.props.i18nLib} sourceFieldsData = {this.state.sourceFieldsData} /> 
+                         } 
+                         <table className="table">
                                 <thead>
                                     <tr>
                                         <th>
                                             <input type="checkbox" checked={this.checkAll('INSERT')} onChange={this.selectAllNew} />
                                             {this.props.i18nLib.t('wizard.choose_projects.import')}
                                         </th>
+                                         <th></th>
                                          <th className="id-column-width">
-                                            {this.props.i18nLib.t('wizard.choose_projects.iati_id')}
+                                          <Tooltip i18nLib={this.props.i18nLib} tooltip={this.props.i18nLib.t('wizard.choose_projects.iati_id_tooltip')}/> {this.props.i18nLib.t('wizard.choose_projects.iati_id')}
                                         </th>
                                         <th>
-                                            {this.props.i18nLib.t('wizard.choose_projects.source_project')}
+                                          <Tooltip i18nLib={this.props.i18nLib} tooltip={this.props.i18nLib.t('wizard.choose_projects.source_project_tooltip')}/> {this.props.i18nLib.t('wizard.choose_projects.source_project')}
                                         </th>
+                                          <th></th>
                                         <th>
-                                            {this.props.i18nLib.t('wizard.choose_projects.destination_project')}
-                                        </th>
+                                          <Tooltip i18nLib={this.props.i18nLib} tooltip={this.props.i18nLib.t('wizard.choose_projects.destination_project_tooltip')}/> {this.props.i18nLib.t('wizard.choose_projects.destination_project')}
+                                        </th>                                      
                                         <th></th>
-                                        <th>{this.props.i18nLib.t('wizard.choose_projects.similar_titles')}</th>
+                                          <th><Tooltip i18nLib={this.props.i18nLib} tooltip={this.props.i18nLib.t('wizard.choose_projects.similar_titles_tooltip')}/>{this.props.i18nLib.t('wizard.choose_projects.similar_titles')}</th>
                                         <th>
-                                        <input type="checkbox" checked={this.overrideAll('INSERT')} onChange={this.overrideTitleAll} />
+                                        <Tooltip i18nLib={this.props.i18nLib} tooltip={this.props.i18nLib.t('wizard.choose_projects.override_title_tooltip')}/> <input type="checkbox" checked={this.overrideAll('INSERT')} onChange={this.overrideTitleAll} />
                                         {this.props.i18nLib.t('wizard.choose_projects.override_title')}
                                         </th>
                                     </tr>
@@ -302,7 +365,7 @@ var ChooseProjects = React.createClass({
                         </div>
                     </div>
                     <div className="panel panel-danger">
-                        <div className="panel-heading">{this.props.i18nLib.t('wizard.choose_projects.existing_projects')}</div>
+                        <div className="panel-heading">{this.props.i18nLib.t('wizard.choose_projects.existing_projects')} <i>({existingProjects.length } {this.props.i18nLib.t('wizard.choose_projects.choose_projects')})</i></div>
                         <div className="panel-body">
                               <div className="alert alert-info" role="alert">{this.props.i18nLib.t('wizard.choose_projects.msg_project_not_editable')}</div>
                             <table className="table">
@@ -312,17 +375,19 @@ var ChooseProjects = React.createClass({
                                             <input type="checkbox" checked={this.checkAll('UPDATE')} onChange={this.selectAllExisting} />
                                             {this.props.i18nLib.t('wizard.choose_projects.update')}
                                         </th>
+                                        <th> </th>
                                          <th className="id-column-width">
-                                            {this.props.i18nLib.t('wizard.choose_projects.iati_id')}
+                                            <Tooltip i18nLib={this.props.i18nLib} tooltip={this.props.i18nLib.t('wizard.choose_projects.iati_id_tooltip')}/>{this.props.i18nLib.t('wizard.choose_projects.iati_id')}
                                         </th>
                                         <th>
-                                            {this.props.i18nLib.t('wizard.choose_projects.source_project')}
+                                            <Tooltip i18nLib={this.props.i18nLib} tooltip={this.props.i18nLib.t('wizard.choose_projects.source_project_tooltip')}/> {this.props.i18nLib.t('wizard.choose_projects.source_project')}
+                                        </th>
+                                         <th></th>
+                                        <th>
+                                            <Tooltip i18nLib={this.props.i18nLib} tooltip={this.props.i18nLib.t('wizard.choose_projects.destination_project_tooltip')}/> {this.props.i18nLib.t('wizard.choose_projects.destination_project')}
                                         </th>
                                         <th>
-                                            {this.props.i18nLib.t('wizard.choose_projects.destination_project')}
-                                        </th>
-                                        <th>
-                                        <input type="checkbox" checked={this.overrideAll('UPDATE')} onChange={this.overrideTitleAll} />
+                                            <Tooltip i18nLib={this.props.i18nLib} tooltip={this.props.i18nLib.t('wizard.choose_projects.override_title_tooltip')}/><input type="checkbox" checked={this.overrideAll('UPDATE')} onChange={this.overrideTitleAll} />
                                         {this.props.i18nLib.t('wizard.choose_projects.override_title')}
                                         </th>
                                     </tr>
@@ -346,6 +411,6 @@ var ChooseProjects = React.createClass({
                 </div>
                 </div>
                 </div>
-            ); } }); 
-            
+            ); } });
+
 module.exports = ChooseProjects;
