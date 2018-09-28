@@ -2,11 +2,13 @@ package org.devgateway.importtool.services.processor.helper;
 
 public class Constants {
 	public static final String SOURCE_PROCESSOR = "SOURCE_PROCESSOR";
+	public static final String IATI_STORE_ACTIVITIES = "IATI_STORE_ACTIVITIES";
 	public static final String DESTINATION_PROCESSOR = "DESTINATION_PROCESSOR";
 	public static final String DOCUMENT_MAPPER = "DOCUMENT_MAPPER";
 	public static final String CURRENT_FILE_ID = "CURRENT_FILE_ID";
 	public static final String SESSION_TOKEN = "SESSION_TOKEN";
 	public static final String WORKFLOW_LIST = "WORKFLOW_LIST";
+	public static final String REPORTING_ORG = "REPORTING_ORG";
 	
 	public static final String WORKFLOW_FILE = "workflows.xml";
 	public static final String WORKFLOW_TAG_NAME = "workflow";
@@ -28,6 +30,14 @@ public class Constants {
 
 	public static final String ACTUAL_EXPENDITURES = ACTUAL + " " + EXPENDITURES;
 	public static final String PLANNED_EXPENDITURES = PLANNED + " " + EXPENDITURES;
+
+	public static final String TRANSACTION_TYPE_ACTUAL_COMMITMENTS ="AC";
+	public static final String TRANSACTION_TYPE_PLANNED_COMMITMENTS ="PC";
+	public static final String TRANSACTION_TYPE_ACTUAL_DISBURSEMENTS ="AD";
+	public static final String TRANSACTION_TYPE_PLANNED_DISBURSEMENTS ="PD";
+	public static final String TRANSACTION_TYPE_ACTUAL_EXPENDITURES ="AE";
+	public static final String TRANSACTION_TYPE_PLANNED_EXPENDITURES ="PE";
+
 
 
 }

@@ -15,6 +15,7 @@ var _ = require('lodash/dist/lodash.underscore');
 var formActions = require('./../../actions/form');
 var appActions = require('./../../actions');
 var constants = require('./../../utils/constants');
+var Tooltip = require('./tooltip');
 
 var ChooseFields = React.createClass({
 	mixins: [Reflux.ListenerMixin],
@@ -287,7 +288,7 @@ var ChooseFields = React.createClass({
                         </td>
                         <td>
                             <div className="table_cell">
-                                {item.displayName}
+                            <Tooltip i18nLib={this.props.i18nLib} tooltip={item.description}/> {item.displayName}
                             </div>
                         </td>
                         <td >

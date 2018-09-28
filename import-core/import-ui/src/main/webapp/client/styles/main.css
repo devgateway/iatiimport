@@ -476,3 +476,56 @@ tbody.scrollablebody td, thead.scrollablebody th {
 .glyphicon-remove-custom{
 	margin-top:5px !important;
 }
+
+.glyphicon-custom {
+	margin-left: 20px;
+	font-size: 18px;
+}
+
+.import-type-select, .reporting-org-select{
+	width: 40%;
+}
+
+.glyphicon-info-sign-custom1 {
+	color: #337ab7;
+	font-size: 14px;
+	margin-right:10px;
+}
+
+.glyphicon-info-sign-custom2{
+	font-size: 14px;
+	margin-right:10px;
+}
+
+.glyphicon-eye-open-custom {
+	font-size: 16px;
+	margin:5px;
+	pointer-events: all !important;
+}
+
+.landing-page-left {
+	border-right-color: #e7e7e7;
+    border-right-width: 2px;
+    border-right-style: solid;
+    padding: 40px;
+}
+
+.landing-page-right {
+	padding: 40px;
+}
+
+.updated-project {
+	background: #ffff80;
+}
+.reporting-orgs-with-updates{
+	font-weight: bold;
+  color: red;
+}
+
+.projectPreview {
+ width: 70% !important;
+ min-height: 600px !important;
+}
+div.tooltip{
+  word-wrap: break-word;
+}

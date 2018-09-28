@@ -35,6 +35,7 @@ import org.springframework.beans.factory.annotation.Value;
  *
  */
 public class ServiceConfiguration {
+    private Log log = LogFactory.getLog(getClass());
 
     public static final String TOOL_NAME = "importer";
 
@@ -43,7 +44,12 @@ public class ServiceConfiguration {
 
     @Value("${spring.dataSource.url}")
     private String dataSourceURL;
-    
+
+    @Value("${spring.dataSource.username}")
+    private String dataSourceUsername;
+    @Value("${spring.dataSource.password}")
+    private String dataSourcePassword;
+
     @Value("${spring.dataSource.driverClassName}")
     private String driverClassName;    
     
@@ -83,7 +89,9 @@ public class ServiceConfiguration {
             DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
             dataSourceBuilder.driverClassName(driverClassName);
             dataSourceBuilder.url(dataSourceURL);
-            return dataSourceBuilder.build();   
+            dataSourceBuilder.username(dataSourceUsername);
+            dataSourceBuilder.password(dataSourcePassword);
+            return dataSourceBuilder.build();
     }
     Properties getHibernateProperties(){    	
         Properties properties = new Properties();

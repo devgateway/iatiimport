@@ -1,0 +1,1 @@
+INSERT INTO public.data_source (id, default_url) VALUES (nextval( 'hibernate_sequence'), 'http://datastore.iatistandard.org/api/1/access/activity.xml');

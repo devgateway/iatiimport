@@ -13,17 +13,22 @@ var Navigation = Router.Navigation;
 var formActions = require('./../../actions/form');
 var Cookies = require('js-cookie');
 var constants = require('./../../utils/constants');
+var common = require('./../../utils/common');
 var destinationSessionStore = require('./../../stores/DestinationSessionStore');
 
 var Wizard = React.createClass({
 	mixins: [Navigation],
 	setIntervalId: null,
 	getInitialState: function() {
-		return {
+	    return {
 			info: {},
 			results: [],
-			currentStep: constants.UPLOAD_FILE,
+			currentStep: this.props.params.src == constants.IMPORT_TYPE_AUTOMATIC ? constants.SELECT_DATASOURCE : constants.UPLOAD_FILE,
 			completedSteps: [],
+			versions:[],
+			processedVersions: [],
+			projectWithUpdates:[],
+			currentVersion: null,
 			statusMessage: ""
 		};
 	},
@@ -32,54 +37,54 @@ var Wizard = React.createClass({
 			this.initImportSession(nextProps.params.src, nextProps.params.dst);
 		}
 	},
-	componentDidMount  : function() {
-		var sourceProcessor = this.props.params.src;
-		var destinationProcessor = this.props.params.dst;
-		appActions.initDestinationSession.triggerPromise().then(function(data) {
-			  appConfig.DESTINATION_AUTH_TOKEN = data.token;
-		    appConfig.DESTINATION_USERNAME = data['user-name'];
-				appConfig.DESTINATION_AUTH_TOKEN_EXPIRATION =  data["token-expiration"] || (new Date).getTime() + (30*60*1000);
-		    Cookies.set("DESTINATION_AUTH_TOKEN", data.token);
-		    Cookies.set("DESTINATION_USERNAME", data['user-name']);
-		    // Added true always for now, the API returns wrong value
-		    Cookies.set("CAN_ADD_ACTIVITY", true || data['add-activity']);
-		    Cookies.set("WORKSPACE", data['team']);
-
-				this.initImportSession(sourceProcessor, destinationProcessor);
-
-				// Timer for token expiration
-				var self = this;
-				self.setIntervalTokenId = setInterval(function(){
-					self.checkTokenStatus();
-				}, 1000);
-
-	      }.bind(this))["catch"](function(err) {
-	      }.bind(this));
-
+	componentDidMount: function() {
+	    if (this.props.params.src !== constants.IMPORT_TYPE_AUTOMATIC) {
+	        this.resetSession();
+	        this.initManualImport();
+	    }
 	},
-	checkTokenStatus: function() {
-		var currentTime = (new Date).getTime();
-		var expirationTime = appConfig.DESTINATION_AUTH_TOKEN_EXPIRATION;
-		var secondsToExpire = (appConfig.DESTINATION_AUTH_TOKEN_EXPIRATION - currentTime)/1000;
-		//console.log("Session in " + secondstoExpire);
-		if(secondsToExpire < 0) {
-			appActions.refreshDestinationSession.triggerPromise().then(function(data) {
-				  appConfig.DESTINATION_AUTH_TOKEN = data.token;
-			    appConfig.DESTINATION_USERNAME = data['user-name'];
-					appConfig.DESTINATION_AUTH_TOKEN_EXPIRATION =  data["token-expiration"] || (new Date).getTime() + (30*60*1000);
-			    Cookies.set("DESTINATION_AUTH_TOKEN", data.token);
-			    Cookies.set("DESTINATION_USERNAME", data['user-name']);
-			    // Added true always for now, the API returns wrong value
-			    Cookies.set("CAN_ADD_ACTIVITY", true || data['add-activity']);
-			    Cookies.set("WORKSPACE", data['team']);
-					$.get(appConfig.TOOL_REST_PATH + '/refresh/' + data.token, function(){});
-
-		      }.bind(this))["catch"](function(err) {
-		      }.bind(this));
-
-		}
+	resetSession: function() {
+	      $.get('/importer/import/wipeall', function(){}); 
 	},
-	updateCurrentStep : function(step){
+	initManualImport: function() {
+	    var sourceProcessor = this.props.params.src;
+        var destinationProcessor = this.props.params.dst;    
+        appActions.refreshDestinationSession.triggerPromise().then(function(data) {
+            common.setAuthCookies(data);
+            this.initImportSession(sourceProcessor, destinationProcessor); 
+            common.refreshToken();
+        }.bind(this))["catch"](function(err) {
+            common.resetAuthCookies();
+            this.goHome();
+        }.bind(this));
+           
+	},
+	getSourceProcessor: function(src) {
+	      if (src === constants.IMPORT_TYPE_AUTOMATIC && this.state.currentVersion) {
+	          return "IATI" + this.state.currentVersion.replace(".", "")
+	      }
+	        
+	      return src;
+	 },  
+	 initAutomaticImport: function() {      
+	      var sourceProcessor = this.props.params.src;
+	      var destinationProcessor = this.props.params.dst; 
+	        
+	      appActions.refreshDestinationSession.triggerPromise().then(function(data) {
+	           common.setAuthCookies(data);           
+	           this.initImportSession(sourceProcessor, destinationProcessor).then(function(){
+	                this.transitionTo('filter', this.props.params);
+	           }.bind(this));
+	            
+	           common.refreshToken();            
+	    }.bind(this))["catch"](function(err) {
+	            common.resetAuthCookies();
+	    }.bind(this));
+	        
+	                
+	        
+	},
+    updateCurrentStep : function(step){
 	  var completedSteps = this.state.completedSteps;
 	  completedSteps.push(step);
 	  this.setState({currentStep:step, completedSteps: completedSteps})
@@ -89,7 +94,6 @@ var Wizard = React.createClass({
 			$(this.refs.loadingIcon.getDOMNode()).hide();
 		}
 	},
-
 	showLoadingIcon:  function(){
 		$(this.refs.loadingIcon.getDOMNode()).show();
 	},
@@ -104,17 +108,25 @@ var Wizard = React.createClass({
 	uploadFile: function() {
 		this.transitionTo('filter', this.props.params);
 	},
-
+     
+	selectDataSource: function() {
+	    this.setState({completedSteps: [], versions:[], processedVersions: [], projectWithUpdates:[], currentVersion: null});        
+	    this.transitionTo('selectdatasource', this.props.params);
+	},
+	
 	filterData: function(languageData, filterData, direction) {
 		var languagesUpdated = false;
 		var filtersUpdated = false;
+		var nextStep = 'projects';
+		var previousStep = this.props.params.src !== constants.IMPORT_TYPE_AUTOMATIC ? 'upload' : 'selectversion';
+		    
 		formActions.updateLanguages.triggerPromise(languageData).then(function() {
 			languagesUpdated = true;
 			if(languagesUpdated && filtersUpdated){
 				if(constants.DIRECTION_NEXT === direction){
-					this.transitionTo('projects', this.props.params);
-				}else{
-					this.transitionTo('upload', this.props.params);
+					this.transitionTo(nextStep, this.props.params);
+				} else {
+					this.transitionTo(previousStep, this.props.params);
 				}
 			}
 		}.bind(this));
@@ -123,15 +135,13 @@ var Wizard = React.createClass({
 			filtersUpdated = true;
 			if(languagesUpdated && filtersUpdated){
 				if(constants.DIRECTION_NEXT === direction){
-					this.transitionTo('projects', this.props.params);
+					this.transitionTo(nextStep, this.props.params);
 				}else{
-					this.transitionTo('upload', this.props.params);
+					this.transitionTo(previousStep, this.props.params);
 				}
 			}
 		}.bind(this));
 	},
-
-
 
 	chooseProjects: function(data,direction) {
 		formActions.updateSelectedProjects(data).then(function() {
@@ -163,6 +173,85 @@ var Wizard = React.createClass({
 				this.transitionTo('fields', this.props.params);
 			}
 		}.bind(this));
+	},
+	//fetch data from iati datastore
+  fetchData: function(reportingOrg){
+	  this.initializeFetchData(reportingOrg);
+    var id;
+    const self = this;
+    id = setInterval(function(){
+      if(self.initializeFailed){
+        clearInterval(id);
+      }else{
+        self.loadReportingOrganisation(id);
+      }
+    }, 3000);
+  },
+  /**
+   * this should probably needs to be an refulx action
+   * @param reportingOrgId
+   */
+  initializeFetchData: function(reportingOrgId) {
+    $(this.refs.loadingIcon.getDOMNode()).show();
+    var self = this;
+    $.ajax({
+      url: '/importer/import/fetch/initialize/' + reportingOrgId,
+      error: function() {
+        self.initializeFailed = true;
+      },
+      success: function(data) {
+        if(data.error){
+          self.props.eventHandlers.hideLoadingIcon();
+          self.setState({statusMessage: ""});
+          var message = self.props.i18nLib.t('server_messages.' + data.code, data) || data.error;
+          self.props.eventHandlers.displayError(message);
+        }
+      },
+      type: 'GET'
+    });
+  },
+  loadReportingOrganisation:  function(id) {
+    var self =this;
+    $.ajax({
+      url: "/importer/import/fetch/results",
+      async: false,
+      timeout:appConfig.REQUEST_TIMEOUT,
+      error: function (error) {
+        self.initializeFailed = true;
+      },
+      success: function (data) {
+        if (data) {
+          if (data.status === 'COMPLETED') {
+            clearInterval(id);
+            $(self.refs.loadingIcon.getDOMNode()).hide();
+            self.setState({
+              versions: data.versions,
+              currentVersion: data.versions[0],
+              processedVersions: [data.versions[0]],
+              projectWithUpdates: data.projectWithUpdates
+            });
+            self.transitionTo('selectversion', self.props.params);
+          } else if (data.status === 'FAILED_WITH_ERROR') {
+            $(self.refs.loadingIcon.getDOMNode()).hide();
+            self.displayError("Server Error");
+            clearInterval(id);
+          }
+        }
+      }
+    });
+  },
+	processNextVersion: function() {
+	    var processedVersions = this.state.processedVersions;
+	    var currentIndex = this.state.versions.indexOf(this.state.currentVersion);
+	   
+	    var nextIndex = currentIndex + 1;
+	    if (nextIndex <= this.state.versions.length - 1){
+	        var nextVersion = this.state.versions[nextIndex]; 
+	        processedVersions.push(nextVersion);
+	        this.setState({currentVersion: nextVersion, processedVersions: processedVersions})
+	    }	
+	    
+	    this.transitionTo('selectversion', this.props.params);
 	},
 	navigateBack: function(){
 		if(this.setIntervalId){
@@ -226,13 +315,13 @@ var Wizard = React.createClass({
             },
 	        type: 'GET'
 	     });
-	}
-	,
+	},
+
 	initImportSession: function(sourceProcessor, destinationProcessor) {
-		this.showLoadingIcon();
+	    this.showLoadingIcon();
 		var compiledURL = _.template(appConfig.TOOL_START_ENDPOINT);
 		var url = compiledURL({
-			'sourceProcessor': sourceProcessor,
+			'sourceProcessor': this.getSourceProcessor(sourceProcessor),
 			'destinationProcessor': destinationProcessor,
 			'authenticationToken': Cookies.get("DESTINATION_AUTH_TOKEN"),
 			'username': Cookies.get("DESTINATION_USERNAME"),
@@ -240,7 +329,7 @@ var Wizard = React.createClass({
 		});
 
 		var self = this;
-		$.ajax({
+		return $.ajax({
 	        url: url,
 	        timeout:appConfig.REQUEST_TIMEOUT,
 	        error: function(result) {
@@ -268,11 +357,8 @@ var Wizard = React.createClass({
 	        },
 	        type: 'GET'
 	     });
-
-
-	},
-
-  render: function() {
+  },
+  render: function() {   
     var eventHandlers = {};
     eventHandlers.uploadFile          = this.uploadFile;
     eventHandlers.filterData          = this.filterData;
@@ -286,10 +372,15 @@ var Wizard = React.createClass({
     eventHandlers.updateCurrentStep = this.updateCurrentStep;
     eventHandlers.navigateBack  = this.navigateBack;
     eventHandlers.goHome = this.goHome;
+    eventHandlers.fetchData = this.fetchData;
+    eventHandlers.initializeFetchData = this.initializeFetchData;
+    eventHandlers.initAutomaticImport = this.initAutomaticImport;
+    eventHandlers.processNextVersion = this.processNextVersion;
+    eventHandlers.selectDataSource = this.selectDataSource;
 
     var error;
-    if(Cookies.get("DESTINATION_AUTH_TOKEN") == "null" || Cookies.get("DESTINATION_AUTH_TOKEN") == "undefined"){
-    	return (<div className="container"><br/><div className="alert alert-danger server-status-message" role="alert" ><span className="glyphicon glyphicon-exclamation-sign error-box" aria-hidden="true"></span><span className="sr-only">Error:</span><span > Session information for the destination system could not be retrieved. Verify if backend services are working correctly.</span> </div></div>);
+    if(common.hasValidSession() == false){
+    	return (<div className="container"><br/><div className="alert alert-danger server-status-message" role="alert" ><span className="glyphicon glyphicon-exclamation-sign error-box" aria-hidden="true"></span><span className="sr-only">Error:</span><span > {window.i18nLib.t('wizard.invalid_session')}</span> </div></div>);
     }
 
     if(Cookies.get("CAN_ADD_ACTIVITY") == "false"){
@@ -298,9 +389,13 @@ var Wizard = React.createClass({
 
     return (
       <div>
-      <div className="wizard-container" >
-      <h2>{this.props.i18nLib.t('wizard.import_process')}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      <small>{this.state.info.sourceProcessorName} {window.i18nLib.t('header.nav.menu.submenu.to')} {this.state.info.destinationProcessorName} </small></h2>
+      <div className="wizard-container" > 
+     <h2>{this.props.i18nLib.t('wizard.import_process')}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      {this.state.info.sourceProcessorName && this.state.info.destinationProcessorName &&
+          
+          <small>{this.state.info.sourceProcessorName} {window.i18nLib.t('header.nav.menu.submenu.to')} {this.state.info.destinationProcessorName} </small> 
+      }      
+      </h2>
       <div className="row">
       <WizardSteps {...this.props} currentStep = {this.state.currentStep} completedSteps= {this.state.completedSteps} />
       <div className="col-sm-10 col-md-10 main " >
@@ -310,7 +405,7 @@ var Wizard = React.createClass({
          <span ref="message"></span>
        </div>
       <div className="loading-icon" ref="loadingIcon"></div>
-      <RouteHandler eventHandlers={eventHandlers} {...this.props} statusMessage = {this.state.statusMessage}/>
+      <RouteHandler eventHandlers={eventHandlers} {...this.props}  {...this.state}/>
       </div>
       </div>
       </div>

@@ -8,11 +8,16 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.model.Workflow;
 import org.devgateway.importtool.services.processor.helper.Processor;
+import org.springframework.beans.factory.annotation.Value;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -25,7 +30,10 @@ public class WorkflowService {
 
 	private Log log = LogFactory.getLog(getClass());
 
-	
+	@Value("${AMPStaticProcessor.processor_version}")
+	private String procesorVersion;
+
+
 	public List<Workflow> getWorkflows() {
 		List<Workflow> workflows = new ArrayList<Workflow>();
 		InputStream stream = this.getClass().getResourceAsStream(WORKFLOW_FILE);
@@ -35,7 +43,15 @@ public class WorkflowService {
 				factory.setIgnoringElementContentWhitespace(true);
 				DocumentBuilder builder = factory.newDocumentBuilder();
 				Document doc = builder.parse(stream);
-				NodeList nodeList = doc.getElementsByTagName(WORKFLOW_TAG_NAME);
+				String xPathWorkFlows = "/workflows/workflow[destination-processor/class-name='org.devgateway" +
+						".importtool.services.processor.AMP%sStaticProcessor']";
+
+				XPath xPath = XPathFactory.newInstance().newXPath();
+
+				NodeList nodeList = (NodeList) xPath.compile(String.format(xPathWorkFlows, procesorVersion)).evaluate(doc,
+						XPathConstants.NODESET);
+
+				//NodeList nodeList = doc.getElementsByTagName(WORKFLOW_TAG_NAME);
 				for (int i = 0; i < nodeList.getLength(); i++) {
 					Element workflowEl = (Element) nodeList.item(i);
 					Element destination = (Element) workflowEl.getElementsByTagName(DESTINATION_PROCESSOR_TAG_NAME).item(0);
@@ -59,7 +75,7 @@ public class WorkflowService {
 					workflow.setTranslationKey(workflowEl.getElementsByTagName(TRANSLATION_KEY_TAG).item(0).getTextContent());
 					workflows.add(workflow);
 				}
-			} catch (ParserConfigurationException | SAXException | IOException e) {
+			} catch (ParserConfigurationException | SAXException | IOException | XPathExpressionException e ) {
 				log.error("Error Parsing workflow file: " + e);
 			}
 

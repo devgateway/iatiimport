@@ -11,6 +11,7 @@ var appConfig = require('./../conf');
 var translations = require('../../i18n/translations');
 var systemInfoStore = require('./../stores/SystemInfoStore');
 var settingsStore = require('./../stores/SettingsStore');
+var common = require('./../utils/common');
 var Home = React.createClass({
    mixins: [Reflux.ListenerMixin],
    getInitialState: function() {                    
@@ -54,7 +55,12 @@ var Home = React.createClass({
   },
   closeImportTool: function(){
 	  if (confirm(this.state.i18nLib.t('header.close_window'))) {
-		  window.location.href = appConfig.AMP_DESKTOP_ENDPOINT;
+	      if (common.isAdmin()) {
+	          window.location.href = appConfig.AMP_ADMIN_HOME;
+	      } else {
+	          window.location.href = appConfig.AMP_DESKTOP_ENDPOINT; 
+	      }
+		  
 	  }  
   },
   render: function() { 

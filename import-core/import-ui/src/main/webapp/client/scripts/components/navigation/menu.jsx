@@ -8,28 +8,52 @@ var SubMenu = require('./sub-menu');
 var ImportProcessMenu = require('./workflow-menu');
 var Router = require('react-router');
 var Link = Router.Link;
+var Cookies = require('js-cookie');
+var appActions = require('./../../actions');
+var common = require('./../../utils/common');
 var Menu = React.createClass({
     mixins              : [
-        reactAsync.Mixin, Reflux.ListenerMixin
+        Reflux.ListenerMixin
     ],
+    getInitialState: function() {
+        return {};
+    },
     componentDidMount   : function () {
         this.listenTo(menuStore, this.updateMenu);
+        this.loadData();
+        
     },
-    getInitialStateAsync: function () {
-        appActions.loadMenuData();
+    loadData: function () {
+        appActions.loadMenuData();       
     },
-    updateMenu          : function (data) {
+    updateMenu: function (data) {
         this.setState({
             menuData: data.menuData
         });
     },
-    render              : function () {
+  
+    showMenu: function(item) {        
+        if (item.name === 'close') {
+            return true;
+        }
+        
+        var isAdmin = common.isAdmin();
+        var showMenuItem = true;
+        if (item.name === 'admin'){
+            showMenuItem = isAdmin;
+        } else {            
+            showMenuItem = isAdmin ? false : true;         
+        }    
+        
+        return showMenuItem;
+    },
+    render: function () {      
         var menusLeft = [];
         var menusRight = [];
         var self = this;
         if (this.state.menuData) {
-            this.state.menuData.forEach(function (item) {
-                if (item && item.enabled) {
+            this.state.menuData.forEach(function (item) {                
+                if (item && item.enabled && this.showMenu(item)) {
                     var iconClass = 'glyphicon ';
                     if (item.iconClass) {
                         iconClass += item.iconClass;
@@ -65,9 +89,12 @@ var Menu = React.createClass({
                         </li>);
                     }
                 }
-            });
+            }.bind(this));
         }
-        menusLeft.splice(1, 0, <ImportProcessMenu {...self.props} />);
+        if (!common.isAdmin()) {
+            menusLeft.splice(1, 0, <ImportProcessMenu {...self.props} />);
+        }
+        
         return (
             <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul className='nav navbar-nav'>

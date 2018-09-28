@@ -1,8 +1,6 @@
 package org.devgateway.importtool.services;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
@@ -28,9 +26,10 @@ import org.devgateway.importtool.services.processor.helper.IDocumentMapper;
 import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
 import org.devgateway.importtool.services.request.ImportRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.web.multipart.MultipartFile;
+
 @EnableAsync
 @org.springframework.stereotype.Service
 public class ImportService {
@@ -41,7 +40,9 @@ public class ImportService {
 
 	@Autowired
 	private WorkflowService workflowService;
-	
+	@Value("${AMPStaticProcessor.processor_version}")
+	private String processorVersion;
+
 	private Log log = LogFactory.getLog(getClass());
 	
 	public ImportSummary getSummary(IDocumentMapper documentMapper, ImportSessionToken importSessionToken, ISourceProcessor processor){
@@ -73,20 +74,30 @@ public class ImportService {
 		return importSummmary;
 	}
 
-	public File uploadFile(MultipartFile file, ISourceProcessor srcProcessor, ImportSessionToken authToken) throws IOException{
-		InputStream is = new ByteArrayInputStream(file.getBytes());
-		srcProcessor.setInput(is);
+	/**
+	 * 
+	 * @param name - name of file or reporting org for automate imports
+	 * @param srcProcessor - Source processor
+	 * @param authToken - authentication token
+	 * @return
+	 * @throws IOException
+	 */
+	public File logImportSession(String name, ISourceProcessor srcProcessor,
+						   ImportSessionToken authToken) throws
+			IOException{
+
 		File uploadedFile = new File();
-		//uploadedFile.setData(file.getBytes());
 		uploadedFile.setCreatedDate(new Date());
-		uploadedFile.setFileName(file.getOriginalFilename());
+		uploadedFile.setFileName(name);
 		uploadedFile.setAuthor(authToken.getAuthenticationToken());
 		uploadedFile.setSessionId(authToken.getImportTokenSessionId());
-		uploadedFile.setValid(srcProcessor.isValidInput());
+		
+		Boolean isValid = srcProcessor != null ? srcProcessor.isValidInput() : true;
+		uploadedFile.setValid(isValid);		
 		fileRepository.save(uploadedFile);
 		return uploadedFile;
 	}
-
+		
 	public void insertLog(ActionResult result, Long id) {
 		Project project = new Project();
 		File file = fileRepository.findById(id);
@@ -94,6 +105,9 @@ public class ImportService {
 		project.setTitle(result.getMessage());
 		project.setNotes(result.getOperation());
 		project.setStatus(result.getStatus());
+		project.setProjectIdentifier(result.getSourceProjectIdentifier());
+			project.setGroupingCriteria(result.getSourceGroupingCriteria());
+		project.setLastSyncedOn(new Date());
 		projectRepository.save(project);
 	}
 	
@@ -122,11 +136,14 @@ public class ImportService {
 		return processor;
 	}
 	
-	public IDestinationProcessor getDestinationProcessor(String processorName, String authenticationToken) {
+	public IDestinationProcessor getDestinationProcessor( String processorName, String authenticationToken,
+														 boolean isAutomaticProcessor) {
 		   IDestinationProcessor processor = null;		  
 			List<Workflow> workflows =  workflowService.getWorkflows();
 						
-			Optional<Workflow> optional = workflows.stream().filter(w -> w.getDestinationProcessor().getName().equals(processorName)).findFirst();
+			Optional<Workflow> optional =
+					workflows.stream().filter(w -> w.getDestinationProcessor().getName().
+							equals(processorName + (isAutomaticProcessor?("_"+processorVersion): "" ))).findFirst();
 			if(optional.isPresent()){				
 				try {						
 					Constructor<?> c = Class.forName(optional.get().getDestinationProcessor().getClassName()).getDeclaredConstructor(String.class);

@@ -1,5 +1,32 @@
 package org.devgateway.importtool.services.processor;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.devgateway.importtool.model.Language;
+import org.devgateway.importtool.services.processor.helper.ActionStatus;
+import org.devgateway.importtool.services.processor.helper.Field;
+import org.devgateway.importtool.services.processor.helper.FieldType;
+import org.devgateway.importtool.services.processor.helper.FieldValue;
+import org.devgateway.importtool.services.processor.helper.IATIProcessorHelper;
+import org.devgateway.importtool.services.processor.helper.InternalDocument;
+import org.devgateway.importtool.services.processor.helper.ProviderOganizationField;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+import org.springframework.util.DigestUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
@@ -10,59 +37,23 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.Set;
-import java.util.Locale;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.devgateway.importtool.model.Language;
-import org.devgateway.importtool.services.processor.helper.ActionStatus;
-import org.devgateway.importtool.services.processor.helper.Field;
-import org.devgateway.importtool.services.processor.helper.FieldType;
-import org.devgateway.importtool.services.processor.helper.FieldValue;
-import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
-import org.devgateway.importtool.services.processor.helper.InternalDocument;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-import org.springframework.util.DigestUtils;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 @Component("IATI1X")
 @Scope("session")
-abstract public class IATI1XProcessor  implements ISourceProcessor {
+abstract public class IATI1XProcessor extends IATIProcessor {
 
 	protected static final String ISO_DATE = "yyyy-MM-dd";
 
 	protected Log log = LogFactory.getLog(getClass());
 
-	// Global Lists for fields and the filters
-	protected List<Field> fieldList = new ArrayList<Field>();
-	protected List<Field> filterFieldList = new ArrayList<Field>();
+
 
 	// Field names on the source document that hold key information
-	protected String DEFAULT_ID_FIELD = "iati-identifier";
 	protected String DEFAULT_TITLE_FIELD = "title";
-	protected String PROCESSOR_VERSION = "";
 
 	protected String descriptiveName = "";
-	protected String defaultLanguage = "";	
-	protected String defaultCurrency = "";
-	protected String codelistPath = "";
-	protected String propertiesFile = "";
-	
+
 	protected ActionStatus actionStatus;
 
 	public ActionStatus getActionStatus() {
@@ -75,26 +66,6 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 	}
 
 
-	public String getPropertiesFile() {
-		return propertiesFile;
-	}
-
-
-	public void setPropertiesFile(String propertiesFile) {
-		this.propertiesFile = propertiesFile;
-	}
-
-	protected List<Language> filterLanguages = new ArrayList<Language>();
-	
-	// XML Document that will hold the entire imported file
-	protected Document doc;
-	
-
-	public Document getDoc() {
-		return doc;
-	}
-
-
 	public String getCodelistPath() {
 		return codelistPath;
 	}
@@ -103,41 +74,8 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 		this.codelistPath = codelistPath;
 	}
 
-	// Map that holds information about how the field names map to code lists
-	private static Map<String, String> mappingNameFile = new HashMap<String, String>();
-	static {
-		mappingNameFile.put("activity-status", "ActivityStatus");
-		mappingNameFile.put("activity-scope", "ActivityScope");
-		mappingNameFile.put("collaboration-type", "CollaborationType");
-		mappingNameFile.put("recipient-country", "Country");
-		mappingNameFile.put("recipient-region", "Region");
-		mappingNameFile.put("default-aid-type", "AidType");
-		mappingNameFile.put("default-finance-type", "FinanceType");
-		mappingNameFile.put("default-flow-type", "FlowType");
-		mappingNameFile.put("default-tied-status", "TiedStatus");
-		mappingNameFile.put("policy-marker", "PolicyMarker");
-		mappingNameFile.put("sector", "Sector");
-	}
-
 	public IATI1XProcessor(){
 		
-	}
-	
-	protected void configureDefaults(){
-		InputStream propsStream = this.getClass().getResourceAsStream(this.getPropertiesFile());
-		Properties properties = new Properties();		
-		try {
-			properties.load(propsStream);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}		
-		defaultLanguage = properties.getProperty("default_language");	
-		defaultCurrency = properties.getProperty("default_currency");	
-	}
-
-	@Override
-	public List<Field> getFields() {
-		return fieldList;
 	}
 
 	@Override
@@ -190,95 +128,93 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 		return list;
 	}
 	
-	@Override
-	public List<Language> getFilterLanguages() {
-		if(this.filterLanguages.size() == 0){
-			List<Language> listLanguages = new ArrayList<Language>();
-			this.getLanguages().stream().forEach(lang -> {
-				Locale tmp = new Locale(lang);
-				listLanguages.add(new Language(tmp.getLanguage(), tmp.getDisplayLanguage()));
-			});
-			this.setFilterLanguages(listLanguages);			
-		}
-		return this.filterLanguages;
-	}
-	@Override
-	public void setFilterLanguages(List<Language> filterLanguages) {
-		this.filterLanguages = filterLanguages;
-	}
+
 
 	@Override
 	public List<Field> getFilterFields() {
 		Document doc = this.doc;
 		if (doc == null)
-			return filterFieldList;
+			return getFilterFieldList();
+		for (Field field : getFilterFieldList()) {
+			String xPath = "//"+ field.getFieldName() + (this.isFromDatastore()?"["+
+					field.getXpathFilterCondition(this.isFromDatastore()) +
+					"ancestor::iati-activity [@*[name()='iati-extra:version']='"+ PROCESSOR_VERSION +"']]":
+					 field.getXpathFilterCondition(this.isFromDatastore()) +"");
+			NodeList nodeList = this.getNodeListFromXpath(this.doc , xPath);
 
-		// List<Field> filterFieldListReduced = new ArrayList<Field>();
-		for (Field field : filterFieldList) {
-			NodeList nodeList = doc.getElementsByTagName(field.getFieldName());
 			List<FieldValue> reducedPossibleValues = new ArrayList<FieldValue>();
-			switch (field.getType()) {
-			case ORGANIZATION:
-				if (field.getPossibleValues() == null) {
-					field.setPossibleValues(new ArrayList<FieldValue>());
-				}
-				if (nodeList.getLength() > 0) {					
-					for (int i = 0; i < nodeList.getLength(); i++) {
-						Element fieldElement = (Element) nodeList.item(i);
-						final String orgCode = fieldElement.getAttribute("value");
-						Optional<FieldValue> fieldValue = field.getPossibleValues().stream().filter(n -> {
-							return n.getCode().equals(orgCode);
-						}).findFirst();
-						if(!fieldValue.isPresent()) {
-							FieldValue newfv = new FieldValue();
-							final String name = fieldElement.getTextContent();
-							newfv.setCode(orgCode);
-							newfv.setValue(name);							
-							newfv.setIndex(field.getPossibleValues().size());
-							field.getPossibleValues().add(newfv);
+			if(nodeList != null) {
+				switch (field.getType()) {
+					case ORGANIZATION:
+						if (field.getPossibleValues() == null) {
+							field.setPossibleValues(new ArrayList<FieldValue>());
+						}
+					if (nodeList.getLength() > 0) {
+						for (int i = 0; i < nodeList.getLength(); i++) {
+							Element fieldElement = (Element) nodeList.item(i);
+							final String orgCode = fieldElement.getAttribute("value");
+							Optional<FieldValue> fieldValue = field.getPossibleValues().stream().filter(n -> {
+								return n.getCode().equals(orgCode);
+							}).findFirst();
+							if (!fieldValue.isPresent()) {
+								final String name = fieldElement.getTextContent();
+								FieldValue newfv = new FieldValue();
+								newfv.setCode(orgCode);
+								if (StringUtils.isEmpty(name)) {
+									newfv.setValue(orgCode);
+								} else {
+									newfv.setValue(name);
+								}
+									newfv.setIndex(field.getPossibleValues().size());
+									field.getPossibleValues().add(newfv);
+								}							
 						}
 					}
-				}
-				break;
-			case LOCATION:
-			case RECIPIENT_COUNTRY:
-			case LIST:
-				if (nodeList.getLength() > 0) {					
-					for (int i = 0; i < nodeList.getLength(); i++) {
-						Element fieldElement = (Element) nodeList.item(i);
-						final String codeValue = fieldElement.getAttribute("code");
-						Optional<FieldValue> fieldValue = field.getPossibleValues().stream().filter(n -> {
-							return n.getCode().equals(codeValue);
-						}).findFirst();
-						
-						if(!fieldValue.isPresent() && !codeValue.isEmpty()){
-							FieldValue newfv = new FieldValue();
-							final String name = fieldElement.getTextContent();
-							newfv.setCode(codeValue);
-							newfv.setValue(name);							
-							newfv.setIndex(field.getPossibleValues().size());
-							field.getPossibleValues().add(newfv);							
-							if (!reducedPossibleValues.stream().filter(n -> {
-								return n.getCode().equals(newfv.getCode());
-							}).findFirst().isPresent()) {
-								reducedPossibleValues.add(newfv);
+						break;
+					case LOCATION:
+					case RECIPIENT_COUNTRY:
+					case LIST:
+						if (nodeList.getLength() > 0) {
+							for (int i = 0; i < nodeList.getLength(); i++) {
+								Element fieldElement = (Element) nodeList.item(i);
+								final String codeValue = fieldElement.getAttribute("code");
+								Optional<FieldValue> fieldValue = field.getPossibleValues().stream().filter(n -> {
+									return n.getCode().equals(codeValue);
+								}).findFirst();
+
+								if (!fieldValue.isPresent() && !codeValue.isEmpty()) {
+									FieldValue newfv = new FieldValue();
+									final String name = fieldElement.getTextContent();
+									newfv.setCode(codeValue);									
+									if (StringUtils.isEmpty(name) ) {
+										newfv.setValue(codeValue);
+									} else {										
+										newfv.setValue(name);	
+									}									
+									newfv.setIndex(field.getPossibleValues().size());
+									field.getPossibleValues().add(newfv);
+									if (!reducedPossibleValues.stream().filter(n -> {
+										return n.getCode().equals(newfv.getCode());
+									}).findFirst().isPresent()) {
+										reducedPossibleValues.add(newfv);
+									}
+								}
+
+								if (fieldValue.isPresent() && !reducedPossibleValues.stream().filter(n -> {
+									return n.getCode().equals(fieldValue.get().getCode());
+								}).findFirst().isPresent()) {
+									reducedPossibleValues.add(fieldValue.get());
+								}
 							}
 						}
-						
-						if (fieldValue.isPresent() && !reducedPossibleValues.stream().filter(n -> {
-							return n.getCode().equals(fieldValue.get().getCode());
-						}).findFirst().isPresent()) {
-							reducedPossibleValues.add(fieldValue.get());
-						}
-					}
+						field.setPossibleValues(reducedPossibleValues);
+						break;
+					default:
+						break;
 				}
-				field.setPossibleValues(reducedPossibleValues);
-				break;
-			default:
-				break;
 			}
 		}
-		return filterFieldList;
+		return getFilterFieldList();
 	}
 
 	@Override
@@ -288,7 +224,7 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 
 	@Override
 	public void setFilterFields(List<Field> fields) {
-		filterFieldList = fields;
+		setFilterFieldList(fields);
 	}
 
 	// Private methods. Includes methods to get values for the different types
@@ -299,16 +235,10 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 	}
 
 	private List<FieldValue> getCodeListValues(String codeListName, Boolean concatenate) {
-		String standardFieldName = mappingNameFile.get(codeListName);
+		String standardFieldName = IATIProcessorHelper.mappingNameFile.get(codeListName);
 		List<FieldValue> possibleValues = new ArrayList<FieldValue>();
-		InputStream is = this.getClass().getResourceAsStream(this.getCodelistPath() + standardFieldName + ".xml");
-		if (is != null) {
 			try {
-				DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-				factory.setValidating(false);
-				factory.setIgnoringElementContentWhitespace(true);
-				DocumentBuilder builder = factory.newDocumentBuilder();
-				Document doc = builder.parse(is);
+                 Document doc = getDocument(this.getCodelistPath() + standardFieldName + ".xml");
 				NodeList nodeList = doc.getElementsByTagName(standardFieldName);
 				if (nodeList.getLength() == 0) {
 					nodeList = doc.getElementsByTagName("codelist-item");
@@ -325,6 +255,7 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 						String name = nameElement.getChildNodes().item(0).getNodeValue();
 
 						FieldValue fv = new FieldValue();
+
 						fv.setIndex(index++);
 						fv.setCode(code);
 						if (concatenate) {
@@ -337,77 +268,12 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 					}
 				}
 			} catch (ParserConfigurationException | SAXException | IOException e) {
-				log.error("IOException Parsing Source File: " + e);
+				log.error("IOException Parsing Source File:  " + e);
 			}
-		}
 		return possibleValues;
 	}
 
-	private NodeList getActivities() throws XPathExpressionException{		
-		XPath xPath = XPathFactory.newInstance().newXPath();
-		final StringBuilder query = new StringBuilder("/iati-activities/iati-activity[");		
-		Field countryField = this.getFields().stream().filter(f -> {
-			return f.getType().equals(FieldType.RECIPIENT_COUNTRY);
-		}).findFirst().get();
-		
-		Field countryFilters = filterFieldList.stream().filter(n -> {
-			return countryField.getFieldName().equals(n.getFieldName());
-		}).findFirst().get();
-		
-		if(countryFilters.getFilters().size() > 0){
-			String selectedCountry  = countryFilters.getFilters().get(0);
-			query.append("recipient-country[@code='"+ selectedCountry +"']");
-		}	
-		
-		
-		this.getFields().forEach(field -> {			
-			if(field.getType().equals(FieldType.LIST)){				
-				Optional<Field> optFilter = filterFieldList.stream().filter(n -> {
-					return field.getFieldName().equals(n.getFieldName());
-				}).findFirst();
-				
-				Field filter = optFilter.isPresent() ? optFilter.get() : null;
-				if(filter != null && filter.getFilters().size() > 0){		
-					if(!("/iati-activities/iati-activity[".equals(query.toString()))){					
-						query.append(" and ");	
-					}
-					//Some filters need relative paths
-					String fieldName = getFieldName(field.getFieldName());
-					query.append(fieldName + "[");
-					for (int i = 0;i < filter.getFilters().size(); i++) {
-						String value = filter.getFilters().get(i);
-						if(i > 0){
-							query.append(" or ");
-						}
-						query.append("@code='" + value + "'");
-					}					
-					query.append("]");
-				}	
-			}			
-			
-		});		
-		
-		if(!("/iati-activities/iati-activity[".equals(query.toString()))){					
-			query.append("]");	
-		}else{
-			query.setLength(query.length() - 1);
-		}
-		
-		NodeList activities = (NodeList)xPath.compile(query.toString()).evaluate(this.getDoc(), XPathConstants.NODESET);
-		return activities;
-	}
-
-	private String getFieldName(String fieldName) {
-		String name = fieldName;
-		switch(fieldName) {
-		case "sector":
-			name = "//sector";
-			break;
-		}
-		return name;
-	}
-	
-	private List<InternalDocument> extractDocuments(Document doc) throws Exception {		
+    private List<InternalDocument> extractDocuments(Document doc) throws Exception {		
 		// Extract global values		
 		XPath xPath = XPathFactory.newInstance().newXPath();		
 		NodeList nodeList = getActivities();
@@ -418,26 +284,41 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 			actionStatus.incrementProcessed();
 			InternalDocument document = new InternalDocument();
 			Element element = (Element) nodeList.item(i);
-			String currency = !("".equals(element.getAttribute("default-currency"))) ? element.getAttribute("default-currency") : this.defaultCurrency;			
+			String currency = !("".equals(element.getAttribute("default-currency"))) ? element.getAttribute
+					("default-currency") : this.getDefaultCurrency();
 			document.addStringField("default-currency", currency);	
-			String defaultLanguageCode = !("".equals(element.getAttribute("xml:lang"))) ? element.getAttribute("xml:lang") : this.defaultLanguage;
+			String defaultLanguageCode = !("".equals(element.getAttribute("xml:lang"))) ? element.getAttribute
+					("xml:lang") : this.getDefaultLanguage();
 			
 			
 			NodeList fieldNodeList;			
 			for (Field field : getFields()) {
 				switch (field.getType()) {
 				case LOCATION:
-					fieldNodeList = element.getElementsByTagName(field.getFieldName());
+					NodeList locations  = (NodeList) xPath.evaluate(field.getFieldName(), element, XPathConstants.NODESET);					
 					List <String> codesLocation = new ArrayList<String>(); 
-					for (int j = 0; j < fieldNodeList.getLength(); j++) {
-						Element fieldElement = (Element) fieldNodeList.item(j);
-						String code = "code";							
-						if(!code.isEmpty()) {
-							codesLocation.add(code);
+					for (int j = 0; j < locations.getLength(); j++) {
+						Element fieldElement = (Element) locations.item(j);
+						String name = null;
+						
+						
+						if(fieldElement.getElementsByTagName("name").item(0) != null && fieldElement.getElementsByTagName("name").item(0).getChildNodes().item(0) != null){
+							name = fieldElement.getElementsByTagName("name").item(0).getChildNodes().item(0).getNodeValue();
+						}
+						
+						if (StringUtils.isBlank(name)) {
+							if(fieldElement.getElementsByTagName("description").item(0) != null && fieldElement.getElementsByTagName("description").item(0).getChildNodes().item(0) != null){
+								name = fieldElement.getElementsByTagName("description").item(0).getChildNodes().item(0).getNodeValue();
+							}							
+						}
+						
+					    		
+					    if (!StringUtils.isBlank(name)) {
+							codesLocation.add(name);
 							FieldValue fv = new FieldValue();
-							if(code != null && !code.isEmpty() ){
-								fv.setCode(code);
-								fv.setValue(code);	
+							if(name != null && !name.isEmpty() ){
+								fv.setCode(name);
+								fv.setValue(name);	
 								fv.setSelected(true);
 							}
 							int index = field.getPossibleValues() == null ? 0 : field.getPossibleValues().size();
@@ -445,7 +326,7 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 							if (field.getPossibleValues() == null) {
 								field.setPossibleValues(new ArrayList<FieldValue>());
 							}
-							if(!field.getPossibleValues().stream().anyMatch(n->{ return n.getCode().equals(code);})) {									
+							if(!field.getPossibleValues().stream().anyMatch(n->{ return n.getCode().equals(fv.getValue());})) {									
 								field.getPossibleValues().add(fv);
 							}
 						}				
@@ -456,54 +337,19 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 					}
 					break;
 				case LIST:
-					if (field.isMultiple()) {
-						fieldNodeList = element.getElementsByTagName(field.getFieldName());						
-						List <String> codes = new ArrayList<String>(); 
-						for (int j = 0; j < fieldNodeList.getLength(); j++) {
-							Element fieldElement = (Element) fieldNodeList.item(j);
-							String code = fieldElement.getAttribute("code");								
-							if(!code.isEmpty()){
-								codes.add(code);
-								Optional<FieldValue> foundfv = field.getPossibleValues().stream().filter( n -> {return n.getCode().equals(code);}).findFirst();
-								FieldValue fv  = foundfv.isPresent() ? foundfv.get() : null;
-								if(fv != null && fv.isSelected() != true){
-									fv.setSelected(true);
-								}
-							}				
-						}
-						if(!codes.isEmpty()){
-							String[] codeValues = codes.stream().toArray(String[]::new);						
-							document.addStringMultiField(field.getFieldName(), codeValues);
-						}
-					} else {						
-						fieldNodeList = element.getElementsByTagName(field.getFieldName());
-						if (fieldNodeList.getLength() > 0 && fieldNodeList.getLength() == 1) {							
-							Element fieldElement = (Element) fieldNodeList.item(0);
-							String codeValue = fieldElement.getAttribute("code");							
-							if(!codeValue.isEmpty()){
-								Optional<FieldValue> foundfv = field.getPossibleValues().stream().filter( n -> {
-									return n.getCode().equals(codeValue);
-								}).findFirst();
-								FieldValue fv  = foundfv.isPresent() ? foundfv.get() : null;
-								if(fv != null && fv.isSelected() != true){
-									fv.setSelected(true);
-								}
-								document.addStringField(field.getFieldName(), codeValue);
-							}														
-						}						
-					}					
+					IATIProcessorHelper.processListElementType(document, element, field);
 					break;
-				case RECIPIENT_COUNTRY:	
-					Field filtersField = filterFieldList.stream().filter(n -> {
+				case RECIPIENT_COUNTRY:
+					Field filtersField = getFilterFieldList().stream().filter(n -> {
 						return field.getFieldName().equals(n.getFieldName());
 					}).findFirst().get();
-					
-					fieldNodeList = element.getElementsByTagName(field.getFieldName());					
+
+					fieldNodeList = element.getElementsByTagName(field.getFieldName());
 					List<FieldValue> recipients = new ArrayList<FieldValue>();
 					for (int j = 0; j < fieldNodeList.getLength(); j++) {
 						Element fieldElement = (Element) fieldNodeList.item(j);
-						FieldValue recipient = new FieldValue();	
-						String code = fieldElement.getAttribute("code");	
+						FieldValue recipient = new FieldValue();
+						String code = fieldElement.getAttribute("code");
 						boolean includeCountry = includedByFilter(filtersField.getFilters(), code);
 						if(includeCountry){
 							recipient.setCode(code);
@@ -511,24 +357,14 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 							if(fieldValue.isPresent()){
 								recipient.setValue(fieldValue.get().getValue());
 							}
-							recipient.setPercentage(fieldElement.getAttribute("percentage"));	
+							recipient.setPercentage(fieldElement.getAttribute("percentage"));
 							recipients.add(recipient);
 						}
-					}					
-					document.addRecepientCountryFields(field.getFieldName(), recipients);					
+					}
+					document.addRecepientCountryFields(field.getFieldName(), recipients);
 					break;
 				case STRING:
-					String stringValue = "";
-					fieldNodeList = element.getElementsByTagName(field.getFieldName());
-					if (fieldNodeList.getLength() > 0 && fieldNodeList.getLength() == 1) {
-						Element fieldElement = (Element) fieldNodeList.item(0);
-						if (fieldElement.getChildNodes().getLength() == 1) {
-							stringValue = fieldElement.getChildNodes().item(0).getNodeValue();
-						} else {
-							stringValue = "";
-						}
-					}					
-					document.addStringField(field.getFieldName(), stringValue);
+					IATIProcessorHelper.processStringElementType(document, element, field);
 					break;
 				case ORGANIZATION:
 					fieldNodeList = element.getElementsByTagName(field.getFieldName());
@@ -605,7 +441,10 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 				case TRANSACTION:
 					try {
 						NodeList nodes;
-						nodes = (NodeList) xPath.evaluate("transaction/transaction-type[@code='" + field.getSubType() + "' or @code= '" + field.getSubTypeCode() + "']/parent::*", element, XPathConstants.NODESET);
+
+						nodes = (NodeList) xPath.evaluate("(transaction/value/parent::*)/transaction-type[@code='"+
+								field.getSubType() +"' or @code= '"+ field.getSubTypeCode() +"']/parent::*",element,
+								XPathConstants.NODESET);
 						for (int j = 0; j < nodes.getLength(); ++j) {
 							String reference = "";
 							
@@ -639,7 +478,7 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 							final String providerRef = (providerNode != null) ? providerNode.getAttribute("ref") : "";
 
 							// Get the field for provider org
-							Optional<Field> fieldValue = filterFieldList.stream().filter(n -> {
+							Optional<Field> fieldValue = getFilterFieldList().stream().filter(n -> {
 								return "provider-org".equals(n.getFieldName());
 							}).findFirst();
 
@@ -657,6 +496,11 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 									// transaction
 									continue;
 								}
+							}
+							
+							if (StringUtils.isBlank(providingOrganization)) {
+								//if we don't have provider organization we should ingore the transaction
+								continue;
 							}
 
 							Map<String, String> transactionFields = new HashMap<String, String>();
@@ -678,11 +522,11 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 				case DATE:
 					try {
 						NodeList nodes;
-						nodes = (NodeList) xPath.evaluate("//activity-date[@type='" + field.getSubType() + "']", element, XPathConstants.NODESET);
+						nodes = (NodeList) xPath.evaluate("activity-date[@type='" + field.getSubType() + "']", element, XPathConstants.NODESET);
 						for (int j = 0; j < nodes.getLength(); ++j) {
 							Element e = (Element) nodes.item(j);
 							String localDate = e.getAttribute("iso-date");
-							String format = "yyyy-MM-dd";
+							String format = "yyyy-MM-dd";						 							
 							SimpleDateFormat sdf = new SimpleDateFormat(format);
 							if(localDate != null && !localDate.isEmpty()){
 								document.addDateField(field.getUniqueFieldName(), sdf.parse(localDate));
@@ -727,7 +571,7 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 		}		
 		return list;
 	}
-	
+
 	private Boolean includedByFilter(List<String> filters, String codeValue) {
 		if (filters.size() == 0)
 			return true;
@@ -771,142 +615,150 @@ abstract public class IATI1XProcessor  implements ISourceProcessor {
 
 	protected void instantiateStaticFields() {
 		// Text fields
-		fieldList.add(new Field("IATI Identifier", "iati-identifier", FieldType.STRING, false));
-		fieldList.add(new Field("Title", "title", FieldType.MULTILANG_STRING, false));
-		fieldList.add(new Field("Description", "description", FieldType.MULTILANG_STRING, true));
-		//fieldList.add(new Field("Currency", "default-currency", FieldType.STRING, false));
+		getFields().add(new Field("IATI Identifier", "iati-identifier", FieldType.STRING,
+                false, getTranslationForField("iati-identifier")));
+		getFields().add(new Field("Title", "title", FieldType.MULTILANG_STRING, false,
+                getTranslationForField("title")));
+		getFields().add(new Field("Description", "description", FieldType.MULTILANG_STRING,
+                true, getTranslationForField("description ")));
+		//getFields().add(new Field("Currency", "default-currency", FieldType.STRING, false));
 
 		// Code Lists
-		Field activityStatus = new Field("Activity Status", "activity-status", FieldType.LIST, true);
+		Field activityStatus = new Field("Activity Status", "activity-status", FieldType.LIST,
+                true, getTranslationForField("activity-status"));
 		activityStatus.setPossibleValues(getCodeListValues("activity-status"));
-		fieldList.add(activityStatus);
-		filterFieldList.add(activityStatus);
+		getFields().add(activityStatus);
+		getFilterFieldList().add(activityStatus);
 
-		Field activityScope = new Field("Activity Scope", "activity-scope", FieldType.LIST, true);
+		Field activityScope = new Field("Activity Scope", "activity-scope", FieldType.LIST,
+                true, getTranslationForField("activity-scope"));
 		activityScope.setPossibleValues(getCodeListValues("activity-scope"));
-		fieldList.add(activityScope);
-		filterFieldList.add(activityScope);
+		getFields().add(activityScope);
+		getFilterFieldList().add(activityScope);
 
-		Field aidType = new Field("Aid Type", "default-aid-type", FieldType.LIST, true);
+		Field aidType = new Field("Aid Type", "default-aid-type", FieldType.LIST, true,
+                getTranslationForField("default-aid-type"));
 		aidType.setPossibleValues(getCodeListValues("default-aid-type"));
-		fieldList.add(aidType);
-		filterFieldList.add(aidType);
+		getFields().add(aidType);
+		getFilterFieldList().add(aidType);
 
-		Field financeType = new Field("Finance Type", "default-finance-type", FieldType.LIST, true);
+		Field financeType = new Field("Finance Type", "default-finance-type", FieldType.LIST,
+                true,getTranslationForField("default-finance-type"));
 		financeType.setPossibleValues(getCodeListValues("default-finance-type"));
-		fieldList.add(financeType);
-		filterFieldList.add(financeType);
+		getFields().add(financeType);
+		getFilterFieldList().add(financeType);
 
-		Field flowType = new Field("Flow Type", "default-flow-type", FieldType.LIST, true);
+		Field flowType = new Field("Flow Type", "default-flow-type", FieldType.LIST,
+                true, getTranslationForField("default-flow-type"));
 		flowType.setPossibleValues(getCodeListValues("default-flow-type"));
-		fieldList.add(flowType);
-		filterFieldList.add(flowType);
+		getFields().add(flowType);
+		getFilterFieldList().add(flowType);
 
-		Field tiedStatus = new Field("Tied Status", "default-tied-status", FieldType.LIST, true);
+		Field tiedStatus = new Field("Tied Status", "default-tied-status", FieldType.LIST,
+                true, getTranslationForField("default-tied-status"));
 		tiedStatus.setPossibleValues(getCodeListValues("default-tied-status"));
-		fieldList.add(tiedStatus);
-		filterFieldList.add(tiedStatus);
+		getFields().add(tiedStatus);
+		getFilterFieldList().add(tiedStatus);
 
-		Field policyMarker = new Field("PolicyMarker", "policy-marker", FieldType.LIST, true);
+
+		Field policyMarker = new Field("PolicyMarker", "policy-marker", FieldType.LIST,
+                true, this.getTranslationForField("policy-marker"));
 		policyMarker.setPossibleValues(getCodeListValues("policy-marker"));
-		fieldList.add(policyMarker);
-		filterFieldList.add(policyMarker);
+		policyMarker.setMultiple(true);
+		getFields().add(policyMarker);
+		getFilterFieldList().add(policyMarker);
 
-		Field recipientCountry = new Field("Recipient Country", "recipient-country", FieldType.RECIPIENT_COUNTRY, true);
+		Field recipientCountry = new Field("Recipient Country", "recipient-country",
+                FieldType.RECIPIENT_COUNTRY, true, getTranslationForField("recipient-country"));
 		recipientCountry.setPossibleValues(getCodeListValues("recipient-country"));
 		recipientCountry.setExclusive(true);
 		recipientCountry.setFilterRequired(true);
-		fieldList.add(recipientCountry);
-		filterFieldList.add(recipientCountry);
+		getFields().add(recipientCountry);
+		getFilterFieldList().add(recipientCountry);
 
-		Field sector = new Field("Sector", "sector", FieldType.LIST, true);
+		Field sector = new Field("Sector", "sector", FieldType.LIST, true,
+                getTranslationForField("sector") );
 		sector.setPossibleValues(getCodeListValues("sector"));
 		sector.setMultiple(true);
 		sector.setPercentage(true);
-		fieldList.add(sector);
-		filterFieldList.add(sector);
+		getFields().add(sector);
+		getFilterFieldList().add(sector);
 
-		Field location = new Field("Location", "location", FieldType.LOCATION, true);
+		Field location = new Field("Location", "location", FieldType.LOCATION, true,
+                getTranslationForField("location"));
 		location.setPossibleValues(new ArrayList<FieldValue>());
 		location.setMultiple(true);
 		location.setPercentage(true);
-		fieldList.add(location);
+		getFields().add(location);
 
 		// Dates
-		Field activityDateStartPlanned = new Field("Activity Date Start Planned", "activity-date", FieldType.DATE, true);
+		Field activityDateStartPlanned = new Field("Activity Date Start Planned", "activity-date",
+                FieldType.DATE, true, getTranslationForField("activity-date"));
 		activityDateStartPlanned.setSubType("start-planned");
-		fieldList.add(activityDateStartPlanned);
+		getFields().add(activityDateStartPlanned);
 
-		Field activityDateEndPlanned = new Field("Activity Date End Planned", "activity-date", FieldType.DATE, true);
-		fieldList.add(activityDateEndPlanned);
+		Field activityDateEndPlanned = new Field("Activity Date End Planned", "activity-date",
+                FieldType.DATE, true, getTranslationForField("activity-date"));
+		getFields().add(activityDateEndPlanned);
 		activityDateEndPlanned.setSubType("end-planned");
 
-		Field activityDateStartActual = new Field("Activity Date Start Actual", "activity-date", FieldType.DATE, true);
+		Field activityDateStartActual = new Field("Activity Date Start Actual", "activity-date",
+                FieldType.DATE, true ,getTranslationForField("activity-date"));
 		activityDateStartActual.setSubType("start-actual");
-		fieldList.add(activityDateStartActual);
+		getFields().add(activityDateStartActual);
 
-		Field activityDateEndActual = new Field("Activity Date End Actual", "activity-date", FieldType.DATE, true);
-		fieldList.add(activityDateEndActual);
+		Field activityDateEndActual = new Field("Activity Date End Actual", "activity-date",
+                FieldType.DATE, true, getTranslationForField("activity-date"));
+		getFields().add(activityDateEndActual);
 		activityDateEndActual.setSubType("end-actual");
 
 		// Transaction Fields
-		Field commitments = new Field("Commitments", "transaction", FieldType.TRANSACTION, true);
+		Field commitments = new Field("Commitments", "transaction", FieldType.TRANSACTION,
+                true, getTranslationForField("transaction"));
 		commitments.setSubType("C");
 		commitments.setSubTypeCode("2");
-		fieldList.add(commitments);
+		getFields().add(commitments);
 
-		Field disbursements = new Field("Disbursements", "transaction", FieldType.TRANSACTION, true);
+		Field disbursements = new Field("Disbursements", "transaction", FieldType.TRANSACTION,
+                true, getTranslationForField("transaction"));
 		disbursements.setSubType("D");
 		disbursements.setSubTypeCode("3");
-		fieldList.add(disbursements);
+		getFields().add(disbursements);
 
 		// Organization Fields
-		Field participatingOrg = new Field("Funding Organization", "participating-org", FieldType.ORGANIZATION, true);
+		Field participatingOrg = new Field("Funding Organization", "participating-org",
+                FieldType.ORGANIZATION,true, getTranslationForField("participating-org"));
 		participatingOrg.setSubType("Funding");
-		fieldList.add(participatingOrg);
+		getFields().add(participatingOrg);
 		
-		Field accountableOrg = new Field("Accountable Organization", "participating-org", FieldType.ORGANIZATION, true);
+		Field accountableOrg = new Field("Accountable Organization", "participating-org",
+                FieldType.ORGANIZATION, true ,getTranslationForField("participating-org"));
 		accountableOrg.setSubType("Accountable");
-		fieldList.add(accountableOrg);
+		getFields().add(accountableOrg);
 
-		Field extendingOrg = new Field("Extending Organization", "participating-org", FieldType.ORGANIZATION, true);
+		Field extendingOrg = new Field("Extending Organization", "participating-org",
+                FieldType.ORGANIZATION, true, getTranslationForField("participating-org"));
 		extendingOrg.setSubType("Extending");
-		fieldList.add(extendingOrg);
+		getFields().add(extendingOrg);
 
-		Field implementingOrg = new Field("Implementing Organization", "participating-org", FieldType.ORGANIZATION, true);
+		Field implementingOrg = new Field("Implementing Organization", "participating-org",
+                FieldType.ORGANIZATION, true, getTranslationForField("participating-org"));
 		implementingOrg.setSubType("Implementing");
-		fieldList.add(implementingOrg);
+		getFields().add(implementingOrg);
 		
 		// Provider Organization, within Transactions
-		Field providerOrg = new Field("Provider Organization", "provider-org", FieldType.ORGANIZATION, false);
+		Field providerOrg = new ProviderOganizationField("Provider Organization", "provider-org",
+                FieldType.ORGANIZATION, false, getTranslationForField("provider-org"));
 		providerOrg.setSubType("Provider");
-		fieldList.add(providerOrg);
-		filterFieldList.add(providerOrg);
+		getFields().add(providerOrg);
+		getFilterFieldList().add(providerOrg);
 
 		//Contact Info
-		Field contact = new Field("Contact Info", "contact-info", FieldType.CONTACT, false);
+		Field contact = new Field("Contact Info", "contact-info", FieldType.CONTACT,
+                false,getTranslationForField("contact-info"));
 		contact.setMultiple(true);
-		fieldList.add(contact);
-	}
+		getFields().add(contact);
 
-	@Override
-	public Boolean isValidInput() {
-		NodeList nodeList = doc.getElementsByTagName("iati-activities");
-		try {
-			for (int i = 0; i < nodeList.getLength(); i++) {
-				Node version = nodeList.item(i).getAttributes().getNamedItem("version");
-				if (version == null)
-					continue;
-				String ver = version.getNodeValue();
-				if (ver.equalsIgnoreCase(PROCESSOR_VERSION)) {
-					return true;
-				}
-			}
-		} catch (Exception e) {
-			log.error("Error validating IATI " + PROCESSOR_VERSION + " file");
-		}
-
-		return false;
 	}
 
 	public boolean isValidDate(String dateString) {

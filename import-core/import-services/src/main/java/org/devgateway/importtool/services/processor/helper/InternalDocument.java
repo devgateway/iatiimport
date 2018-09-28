@@ -7,6 +7,7 @@ import java.util.Map;
 
 public class InternalDocument {
 	private String identifier = "";
+	private String grouping = "";
 	private Map<String, String> stringFields = new HashMap<String, String>();
 	private Map<String, String[]> stringMultiFields = new HashMap<String, String[]>();
 	private Map<String, Map<String, String>> multilangFields = new HashMap<String, Map<String, String>>();
@@ -147,5 +148,12 @@ public class InternalDocument {
 	public void addRecepientCountryFields(String fieldName, List<FieldValue> value) {
 		this.getRecepientCountryFields().put(fieldName, value);
 	}
-	
+
+	public String getGrouping() {
+		return grouping;
+	}
+
+	public void setGrouping(String grouping) {
+		this.grouping = grouping;
+	}
 }
