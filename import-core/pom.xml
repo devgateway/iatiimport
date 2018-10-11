@@ -5,7 +5,7 @@
 	<artifactId>importtool</artifactId>
 	<name>IMPORT TOOL Parent Package</name>
 	<url>http://maven.apache.org</url>
-	<version>1.0</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<version>1.2.2.RELEASE</version>
