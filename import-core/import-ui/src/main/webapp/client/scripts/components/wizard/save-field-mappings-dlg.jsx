@@ -1,5 +1,7 @@
 var React = require('react');
 var formActions = require('./../../actions/form');
+var _ = require('lodash/dist/lodash.underscore');
+
 var SaveMappingsDialog = React.createClass({
     getInitialState: function() {
        return {
@@ -18,7 +20,11 @@ var SaveMappingsDialog = React.createClass({
        mappingId = this.props.mappingInfo ? this.props.mappingInfo.id : null;
      }
 
-     formActions.saveFieldMappingsTemplate({fieldMapping:this.props.mappingFieldsData, name:this.state.name, id: mappingId }).then(function(data) {
+     var mapped = _.filter(this.props.mappingFieldsData, function(m) {
+            return m.destinationField;
+     });
+     
+     formActions.saveFieldMappingsTemplate({fieldMapping: mapped, name:this.state.name, id: mappingId }).then(function(data) {
         if(data.error){
            this.displayError(this.props.i18nLib.t('wizard.save_field_mappings_dlg.'+ data.error));
         }else{
