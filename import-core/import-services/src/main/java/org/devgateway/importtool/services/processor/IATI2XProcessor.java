@@ -500,6 +500,13 @@ public class IATI2XProcessor extends IATIProcessor {
 							final String receivingOrganization = extractNarrative(e, "receiver-org");
 							Element providerNode = e.getElementsByTagName("provider-org").item(0) != null
 									? (Element) e.getElementsByTagName("provider-org").item(0) : null;
+							
+                            // if no provider tag, use reporting org
+                            if (providerNode == null) {
+                                providerNode = element.getElementsByTagName("reporting-org").item(0) != null
+                                        ? (Element) element.getElementsByTagName("reporting-org").item(0)
+                                        : null;
+                            }
 
 							final String providingOrganization = (providerNode != null
 									&& providerNode.getElementsByTagName("narrative").item(0) != null)
@@ -527,7 +534,11 @@ public class IATI2XProcessor extends IATIProcessor {
 									continue;
 								}
 							}
-							// Receiving Org
+							
+							if (StringUtils.isBlank(providingOrganization)) {
+                                //if we don't have provider organization we should ingore the transaction
+                                continue;
+                            }
 
 							Map<String, String> transactionFields = new HashMap<String, String>();
 							transactionFields.put("date", localDate);
