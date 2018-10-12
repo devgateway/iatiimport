@@ -1063,17 +1063,20 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		List<FieldValue> sourcePossibleValues = mapping.getSourceField().getPossibleValues();
 		String[] stringValues = (String[]) value;
 
-		for (int i = 0; i < stringValues.length; i++) {
-			final int stringValueIndex = i;
-			Optional<FieldValue> optSourceValueIndex = sourcePossibleValues.stream().filter(n -> {
-				return n.getCode().equals(stringValues[stringValueIndex]);
-			}).findAny();
-			Integer sourceValueIndex = optSourceValueIndex.get().getIndex();
-			Integer destinationValueIndex = valueMapIndex.get(sourceValueIndex);
-			List<FieldValue> destinationPossibleValues = mapping.getDestinationField().getPossibleValues();
-			FieldValue destinationValue = destinationPossibleValues.get(destinationValueIndex);
-			return destinationValue.getProperties();
+		if (stringValues != null) {
+		    for (int i = 0; i < stringValues.length; i++) {
+	            final int stringValueIndex = i;
+	            Optional<FieldValue> optSourceValueIndex = sourcePossibleValues.stream().filter(n -> {
+	                return n.getCode().equals(stringValues[stringValueIndex]);
+	            }).findAny();
+	            Integer sourceValueIndex = optSourceValueIndex.get().getIndex();
+	            Integer destinationValueIndex = valueMapIndex.get(sourceValueIndex);
+	            List<FieldValue> destinationPossibleValues = mapping.getDestinationField().getPossibleValues();
+	            FieldValue destinationValue = destinationPossibleValues.get(destinationValueIndex);
+	            return destinationValue.getProperties();
+	        } 
 		}
+		
 		return null;
 	}
 
