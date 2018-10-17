@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
@@ -80,6 +81,7 @@ class ValueMappingTemplateController {
 	@RequestMapping(method = RequestMethod.GET, value = "/{id}")
 	public ResponseEntity<ValueMappingTemplateReponse> findById(@PathVariable Long id, HttpServletRequest request) {
 		ObjectMapper mapper = new ObjectMapper();
+		mapper.configure(Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
 		ValueMappingTemplate  valueMappingTemplate = valueMappingTemplateRepository.findById(id);		
 		ValueMappingTemplateReponse valueMappingTemplateReponse = new ValueMappingTemplateReponse();
 	    try{
