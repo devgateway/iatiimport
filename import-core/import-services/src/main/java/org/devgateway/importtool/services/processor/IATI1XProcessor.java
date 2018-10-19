@@ -471,12 +471,20 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 
 							Element providerNode = e.getElementsByTagName("provider-org").item(0) != null
 									? (Element) e.getElementsByTagName("provider-org").item(0) : null;
+							
+							//if no provider tag, use reporting org		
+                            if (providerNode == null) {
+                                providerNode = element.getElementsByTagName("reporting-org").item(0) != null
+                                        ? (Element) element.getElementsByTagName("reporting-org").item(0)
+                                        : null;
+                            }
 
 							final String providingOrganization = (providerNode != null
 									&& providerNode.getChildNodes().getLength() > 0)
 											? providerNode.getChildNodes().item(0).getNodeValue() : "";
 							final String providerRef = (providerNode != null) ? providerNode.getAttribute("ref") : "";
-
+							
+							
 							// Get the field for provider org
 							Optional<Field> fieldValue = getFilterFieldList().stream().filter(n -> {
 								return "provider-org".equals(n.getFieldName());
