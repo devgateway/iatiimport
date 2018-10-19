@@ -84,28 +84,23 @@ class ImportController  {
 	@RequestMapping(method = RequestMethod.GET, value = "/new/{sourceProcessorName}/{destinationProcessorName}/{authenticationToken}/{userName}")
 	ResponseEntity<ImportSessionToken> initiateImport(@PathVariable String sourceProcessorName, @PathVariable String destinationProcessorName, @PathVariable String authenticationToken, @PathVariable String userName,
 			HttpServletRequest request) {
-		boolean isAutomaticProcessor = false;
-		if(request.getSession().getAttribute(IATI_STORE_ACTIVITIES) != null) {
-			isAutomaticProcessor = true;
-		}
 		log.debug("Initialized import");
 		request.getSession().removeAttribute(SOURCE_PROCESSOR);
 		request.getSession().removeAttribute(DESTINATION_PROCESSOR);
 		request.getSession().removeAttribute(SESSION_TOKEN);
 		request.getSession().removeAttribute(DOCUMENT_MAPPER);
 		ISourceProcessor srcProcessor = importService.getSourceProcessor(sourceProcessorName);
-		IDestinationProcessor destProcessor = importService.getDestinationProcessor(destinationProcessorName,
-				authenticationToken, isAutomaticProcessor);
+		IDestinationProcessor destProcessor = importService.getDestinationProcessor(destinationProcessorName, authenticationToken);
 		request.getSession().setAttribute(DESTINATION_PROCESSOR, destProcessor);
 		ImportSessionToken importSessionToken = new ImportSessionToken(authenticationToken, userName, new Date(), srcProcessor.getDescriptiveName(), destProcessor.getDescriptiveName());
 		request.getSession().setAttribute(SESSION_TOKEN, importSessionToken);
-
-		if(isAutomaticProcessor) {
-			FetchResult fr = (FetchResult) request.getSession().getAttribute(IATI_STORE_ACTIVITIES);
-			srcProcessor.setFromDataStore(true);
-			srcProcessor.setInput(fr.getActivities());
-			logAutomatedImport(request, srcProcessor);
-		}
+		if(request.getSession().getAttribute(IATI_STORE_ACTIVITIES) != null) {
+            FetchResult fr = (FetchResult)
+                    request.getSession().getAttribute(IATI_STORE_ACTIVITIES);
+            srcProcessor.setFromDataStore(true);
+            srcProcessor.setInput(fr.getActivities());
+            logAutomatedImport(request, srcProcessor);          
+        }
 		request.getSession().setAttribute(SOURCE_PROCESSOR, srcProcessor);
 			return new ResponseEntity<>(importSessionToken, HttpStatus.OK);
 	}
