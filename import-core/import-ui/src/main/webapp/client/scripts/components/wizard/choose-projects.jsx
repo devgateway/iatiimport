@@ -54,6 +54,14 @@ var ChooseProjects = React.createClass({
      this.loadProjects();
       var id;
       this.props.eventHandlers.showLoadingIcon();
+      
+      appActions.loadSourceFieldsData.triggerPromise().then(function(data) {
+        this.updateSourceFields(data);
+      }.bind(this))["catch"](function(err) {
+        this.props.eventHandlers.displayError(this.props.i18nLib.t('wizard.map_fields.msg_error_retrieving_source_fields'));
+      }.bind(this));
+
+
       this.initializeMapping();
       var self = this;
       id = setInterval(function(){
@@ -329,7 +337,7 @@ var ChooseProjects = React.createClass({
                       <div className="panel-heading">{this.props.i18nLib.t('wizard.choose_projects.new_projects')} <i>({newProjects.length } {this.props.i18nLib.t('wizard.choose_projects.choose_projects')})</i></div>
                         <div className="panel-body">
                          <SimilarProjectsDialog projectMapping={this.state.projectMapping} getTitle={this.getTitle} mapProject={this.mapProject} {...this.props} />
-                         {this.state.showSourceProjectPreview && this.state.projectMapping &&
+                         {this.state.showSourceProjectPreview && this.state.projectMapping && this.state.sourceFieldsData.length > 0  &&
                             <ProjectPreview closeProjectPreview={this.closeProjectPreview.bind(this)} project={this.state.projectMapping.sourceDocument} i18nLib = {this.props.i18nLib} sourceFieldsData = {this.state.sourceFieldsData} /> 
                          } 
                          <table className="table">
