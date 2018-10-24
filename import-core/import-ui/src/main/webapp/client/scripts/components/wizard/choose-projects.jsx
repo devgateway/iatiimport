@@ -54,14 +54,12 @@ var ChooseProjects = React.createClass({
      this.loadProjects();
       var id;
       this.props.eventHandlers.showLoadingIcon();
-      
       appActions.loadSourceFieldsData.triggerPromise().then(function(data) {
-        this.updateSourceFields(data);
+          this.updateSourceFields(data);          
       }.bind(this))["catch"](function(err) {
-        this.props.eventHandlers.displayError(this.props.i18nLib.t('wizard.map_fields.msg_error_retrieving_source_fields'));
+          this.props.eventHandlers.displayError(this.props.i18nLib.t('wizard.map_fields.msg_error_retrieving_source_fields'));
       }.bind(this));
-
-
+      
       this.initializeMapping();
       var self = this;
       id = setInterval(function(){

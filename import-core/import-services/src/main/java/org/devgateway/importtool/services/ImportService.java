@@ -40,6 +40,7 @@ public class ImportService {
 
 	@Autowired
 	private WorkflowService workflowService;
+
 	@Value("${AMPStaticProcessor.processor_version}")
 	private String processorVersion;
 
@@ -136,24 +137,24 @@ public class ImportService {
 		return processor;
 	}
 	
-	public IDestinationProcessor getDestinationProcessor( String processorName, String authenticationToken,
-														 boolean isAutomaticProcessor) {
-		   IDestinationProcessor processor = null;		  
-			List<Workflow> workflows =  workflowService.getWorkflows();
-						
-			Optional<Workflow> optional =
-					workflows.stream().filter(w -> w.getDestinationProcessor().getName().
-							equals(processorName + (isAutomaticProcessor?("_"+processorVersion): "" ))).findFirst();
-			if(optional.isPresent()){				
-				try {						
-					Constructor<?> c = Class.forName(optional.get().getDestinationProcessor().getClassName()).getDeclaredConstructor(String.class);
-					c.setAccessible(true);
-					processor = (IDestinationProcessor)c.newInstance(new Object[] {authenticationToken});
-				} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException e) {
-					e.printStackTrace();
-					log.error("Error loading destination processor class: " + optional.get().getDestinationProcessor().getClassName() + " " + e);
-				}
-			}			
+	public IDestinationProcessor getDestinationProcessor(String processorName, String authenticationToken) {
+		IDestinationProcessor processor = null;
+		List<Workflow> workflows = workflowService.getWorkflows();
+
+		Optional<Workflow> optional = workflows.stream().filter(w -> w.getDestinationProcessor().
+				getName().equals(processorName)).findFirst();
+
+		if (optional.isPresent()) {
+			try {
+				Constructor<?> c = Class.forName(optional.get().getDestinationProcessor().getClassName()).getDeclaredConstructor(String.class);
+				c.setAccessible(true);
+				processor = (IDestinationProcessor) c.newInstance(new Object[]{authenticationToken});
+				processor.setProcessorVersion(processorVersion);
+			} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException e) {
+				e.printStackTrace();
+				log.error("Error loading destination processor class: " + optional.get().getDestinationProcessor().getClassName() + " " + e);
+			}
+		}
 		return processor;
 	}
 	
