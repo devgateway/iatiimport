@@ -610,7 +610,7 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 				Node langAttr = elementsByTagName.item(i).getAttributes().getNamedItem("xml:lang");
 				if (langAttr == null)
 					continue;
-				String lang = langAttr.getNodeValue();
+				String lang = langAttr.getNodeValue().trim().toLowerCase();
 				if (!list.contains(lang)) {
 					list.add(lang);
 				}
