@@ -1,0 +1,33 @@
+version: '2'
+services:
+  web:
+    restart: unless-stopped
+    image: phosphorus:5000/iati-importer-ui:$IATI_IMPORTER_TAG
+    container_name: $AMP_HOST-iati-importer-ui
+    depends_on:
+    - db
+    labels:
+      - "traefik.frontend.rule=Host:$AMP_HOST;PathPrefix:/import/"
+      - "traefik.port=8081"
+    networks:
+    - default    # connect to default network to be able to communicate with db
+    - nginxproxy # expose IATI importer to the Traefik
+    volumes:
+    - /opt/heapdumps:/opt/heapdumps:rw
+    - importer_data:/opt/importer/data:rw
+  db:
+    restart: unless-stopped
+    image: postgres:9.4
+    container_name: $AMP_HOST-iati-importer-db
+    volumes:
+    - pg_data:/var/lib/postgresql/data:rw
+volumes:
+  importer_data:
+    driver: local
+  pg_data:
+    driver: local
+networks:
+  default:
+  nginxproxy:
+    external:
+      name: traefik_default

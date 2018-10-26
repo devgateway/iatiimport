@@ -15,6 +15,10 @@
 		<version>1.1-SNAPSHOT</version>
 	</parent>
 
+	<properties>
+		<iatiImporterTag>develop</iatiImporterTag>
+	</properties>
+
 	<dependencies>
 
 		<dependency>
@@ -69,16 +73,30 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
-			<!--
 			<plugin>
 				<groupId>com.github.eirslett</groupId>
 				<artifactId>frontend-maven-plugin</artifactId>
-				<version>0.0.23</version>
+				<version>1.6</version>
 				<executions>
+					<execution>
+						<id>install node and npm</id>
+						<goals>
+							<goal>install-node-and-npm</goal>
+						</goals>
+					</execution>
 					<execution>
 						<id>npm install</id>
 						<goals>
 							<goal>npm</goal>
+						</goals>
+						<configuration>
+							<arguments>install</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>bower install</id>
+						<goals>
+							<goal>bower</goal>
 						</goals>
 					</execution>
 					<execution>
@@ -88,8 +106,32 @@
 						</goals>
 					</execution>
 				</executions>
+				<configuration>
+					<nodeVersion>v4.7.0</nodeVersion>
+					<npmVersion>5.8.0</npmVersion>
+					<workingDirectory>src/main/webapp</workingDirectory>
+				</configuration>
 			</plugin>
-			 -->
+			<plugin>
+				<groupId>com.spotify</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+				<version>1.2.0</version>
+				<configuration>
+					<dockerDirectory>${project.basedir}/docker</dockerDirectory>
+					<imageName>phosphorus:5000/iati-importer-ui:${iatiImporterTag}</imageName>
+					<buildArgs>
+						<IMPORTER_JAR>${project.build.finalName}.jar</IMPORTER_JAR>
+					</buildArgs>
+					<rm>false</rm>
+					<resources>
+						<resource>
+							<targetPath>/</targetPath>
+							<directory>${project.build.directory}</directory>
+							<include>${project.build.finalName}.jar</include>
+						</resource>
+					</resources>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
