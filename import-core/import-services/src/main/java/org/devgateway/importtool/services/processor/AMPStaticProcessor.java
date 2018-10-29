@@ -1003,8 +1003,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	
 	private Integer getOrgIdFromList(String fieldValue, String sourceField, List<FieldMapping> fieldMappings,
             List<FieldValueMapping> valueMappings, Boolean useCode, String fieldDisplayName) throws ValueMappingException {
-        log.info(sourceField + ":" + fieldValue);
-        
+                
         Optional<FieldValueMapping> optVm = valueMappings.stream().filter(n -> {
             return n.getSourceField().getFieldName().equals(sourceField) && n.getSourceField().getDisplayName().equals(fieldDisplayName);
         }).findFirst();
@@ -1018,9 +1017,6 @@ public class AMPStaticProcessor implements IDestinationProcessor {
         }        
         
         FieldValueMapping vm = optVm.get();
-        for (FieldValue v: vm.getSourceField().getPossibleValues()) {
-          log.info(v.getCode() + ":" + v.getValue());    
-        }
         FieldValue fvs = vm.getSourceField().getPossibleValues().stream().filter(n -> {
             if (useCode) {
                 return n.getCode().equals(fieldValue);
