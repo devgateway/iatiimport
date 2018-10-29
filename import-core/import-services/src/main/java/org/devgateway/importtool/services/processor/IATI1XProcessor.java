@@ -371,7 +371,7 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 					if (fieldNodeList.getLength() > 0) {
 						for (int j = 0; j < fieldNodeList.getLength(); j++) {
 							Element fieldElement = (Element) fieldNodeList.item(j);
-							if (fieldElement.getAttribute("role").equals(field.getSubType())) {
+							if (fieldElement.getAttribute("role").equals(field.getSubType()) || fieldElement.getAttribute("role").equals(field.getSubTypeCode())) {
 								final String stringOrgValue = fieldElement.getTextContent();
 								final String ref = fieldElement.getAttribute("ref");
 								if ((stringOrgValue != null && !stringOrgValue.trim().isEmpty())
@@ -737,20 +737,24 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 		Field participatingOrg = new Field("Funding Organization", "participating-org",
                 FieldType.ORGANIZATION,true, getTranslationForField("participating-org"));
 		participatingOrg.setSubType("Funding");
+		participatingOrg.setSubTypeCode("1");
 		getFields().add(participatingOrg);
 		
 		Field accountableOrg = new Field("Accountable Organization", "participating-org",
                 FieldType.ORGANIZATION, true ,getTranslationForField("participating-org"));
+		accountableOrg.setSubTypeCode("2");
 		accountableOrg.setSubType("Accountable");
 		getFields().add(accountableOrg);
 
 		Field extendingOrg = new Field("Extending Organization", "participating-org",
                 FieldType.ORGANIZATION, true, getTranslationForField("participating-org"));
+		extendingOrg.setSubTypeCode("3");
 		extendingOrg.setSubType("Extending");
 		getFields().add(extendingOrg);
 
 		Field implementingOrg = new Field("Implementing Organization", "participating-org",
                 FieldType.ORGANIZATION, true, getTranslationForField("participating-org"));
+		implementingOrg.setSubTypeCode("4");
 		implementingOrg.setSubType("Implementing");
 		getFields().add(implementingOrg);
 		
