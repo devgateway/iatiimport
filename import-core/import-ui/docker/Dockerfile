@@ -2,6 +2,8 @@ FROM openjdk:8-jre-alpine
 
 LABEL maintainer="ociubotaru@developmentgateway.org"
 
+ARG PULL_REQUEST
+ARG BRANCH
 ARG IMPORTER_JAR
 ARG AMP_URL
 ARG IATI_ID_FIELD
@@ -31,5 +33,8 @@ ENTRYPOINT ./wait-for-it.sh db:5432 -t 0 -- \
         -DIATIProcessor.default_country=$COUNTRY \
         -XX:HeapDumpPath=/opt/heapdumps -XX:+HeapDumpOnOutOfMemoryError \
         -jar importer.jar
+
+LABEL "pull-request"=$PULL_REQUEST
+LABEL "branch"=$BRANCH
 
 ADD $IMPORTER_JAR importer.jar

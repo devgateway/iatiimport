@@ -17,6 +17,8 @@
 
 	<properties>
 		<iatiImporterTag>develop</iatiImporterTag>
+		<pullRequest />
+		<branch />
 		<gruntArguments>build</gruntArguments>
 	</properties>
 
@@ -139,6 +141,8 @@
 					<imageName>phosphorus:5000/iati-importer-ui:${iatiImporterTag}</imageName>
 					<buildArgs>
 						<IMPORTER_JAR>${project.build.finalName}.jar</IMPORTER_JAR>
+						<PULL_REQUEST>${pullRequest}</PULL_REQUEST>
+						<BRANCH>${branch}</BRANCH>
 					</buildArgs>
 					<rm>false</rm>
 					<resources>

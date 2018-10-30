@@ -2,6 +2,10 @@
 
 def tag = BRANCH_NAME.replaceAll(/[^a-zA-Z0-9_-]/, "-").toLowerCase()
 
+// Record original branch or pull request for cleanup jobs
+def branch = env.CHANGE_ID == null ? BRANCH_NAME : null
+def pr = env.CHANGE_ID
+
 stage('Build') {
     node {
         checkout scm
@@ -10,10 +14,10 @@ stage('Build') {
             try {
                 sh returnStatus: true, script: 'tar -xf ../iati-node-cache.tar'
                 sh "cd import-core && mvn clean package -DskipTests -DqaBuild"
-                sh "cd import-core/import-ui && mvn docker:build -DiatiImporterTag=${tag} -DpushImage"
+                sh "cd import-core/import-ui && mvn docker:build -DiatiImporterTag=$tag -DpullRequest=$pr -Dbranch=$branch -DpushImage"
             } finally {
                 sh returnStatus: true,
-                        script: "cd import-core/import-ui && mvn docker:removeImage -DiatiImporterTag=${tag}"
+                        script: "cd import-core/import-ui && mvn docker:removeImage -DiatiImporterTag=$tag"
                 sh returnStatus: true, script: "tar -cf ../iati-node-cache.tar --remove-files" +
                         " import-core/import-ui/src/main/webapp/node" +
                         " import-core/import-ui/src/main/webapp/node_modules"
