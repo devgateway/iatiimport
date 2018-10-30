@@ -71,6 +71,8 @@ public class ActivityFetchService {
 				if (now.isAfter(modifiedDate)) {
 					shouldUseFile = Boolean.FALSE;
 				}
+			}else {
+				shouldUseFile = Boolean.FALSE;
 			}
 
 			if (shouldUseFile) {
