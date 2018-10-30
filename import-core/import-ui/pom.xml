@@ -17,7 +17,22 @@
 
 	<properties>
 		<iatiImporterTag>develop</iatiImporterTag>
+		<gruntArguments>build</gruntArguments>
 	</properties>
+
+	<profiles>
+		<profile>
+			<id>qa</id>
+			<activation>
+				<property>
+					<name>qaBuild</name>
+				</property>
+			</activation>
+			<properties>
+				<gruntArguments>build --target=qa</gruntArguments>
+			</properties>
+		</profile>
+	</profiles>
 
 	<dependencies>
 
@@ -104,6 +119,9 @@
 						<goals>
 							<goal>grunt</goal>
 						</goals>
+						<configuration>
+							<arguments>${gruntArguments}</arguments>
+						</configuration>
 					</execution>
 				</executions>
 				<configuration>
