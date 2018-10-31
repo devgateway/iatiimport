@@ -335,7 +335,7 @@ var ChooseProjects = React.createClass({
                       <div className="panel-heading">{this.props.i18nLib.t('wizard.choose_projects.new_projects')} <i>({newProjects.length } {this.props.i18nLib.t('wizard.choose_projects.choose_projects')})</i></div>
                         <div className="panel-body">
                          <SimilarProjectsDialog projectMapping={this.state.projectMapping} getTitle={this.getTitle} mapProject={this.mapProject} {...this.props} />
-                         {this.state.showSourceProjectPreview && this.state.projectMapping &&
+                         {this.state.showSourceProjectPreview && this.state.projectMapping && this.state.sourceFieldsData.length > 0  &&
                             <ProjectPreview closeProjectPreview={this.closeProjectPreview.bind(this)} project={this.state.projectMapping.sourceDocument} i18nLib = {this.props.i18nLib} sourceFieldsData = {this.state.sourceFieldsData} /> 
                          } 
                          <table className="table">
