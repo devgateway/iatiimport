@@ -5,7 +5,8 @@ This tool allows users to import data in IATI format into a target system. The t
 # Requirements
  - Java 8 or later	
  - Apache Maven 3.2.2
- - Node 4.7.0 (doesn't work with newest versions of node)
+ - Node 4.7.0 (doesn't work with newest versions of node / maven will download and install correct version of node automatically)
+ - libpng-dev on Unix or libpng on MacOS version 1.2 (won't work with newer versions, required by imagemin-pngquant module)
 
 # Configuration
  After pulling the source code from github, you need to make some changes to import-core/import-ui/src/main/webapp/client/scripts/conf/index.js.
@@ -17,25 +18,11 @@ This tool allows users to import data in IATI format into a target system. The t
 
 # Packaging the Tool
 
- There are two steps involved in packaging the import tool. First, build the UI using grunt. Then create a jar file using maven.
+## Use maven to build
 
-## Build the UI
- 
 ```
-cd import-core/import-ui/src/main/webapp
-npm install --dev
-##notice that you might need to run. Do it if you get grunt or bower commands not found
-npm install grunt -g
-npm install bower -g
-bower install
-grunt build
-```
- 
-## Create jar File
- 
- ```
 cd import-core/
-mvn clean install
+mvn clean package
 ```
 
 ##  Run Jar File
@@ -46,6 +33,21 @@ java -jar import-ui-0.0.6-SNAPSHOT.jar &
 ```
 
 Then go to the initial page of the app: http://localhost:8080/importer/. 
+
+## Build the UI
+
+This section is required for development only.
+
+```
+cd import-core/import-ui/src/main/webapp
+npm install --dev
+##notice that you might need to run. Do it if you get grunt or bower commands not found
+npm install grunt -g
+npm install bower -g
+bower install
+grunt build
+```
+ 
      
 # Copyright
 

@@ -11,11 +11,14 @@ var taskConfig = function(grunt) {
     compile: [
       'browserify:dist'
     ],
+    qa: [
+      'browserify:qa'
+    ],
+
     docs: [
       'jsdoc:dist',
     ]
   });
-
 };
 
 module.exports = taskConfig;
