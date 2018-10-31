@@ -23,6 +23,13 @@ public class OrganizationFetchService {
     ReportingOrgRepository reportingOrgRepository;
 
     @Transactional
+    public void fetchIfEmpty() {
+        if (reportingOrgRepository.findAll().size() == 0) {
+            this.fetch();
+        }
+    }
+    
+    @Transactional
     public void fetch() {
         try {
             RestTemplate restTemplate = new RestTemplate();
