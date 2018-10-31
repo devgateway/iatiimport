@@ -60,7 +60,7 @@ public class ActivityFetchService {
 		String fileName = ReportingOrganizationHelper.getFileName(reportingOrg);
 		try {
 			File f = new File(fileName);
-			Boolean shouldUseFile = Boolean.FALSE;
+			Boolean shouldUseFile = Boolean.TRUE;
 			Document doc;
 
 			if (f.exists()) {
@@ -69,8 +69,10 @@ public class ActivityFetchService {
 						LocalDateTime.ofInstant(new Date(f.lastModified()).toInstant(),ZoneId.systemDefault())
 								.plusHours(FILE_EXPIRATION_TIME);
 				if (now.isAfter(modifiedDate)) {
-					shouldUseFile = Boolean.TRUE;
+					shouldUseFile = Boolean.FALSE;
 				}
+			}else {
+				shouldUseFile = Boolean.FALSE;
 			}
 
 			if (shouldUseFile) {
