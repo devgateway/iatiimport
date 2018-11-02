@@ -368,5 +368,23 @@ public abstract class IATIProcessor implements ISourceProcessor {
             descriptionTooltipsMap.put(version, mapForVersion);
         }
         return descriptionTooltipsMap.get(version);
+    }    
+    
+    protected List<String> extractLanguage(NodeList elementsByTagName) {
+        List<String> list = new ArrayList<String>();
+        try {
+            for (int i = 0; i < elementsByTagName.getLength(); i++) {
+                Node langAttr = elementsByTagName.item(i).getAttributes().getNamedItem("xml:lang");
+                if (langAttr == null)
+                    continue;
+                String lang = langAttr.getNodeValue().trim().toLowerCase();
+                if (!list.contains(lang)) {
+                    list.add(lang);
+                }
+            }
+        } catch (Exception e) {
+            log.error("Error extracting languages", e);
+        }
+        return list;
     }
 }

@@ -623,24 +623,6 @@ public class IATI2XProcessor extends IATIProcessor {
 
 	}
 
-	private List<String> extractLanguage(NodeList elementsByTagName) {
-		List<String> list = new ArrayList<String>();
-		try {
-			for (int i = 0; i < elementsByTagName.getLength(); i++) {
-				Node langAttr = elementsByTagName.item(i).getAttributes().getNamedItem("xml:lang");
-				if (langAttr == null)
-					continue;
-				String lang = langAttr.getNodeValue().trim().toLowerCase();
-				if (!list.contains(lang)) {
-					list.add(lang);
-				}
-			}
-		} catch (Exception e) {
-			// e.printStackTrace();
-		}
-		return list;
-	}
-
 	protected void instantiateStaticFields() {
 		// Text fields
 		getFields().add(new Field("IATI Identifier", "iati-identifier", FieldType.STRING,
