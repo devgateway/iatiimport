@@ -759,32 +759,32 @@ public class IATI2XProcessor extends IATIProcessor {
 
 
 		// Organization Fields
-		Field participatingOrg = new Field("Funding Organization", "participating-org",
+		Field participatingOrg = new Field(Constants.FUNDING_ORG_DISPLAY_NAME, "participating-org",
 				FieldType.ORGANIZATION, true, getTranslationForField("participating-org"));
-		participatingOrg.setSubType("Funding");
-		participatingOrg.setSubTypeCode("1");
+		participatingOrg.setSubType(Constants.ORG_ROLE_FUNDING);
+        participatingOrg.setSubTypeCode(Constants.ORG_ROLE_FUNDING_CODE);
 		getFields().add(participatingOrg);
 
-		Field accountableOrg = new Field("Accountable Organization", "participating-org",
+		Field accountableOrg = new Field(Constants.ACCOUNTABLE_ORG_DISPLAY_NAME, "participating-org",
 				FieldType.ORGANIZATION, true, getTranslationForField("participating-org"));
-		accountableOrg.setSubType("Accountable");
-		accountableOrg.setSubTypeCode("2");
+		accountableOrg.setSubTypeCode(Constants.ORG_ROLE_ACCOUNTABLE_CODE);
+        accountableOrg.setSubType(Constants.ORG_ROLE_ACCOUNTABLE);
 		getFields().add(accountableOrg);
 
-		Field extendingOrg = new Field("Extending Organization", "participating-org",
+		Field extendingOrg = new Field(Constants.EXTENDING_ORG_DISPLAY_NAME, "participating-org",
 				FieldType.ORGANIZATION, true, getTranslationForField("participating-org"));
-		extendingOrg.setSubType("Extending");
-		extendingOrg.setSubTypeCode("3");
+		 extendingOrg.setSubTypeCode(Constants.ORG_ROLE_EXTENDING_CODE);
+	     extendingOrg.setSubType(Constants.ORG_ROLE_EXTENDING);
 		getFields().add(extendingOrg);
 
-		Field implementingOrg = new Field("Implementing Organization", "participating-org",
+		Field implementingOrg = new Field(Constants.IMPLEMENTING_ORG_DISPLAY_NAME, "participating-org",
 				FieldType.ORGANIZATION, true, getTranslationForField("participating-org"));
-		implementingOrg.setSubType("Implementing");
-		implementingOrg.setSubTypeCode("4");
+		implementingOrg.setSubTypeCode(Constants.ORG_ROLE_IMPLEMENTING_CODE);
+        implementingOrg.setSubType(Constants.ORG_ROLE_IMPLEMENTING);
 		getFields().add(implementingOrg);
 
 // Provider Organization, within Transactions
-		Field providerOrg = new Field("Provider Organization - transactions", "provider-org",
+		Field providerOrg = new Field(Constants.PROVIDER_ORG_DISPLAY_NAME, "provider-org",
 				FieldType.ORGANIZATION, false, getTranslationForField("provider-org"));
 		providerOrg.setSubType("Provider");
 		getFields().add(providerOrg);

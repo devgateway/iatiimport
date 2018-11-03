@@ -299,12 +299,11 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				processListDestinationProjects(source, valueMappings, project, mapping, sourceField, destinationField);
 				break;
 			 case ORGANIZATION:
-	                if (!"Funding Organization".equals(sourceField.getDisplayName()) && !"Provider Organization".equals(sourceField.getDisplayName())) {                    
-	                    project.set(destinationField.getFieldName(), getOrgsByRole(source, sourceField.getSubType(), fieldMappings, valueMappings, sourceField.getDisplayName()));                  
-	                    
-	                }
-	                
-	                break;
+			     if (!Constants.FUNDING_ORG_DISPLAY_NAME.equals(sourceField.getDisplayName()) && !Constants.PROVIDER_ORG_DISPLAY_NAME.equals(sourceField.getDisplayName())) {                   
+	                    project.set(destinationField.getFieldName(), getOrgsByRole(source, sourceField.getSubType(), fieldMappings, valueMappings, sourceField.getDisplayName()));                     
+	             }	                
+	             
+			     break;
 			case MULTILANG_STRING:
 				Object fieldValue = getMapFromString(source, destinationField.getFieldName(), mapping);
 				if(destinationField.getLength() > 0 && fieldValue instanceof Map) {
@@ -593,9 +592,8 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				processListDestinationProjects(source, valueMappings, project, mapping, sourceField, destinationField);
 				break;
 			case ORGANIZATION:
-			    if (!"Funding Organization".equals(sourceField.getDisplayName()) && !"Provider Organization".equals(sourceField.getDisplayName())) {			        
+			    if (!Constants.FUNDING_ORG_DISPLAY_NAME.equals(sourceField.getDisplayName()) && !Constants.PROVIDER_ORG_DISPLAY_NAME.equals(sourceField.getDisplayName())) {			        
 			        project.set(destinationField.getFieldName(), getOrgsByRole(source, sourceField.getSubType(), fieldMappings, valueMappings, sourceField.getDisplayName()));			        
-			        
 			    }
 			    
 			    break;
