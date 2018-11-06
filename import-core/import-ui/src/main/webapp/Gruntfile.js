@@ -82,6 +82,7 @@ module.exports = function(grunt) {
   invokeConfigFn(registerDefinitions);
 
   grunt.loadNpmTasks('grunt-connect-proxy');
+  grunt.loadNpmTasks('grunt-string-replace');
 
 /*  grunt.config.set('prism',
   {
