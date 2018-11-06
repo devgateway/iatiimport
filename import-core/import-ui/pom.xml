@@ -32,7 +32,7 @@
 			</activation>
 			<properties>
 				<buildSource>${buildSource}</buildSource>
-				<gruntArguments>build --target=qa --buildsource="Julian"</gruntArguments>
+				<gruntArguments>build --target=qa --buildsource=${buildSource}</gruntArguments>
 			</properties>
 		</profile>
 	</profiles>
