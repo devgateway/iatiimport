@@ -13,7 +13,7 @@ stage('Build') {
         withEnv(["PATH+MAVEN=${tool 'M339'}/bin"]) {
             try {
                 sh returnStatus: true, script: 'tar -xf ../iati-node-cache.tar'
-                sh "cd import-core && mvn clean package -DskipTests -DqaBuild"
+                sh "cd import-core && mvn clean package -DskipTests -DqaBuild -DbuildSource=$tag"
                 sh "cd import-core/import-ui && mvn docker:build -DiatiImporterTag=$tag -DpullRequest=$pr -Dbranch=$branch -DpushImage"
             } finally {
                 sh returnStatus: true,

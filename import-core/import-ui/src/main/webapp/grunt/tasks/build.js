@@ -20,6 +20,7 @@ var taskConfig = function(grunt) {
       'wiredep',
       'copy:dist',
       concurrentTask,
+      'string-replace',
       'useminPrepare',
       'concat:generated',
       'cssmin',

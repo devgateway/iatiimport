@@ -5,7 +5,7 @@ var Footer = React.createClass({
     return (
     <div className="container">
         <footer className="footer">
-            <p>Developed by Development Gateway, Inc - {year} </p>
+          @@buildSource@@ <p>Developed by Development Gateway, Inc - {year} </p>
        </footer>
     </div>
       
