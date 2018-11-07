@@ -524,7 +524,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		if (project.get("project_title") instanceof Map) {
 			@SuppressWarnings("unchecked")
 			Map<String, String> titleMultilang = (Map<String, String>) project.get("project_title");
-			Map<Object, Object> titleMultilangShort = titleMultilang.entrySet().stream().map(e -> new AbstractMap.SimpleEntry<>(e.getKey(), e.getValue().substring(0, 255)))
+			Map<Object, Object> titleMultilangShort = titleMultilang.entrySet().stream().map(e -> new AbstractMap.SimpleEntry<>(e.getKey(),e.getValue().length() > 255 ? e.getValue().substring(0, 255) : e.getValue()))
 			         .collect(Collectors.toMap(
 			             Map.Entry::getKey,
 			             Map.Entry::getValue
@@ -566,9 +566,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				break;
 			case MULTILANG_STRING:
 				Object fieldValue = getMapFromString(source, destinationField.getFieldName(), mapping);
-				if(destinationField.getLength() > 0 && fieldValue instanceof Map) {
-					//NOOP
-				} else {
+				if(!(fieldValue instanceof Map)) {
 					String fieldValueString = (String)fieldValue;
 					if (destinationField.getLength() != 0 && fieldValueString.length() > destinationField.getLength()) {
 						fieldValue = fieldValueString.substring(0, destinationField.getLength());
