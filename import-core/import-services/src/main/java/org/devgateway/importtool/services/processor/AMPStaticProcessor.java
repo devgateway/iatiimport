@@ -298,6 +298,12 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			case LIST:
 				processListDestinationProjects(source, valueMappings, project, mapping, sourceField, destinationField);
 				break;
+			 case ORGANIZATION:
+			     if (!Constants.FUNDING_ORG_DISPLAY_NAME.equals(sourceField.getDisplayName()) && !Constants.PROVIDER_ORG_DISPLAY_NAME.equals(sourceField.getDisplayName())) {                   
+	                    project.set(destinationField.getFieldName(), getOrgsByRole(source, sourceField.getSubType(), fieldMappings, valueMappings, sourceField.getDisplayName()));                     
+	             }	                
+	             
+			     break;
 			case MULTILANG_STRING:
 				Object fieldValue = getMapFromString(source, destinationField.getFieldName(), mapping);
 				if(destinationField.getLength() > 0 && fieldValue instanceof Map) {
@@ -375,6 +381,27 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		return listDonorOrganizations;
 
 	}
+	
+	   private List<JsonBean> getOrgsByRole(InternalDocument source, String role, List<FieldMapping> fieldMappings,
+	            List<FieldValueMapping> valueMappings, String fieldDisplayName) throws Exception {
+	        List<JsonBean> orgs = new ArrayList<JsonBean>();
+	       
+	        Map<String, Map<String, String>> organizations = source.getOrganizationFields().entrySet().stream()
+	                .filter(p -> {
+	                    return p.getValue().get("role").equals(role);
+	                }).collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
+	        
+	        for (Entry<String, Map<String, String>> entry : organizations.entrySet()) {	                        
+	            Integer orgId = getOrgIdFromList(entry.getValue().get("value"), "participating-org", fieldMappings,
+                        valueMappings, false, fieldDisplayName);
+                
+	            JsonBean org = new JsonBean();
+	            org.set("organization", orgId);
+	            orgs.add(org);                
+	        }	      
+
+	        return orgs;
+	    }
 
 	private JsonBean getProject(String documentId) {
 		JsonBean projectObject = null;
@@ -564,6 +591,12 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			case LIST:
 				processListDestinationProjects(source, valueMappings, project, mapping, sourceField, destinationField);
 				break;
+			case ORGANIZATION:
+			    if (!Constants.FUNDING_ORG_DISPLAY_NAME.equals(sourceField.getDisplayName()) && !Constants.PROVIDER_ORG_DISPLAY_NAME.equals(sourceField.getDisplayName())) {			        
+			        project.set(destinationField.getFieldName(), getOrgsByRole(source, sourceField.getSubType(), fieldMappings, valueMappings, sourceField.getDisplayName()));			        
+			    }
+			    
+			    break;
 			case MULTILANG_STRING:
 				Object fieldValue = getMapFromString(source, destinationField.getFieldName(), mapping);
 				if(!(fieldValue instanceof Map)) {
@@ -956,30 +989,45 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 	private Integer getIdFromList(String fieldValue, String sourceField, List<FieldMapping> fieldMappings,
 			List<FieldValueMapping> valueMappings, Boolean useCode) throws ValueMappingException {
+	    	    
 		Optional<FieldValueMapping> optVm = valueMappings.stream().filter(n -> {
 			return n.getSourceField().getFieldName().equals(sourceField);
 		}).findFirst();
 
-		if ((!optVm.isPresent()) || (optVm.get().getSourceField().getPossibleValues() == null)) {
-			throw new ValueMappingException("The mapping for " + sourceField + " is invalid. No source values were found." );						
-		}
-		
-		FieldValueMapping vm = optVm.get();
-		FieldValue fvs = vm.getSourceField().getPossibleValues().stream().filter(n -> {
-			if (useCode) {
-				return n.getCode().equals(fieldValue);
-			} else {
-				return n.getValue().equals(fieldValue);
-			}
-		}).findFirst().get();
-		Integer sourceValueIndex = fvs.getIndex();
-		Integer destinationValueIndex = vm.getValueIndexMapping().get(sourceValueIndex);
-		FieldValue fvd = vm.getDestinationField().getPossibleValues().stream().filter(n -> {
-			return destinationValueIndex != null && n.getIndex() == destinationValueIndex;
-		}).findFirst().get();
-		return Integer.parseInt(fvd.getCode());
+		return getIdByValue(fieldValue, optVm, sourceField, useCode);
 	}
+	
+	private Integer getOrgIdFromList(String fieldValue, String sourceField, List<FieldMapping> fieldMappings,
+            List<FieldValueMapping> valueMappings, Boolean useCode, String fieldDisplayName) throws ValueMappingException {
+                
+        Optional<FieldValueMapping> optVm = valueMappings.stream().filter(n -> {
+            return n.getSourceField().getFieldName().equals(sourceField) && n.getSourceField().getDisplayName().equals(fieldDisplayName);
+        }).findFirst();
 
+        return getIdByValue(fieldValue, optVm, sourceField, useCode);
+    }
+
+	private Integer getIdByValue(String fieldValue, Optional<FieldValueMapping> optVm, String sourceField, Boolean useCode) throws ValueMappingException {
+	    if ((!optVm.isPresent()) || (optVm.get().getSourceField().getPossibleValues() == null)) {
+            throw new ValueMappingException("The mapping for " + sourceField + " is invalid. No source values were found." );                       
+        }        
+        
+        FieldValueMapping vm = optVm.get();
+        FieldValue fvs = vm.getSourceField().getPossibleValues().stream().filter(n -> {
+            if (useCode) {
+                return n.getCode().equals(fieldValue);
+            } else {
+                return n.getValue().equals(fieldValue);
+            }
+        }).findFirst().get();
+        Integer sourceValueIndex = fvs.getIndex();
+        Integer destinationValueIndex = vm.getValueIndexMapping().get(sourceValueIndex);
+        FieldValue fvd = vm.getDestinationField().getPossibleValues().stream().filter(n -> {
+            return destinationValueIndex != null && n.getIndex() == destinationValueIndex;
+        }).findFirst().get();
+        return Integer.parseInt(fvd.getCode());
+	}
+	
 	private String getTransactionDate(String dateString) {
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Date inputDate;

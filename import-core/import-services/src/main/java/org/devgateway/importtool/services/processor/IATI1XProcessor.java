@@ -5,6 +5,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.model.Language;
 import org.devgateway.importtool.services.processor.helper.ActionStatus;
+import org.devgateway.importtool.services.processor.helper.Constants;
 import org.devgateway.importtool.services.processor.helper.Field;
 import org.devgateway.importtool.services.processor.helper.FieldType;
 import org.devgateway.importtool.services.processor.helper.FieldValue;
@@ -369,7 +370,7 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 					if (fieldNodeList.getLength() > 0) {
 						for (int j = 0; j < fieldNodeList.getLength(); j++) {
 							Element fieldElement = (Element) fieldNodeList.item(j);
-							if (fieldElement.getAttribute("role").equals(field.getSubType())) {
+							if (fieldElement.getAttribute("role").equals(field.getSubType()) || fieldElement.getAttribute("role").equals(field.getSubTypeCode())) {
 								final String stringOrgValue = fieldElement.getTextContent();
 								final String ref = fieldElement.getAttribute("ref");
 								if ((stringOrgValue != null && !stringOrgValue.trim().isEmpty())
@@ -715,28 +716,33 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 		getFields().add(disbursements);
 
 		// Organization Fields
-		Field participatingOrg = new Field("Funding Organization", "participating-org",
+		
+		Field participatingOrg = new Field(Constants.FUNDING_ORG_DISPLAY_NAME, "participating-org",
                 FieldType.ORGANIZATION,true, getTranslationForField("participating-org"));
-		participatingOrg.setSubType("Funding");
+		participatingOrg.setSubType(Constants.ORG_ROLE_FUNDING);
+		participatingOrg.setSubTypeCode(Constants.ORG_ROLE_FUNDING_CODE);
 		getFields().add(participatingOrg);
 		
-		Field accountableOrg = new Field("Accountable Organization", "participating-org",
+		Field accountableOrg = new Field(Constants.ACCOUNTABLE_ORG_DISPLAY_NAME, "participating-org",
                 FieldType.ORGANIZATION, true ,getTranslationForField("participating-org"));
-		accountableOrg.setSubType("Accountable");
+		accountableOrg.setSubTypeCode(Constants.ORG_ROLE_ACCOUNTABLE_CODE);
+		accountableOrg.setSubType(Constants.ORG_ROLE_ACCOUNTABLE);
 		getFields().add(accountableOrg);
 
-		Field extendingOrg = new Field("Extending Organization", "participating-org",
+		Field extendingOrg = new Field(Constants.EXTENDING_ORG_DISPLAY_NAME, "participating-org",
                 FieldType.ORGANIZATION, true, getTranslationForField("participating-org"));
-		extendingOrg.setSubType("Extending");
+		extendingOrg.setSubTypeCode(Constants.ORG_ROLE_EXTENDING_CODE);
+		extendingOrg.setSubType(Constants.ORG_ROLE_EXTENDING);
 		getFields().add(extendingOrg);
 
-		Field implementingOrg = new Field("Implementing Organization", "participating-org",
+		Field implementingOrg = new Field(Constants.IMPLEMENTING_ORG_DISPLAY_NAME, "participating-org",
                 FieldType.ORGANIZATION, true, getTranslationForField("participating-org"));
-		implementingOrg.setSubType("Implementing");
+		implementingOrg.setSubTypeCode(Constants.ORG_ROLE_IMPLEMENTING_CODE);
+		implementingOrg.setSubType(Constants.ORG_ROLE_IMPLEMENTING);
 		getFields().add(implementingOrg);
 		
 		// Provider Organization, within Transactions
-		Field providerOrg = new ProviderOganizationField("Provider Organization", "provider-org",
+		Field providerOrg = new ProviderOganizationField(Constants.PROVIDER_ORG_DISPLAY_NAME, "provider-org",
                 FieldType.ORGANIZATION, false, getTranslationForField("provider-org"));
 		providerOrg.setSubType("Provider");
 		getFields().add(providerOrg);
