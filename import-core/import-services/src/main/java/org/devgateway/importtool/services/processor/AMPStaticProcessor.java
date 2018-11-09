@@ -401,8 +401,8 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	                }).collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
 	        
 	        for (Entry<String, Map<String, String>> entry : organizations.entrySet()) {	                        
-	            Integer orgId = getOrgIdFromList(entry.getValue().get("value"), "participating-org", fieldMappings,
-                        valueMappings, false, fieldDisplayName);
+	            Integer orgId = getOrgIdFromList(entry.getValue().get("value"), "participating-org",
+                        fieldMappings, valueMappings, false, fieldDisplayName);
                 
 	            JsonBean org = new JsonBean();
 	            org.set("organization", orgId);
@@ -422,17 +422,17 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			percentageObject.forEach(po -> {
 				po.set(percentageField, distribution);
 			});
-			AtomicReference<Integer> difference = new AtomicReference<>((100 - distribution * objectCount));
-			if (difference.equals(0)) {
+			Integer difference = 100 - distribution * objectCount;
+			if (difference ==0) {
 				return;
 			}
 			Integer increment = 1;
-			while (difference.get() > 0) {
+			while (difference > 0) {
 				for(JsonBean po:percentageObject) {
 					Integer previousDistribution = (Integer) po.get(percentageField);
 					po.set(percentageField, previousDistribution + increment);
-					difference.set(difference.get() - increment);
-					if (difference.get() == 0) {
+                    difference -= increment;
+					if (difference == 0) {
 						break;
 					}
 				}
