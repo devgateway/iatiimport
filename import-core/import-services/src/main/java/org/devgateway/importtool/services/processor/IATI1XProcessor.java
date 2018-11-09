@@ -603,6 +603,8 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 
 
 	protected void instantiateStaticFields() {
+		//We need to to refactor the way of instantiating this static fields. Probably from a config file, or from
+		// configuration map, but it has a lot of repeating code
 		// Text fields
 		getFields().add(new Field("IATI Identifier", "iati-identifier", FieldType.STRING,
                 false, getTranslationForField("iati-identifier")));
@@ -682,56 +684,56 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 
 		// Dates
 		Field activityDateStartPlanned = new Field("Activity Date Start Planned", "activity-date",
-                FieldType.DATE, true, getTranslationForField("activity-date"));
+                FieldType.DATE, true, getTranslationForField("activity-date_start-planned"));
 		activityDateStartPlanned.setSubType("start-planned");
 		getFields().add(activityDateStartPlanned);
 
 		Field activityDateEndPlanned = new Field("Activity Date End Planned", "activity-date",
-                FieldType.DATE, true, getTranslationForField("activity-date"));
+                FieldType.DATE, true, getTranslationForField("activity-date_end-planned"));
 		getFields().add(activityDateEndPlanned);
 		activityDateEndPlanned.setSubType("end-planned");
 
 		Field activityDateStartActual = new Field("Activity Date Start Actual", "activity-date",
-                FieldType.DATE, true ,getTranslationForField("activity-date"));
+                FieldType.DATE, true ,getTranslationForField("activity-date_start-actual"));
 		activityDateStartActual.setSubType("start-actual");
 		getFields().add(activityDateStartActual);
 
 		Field activityDateEndActual = new Field("Activity Date End Actual", "activity-date",
-                FieldType.DATE, true, getTranslationForField("activity-date"));
+                FieldType.DATE, true, getTranslationForField("activity-date_end-actual"));
 		getFields().add(activityDateEndActual);
 		activityDateEndActual.setSubType("end-actual");
 
 		// Transaction Fields
 		Field commitments = new Field("Commitments", "transaction", FieldType.TRANSACTION,
-                true, getTranslationForField("transaction"));
+                true, getTranslationForField("transaction_C"));
 		commitments.setSubType("C");
 		commitments.setSubTypeCode("2");
 		getFields().add(commitments);
 
 		Field disbursements = new Field("Disbursements", "transaction", FieldType.TRANSACTION,
-                true, getTranslationForField("transaction"));
+                true, getTranslationForField("transaction_D"));
 		disbursements.setSubType("D");
 		disbursements.setSubTypeCode("3");
 		getFields().add(disbursements);
 
 		// Organization Fields
 		Field participatingOrg = new Field("Funding Organization", "participating-org",
-                FieldType.ORGANIZATION,true, getTranslationForField("participating-org"));
+                FieldType.ORGANIZATION,true, getTranslationForField("participating-org_Funding"));
 		participatingOrg.setSubType("Funding");
 		getFields().add(participatingOrg);
 		
 		Field accountableOrg = new Field("Accountable Organization", "participating-org",
-                FieldType.ORGANIZATION, true ,getTranslationForField("participating-org"));
+                FieldType.ORGANIZATION, true ,getTranslationForField("participating-org_Accountable"));
 		accountableOrg.setSubType("Accountable");
 		getFields().add(accountableOrg);
 
 		Field extendingOrg = new Field("Extending Organization", "participating-org",
-                FieldType.ORGANIZATION, true, getTranslationForField("participating-org"));
+                FieldType.ORGANIZATION, true, getTranslationForField("participating-org_Extending"));
 		extendingOrg.setSubType("Extending");
 		getFields().add(extendingOrg);
 
 		Field implementingOrg = new Field("Implementing Organization", "participating-org",
-                FieldType.ORGANIZATION, true, getTranslationForField("participating-org"));
+                FieldType.ORGANIZATION, true, getTranslationForField("participating-org_Implementing"));
 		implementingOrg.setSubType("Implementing");
 		getFields().add(implementingOrg);
 		
