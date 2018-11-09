@@ -356,8 +356,10 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	}
 
 	private void processOrganization(JsonBean project, InternalDocument source, List<FieldMapping> fieldMappings,
-									 List<FieldValueMapping> valueMappings, FieldMapping mapping, Field sourceField, Field destinationField) throws Exception {
-		if (!Constants.FUNDING_ORG_DISPLAY_NAME.equals(sourceField.getDisplayName()) && !Constants.PROVIDER_ORG_DISPLAY_NAME.equals(sourceField.getDisplayName())) {
+									 List<FieldValueMapping> valueMappings, FieldMapping mapping, Field sourceField,
+									 Field destinationField) throws Exception {
+		if (!Constants.FUNDING_ORG_DISPLAY_NAME.equals(sourceField.getDisplayName())
+				&& !Constants.PROVIDER_ORG_DISPLAY_NAME.equals(sourceField.getDisplayName())) {
 
 			project.set(destinationField.getFieldName(), getOrgsByRole(source, sourceField.getSubType(),
 					fieldMappings, valueMappings, sourceField.getDisplayName(), destinationField.isPercentage()));
@@ -387,10 +389,6 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 		return listDonorOrganizations;
 
-	}
-	private List<JsonBean> getOrgsByRole(InternalDocument source, String role, List<FieldMapping> fieldMappings,
-										 List<FieldValueMapping> valueMappings, String fieldDisplayName) throws Exception {
-		return getOrgsByRole(source, role, fieldMappings, valueMappings, fieldDisplayName, false);
 	}
 
 	   private List<JsonBean> getOrgsByRole(InternalDocument source, String role, List<FieldMapping> fieldMappings,
