@@ -38,6 +38,18 @@ public class Constants {
 	public static final String TRANSACTION_TYPE_ACTUAL_EXPENDITURES ="AE";
 	public static final String TRANSACTION_TYPE_PLANNED_EXPENDITURES ="PE";
 
-
-
+	public static final String ORG_ROLE_FUNDING_CODE = "1";
+	public static final String ORG_ROLE_FUNDING = "Funding";
+	public static final String ORG_ROLE_ACCOUNTABLE_CODE = "2";
+	public static final String ORG_ROLE_ACCOUNTABLE = "Accountable";
+	public static final String ORG_ROLE_EXTENDING_CODE = "3";
+	public static final String ORG_ROLE_EXTENDING = "Extending";	
+	public static final String ORG_ROLE_IMPLEMENTING_CODE = "4";
+	public static final String ORG_ROLE_IMPLEMENTING = "Implementing";
+		
+	public static final String FUNDING_ORG_DISPLAY_NAME = "Funding Organization";
+	public static final String PROVIDER_ORG_DISPLAY_NAME = "Provider Organization";	
+	public static final String IMPLEMENTING_ORG_DISPLAY_NAME = "Implementing Organization";
+	public static final String EXTENDING_ORG_DISPLAY_NAME = "Extending Organization";
+	public static final String ACCOUNTABLE_ORG_DISPLAY_NAME = "Accountable Organization";	
 }

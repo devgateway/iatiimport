@@ -701,72 +701,77 @@ public class IATI2XProcessor extends IATIProcessor {
 
 		// Dates
 		Field activityDateStartPlanned = new Field("Activity Date Start Planned",
-				"activity-date", FieldType.DATE, true, getTranslationForField("activity-date"));
+				"activity-date", FieldType.DATE, true,
+				getTranslationForField("activity-date_start-planned"));
 		activityDateStartPlanned.setSubType("start-planned");
 		getFields().add(activityDateStartPlanned);
 
 		Field activityDateEndPlanned = new Field("Activity Date End Planned", "activity-date",
-				FieldType.DATE, true, getTranslationForField("activity-date"));
+				FieldType.DATE, true, getTranslationForField("activity-date_end-planned"));
 		getFields().add(activityDateEndPlanned);
 		activityDateEndPlanned.setSubType("end-planned");
 
 		Field activityDateStartActual = new Field("Activity Date Start Actual", "activity-date",
-				FieldType.DATE, true, getTranslationForField("activity-date"));
+				FieldType.DATE, true, getTranslationForField("activity-date_start-actual"));
 		activityDateStartActual.setSubType("start-actual");
 		getFields().add(activityDateStartActual);
 
 		Field activityDateEndActual = new Field("Activity Date End Actual", "activity-date",
-				FieldType.DATE, true, getTranslationForField("activity-date"));
+				FieldType.DATE, true, getTranslationForField("activity-date_end-actual"));
 		getFields().add(activityDateEndActual);
 		activityDateEndActual.setSubType("end-actual");
 
 		// Transaction Fields
 		Field commitments = new Field("Commitments", "transaction", FieldType.TRANSACTION,
-				true, getTranslationForField("transaction"));
+				true, getTranslationForField("transaction_C"));
 		commitments.setSubType("C");
 		commitments.setSubTypeCode("2");
 		getFields().add(commitments);
 
 		Field disbursements = new Field("Disbursements", "transaction", FieldType.TRANSACTION,
-				true, getTranslationForField("transaction"));
+				true, getTranslationForField("transaction_D"));
 		disbursements.setSubType("D");
 		disbursements.setSubTypeCode("3");
 		getFields().add(disbursements);
 
 		Field expenditure = new Field(Constants.EXPENDITURES, "transaction", FieldType.TRANSACTION,
-				true, getTranslationForField("transaction"));
+				true, getTranslationForField("transaction_E"));
 		expenditure.setSubType("E");
 		expenditure.setSubTypeCode("4");
 		getFields().add(expenditure);
 
 
 		// Organization Fields
-		Field participatingOrg = new Field("Funding Organization", "participating-org",
-				FieldType.ORGANIZATION, true, getTranslationForField("participating-org"));
-		participatingOrg.setSubType("Funding");
-		participatingOrg.setSubTypeCode("1");
+		Field participatingOrg = new Field(Constants.FUNDING_ORG_DISPLAY_NAME, "participating-org",
+				FieldType.ORGANIZATION, true, getTranslationForField("participating-org_"
+				+ Constants.ORG_ROLE_FUNDING));
+		participatingOrg.setSubType(Constants.ORG_ROLE_FUNDING);
+        participatingOrg.setSubTypeCode(Constants.ORG_ROLE_FUNDING_CODE);
 		getFields().add(participatingOrg);
 
-		Field accountableOrg = new Field("Accountable Organization", "participating-org",
-				FieldType.ORGANIZATION, true, getTranslationForField("participating-org"));
-		accountableOrg.setSubType("Accountable");
-		accountableOrg.setSubTypeCode("2");
+		Field accountableOrg = new Field(Constants.ACCOUNTABLE_ORG_DISPLAY_NAME, "participating-org",
+				FieldType.ORGANIZATION, true, getTranslationForField("participating-org_"
+				+ Constants.ORG_ROLE_ACCOUNTABLE));
+		accountableOrg.setSubTypeCode(Constants.ORG_ROLE_ACCOUNTABLE_CODE);
+        accountableOrg.setSubType(Constants.ORG_ROLE_ACCOUNTABLE);
 		getFields().add(accountableOrg);
 
-		Field extendingOrg = new Field("Extending Organization", "participating-org",
-				FieldType.ORGANIZATION, true, getTranslationForField("participating-org"));
-		extendingOrg.setSubType("Extending");
-		extendingOrg.setSubTypeCode("3");
+		Field extendingOrg = new Field(Constants.EXTENDING_ORG_DISPLAY_NAME, "participating-org",
+				FieldType.ORGANIZATION, true, getTranslationForField("participating-org_"
+				+ Constants.ORG_ROLE_EXTENDING));
+		 extendingOrg.setSubTypeCode(Constants.ORG_ROLE_EXTENDING_CODE);
+	     extendingOrg.setSubType(Constants.ORG_ROLE_EXTENDING);
 		getFields().add(extendingOrg);
 
-		Field implementingOrg = new Field("Implementing Organization", "participating-org",
-				FieldType.ORGANIZATION, true, getTranslationForField("participating-org"));
-		implementingOrg.setSubType("Implementing");
-		implementingOrg.setSubTypeCode("4");
+		Field implementingOrg = new Field(Constants.IMPLEMENTING_ORG_DISPLAY_NAME, "participating-org",
+				FieldType.ORGANIZATION, true, getTranslationForField("participating-org_"
+				+ Constants.ORG_ROLE_IMPLEMENTING));
+		implementingOrg.setSubTypeCode(Constants.ORG_ROLE_IMPLEMENTING_CODE);
+        implementingOrg.setSubType(Constants.ORG_ROLE_IMPLEMENTING);
 		getFields().add(implementingOrg);
 
 // Provider Organization, within Transactions
-		Field providerOrg = new Field("Provider Organization - transactions", "provider-org",
+		Field providerOrg = new Field(Constants.PROVIDER_ORG_DISPLAY_NAME, "provider-org",
 				FieldType.ORGANIZATION, false, getTranslationForField("provider-org"));
 		providerOrg.setSubType("Provider");
 		getFields().add(providerOrg);

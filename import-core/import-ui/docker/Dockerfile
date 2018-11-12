@@ -28,7 +28,7 @@ ENTRYPOINT ./wait-for-it.sh db:5432 -t 0 -- \
         -Djava.io.tmpdir=/opt/importer/data/tmp \
         -DActivityFetcher.fileStore=/opt/importer/data/files \
         -DAMPStaticProcessor.baseURL=$AMP_URL \
-        -DAMPStaticProcessor.ampIatiIdField==$IATI_ID_FIELD \
+        -DAMPStaticProcessor.ampIatiIdField=$IATI_ID_FIELD \
         -DAMPStaticProcessor.processor_version=$PROCESSOR_VERSION \
         -DIATIProcessor.default_country=$COUNTRY \
         -XX:HeapDumpPath=/opt/heapdumps -XX:+HeapDumpOnOutOfMemoryError \

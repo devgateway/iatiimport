@@ -14,22 +14,19 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
-import java.io.Writer;
+import java.io.InputStreamReader;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -139,7 +136,6 @@ public abstract class IATIProcessor implements ISourceProcessor {
     public List<Field> getFields() {
         return fieldList;
     }
-
     protected void configureDefaults(){
         InputStream propsStream = this.getClass().getResourceAsStream(this.getPropertiesFile());
         Properties properties = new Properties();
@@ -273,16 +269,9 @@ public abstract class IATIProcessor implements ISourceProcessor {
             String descriptionXPath = "/*[name()='xsd:schema']/*[name()='xsd:element'][@name='%s']/*[name()='xsd:annotation']/*[name()" +
                     "='xsd:documentation']";
             Properties prop = new Properties();
-
-            // InputStream propsStream = this.getClass().getResourceAsStream(this.getPropertiesFile());
-
             URL url = this.getClass().getResource(this.fieldsTooltipsLocation + "_en.properties");
             File fileObject = new File(url.toURI());
-
             FileOutputStream out = new FileOutputStream(fileObject);
-
-            //OutputStream output = new FileOutputStream(this.fieldsTooltipsLocation);
-
             Document doc = getDocument(this.schemaPath + this.activtySchemaName);
             this.fieldList.stream().forEach(field -> {
                 String fieldXPath = String.format(descriptionXPath, field.getFieldName());
@@ -301,15 +290,6 @@ public abstract class IATIProcessor implements ISourceProcessor {
             log.error("Cannot generate tooltips", ex);
             return null;
         }
-    }
-    public static final void prettyPrint(Document xml) throws Exception {
-
-        Transformer tf = TransformerFactory.newInstance().newTransformer();
-        tf.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-        tf.setOutputProperty(OutputKeys.INDENT, "yes");
-        Writer out = new StringWriter();
-        tf.transform(new DOMSource(xml), new StreamResult(out));
-        System.out.println(out.toString());
     }
 
     public NodeList getNodeListFromXpath(Document xDoc, String xPathExpresion)  {
@@ -348,19 +328,22 @@ public abstract class IATIProcessor implements ISourceProcessor {
             SUPPORTED_LOCALES.stream().forEach(lang -> {
                 try {
                     Properties properties = new Properties();
-                    properties.load(this.getClass().getResourceAsStream(this.fieldsTooltipsLocation +
-                            "_" + lang + ".properties"));
+                    properties.load(new InputStreamReader(this.getClass().getResource(getTooltipsFileName(lang))
+                            .openStream(), Charset.forName("UTF-8")));
                     properties.stringPropertyNames().stream().forEach(property -> {
                         if (mapForVersion.get(property) == null) {
                             mapForVersion.put(property, new HashMap<String, String>() {{
-                                put(lang,properties.getProperty(property));
+                                put(lang, properties.getProperty(property));
                             }});
                         } else {
                             mapForVersion.get(property).put(lang, properties.getProperty(property));
                         }
 
                     });
-                } catch (IOException ex) {
+                    System.out.println("properties loaded");
+                } catch (IOException  ex ){
+                    //we need to properly handle exceptions but we need to do it on scope of the refactoring
+                    //so we properly inform the user of the problem.
                     log.error("Cannot process properties file " + this.fieldsTooltipsLocation +
                             "_" + lang + ".properties");
                 }
@@ -368,8 +351,13 @@ public abstract class IATIProcessor implements ISourceProcessor {
             descriptionTooltipsMap.put(version, mapForVersion);
         }
         return descriptionTooltipsMap.get(version);
-    }    
-    
+    }
+
+    private String getTooltipsFileName(String lang) {
+        return this.fieldsTooltipsLocation + "_"
+                + lang + ".properties";
+    }
+
     protected List<String> extractLanguage(NodeList elementsByTagName) {
         List<String> list = new ArrayList<String>();
         try {
