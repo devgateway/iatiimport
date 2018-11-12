@@ -328,9 +328,8 @@ public abstract class IATIProcessor implements ISourceProcessor {
             SUPPORTED_LOCALES.stream().forEach(lang -> {
                 try {
                     Properties properties = new Properties();
-                    properties.load(new InputStreamReader(new FileInputStream(
-                            new File((this.getClass().getResource(getTooltipsFileName(lang))).toURI())), Charset.forName("UTF-8")));
-
+                    properties.load(new InputStreamReader(this.getClass().getResource(getTooltipsFileName(lang))
+                            .openStream(), Charset.forName("UTF-8")));
                     properties.stringPropertyNames().stream().forEach(property -> {
                         if (mapForVersion.get(property) == null) {
                             mapForVersion.put(property, new HashMap<String, String>() {{
@@ -341,7 +340,8 @@ public abstract class IATIProcessor implements ISourceProcessor {
                         }
 
                     });
-                } catch (IOException | URISyntaxException ex) {
+                    System.out.println("properties loaded");
+                } catch (IOException  ex ){
                     //we need to properly handle exceptions but we need to do it on scope of the refactoring
                     //so we properly inform the user of the problem.
                     log.error("Cannot process properties file " + this.fieldsTooltipsLocation +
