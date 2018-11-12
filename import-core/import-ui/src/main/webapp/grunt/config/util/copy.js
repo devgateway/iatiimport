@@ -12,7 +12,7 @@ var taskConfig = function(grunt) {
         dest: '<%= yeogurt.dist %>/',
         src: [
           'fonts/**/*.{woff,woff2,otf,ttf,eot,svg}',
-          'images/**/*.{webp}',
+          'images/**/*.{webp,gif}',
           'mockup/**/*.json',
           '!*.js',
           '*.{ico,png,txt}',
