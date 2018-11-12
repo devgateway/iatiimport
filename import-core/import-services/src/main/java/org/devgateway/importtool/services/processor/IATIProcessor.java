@@ -340,7 +340,6 @@ public abstract class IATIProcessor implements ISourceProcessor {
                         }
 
                     });
-                    System.out.println("properties loaded");
                 } catch (IOException  ex ){
                     //we need to properly handle exceptions but we need to do it on scope of the refactoring
                     //so we properly inform the user of the problem.

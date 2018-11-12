@@ -602,7 +602,7 @@ module.exports = {
 					'header' : {
 						'import_tool' : 'Outil Import',
 						'select_import_process' : 'Veuillez sélectionner le processus d’import des données:',
-						'close_window': 'Close Import Tool Window?',
+						'close_window': 'Êtes-vous sûr de vouloir fermer la fenêtre de l’outil d’import?',
 						'nav' : {
 							'menu' : {
 								'home' : ' Accueil ',
@@ -686,7 +686,9 @@ module.exports = {
 							'previous' : ' << Précédent ',
 							'msg_error_retrieving_projects' : ' Erreur dans la recherche des Filtres.',
 							'msg_error_select_project' : ' Veuillez sélectionner au moins un projet pour continuer ',
-							'similar_titles': 'Nbre de titres similaires',
+              'msg_project_not_editable':'Les projets marqués d\'un * et mis en surbrillance ne sont pas modifiables ' +
+                'car ils ne figurent pas dans l\'espace de travail actuel.',
+              'similar_titles': 'Nbre de titres similaires',
 						    'iati_id_tooltip': 'IATI ID - Un identifiant unique pour chaque projet.',
                             'source_project_tooltip': 'Le titre du projet extrait de la banque de données ou du fichier IATI.',
                             'destination_project_tooltip': 'Le titre du projet dans le système de destination qui sera mis à jour',
@@ -777,7 +779,6 @@ module.exports = {
 							'import_option_replace': 'Remplacer les informations de financement',
 							'import_option_replace_explanation': "Remplace les informations de financement dans le projet AMP avec des informations de financement provenant du fichier IATI. Ceci est fait par donateur. Les données des donateurs ni figurant pas dans le fichier IATI ne seront pas affectées.",
 							'import_option_replace_prompt': "Vous avez sélectionné l'option d'import Remplacer les informations de financement. Cette option met à jour les activités existantes en écrasant toutes les transactions financières des donateurs qui sont inclus dans le fichier de l'IATI. Voulez-vous continuer?",
-							'import_option_replace_prompt': 'You have selected the "Replace funding information" Import option. This option updates existing activities by overwriting the fundings for donors that have data in the IATI file. Do you want to proceed? ',
 							'process_next_version' :'Traiter la version suivante'
 						},
 						'mappings_dropdown' : {
