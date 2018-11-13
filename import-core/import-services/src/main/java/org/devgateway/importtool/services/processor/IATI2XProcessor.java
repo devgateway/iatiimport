@@ -477,7 +477,7 @@ public class IATI2XProcessor extends IATIProcessor {
 						nodes = (NodeList) xPath.evaluate("transaction/transaction-type[@code='" + field.getSubType() + "' or @code= '" + field.getSubTypeCode() + "']/parent::*", element, XPathConstants.NODESET);
 						for (int j = 0; j < nodes.getLength(); ++j) {
 							String reference = "";
-													Element e = (Element) nodes.item(j);
+							Element e = (Element) nodes.item(j);
 							// Reference
 							reference = e.getAttribute("ref");
 							// Amount
@@ -485,14 +485,14 @@ public class IATI2XProcessor extends IATIProcessor {
 							// Date
 							NodeList el = e.getElementsByTagName("transaction-date").item(0).getChildNodes();
 							String localDate = "";
-							if(el.getLength() == 0) {
+							if (el.getLength() == 0) {
 								localDate = ((Element) el).getAttribute("iso-date");
-							}else{
+							} else {
 								localDate = el.item(0).getNodeValue();
 
 							}
 							if (localDate != null && !isValidDate(localDate)) // TODO: Make it
-															// defensive
+							// defensive
 							{
 								localDate = e.getElementsByTagName("transaction-date").item(0).getAttributes().getNamedItem("iso-date").getNodeValue();
 							}
@@ -500,13 +500,21 @@ public class IATI2XProcessor extends IATIProcessor {
 							final String receivingOrganization = extractNarrative(e, "receiver-org");
 							Element providerNode = e.getElementsByTagName("provider-org").item(0) != null
 									? (Element) e.getElementsByTagName("provider-org").item(0) : null;
-							
-                            // if no provider tag, use reporting org
-                            if (providerNode == null) {
-                                providerNode = element.getElementsByTagName("reporting-org").item(0) != null
-                                        ? (Element) element.getElementsByTagName("reporting-org").item(0)
-                                        : null;
-                            }
+
+							// if no provider tag, check if we have participating-org with role 1 (funding
+							// if not use reporting org )
+							if (providerNode == null) {
+								String xPathParticipatingOrg = "participating-org[@role=1]";
+								NodeList participatingOrgs = (NodeList) xPath.evaluate(xPathParticipatingOrg,
+										element, XPathConstants.NODESET);
+								if (participatingOrgs.getLength() > 0) {
+									providerNode = (Element) participatingOrgs.item(0);
+								} else {
+									providerNode = element.getElementsByTagName("participating-org").item(0)
+											!= null ? (Element) element.getElementsByTagName("reporting-org")
+											.item(0) : null;
+								}
+							}
 
 							final String providingOrganization = (providerNode != null
 									&& providerNode.getElementsByTagName("narrative").item(0) != null)
