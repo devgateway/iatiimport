@@ -5,21 +5,31 @@
 'use strict';
 
 var taskConfig = function(grunt) {
-  grunt.registerTask('build', 'Build a production ready version of your site.', [
-    'clean:dist',
-    'injector',
-    'wiredep',
-    'copy:dist',
-    'concurrent',
-    'useminPrepare',
-    'concat:generated',
-    'cssmin',
-    'autoprefixer:server',
-    'usemin',
-    'htmlmin:dist',
-    'uglify',
-    'clean:tmp'
-  ]);
-};
+  grunt.registerTask('build', 'Open a development server within your browser', function () {
 
+    var target = grunt.option('target');
+    var concurrentTask = 'concurrent:compile';
+
+    if (target && target === 'qa') {
+      concurrentTask = 'concurrent:qa';
+    }
+
+    return grunt.task.run([
+      'clean:dist',
+      'injector',
+      'wiredep',
+      'copy:dist',
+      concurrentTask,
+      'string-replace',
+      'useminPrepare',
+      'concat:generated',
+      'cssmin',
+      'autoprefixer:server',
+      'usemin',
+      'htmlmin:dist',
+      'uglify',
+      'clean:tmp'
+    ]);
+  });
+};
 module.exports = taskConfig;

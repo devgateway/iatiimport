@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import org.apache.commons.logging.Log;
@@ -41,7 +42,7 @@ import org.springframework.util.StringUtils;
 // TODO: Add default values when mappings are missing, reading them from configuration db or files
 // TODO: Better error handling to the end user. Friendlier user messages, specially when referencing a missing dependency
 
-public abstract class AMPStaticProcessor implements IDestinationProcessor {
+public class AMPStaticProcessor implements IDestinationProcessor {
 	private String descriptiveName = "AMP";
 	static final String BASEURL_PROPERTY = "AMPStaticProcessor.baseURL";
 	static final String BASEURL_DEFAULT_VALUE = "http://localhost:8081";
@@ -71,9 +72,18 @@ public abstract class AMPStaticProcessor implements IDestinationProcessor {
 	public List<String> getDestinationFieldsList() {
 		return destinationFieldsList;
 	}
+	private String processorVersion;
 
 	public void setDestinationFieldsList(List<String> destinationFieldsList) {
 		this.destinationFieldsList = destinationFieldsList;
+	}
+	@Override
+	public String getProcessorVersion() {
+		return processorVersion;
+	}
+	@Override
+	public void setProcessorVersion(String processorVersion) {
+		this.processorVersion = processorVersion;
 	}
 
 	private RestTemplate template;
@@ -289,6 +299,9 @@ public abstract class AMPStaticProcessor implements IDestinationProcessor {
 			case LIST:
 				processListDestinationProjects(source, valueMappings, project, mapping, sourceField, destinationField);
 				break;
+				case ORGANIZATION:
+					processOrganization(project, source, fieldMappings, valueMappings, mapping, sourceField, destinationField);
+					break;
 			case MULTILANG_STRING:
 				Object fieldValue = getMapFromString(source, destinationField.getFieldName(), mapping);
 				if(destinationField.getLength() > 0 && fieldValue instanceof Map) {
@@ -342,6 +355,17 @@ public abstract class AMPStaticProcessor implements IDestinationProcessor {
 		}
 	}
 
+	private void processOrganization(JsonBean project, InternalDocument source, List<FieldMapping> fieldMappings,
+									 List<FieldValueMapping> valueMappings, FieldMapping mapping, Field sourceField,
+									 Field destinationField) throws Exception {
+		if (!Constants.FUNDING_ORG_DISPLAY_NAME.equals(sourceField.getDisplayName())
+				&& !Constants.PROVIDER_ORG_DISPLAY_NAME.equals(sourceField.getDisplayName())) {
+
+			project.set(destinationField.getFieldName(), getOrgsByRole(source, sourceField.getSubType(),
+					fieldMappings, valueMappings, sourceField.getDisplayName(), destinationField.isPercentage()));
+		}
+	}
+
 	private List<JsonBean> getDonorOrgs(List<JsonBean> fundings) {
 		List<JsonBean> listDonorOrganizations = new ArrayList<JsonBean>();
 		for (JsonBean funding : fundings) {
@@ -356,7 +380,9 @@ public abstract class AMPStaticProcessor implements IDestinationProcessor {
 			if (org.isPresent() && !foundDonor.isPresent()) {
 				JsonBean donorRole = new JsonBean();
 				donorRole.set("organization", funding.get("donor_organization_id"));
-				addAditionalDonorInformation(donorRole);
+				if(processorVersion.equals("2.x")) {
+					donorRole.set("role", 1);
+				}
 				listDonorOrganizations.add(donorRole);
 			}
 		}
@@ -365,7 +391,54 @@ public abstract class AMPStaticProcessor implements IDestinationProcessor {
 
 	}
 
-	protected abstract void addAditionalDonorInformation(JsonBean donorRole);
+	   private List<JsonBean> getOrgsByRole(InternalDocument source, String role, List<FieldMapping> fieldMappings,
+	            List<FieldValueMapping> valueMappings, String fieldDisplayName, Boolean percentage) throws Exception {
+	        List<JsonBean> orgs = new ArrayList<JsonBean>();
+	       
+	        Map<String, Map<String, String>> organizations = source.getOrganizationFields().entrySet().stream()
+	                .filter(p -> {
+	                    return p.getValue().get("role").equals(role);
+	                }).collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
+	        
+	        for (Entry<String, Map<String, String>> entry : organizations.entrySet()) {	                        
+	            Integer orgId = getOrgIdFromList(entry.getValue().get("value"), "participating-org",
+                        fieldMappings, valueMappings, false, fieldDisplayName);
+                
+	            JsonBean org = new JsonBean();
+	            org.set("organization", orgId);
+	            orgs.add(org);                
+	        }
+			if(percentage){
+				//percentage should be configurable
+				processPercentage(orgs, "percentage");
+			}
+	        return orgs;
+	    }
+
+	private void processPercentage(List<JsonBean> percentageObject, String percentageField) {
+		Integer objectCount = percentageObject.size();
+		if (objectCount > 0) {
+			Integer distribution = 100 / objectCount;
+			percentageObject.forEach(po -> {
+				po.set(percentageField, distribution);
+			});
+			Integer difference = 100 - distribution * objectCount;
+			if (difference ==0) {
+				return;
+			}
+			Integer increment = 1;
+			while (difference > 0) {
+				for(JsonBean po:percentageObject) {
+					Integer previousDistribution = (Integer) po.get(percentageField);
+					po.set(percentageField, previousDistribution + increment);
+                    difference -= increment;
+					if (difference == 0) {
+						break;
+					}
+				}
+			}
+		}
+	}
 
 	private JsonBean getProject(String documentId) {
 		JsonBean projectObject = null;
@@ -515,7 +588,7 @@ public abstract class AMPStaticProcessor implements IDestinationProcessor {
 		if (project.get("project_title") instanceof Map) {
 			@SuppressWarnings("unchecked")
 			Map<String, String> titleMultilang = (Map<String, String>) project.get("project_title");
-			Map<Object, Object> titleMultilangShort = titleMultilang.entrySet().stream().map(e -> new AbstractMap.SimpleEntry<>(e.getKey(), e.getValue().substring(0, 255)))
+			Map<Object, Object> titleMultilangShort = titleMultilang.entrySet().stream().map(e -> new AbstractMap.SimpleEntry<>(e.getKey(),e.getValue().length() > 255 ? e.getValue().substring(0, 255) : e.getValue()))
 			         .collect(Collectors.toMap(
 			             Map.Entry::getKey,
 			             Map.Entry::getValue
@@ -555,11 +628,12 @@ public abstract class AMPStaticProcessor implements IDestinationProcessor {
 			case LIST:
 				processListDestinationProjects(source, valueMappings, project, mapping, sourceField, destinationField);
 				break;
+			case ORGANIZATION:
+				processOrganization(project, source, fieldMappings, valueMappings, mapping, sourceField, destinationField);
+			    break;
 			case MULTILANG_STRING:
 				Object fieldValue = getMapFromString(source, destinationField.getFieldName(), mapping);
-				if(destinationField.getLength() > 0 && fieldValue instanceof Map) {
-					//NOOP
-				} else {
+				if(!(fieldValue instanceof Map)) {
 					String fieldValueString = (String)fieldValue;
 					if (destinationField.getLength() != 0 && fieldValueString.length() > destinationField.getLength()) {
 						fieldValue = fieldValueString.substring(0, destinationField.getLength());
@@ -949,30 +1023,45 @@ public abstract class AMPStaticProcessor implements IDestinationProcessor {
 
 	private Integer getIdFromList(String fieldValue, String sourceField, List<FieldMapping> fieldMappings,
 			List<FieldValueMapping> valueMappings, Boolean useCode) throws ValueMappingException {
+	    	    
 		Optional<FieldValueMapping> optVm = valueMappings.stream().filter(n -> {
 			return n.getSourceField().getFieldName().equals(sourceField);
 		}).findFirst();
 
-		if ((!optVm.isPresent()) || (optVm.get().getSourceField().getPossibleValues() == null)) {
-			throw new ValueMappingException("The mapping for " + sourceField + " is invalid. No source values were found." );						
-		}
-		
-		FieldValueMapping vm = optVm.get();
-		FieldValue fvs = vm.getSourceField().getPossibleValues().stream().filter(n -> {
-			if (useCode) {
-				return n.getCode().equals(fieldValue);
-			} else {
-				return n.getValue().equals(fieldValue);
-			}
-		}).findFirst().get();
-		Integer sourceValueIndex = fvs.getIndex();
-		Integer destinationValueIndex = vm.getValueIndexMapping().get(sourceValueIndex);
-		FieldValue fvd = vm.getDestinationField().getPossibleValues().stream().filter(n -> {
-			return destinationValueIndex != null && n.getIndex() == destinationValueIndex;
-		}).findFirst().get();
-		return Integer.parseInt(fvd.getCode());
+		return getIdByValue(fieldValue, optVm, sourceField, useCode);
 	}
+	
+	private Integer getOrgIdFromList(String fieldValue, String sourceField, List<FieldMapping> fieldMappings,
+            List<FieldValueMapping> valueMappings, Boolean useCode, String fieldDisplayName) throws ValueMappingException {
+                
+        Optional<FieldValueMapping> optVm = valueMappings.stream().filter(n -> {
+            return n.getSourceField().getFieldName().equals(sourceField) && n.getSourceField().getDisplayName().equals(fieldDisplayName);
+        }).findFirst();
 
+        return getIdByValue(fieldValue, optVm, sourceField, useCode);
+    }
+
+	private Integer getIdByValue(String fieldValue, Optional<FieldValueMapping> optVm, String sourceField, Boolean useCode) throws ValueMappingException {
+	    if ((!optVm.isPresent()) || (optVm.get().getSourceField().getPossibleValues() == null)) {
+            throw new ValueMappingException("The mapping for " + sourceField + " is invalid. No source values were found." );                       
+        }        
+        
+        FieldValueMapping vm = optVm.get();
+        FieldValue fvs = vm.getSourceField().getPossibleValues().stream().filter(n -> {
+            if (useCode) {
+                return n.getCode().equals(fieldValue);
+            } else {
+                return n.getValue().equals(fieldValue);
+            }
+        }).findFirst().get();
+        Integer sourceValueIndex = fvs.getIndex();
+        Integer destinationValueIndex = vm.getValueIndexMapping().get(sourceValueIndex);
+        FieldValue fvd = vm.getDestinationField().getPossibleValues().stream().filter(n -> {
+            return destinationValueIndex != null && n.getIndex() == destinationValueIndex;
+        }).findFirst().get();
+        return Integer.parseInt(fvd.getCode());
+	}
+	
 	private String getTransactionDate(String dateString) {
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Date inputDate;
@@ -1054,17 +1143,20 @@ public abstract class AMPStaticProcessor implements IDestinationProcessor {
 		List<FieldValue> sourcePossibleValues = mapping.getSourceField().getPossibleValues();
 		String[] stringValues = (String[]) value;
 
-		for (int i = 0; i < stringValues.length; i++) {
-			final int stringValueIndex = i;
-			Optional<FieldValue> optSourceValueIndex = sourcePossibleValues.stream().filter(n -> {
-				return n.getCode().equals(stringValues[stringValueIndex]);
-			}).findAny();
-			Integer sourceValueIndex = optSourceValueIndex.get().getIndex();
-			Integer destinationValueIndex = valueMapIndex.get(sourceValueIndex);
-			List<FieldValue> destinationPossibleValues = mapping.getDestinationField().getPossibleValues();
-			FieldValue destinationValue = destinationPossibleValues.get(destinationValueIndex);
-			return destinationValue.getProperties();
+		if (stringValues != null) {
+		    for (int i = 0; i < stringValues.length; i++) {
+	            final int stringValueIndex = i;
+	            Optional<FieldValue> optSourceValueIndex = sourcePossibleValues.stream().filter(n -> {
+	                return n.getCode().equals(stringValues[stringValueIndex]);
+	            }).findAny();
+	            Integer sourceValueIndex = optSourceValueIndex.get().getIndex();
+	            Integer destinationValueIndex = valueMapIndex.get(sourceValueIndex);
+	            List<FieldValue> destinationPossibleValues = mapping.getDestinationField().getPossibleValues();
+	            FieldValue destinationValue = destinationPossibleValues.get(destinationValueIndex);
+	            return destinationValue.getProperties();
+	        } 
 		}
+		
 		return null;
 	}
 

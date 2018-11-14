@@ -200,12 +200,15 @@ var FilterData = React.createClass({
                     {this.props.i18nLib.t('wizard.filter_data.select_filters')}
                     <br /><br />
                     {filters}
-                    <div className="panel panel-warning">
+                    {languages.length > 0 &&
+                        <div className="panel panel-warning">
                         <div className="panel-heading">{this.props.i18nLib.t('wizard.filter_data.language')}</div>
                         <div className="panel-body">
                             {languages}
                         </div>
-                    </div>
+                      </div>  
+                    }
+                   
                 </div>
                 <div className="buttons">
                     <div className="row">                          

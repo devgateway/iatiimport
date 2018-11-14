@@ -5,6 +5,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.model.Language;
 import org.devgateway.importtool.services.processor.helper.ActionStatus;
+import org.devgateway.importtool.services.processor.helper.Constants;
 import org.devgateway.importtool.services.processor.helper.Field;
 import org.devgateway.importtool.services.processor.helper.FieldType;
 import org.devgateway.importtool.services.processor.helper.FieldValue;
@@ -127,8 +128,6 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 		
 		return list;
 	}
-	
-
 
 	@Override
 	public List<Field> getFilterFields() {
@@ -371,7 +370,7 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 					if (fieldNodeList.getLength() > 0) {
 						for (int j = 0; j < fieldNodeList.getLength(); j++) {
 							Element fieldElement = (Element) fieldNodeList.item(j);
-							if (fieldElement.getAttribute("role").equals(field.getSubType())) {
+							if (fieldElement.getAttribute("role").equals(field.getSubType()) || fieldElement.getAttribute("role").equals(field.getSubTypeCode())) {
 								final String stringOrgValue = fieldElement.getTextContent();
 								final String ref = fieldElement.getAttribute("ref");
 								if ((stringOrgValue != null && !stringOrgValue.trim().isEmpty())
@@ -471,12 +470,20 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 
 							Element providerNode = e.getElementsByTagName("provider-org").item(0) != null
 									? (Element) e.getElementsByTagName("provider-org").item(0) : null;
+							
+							//if no provider tag, use reporting org		
+                            if (providerNode == null) {
+                                providerNode = element.getElementsByTagName("reporting-org").item(0) != null
+                                        ? (Element) element.getElementsByTagName("reporting-org").item(0)
+                                        : null;
+                            }
 
 							final String providingOrganization = (providerNode != null
 									&& providerNode.getChildNodes().getLength() > 0)
 											? providerNode.getChildNodes().item(0).getNodeValue() : "";
 							final String providerRef = (providerNode != null) ? providerNode.getAttribute("ref") : "";
-
+							
+							
 							// Get the field for provider org
 							Optional<Field> fieldValue = getFilterFieldList().stream().filter(n -> {
 								return "provider-org".equals(n.getFieldName());
@@ -594,26 +601,11 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 			}			
 		
 	}
-	
-	private List<String> extractLanguage(NodeList elementsByTagName) {
-		List<String> list = new ArrayList<String>();
-		try {
-			for (int i = 0; i < elementsByTagName.getLength(); i++) {
-				Node langAttr = elementsByTagName.item(i).getAttributes().getNamedItem("xml:lang");
-				if (langAttr == null)
-					continue;
-				String lang = langAttr.getNodeValue();
-				if (!list.contains(lang)) {
-					list.add(lang);
-				}
-			}
-		} catch (Exception e) {
-			// e.printStackTrace();
-		}
-		return list;
-	}
+
 
 	protected void instantiateStaticFields() {
+		//We need to to refactor the way of instantiating this static fields. Probably from a config file, or from
+		// configuration map, but it has a lot of repeating code
 		// Text fields
 		getFields().add(new Field("IATI Identifier", "iati-identifier", FieldType.STRING,
                 false, getTranslationForField("iati-identifier")));
@@ -693,61 +685,70 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 
 		// Dates
 		Field activityDateStartPlanned = new Field("Activity Date Start Planned", "activity-date",
-                FieldType.DATE, true, getTranslationForField("activity-date"));
+                FieldType.DATE, true, getTranslationForField("activity-date_start-planned"));
 		activityDateStartPlanned.setSubType("start-planned");
 		getFields().add(activityDateStartPlanned);
 
 		Field activityDateEndPlanned = new Field("Activity Date End Planned", "activity-date",
-                FieldType.DATE, true, getTranslationForField("activity-date"));
+                FieldType.DATE, true, getTranslationForField("activity-date_end-planned"));
 		getFields().add(activityDateEndPlanned);
 		activityDateEndPlanned.setSubType("end-planned");
 
 		Field activityDateStartActual = new Field("Activity Date Start Actual", "activity-date",
-                FieldType.DATE, true ,getTranslationForField("activity-date"));
+                FieldType.DATE, true ,getTranslationForField("activity-date_start-actual"));
 		activityDateStartActual.setSubType("start-actual");
 		getFields().add(activityDateStartActual);
 
 		Field activityDateEndActual = new Field("Activity Date End Actual", "activity-date",
-                FieldType.DATE, true, getTranslationForField("activity-date"));
+                FieldType.DATE, true, getTranslationForField("activity-date_end-actual"));
 		getFields().add(activityDateEndActual);
 		activityDateEndActual.setSubType("end-actual");
 
 		// Transaction Fields
 		Field commitments = new Field("Commitments", "transaction", FieldType.TRANSACTION,
-                true, getTranslationForField("transaction"));
+                true, getTranslationForField("transaction_C"));
 		commitments.setSubType("C");
 		commitments.setSubTypeCode("2");
 		getFields().add(commitments);
 
 		Field disbursements = new Field("Disbursements", "transaction", FieldType.TRANSACTION,
-                true, getTranslationForField("transaction"));
+                true, getTranslationForField("transaction_D"));
 		disbursements.setSubType("D");
 		disbursements.setSubTypeCode("3");
 		getFields().add(disbursements);
 
 		// Organization Fields
-		Field participatingOrg = new Field("Funding Organization", "participating-org",
-                FieldType.ORGANIZATION,true, getTranslationForField("participating-org"));
-		participatingOrg.setSubType("Funding");
+		
+		Field participatingOrg = new Field(Constants.FUNDING_ORG_DISPLAY_NAME, "participating-org",
+                FieldType.ORGANIZATION,true, getTranslationForField("participating-org_"
+				+ Constants.ORG_ROLE_FUNDING));
+		participatingOrg.setSubType(Constants.ORG_ROLE_FUNDING);
+		participatingOrg.setSubTypeCode(Constants.ORG_ROLE_FUNDING_CODE);
 		getFields().add(participatingOrg);
 		
-		Field accountableOrg = new Field("Accountable Organization", "participating-org",
-                FieldType.ORGANIZATION, true ,getTranslationForField("participating-org"));
-		accountableOrg.setSubType("Accountable");
+		Field accountableOrg = new Field(Constants.ACCOUNTABLE_ORG_DISPLAY_NAME, "participating-org",
+                FieldType.ORGANIZATION, true ,getTranslationForField("participating-org_"
+				+ Constants.ORG_ROLE_ACCOUNTABLE));
+		accountableOrg.setSubTypeCode(Constants.ORG_ROLE_ACCOUNTABLE_CODE);
+		accountableOrg.setSubType(Constants.ORG_ROLE_ACCOUNTABLE);
 		getFields().add(accountableOrg);
 
-		Field extendingOrg = new Field("Extending Organization", "participating-org",
-                FieldType.ORGANIZATION, true, getTranslationForField("participating-org"));
-		extendingOrg.setSubType("Extending");
+		Field extendingOrg = new Field(Constants.EXTENDING_ORG_DISPLAY_NAME, "participating-org",
+                FieldType.ORGANIZATION, true, getTranslationForField("participating-org_"
+				+ Constants.ORG_ROLE_EXTENDING));
+		extendingOrg.setSubTypeCode(Constants.ORG_ROLE_EXTENDING_CODE);
+		extendingOrg.setSubType(Constants.ORG_ROLE_EXTENDING);
 		getFields().add(extendingOrg);
 
-		Field implementingOrg = new Field("Implementing Organization", "participating-org",
-                FieldType.ORGANIZATION, true, getTranslationForField("participating-org"));
-		implementingOrg.setSubType("Implementing");
+		Field implementingOrg = new Field(Constants.IMPLEMENTING_ORG_DISPLAY_NAME, "participating-org",
+                FieldType.ORGANIZATION, true, getTranslationForField("participating-org_"
+				+ Constants.ORG_ROLE_IMPLEMENTING));
+		implementingOrg.setSubTypeCode(Constants.ORG_ROLE_IMPLEMENTING_CODE);
+		implementingOrg.setSubType(Constants.ORG_ROLE_IMPLEMENTING);
 		getFields().add(implementingOrg);
 		
 		// Provider Organization, within Transactions
-		Field providerOrg = new ProviderOganizationField("Provider Organization", "provider-org",
+		Field providerOrg = new ProviderOganizationField(Constants.PROVIDER_ORG_DISPLAY_NAME, "provider-org",
                 FieldType.ORGANIZATION, false, getTranslationForField("provider-org"));
 		providerOrg.setSubType("Provider");
 		getFields().add(providerOrg);

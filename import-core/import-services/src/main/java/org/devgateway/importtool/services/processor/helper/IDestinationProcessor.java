@@ -21,7 +21,11 @@ public interface IDestinationProcessor {
 
 	public String getTitleField();
 
-	public void setActionStatus(ActionStatus documentMappingStatus);
+	String getProcessorVersion();
+
+	void setProcessorVersion(String processorVersion);
+
+    public void setActionStatus(ActionStatus documentMappingStatus);
 	public List<DocumentMapping> preImportProcessing(List<DocumentMapping> documentMappings);
 	
 

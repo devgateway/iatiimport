@@ -246,6 +246,16 @@ public class AMPProcessor implements IDestinationProcessor {
 		return DEFAULT_TITLE_FIELD;
 	}
 
+	@Override
+	public String getProcessorVersion() {
+		return null;
+	}
+
+	@Override
+	public void setProcessorVersion(String processorVersion) {
+
+	}
+
 	private String getFieldsEndpoint() {
 		return fieldsEndpoint;
 	}

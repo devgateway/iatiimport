@@ -37,6 +37,18 @@ var taskConfig = function(grunt) {
         '<%= yeogurt.dist %>/scripts/main.js': ['<%= yeogurt.client %>/scripts/main.js']
       }
     },
+    qa: {
+      options: {
+        transform:  [ require('grunt-react').browserify ],
+        browserifyOptions: {
+          debug: true,
+          extensions: '.jsx'
+        }
+      },
+      files: {
+        '<%= yeogurt.dist %>/scripts/main.js': ['<%= yeogurt.client %>/scripts/main.js']
+      }
+    },
     test: {
       options: {
         transform:  [ require('grunt-react').browserify ],
