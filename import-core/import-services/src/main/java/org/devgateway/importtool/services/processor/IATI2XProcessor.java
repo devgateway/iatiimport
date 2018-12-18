@@ -35,7 +35,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -47,6 +46,8 @@ public class IATI2XProcessor extends IATIProcessor {
 	private static final String ISO_DATE = "yyyy-MM-dd";
 
 	private Log log = LogFactory.getLog(getClass());
+
+	private String PROCESSOR_SUPER_VERSION = "2x";
 
 	private List<String> languageList = null;
 	// Field names on the source document that hold key information
@@ -65,7 +66,9 @@ public class IATI2XProcessor extends IATIProcessor {
 	private ActionStatus actionStatus;
 
     public IATI2XProcessor(){
-	    
+		labelsTranslationsLocation = "IATI2X/fields/labels/labels";
+
+
 	}
 
 	public ActionStatus getActionStatus() {
@@ -634,58 +637,61 @@ public class IATI2XProcessor extends IATIProcessor {
 	protected void instantiateStaticFields() {
 		// Text fields
 		getFields().add(new Field("IATI Identifier", "iati-identifier", FieldType.STRING,
-				false, getTranslationForField("iati-identifier")));
+				false, getTooltipForField("iati-identifier"),getLabelsForField("iati-identifier")));
+
 		getFields().add(new Field("Title", "title", FieldType.MULTILANG_STRING, false,
-				getTranslationForField("title")));
+				getTooltipForField("title"),getLabelsForField("title")));
+
 		getFields().add(new Field("Description", "description", FieldType.MULTILANG_STRING,
-				true, getTranslationForField("description")));
+				true, getTooltipForField("description"), getLabelsForField("description")));
 
 		// Code Lists
 		Field activityStatus = new Field("Activity Status", "activity-status", FieldType.LIST,
-				true, getTranslationForField("activity-status"));
+				true, getTooltipForField("activity-status"), getLabelsForField("activity-status"));
 		activityStatus.setPossibleValues(getCodeListValues("activity-status"));
 		getFields().add(activityStatus);
 		getFilterFieldList().add(activityStatus);
 
 		Field activityScope = new Field("Activity Scope", "activity-scope", FieldType.LIST,
-				true, getTranslationForField("activity-scope"));
+				true, getTooltipForField("activity-scope"), getLabelsForField("activity-scope"));
 		activityScope.setPossibleValues(getCodeListValues("activity-scope"));
 		getFields().add(activityScope);
 		getFilterFieldList().add(activityScope);
 
 		Field aidType = new Field("Aid Type", "default-aid-type", FieldType.LIST, true,
-				getTranslationForField("default-aid-type"));
+				getTooltipForField("default-aid-type"), getLabelsForField("default-aid-type"));
 		aidType.setPossibleValues(getCodeListValues("default-aid-type"));
 		getFields().add(aidType);
 		getFilterFieldList().add(aidType);
 
 		Field financeType = new Field("Finance Type", "default-finance-type", FieldType.LIST,
-				true, getTranslationForField("default-finance-type"));
+				true, getTooltipForField("default-finance-type"), getLabelsForField("default-finance-type"));
 		financeType.setPossibleValues(getCodeListValues("default-finance-type"));
 		getFields().add(financeType);
 		getFilterFieldList().add(financeType);
 
 		Field flowType = new Field("Flow Type", "default-flow-type", FieldType.LIST,
-				true, getTranslationForField("default-flow-type"));
+				true, getTooltipForField("default-flow-type"), getLabelsForField("default-flow-type"));
 		flowType.setPossibleValues(getCodeListValues("default-flow-type"));
 		getFields().add(flowType);
 		getFilterFieldList().add(flowType);
 
 		Field tiedStatus = new Field("Tied Status", "default-tied-status", FieldType.LIST,
-				true, getTranslationForField("default-tied-status"));
+				true, getTooltipForField("default-tied-status"), getLabelsForField("default-tied-status"));
 		tiedStatus.setPossibleValues(getCodeListValues("default-tied-status"));
 		getFields().add(tiedStatus);
 		getFilterFieldList().add(tiedStatus);
 
 		Field policyMarker = new Field("PolicyMarker", "policy-marker", FieldType.LIST,
-				true, getTranslationForField("policy-marker"));
+				true, getTooltipForField("policy-marker"), getLabelsForField("policy-marker"));
 		policyMarker.setPossibleValues(getCodeListValues("policy-marker"));
 		policyMarker.setMultiple(true);
 		getFields().add(policyMarker);
 		getFilterFieldList().add(policyMarker);
 
 		Field recipientCountry = new Field("Recipient Country", "recipient-country",
-				FieldType.RECIPIENT_COUNTRY, true, getTranslationForField("recipient-country"));
+				FieldType.RECIPIENT_COUNTRY, true, getTooltipForField("recipient-country"),
+				getLabelsForField("recipient-country"));
 		recipientCountry.setPossibleValues(getCodeListValues("recipient-country"));
 		recipientCountry.setExclusive(true);
 		recipientCountry.setFilterRequired(true);
@@ -693,7 +699,7 @@ public class IATI2XProcessor extends IATIProcessor {
 		getFilterFieldList().add(recipientCountry);
 
 		Field sector = new Field("Sector", "sector", FieldType.LIST, true,
-				getTranslationForField("sector"));
+				getTooltipForField("sector"), getLabelsForField("sector"));
 		sector.setPossibleValues(getCodeListValues("sector"));
 		sector.setMultiple(true);
 		sector.setPercentage(true);
@@ -701,7 +707,7 @@ public class IATI2XProcessor extends IATIProcessor {
 		getFilterFieldList().add(sector);
 
 		Field location = new Field("Location", "location", FieldType.LOCATION, true,
-				getTranslationForField("location"));
+				getTooltipForField("location"), getLabelsForField("location"));
 		location.setPossibleValues(new ArrayList<FieldValue>());
 		location.setMultiple(true);
 		location.setPercentage(true);
@@ -710,40 +716,43 @@ public class IATI2XProcessor extends IATIProcessor {
 		// Dates
 		Field activityDateStartPlanned = new Field("Activity Date Start Planned",
 				"activity-date", FieldType.DATE, true,
-				getTranslationForField("activity-date_start-planned"));
+				getTooltipForField("activity-date_start-planned"), getLabelsForField("activity-date_start-planned"));
 		activityDateStartPlanned.setSubType("start-planned");
 		getFields().add(activityDateStartPlanned);
 
 		Field activityDateEndPlanned = new Field("Activity Date End Planned", "activity-date",
-				FieldType.DATE, true, getTranslationForField("activity-date_end-planned"));
+				FieldType.DATE, true, getTooltipForField("activity-date_end-planned"),
+				getLabelsForField("activity-date_end-planned"));
 		getFields().add(activityDateEndPlanned);
 		activityDateEndPlanned.setSubType("end-planned");
 
 		Field activityDateStartActual = new Field("Activity Date Start Actual", "activity-date",
-				FieldType.DATE, true, getTranslationForField("activity-date_start-actual"));
+				FieldType.DATE, true, getTooltipForField("activity-date_start-actual"),
+				getLabelsForField("activity-date_start-actual"));
 		activityDateStartActual.setSubType("start-actual");
 		getFields().add(activityDateStartActual);
 
 		Field activityDateEndActual = new Field("Activity Date End Actual", "activity-date",
-				FieldType.DATE, true, getTranslationForField("activity-date_end-actual"));
+				FieldType.DATE, true, getTooltipForField("activity-date_end-actual"),
+				getLabelsForField("activity-date_end-actual"));
 		getFields().add(activityDateEndActual);
 		activityDateEndActual.setSubType("end-actual");
 
 		// Transaction Fields
 		Field commitments = new Field("Commitments", "transaction", FieldType.TRANSACTION,
-				true, getTranslationForField("transaction_C"));
+				true, getTooltipForField("transaction_C"), getLabelsForField("transaction_C"));
 		commitments.setSubType("C");
 		commitments.setSubTypeCode("2");
 		getFields().add(commitments);
 
 		Field disbursements = new Field("Disbursements", "transaction", FieldType.TRANSACTION,
-				true, getTranslationForField("transaction_D"));
+				true, getTooltipForField("transaction_D"), getLabelsForField("transaction_D"));
 		disbursements.setSubType("D");
 		disbursements.setSubTypeCode("3");
 		getFields().add(disbursements);
 
 		Field expenditure = new Field(Constants.EXPENDITURES, "transaction", FieldType.TRANSACTION,
-				true, getTranslationForField("transaction_E"));
+				true, getTooltipForField("transaction_E"), getLabelsForField("transaction_E"));
 		expenditure.setSubType("E");
 		expenditure.setSubTypeCode("4");
 		getFields().add(expenditure);
@@ -751,36 +760,41 @@ public class IATI2XProcessor extends IATIProcessor {
 
 		// Organization Fields
 		Field participatingOrg = new Field(Constants.FUNDING_ORG_DISPLAY_NAME, "participating-org",
-				FieldType.ORGANIZATION, true, getTranslationForField("participating-org_"
+				FieldType.ORGANIZATION, true, getTooltipForField("participating-org_"
+				+ Constants.ORG_ROLE_FUNDING), getLabelsForField("participating-org_"
 				+ Constants.ORG_ROLE_FUNDING));
 		participatingOrg.setSubType(Constants.ORG_ROLE_FUNDING);
         participatingOrg.setSubTypeCode(Constants.ORG_ROLE_FUNDING_CODE);
 		getFields().add(participatingOrg);
 
 		Field accountableOrg = new Field(Constants.ACCOUNTABLE_ORG_DISPLAY_NAME, "participating-org",
-				FieldType.ORGANIZATION, true, getTranslationForField("participating-org_"
+				FieldType.ORGANIZATION, true, getTooltipForField("participating-org_"
+				+ Constants.ORG_ROLE_ACCOUNTABLE), getLabelsForField("participating-org_"
 				+ Constants.ORG_ROLE_ACCOUNTABLE));
 		accountableOrg.setSubTypeCode(Constants.ORG_ROLE_ACCOUNTABLE_CODE);
         accountableOrg.setSubType(Constants.ORG_ROLE_ACCOUNTABLE);
 		getFields().add(accountableOrg);
 
 		Field extendingOrg = new Field(Constants.EXTENDING_ORG_DISPLAY_NAME, "participating-org",
-				FieldType.ORGANIZATION, true, getTranslationForField("participating-org_"
+				FieldType.ORGANIZATION, true, getTooltipForField("participating-org_"
+				+ Constants.ORG_ROLE_EXTENDING), getLabelsForField("participating-org_"
 				+ Constants.ORG_ROLE_EXTENDING));
 		 extendingOrg.setSubTypeCode(Constants.ORG_ROLE_EXTENDING_CODE);
 	     extendingOrg.setSubType(Constants.ORG_ROLE_EXTENDING);
 		getFields().add(extendingOrg);
 
 		Field implementingOrg = new Field(Constants.IMPLEMENTING_ORG_DISPLAY_NAME, "participating-org",
-				FieldType.ORGANIZATION, true, getTranslationForField("participating-org_"
+				FieldType.ORGANIZATION, true, getTooltipForField("participating-org_"
+				+ Constants.ORG_ROLE_IMPLEMENTING), getLabelsForField("participating-org_"
 				+ Constants.ORG_ROLE_IMPLEMENTING));
 		implementingOrg.setSubTypeCode(Constants.ORG_ROLE_IMPLEMENTING_CODE);
         implementingOrg.setSubType(Constants.ORG_ROLE_IMPLEMENTING);
 		getFields().add(implementingOrg);
 
-// Provider Organization, within Transactions
+	// Provider Organization, within Transactions
 		Field providerOrg = new Field(Constants.PROVIDER_ORG_DISPLAY_NAME, "provider-org",
-				FieldType.ORGANIZATION, false, getTranslationForField("provider-org"));
+				FieldType.ORGANIZATION, false, getTooltipForField("provider-org"),
+				getLabelsForField("provider-org"));
 		providerOrg.setSubType("Provider");
 		getFields().add(providerOrg);
 		getFilterFieldList().add(providerOrg);
