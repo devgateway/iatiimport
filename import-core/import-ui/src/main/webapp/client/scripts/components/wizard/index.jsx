@@ -262,14 +262,14 @@ var Wizard = React.createClass({
     goHome: function(){
         window.location = "#";
     },
-	launchImport: function(importOption) {
+	launchImport: function(importOption, disasterResponse) {
 		var self = this;
 		this.showLoadingIcon();
 		$.ajax({
 	    	url: '/importer/import/execute',
 	        dataType: 'json',
 	        contentType: "application/json; charset=utf-8",
-	        data: JSON.stringify({importOption: importOption}),
+	        data: JSON.stringify({importOption: importOption, disasterResponse: disasterResponse}),
 	        success: function(data) {
 	        },
 	        type: 'POST'

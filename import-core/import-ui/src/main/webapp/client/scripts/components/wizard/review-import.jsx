@@ -10,7 +10,7 @@ var importSummaryStore = require('./../../stores/ImportSummaryStore');
 var ReviewImport = React.createClass({
 	mixins: [Reflux.ListenerMixin],
 	getInitialState: function() {
-		return {importSummary:{}, importOption: constants.OVERWRITE_ALL_FUNDING};
+		return {importSummary:{}, importOption: constants.OVERWRITE_ALL_FUNDING, disasterResponse: false};
 	 },
 	componentDidMount: function() {
 		this.props.eventHandlers.updateCurrentStep(constants.REVIEW_IMPORT);
@@ -44,14 +44,19 @@ var ReviewImport = React.createClass({
          this.setState({importOption:event.target.value})
       }
     }, 
+    onDisasterReponseChange: function(event) {
+        if(event.target.checked) {              
+            this.setState({disasterResponse: event.target.value === constants.YES })
+         }
+       }, 
     import: function() {
      if (this.state.importOption === constants.OVERWRITE_ALL_FUNDING || this.state.importOption === constants.REPLACE_DONOR_FUNDING) {
        var message = this.state.importOption === constants.OVERWRITE_ALL_FUNDING ? this.props.i18nLib.t('wizard.review_import.import_option_overwrite_prompt') : this.props.i18nLib.t('wizard.review_import.import_option_replace_prompt');
        if (confirm(message)) {
-           this.props.eventHandlers.launchImport(this.state.importOption);
+           this.props.eventHandlers.launchImport(this.state.importOption, this.state.disasterResponse);
        }
      } else {
-       this.props.eventHandlers.launchImport(this.state.importOption);
+       this.props.eventHandlers.launchImport(this.state.importOption, this.state.disasterResponse);
      }       
     },  
     hasMoreVersions: function() {
@@ -83,8 +88,23 @@ var ReviewImport = React.createClass({
                                <label><input type="radio" name="importOption" value={constants.REPLACE_DONOR_FUNDING} onChange={this.onImportOptionChange} checked={constants.REPLACE_DONOR_FUNDING === this.state.importOption}/>{this.props.i18nLib.t('wizard.review_import.import_option_replace')}</label><br/>
                                <label className="import-option-explanation">{this.props.i18nLib.t('wizard.review_import.import_option_replace_explanation')}</label>
                              </div>
+                               
+                               <label>{this.props.i18nLib.t('wizard.review_import.disaster_response')}</label>                               
+                               <div className="radio">
+                                 <label><input type="radio" name="disasterResponse" value={constants.YES} onChange={this.onDisasterReponseChange} checked={true === this.state.disasterResponse}/>{this.props.i18nLib.t('wizard.review_import.yes')}</label><br/>
+                               </div>
+                               
+                               <div className="radio">
+                                 <label><input type="radio" name="disasterResponse" value={constants.NO} onChange={this.onDisasterReponseChange} checked={false === this.state.disasterResponse}/>{this.props.i18nLib.t('wizard.review_import.no')}</label><br/>
+                               </div>
+                               
+                               
                           </div>
                         </div>
+                        <div>                              
+                               
+                          </div>
+                                                 
                         <div className="col-sm-6 col-md-6">
                             <div className="form-group has-success has-feedback">
                             

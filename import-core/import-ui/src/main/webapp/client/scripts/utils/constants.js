@@ -42,5 +42,7 @@ module.exports = {
       DEFAULT_TIED_STATUS:'default-tied-status',
       SECTOR: 'sector',
       POLICY_MARKER: 'policy-marker'
-  }
+  },
+  YES: 'Yes',
+  NO: 'No'
 };
