@@ -180,7 +180,10 @@ module.exports = {
 							'import_option_replace': 'Replace funding information',
 							'import_option_replace_explanation': 'Replaces funding information in the AMP project with funding information from the IATI file. This is done per donor. Data for donors that are not reporting is not affected.',
 							'import_option_replace_prompt': 'You have selected the "Replace funding information" Import option. This option updates existing activities by overwriting the fundings for donors that have data in the IATI file. Do you want to proceed? ',
-							'process_next_version' :'Process Next Version'
+							'process_next_version' :'Process Next Version',
+							'yes': 'Yes',
+							'no': 'No',
+							'disaster_response': 'Disaster Response'
 						},
 						'mappings_dropdown' : {
 							'confirm_delete' : 'Are you sure you want to delete  __templateName__ ?'
@@ -480,7 +483,10 @@ module.exports = {
 							'import_option_replace': 'Reemplazar información de financiamiento',
 							'import_option_replace_explanation': 'Reemplaza la información de financiamiento en el proyecto de AMP con información de financiamiento proveniente del archivo IATI. Esto se hace por cada organización donante. No se ven afectados los datos de donantes que no están declarando información.',
 							'import_option_replace_prompt': 'Ha seleccionado la opción de importación: "Reemplazar información de financiamiento". Esta opción actualiza los proyectos existentes reemplazando el financiamento en aquellas organizaciones donantes que possen datos en el archivo de IATI. Desea proceder?',
-							'process_next_version': 'Procesar la siguiente versión'
+							'process_next_version': 'Procesar la siguiente versión',
+							'yes': 'Sí',
+							'no': 'No',
+							'disaster_response': 'Respuesta a desastres'
 						},
 						'mappings_dropdown' : {
 							'confirm_delete' : 'Está seguro de eliminar  __templateName__ ?'
@@ -779,7 +785,10 @@ module.exports = {
 							'import_option_replace': 'Remplacer les informations de financement',
 							'import_option_replace_explanation': "Remplace les informations de financement dans le projet AMP avec des informations de financement provenant du fichier IATI. Ceci est fait par donateur. Les données des donateurs ni figurant pas dans le fichier IATI ne seront pas affectées.",
 							'import_option_replace_prompt': "Vous avez sélectionné l'option d'import Remplacer les informations de financement. Cette option met à jour les activités existantes en écrasant toutes les transactions financières des donateurs qui sont inclus dans le fichier de l'IATI. Voulez-vous continuer?",
-							'process_next_version' :'Traiter la version suivante'
+							'process_next_version' :'Traiter la version suivante',
+							'yes': 'Oui',
+							'no': 'Non',
+							'disaster_response': 'Disaster Response'
 						},
 						'mappings_dropdown' : {
 							'confirm_delete' : ' Etes - vous sûr(e)de vouloir supprimer __templateName__ ? '
