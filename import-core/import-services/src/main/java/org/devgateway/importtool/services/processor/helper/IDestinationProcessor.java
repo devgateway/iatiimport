@@ -15,7 +15,7 @@ public interface IDestinationProcessor {
 
 	public String getIdField();
 
-	public ActionResult insert(InternalDocument source, List<FieldMapping> fieldMapping, List<FieldValueMapping> valueMapping);
+	public ActionResult insert(InternalDocument source, List<FieldMapping> fieldMapping, List<FieldValueMapping> valueMapping, ImportRequest importRequest);
 
 	public ActionResult update(InternalDocument source, InternalDocument destination, List<FieldMapping> fieldMapping, List<FieldValueMapping> valueMapping, boolean overrideTitle, ImportRequest importRequest);
 
@@ -27,6 +27,4 @@ public interface IDestinationProcessor {
 
     public void setActionStatus(ActionStatus documentMappingStatus);
 	public List<DocumentMapping> preImportProcessing(List<DocumentMapping> documentMappings);
-	
-
 }
