@@ -190,9 +190,10 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 					String id = node.get("internal_id").asText();
 					String internalId = node.get("amp_id").asText();
 					// Needs to be checked, since it's configurable it might not have a value
-					if (node.get(ampIatiIdField) != null) {
-						document.setIdentifier(node.get(ampIatiIdField).asText());
-						document.addStringField(ampIatiIdField, node.get(ampIatiIdField).asText());
+					JsonNode ampIatiId = node.get(ampIatiIdField);					
+					if (ampIatiId != null && !Constants.NULL_STRING.equals(ampIatiId.asText())) {
+					    document.setIdentifier(ampIatiId.asText());
+						document.addStringField(ampIatiIdField, ampIatiId.asText());
 					}
 					Map<String, String> title = extractMultilanguageText(node.get("project_title"));
 					String dateString = node.get("creation_date").asText();

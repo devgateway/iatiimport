@@ -65,4 +65,6 @@ public class Constants {
 	public static final List<String> TRANSACTION_FIELDS = new ArrayList<>(Arrays.asList("Actual Commitments",
 			"Actual Disbursements","Actual Expenditures","Planned Commitments", "Planned Disbursements",
 			"Planned Expenditures"));
+	
+	public static final String NULL_STRING ="null";
 }
