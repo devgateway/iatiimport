@@ -21,7 +21,14 @@ module.exports = {
 	 }
 	  
 	 return result;
-  },  
+  },
+  getDisplayValue: function(item, language) {
+    var displayValue = item.displayName;
+    if (item.multiLangDisplayName && item.multiLangDisplayName[language]) {
+      displayValue = item.multiLangDisplayName[language];
+    }
+    return displayValue;
+  },
   getFieldDisplayName: function(fieldData, fieldName) {
 	  var displayName = '';
 	  var field = _.find(fieldData, function(sourceField) { 

@@ -1,5 +1,11 @@
 package org.devgateway.importtool.services.processor.helper;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 public class Constants {
 	public static final String SOURCE_PROCESSOR = "SOURCE_PROCESSOR";
 	public static final String IATI_STORE_ACTIVITIES = "IATI_STORE_ACTIVITIES";
@@ -51,5 +57,12 @@ public class Constants {
 	public static final String PROVIDER_ORG_DISPLAY_NAME = "Provider Organization";	
 	public static final String IMPLEMENTING_ORG_DISPLAY_NAME = "Implementing Organization";
 	public static final String EXTENDING_ORG_DISPLAY_NAME = "Extending Organization";
-	public static final String ACCOUNTABLE_ORG_DISPLAY_NAME = "Accountable Organization";	
+	public static final String ACCOUNTABLE_ORG_DISPLAY_NAME = "Accountable Organization";
+	public static final Set<String> SUPPORTED_LOCALES= new HashSet<>(Arrays.asList("en","fr", "es"));
+
+	public static final String LANG_PACK_TOOLTIPS="TOOLTIPS";
+	public static final String LANG_PACK_LABELS="LABELS";
+	public static final List<String> TRANSACTION_FIELDS = new ArrayList<>(Arrays.asList("Actual Commitments",
+			"Actual Disbursements","Actual Expenditures","Planned Commitments", "Planned Disbursements",
+			"Planned Expenditures"));
 }
