@@ -14,7 +14,7 @@ var ReviewImport = React.createClass({
 	 },
 	componentDidMount: function() {
 		this.props.eventHandlers.updateCurrentStep(constants.REVIEW_IMPORT);
-		this.listenTo(importSummaryStore, this.updateLanguages);
+		this.listenTo(importSummaryStore, this.updateImportSummary);
 		this.loadData();
 	}, 
 	updateImportSummary: function(data){
@@ -88,17 +88,18 @@ var ReviewImport = React.createClass({
                                <label><input type="radio" name="importOption" value={constants.REPLACE_DONOR_FUNDING} onChange={this.onImportOptionChange} checked={constants.REPLACE_DONOR_FUNDING === this.state.importOption}/>{this.props.i18nLib.t('wizard.review_import.import_option_replace')}</label><br/>
                                <label className="import-option-explanation">{this.props.i18nLib.t('wizard.review_import.import_option_replace_explanation')}</label>
                              </div>
-                               
-                               <label>{this.props.i18nLib.t('wizard.review_import.disaster_response')}</label>                               
-                               <div className="radio">
-                                 <label><input type="radio" name="disasterResponse" value={constants.YES} onChange={this.onDisasterReponseChange} checked={true === this.state.disasterResponse}/>{this.props.i18nLib.t('wizard.review_import.yes')}</label><br/>
-                               </div>
-                               
-                               <div className="radio">
-                                 <label><input type="radio" name="disasterResponse" value={constants.NO} onChange={this.onDisasterReponseChange} checked={false === this.state.disasterResponse}/>{this.props.i18nLib.t('wizard.review_import.no')}</label><br/>
-                               </div>
-                               
-                               
+                               {this.props.showDisasterResponse &&
+                                   <div>
+                                   <label>{this.props.i18nLib.t('wizard.review_import.disaster_response')}</label>                               
+                                   <div className="radio">
+                                     <label><input type="radio" name="disasterResponse" value={constants.YES} onChange={this.onDisasterReponseChange} checked={true === this.state.disasterResponse}/>{this.props.i18nLib.t('wizard.review_import.yes')}</label><br/>
+                                   </div>
+                                   
+                                   <div className="radio">
+                                     <label><input type="radio" name="disasterResponse" value={constants.NO} onChange={this.onDisasterReponseChange} checked={false === this.state.disasterResponse}/>{this.props.i18nLib.t('wizard.review_import.no')}</label><br/>
+                                   </div>
+                                   </div>     
+                               }                              
                           </div>
                         </div>
                         <div>                              

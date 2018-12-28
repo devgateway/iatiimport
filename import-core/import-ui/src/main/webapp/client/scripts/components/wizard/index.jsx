@@ -29,7 +29,8 @@ var Wizard = React.createClass({
 			processedVersions: [],
 			projectWithUpdates:[],
 			currentVersion: null,
-			statusMessage: ""
+			statusMessage: "",
+			showDisasterResponse: false
 		};
 	},
 	componentWillReceiveProps: function(nextProps) {
@@ -358,6 +359,9 @@ var Wizard = React.createClass({
 	        type: 'GET'
 	     });
   },
+  showDisasterResponse: function(hasDisasterResponseField) {
+     this.setState({showDisasterResponse: hasDisasterResponseField});
+  },
   render: function() {   
     var eventHandlers = {};
     eventHandlers.uploadFile          = this.uploadFile;
@@ -377,6 +381,7 @@ var Wizard = React.createClass({
     eventHandlers.initAutomaticImport = this.initAutomaticImport;
     eventHandlers.processNextVersion = this.processNextVersion;
     eventHandlers.selectDataSource = this.selectDataSource;
+    eventHandlers.showDisasterResponse = this.showDisasterResponse;
 
     var error;
     if(common.hasValidSession() == false){

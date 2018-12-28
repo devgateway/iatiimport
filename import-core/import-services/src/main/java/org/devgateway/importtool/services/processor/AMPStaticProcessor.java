@@ -1471,6 +1471,11 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		Field currency = new Field("Currency Code", "currency_code", FieldType.LIST, true);
 		currency.setPossibleValues(getCodeListValues("fundings~funding_details~currency"));
 		fieldList.add(currency);
+		
+		 if (destinationFieldsList.contains("fundings~funding_details~disaster_response")) {
+		     Field disasterResponse = new Field("Disaster Response", "disaster_response", FieldType.BOOLEAN, false);
+		     fieldList.add(disasterResponse);
+          }
 
 	}
 
