@@ -1493,6 +1493,11 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		currency.setMultiLangDisplayName(destinationFieldsListLabels.get("fundings~funding_details~currency"));
 		currency.setPossibleValues(getCodeListValues("fundings~funding_details~currency"));
 		fieldList.add(currency);
+		
+		 if (destinationFieldsList.contains("fundings~funding_details~disaster_response")) {
+		     Field disasterResponse = new Field("Disaster Response", "disaster_response", FieldType.BOOLEAN, false);
+		     fieldList.add(disasterResponse);
+          }
 
 	}
 
