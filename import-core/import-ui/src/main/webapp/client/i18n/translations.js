@@ -183,7 +183,8 @@ module.exports = {
 							'process_next_version' :'Process Next Version',
 							'yes': 'Yes',
 							'no': 'No',
-							'disaster_response': 'Disaster Response'
+							'disaster_response': 'Disaster Response',
+							'disaster_response_tooltip': 'If the marker is true, it identifies that the funds in the projects go toward disaster response / relief. The option selected here will be a default value and may need to be adjusted afterwards in the AMP.'
 						},
 						'mappings_dropdown' : {
 							'confirm_delete' : 'Are you sure you want to delete  __templateName__ ?'
@@ -486,7 +487,8 @@ module.exports = {
 							'process_next_version': 'Procesar la siguiente versión',
 							'yes': 'Sí',
 							'no': 'No',
-							'disaster_response': 'Respuesta a desastres'
+							'disaster_response': 'Respuesta a desastres',
+							'disaster_response_tooltip': 'Si el marcador es verdadero, identifica que los fondos de los proyectos se destinan para respuesta en caso de desastres / alivio. La opción seleccionada aquí será un valor predeterminado y es posible que deba ajustarse posteriormente en el AMP.'
 						},
 						'mappings_dropdown' : {
 							'confirm_delete' : 'Está seguro de eliminar  __templateName__ ?'
@@ -788,7 +790,8 @@ module.exports = {
 							'process_next_version' :'Traiter la version suivante',
 							'yes': 'Oui',
 							'no': 'Non',
-							'disaster_response': 'Disaster Response'
+							'disaster_response': 'Disaster Response',
+							'disaster_response_tooltip': 'Si le marqueur est vrai, cela indique que les fonds des projets vont au secours en cas de catastrophe. L\'option sélectionnée ici sera une valeur par défaut et, si nécessaire, devra être ajustée ultérieurement dans le MGAE.'
 						},
 						'mappings_dropdown' : {
 							'confirm_delete' : ' Etes - vous sûr(e)de vouloir supprimer __templateName__ ? '

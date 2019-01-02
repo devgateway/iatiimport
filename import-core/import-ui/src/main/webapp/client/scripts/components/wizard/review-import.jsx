@@ -3,9 +3,9 @@ var reactAsync = require('react-async');
 var Reflux = require('reflux');
 var appActions = require('./../../actions');
 var Router = require('react-router');
-
 var constants = require('./../../utils/constants');
 var importSummaryStore = require('./../../stores/ImportSummaryStore');
+var Tooltip = require('./tooltip');
 
 var ReviewImport = React.createClass({
 	mixins: [Reflux.ListenerMixin],
@@ -90,7 +90,7 @@ var ReviewImport = React.createClass({
                              </div>
                                {this.props.showDisasterResponse &&
                                    <div>
-                                   <label>{this.props.i18nLib.t('wizard.review_import.disaster_response')}</label>                               
+                                   <Tooltip i18nLib={this.props.i18nLib} tooltip={this.props.i18nLib.t('wizard.review_import.disaster_response_tooltip')}/><label>{this.props.i18nLib.t('wizard.review_import.disaster_response')}</label>                               
                                    <div className="radio">
                                      <label><input type="radio" name="disasterResponse" value={constants.YES} onChange={this.onDisasterReponseChange} checked={true === this.state.disasterResponse}/>{this.props.i18nLib.t('wizard.review_import.yes')}</label><br/>
                                    </div>
