@@ -14,7 +14,6 @@ import org.devgateway.importtool.services.processor.helper.InternalDocument;
 import org.devgateway.importtool.services.processor.helper.ProviderOganizationField;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.util.DigestUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -366,52 +365,8 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 					IATIProcessorHelper.processStringElementType(document, element, field);
 					break;
 				case ORGANIZATION:
-					fieldNodeList = element.getElementsByTagName(field.getFieldName());
-					if (fieldNodeList.getLength() > 0) {
-						for (int j = 0; j < fieldNodeList.getLength(); j++) {
-							Element fieldElement = (Element) fieldNodeList.item(j);
-							if (fieldElement.getAttribute("role").equals(field.getSubType()) || fieldElement.getAttribute("role").equals(field.getSubTypeCode())) {
-								final String stringOrgValue = fieldElement.getTextContent();
-								final String ref = fieldElement.getAttribute("ref");
-								if ((stringOrgValue != null && !stringOrgValue.trim().isEmpty())
-										|| (ref != null && !ref.trim().isEmpty())) {
-									Map<String, String> orgFields = new HashMap<String, String>();
-									orgFields.put("value", stringOrgValue);
-									orgFields.put("role", field.getSubType());
-									orgFields.put("ref", ref);
-									orgFields.put("type", fieldElement.getAttribute("type"));
-									FieldValue fv = new FieldValue();
-									if (stringOrgValue != null && !stringOrgValue.isEmpty()) {
-										fv.setCode(stringOrgValue);
-										fv.setValue(stringOrgValue);
-									} else {
-										fv.setCode(ref);
-										fv.setValue(ref);
-									}
-									fv.setSelected(true);
-									int index = field.getPossibleValues() == null ? 0
-											: field.getPossibleValues().size();
-									fv.setIndex(index);
-
-									if (field.getPossibleValues() == null) {
-										field.setPossibleValues(new ArrayList<FieldValue>());
-									}
-
-									if (!field.getPossibleValues().stream().anyMatch(n -> {
-										return n.getCode().equals(stringOrgValue);
-									})) {
-										field.getPossibleValues().add(fv);
-									}
-
-									document.addOrganizationField(field.getFieldName() + "_" + field.getSubType() + "_"
-											+ DigestUtils.md5DigestAsHex(fv.getValue().getBytes()), orgFields);
-								}
-								
-							}
-						}
-					}
-					
-					break;
+                    processOrganizationElementType(document,element,field);
+                    break;
 				case MULTILANG_STRING:					
 					Map<String, String> mlv = new HashMap<String, String>();
 					fieldNodeList = (NodeList) xPath.evaluate(field.getFieldName(), element, XPathConstants.NODESET);
@@ -771,7 +726,9 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 		getFields().add(contact);
 
 	}
-
+    protected String getStringOrgValue(Element fieldElement) {
+        return fieldElement.getTextContent();
+    }
 	public boolean isValidDate(String dateString) {
 		SimpleDateFormat df = new SimpleDateFormat(ISO_DATE);
 		try {
