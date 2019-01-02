@@ -1,5 +1,6 @@
 package org.devgateway.importtool.services.processor;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.model.Language;
@@ -482,6 +483,40 @@ public abstract class IATIProcessor implements ISourceProcessor {
         document.addRecepientCountryFields(field.getFieldName(), recipients);
     }
 
+    protected void processLocationElementType(InternalDocument document, Element element, Field field) {
+
+        NodeList fieldNodeList = element.getElementsByTagName(field.getFieldName());
+        List<String> codesLocation = new ArrayList<String>();
+
+        for (int j = 0; j < fieldNodeList.getLength(); j++) {
+            Element fieldElement = (Element) fieldNodeList.item(j);
+            String name = getNameFromElement(fieldElement);
+
+            if (!StringUtils.isBlank(name)) {
+                codesLocation.add(name);
+                FieldValue fv = new FieldValue();
+                if (name != null && !name.isEmpty()) {
+                    fv.setCode(name);
+                    fv.setValue(name);
+                    fv.setSelected(true);
+                }
+                int index = field.getPossibleValues() == null ? 0 : field.getPossibleValues().size();
+                fv.setIndex(index);
+                if (field.getPossibleValues() == null) {
+                    field.setPossibleValues(new ArrayList<FieldValue>());
+                }
+                if (!field.getPossibleValues().stream().anyMatch(n -> {
+                    return n.getCode().equals(fv.getValue());
+                })) {
+                    field.getPossibleValues().add(fv);
+                }
+            }
+            if(!codesLocation.isEmpty()){
+                String[] codeValues = codesLocation.stream().toArray(String[]::new);
+                document.addStringMultiField(field.getFieldName(), codeValues);
+            }
+        }
+    }
     protected Boolean includedByFilter(List<String> filters, String codeValue) {
         if (filters.size() == 0)
             return true;
@@ -494,5 +529,15 @@ public abstract class IATIProcessor implements ISourceProcessor {
         return false;
     }
     protected abstract String getStringOrgValue(Element fieldElement);
+
+    /**
+     * Search for name in the element, if not available return description. Otherwise return null
+     * Each processor shall implemente where to look for name and description since it will depend on the iati version
+     * @param fieldElement
+     * @return
+     */
+
+    protected abstract String getNameFromElement(Element fieldElement);
+
 
 }
