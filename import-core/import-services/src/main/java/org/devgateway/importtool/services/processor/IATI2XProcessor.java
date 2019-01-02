@@ -358,29 +358,8 @@ public class IATI2XProcessor extends IATIProcessor {
 					IATIProcessorHelper.processListElementType(document, element, field);
 					break;
 				case RECIPIENT_COUNTRY:
-					Field filtersField = getFilterFieldList().stream().filter(n -> {
-						return field.getFieldName().equals(n.getFieldName());
-					}).findFirst().get();
-
-					fieldNodeList = element.getElementsByTagName(field.getFieldName());
-					List<FieldValue> recipients = new ArrayList<FieldValue>();
-					for (int j = 0; j < fieldNodeList.getLength(); j++) {
-						Element fieldElement = (Element) fieldNodeList.item(j);
-						FieldValue recipient = new FieldValue();
-						String code = fieldElement.getAttribute("code");
-						boolean includeCountry = includedByFilter(filtersField.getFilters(), code);
-						if(includeCountry){
-							recipient.setCode(code);
-							Optional<FieldValue> fieldValue = field.getPossibleValues().stream().filter(f -> f.getCode().equals(code)).findFirst();
-							if(fieldValue.isPresent()){
-								recipient.setValue(fieldValue.get().getValue());
-							}
-							recipient.setPercentage(fieldElement.getAttribute("percentage"));
-							recipients.add(recipient);
-						}
-					}
-					document.addRecepientCountryFields(field.getFieldName(), recipients);
-					break;
+                    processRecipientCountryElementType(document, element, field);
+                    break;
 				case STRING:
 					IATIProcessorHelper.processStringElementType(document, element, field);
 					break;
@@ -554,7 +533,7 @@ public class IATI2XProcessor extends IATIProcessor {
 		return list;
 	}
 
-	private String extractNarrative(Element e, String string) {
+    private String extractNarrative(Element e, String string) {
 		Node node = e.getElementsByTagName(string).item(0);
 		if(node != null && node.getChildNodes().getLength() > 0) {
 		    for (int i = 0; i < node.getChildNodes().getLength(); i++) {
@@ -565,19 +544,6 @@ public class IATI2XProcessor extends IATIProcessor {
 		    }
 		}
 		return null;
-	}
-
-
-	private Boolean includedByFilter(List<String> filters, String codeValue) {
-		if (filters.size() == 0)
-			return true;
-
-		for (String value : filters) {
-			if (value.equals(codeValue)) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	private void clearUsedValues(){
