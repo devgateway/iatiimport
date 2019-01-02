@@ -6,8 +6,12 @@ import org.devgateway.importtool.model.Language;
 import org.devgateway.importtool.services.processor.helper.Constants;
 import org.devgateway.importtool.services.processor.helper.Field;
 import org.devgateway.importtool.services.processor.helper.FieldType;
+import org.devgateway.importtool.services.processor.helper.FieldValue;
 import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
+import org.devgateway.importtool.services.processor.helper.InternalDocument;
+import org.springframework.util.DigestUtils;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -405,4 +409,53 @@ public abstract class IATIProcessor implements ISourceProcessor {
         }
         return list;
     }
+    protected void processOrganizationElementType(InternalDocument document, Element element, Field field) {
+        NodeList fieldNodeList;
+        fieldNodeList = element.getElementsByTagName(field.getFieldName());
+        if (fieldNodeList.getLength() > 0) {
+            for (int j = 0; j < fieldNodeList.getLength(); j++) {
+                Element fieldElement = (Element) fieldNodeList.item(j);
+                if (fieldElement.getAttribute("role").equals(field.getSubType()) || fieldElement.getAttribute("role").equals(field.getSubTypeCode())) {
+                    final String stringOrgValue = getStringOrgValue(fieldElement);
+
+                    final String ref = fieldElement.getAttribute("ref");
+
+                    if ((stringOrgValue != null && !stringOrgValue.trim().isEmpty())
+                            || (ref != null && !ref.trim().isEmpty())) {
+                        Map<String, String> orgFields = new HashMap<String, String>();
+                        orgFields.put("value", stringOrgValue);
+                        orgFields.put("role", field.getSubType());
+                        orgFields.put("ref", ref);
+                        orgFields.put("type", fieldElement.getAttribute("type"));
+                        FieldValue fv = new FieldValue();
+                        if (stringOrgValue != null && !stringOrgValue.isEmpty()) {
+                            fv.setCode(stringOrgValue);
+                            fv.setValue(stringOrgValue);
+                        } else {
+                            fv.setCode(ref);
+                            fv.setValue(ref);
+                        }
+                        fv.setSelected(true);
+                        int index = field.getPossibleValues() == null ? 0
+                                : field.getPossibleValues().size();
+                        fv.setIndex(index);
+                        if (field.getPossibleValues() == null) {
+                            field.setPossibleValues(new ArrayList<FieldValue>());
+                        }
+                        if (!field.getPossibleValues().stream().anyMatch(n -> {
+                            return n.getCode().equals(stringOrgValue);
+                        })) {
+                            field.getPossibleValues().add(fv);
+                        }
+
+                        document.addOrganizationField(field.getFieldName() + "_" + field.getSubType() + "_"
+                                + DigestUtils.md5DigestAsHex(fv.getValue().getBytes()), orgFields);
+
+                    }
+                }
+            }
+        }
+    }
+    protected abstract String getStringOrgValue(Element fieldElement);
+
 }
