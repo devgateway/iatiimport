@@ -456,6 +456,43 @@ public abstract class IATIProcessor implements ISourceProcessor {
             }
         }
     }
+    protected  void processRecipientCountryElementType(InternalDocument document, Element element, Field field) {
+        NodeList fieldNodeList;
+        Field filtersField = getFilterFieldList().stream().filter(n -> {
+            return field.getFieldName().equals(n.getFieldName());
+        }).findFirst().get();
+
+        fieldNodeList = element.getElementsByTagName(field.getFieldName());
+        List<FieldValue> recipients = new ArrayList<>();
+        for (int j = 0; j < fieldNodeList.getLength(); j++) {
+            Element fieldElement = (Element) fieldNodeList.item(j);
+            FieldValue recipient = new FieldValue();
+            String code = fieldElement.getAttribute("code");
+            boolean includeCountry = includedByFilter(filtersField.getFilters(), code);
+            if(includeCountry){
+                recipient.setCode(code);
+                Optional<FieldValue> fieldValue = field.getPossibleValues().stream().filter(f -> f.getCode().equals(code)).findFirst();
+                if(fieldValue.isPresent()){
+                    recipient.setValue(fieldValue.get().getValue());
+                }
+                recipient.setPercentage(fieldElement.getAttribute("percentage"));
+                recipients.add(recipient);
+            }
+        }
+        document.addRecepientCountryFields(field.getFieldName(), recipients);
+    }
+
+    protected Boolean includedByFilter(List<String> filters, String codeValue) {
+        if (filters.size() == 0)
+            return true;
+
+        for (String value : filters) {
+            if (value.equals(codeValue)) {
+                return true;
+            }
+        }
+        return false;
+    }
     protected abstract String getStringOrgValue(Element fieldElement);
 
 }
