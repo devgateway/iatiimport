@@ -42,6 +42,8 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 
+import static org.devgateway.importtool.services.processor.helper.IATIProcessorHelper.getStringFromElement;
+
 /**
  * Class that will hold common code among all IATI processors
  */
@@ -409,6 +411,51 @@ public abstract class IATIProcessor implements ISourceProcessor {
             log.error("Error extracting languages", e);
         }
         return list;
+    }
+    protected void processStringElementType(InternalDocument document, Element element, Field field) {
+        String stringValue = getStringFromElement(element, field.getFieldName());
+        document.addStringField(field.getFieldName(), stringValue);
+    }
+
+
+    protected void processListElementType(InternalDocument document, Element element, Field field) {
+        NodeList fieldNodeList;
+        if (field.isMultiple()) {
+            fieldNodeList = element.getElementsByTagName(field.getFieldName());
+            List<String> codes = new ArrayList<String>();
+            for (int j = 0; j < fieldNodeList.getLength(); j++) {
+                Element fieldElement = (Element) fieldNodeList.item(j);
+                String code = fieldElement.getAttribute("code");
+                if(!code.isEmpty()){
+                    codes.add(code);
+                    Optional<FieldValue> foundfv = field.getPossibleValues().stream().filter(n -> {return n.getCode().equals(code);}).findFirst();
+                    FieldValue fv  = foundfv.isPresent() ? foundfv.get() : null;
+                    if(fv != null && fv.isSelected() != true){
+                        fv.setSelected(true);
+                    }
+                }
+            }
+            if(!codes.isEmpty()){
+                String[] codeValues = codes.stream().toArray(String[]::new);
+                document.addStringMultiField(field.getFieldName(), codeValues);
+            }
+        } else {
+            fieldNodeList = element.getElementsByTagName(field.getFieldName());
+            if (fieldNodeList.getLength() > 0 && fieldNodeList.getLength() == 1) {
+                Element fieldElement = (Element) fieldNodeList.item(0);
+                String codeValue = fieldElement.getAttribute("code");
+                if(!codeValue.isEmpty()){
+                    Optional<FieldValue> foundfv = field.getPossibleValues().stream().filter( n -> {
+                        return n.getCode().equals(codeValue);
+                    }).findFirst();
+                    FieldValue fv  = foundfv.isPresent() ? foundfv.get() : null;
+                    if(fv != null && fv.isSelected() != true){
+                        fv.setSelected(true);
+                    }
+                    document.addStringField(field.getFieldName(), codeValue);
+                }
+            }
+        }
     }
     protected void processOrganizationElementType(InternalDocument document, Element element, Field field) {
         NodeList fieldNodeList;
