@@ -323,36 +323,7 @@ public class IATI2XProcessor extends IATIProcessor {
 			for (Field field : getFields()) {
 				switch (field.getType()) {
 				case LOCATION:
-					fieldNodeList = element.getElementsByTagName(field.getFieldName());
-					List <String> codesLocation = new ArrayList<String>();
-					for (int j = 0; j < fieldNodeList.getLength(); j++) {
-						Element fieldElement = (Element) fieldNodeList.item(j);
-						String code = extractNarrative(fieldElement, "name");
-						if (StringUtils.isBlank(code)) {
-							code = extractNarrative(fieldElement, "description");
-						}
-						if(code != null && !code.isEmpty()) {
-							codesLocation.add(code);
-							FieldValue fv = new FieldValue();
-							if(code != null && !code.isEmpty() ){
-								fv.setCode(code);
-								fv.setValue(code);
-								fv.setSelected(true);
-							}
-							int index = field.getPossibleValues() == null ? 0 : field.getPossibleValues().size();
-							fv.setIndex(index);
-							if (field.getPossibleValues() == null) {
-								field.setPossibleValues(new ArrayList<FieldValue>());
-							}
-							if(!field.getPossibleValues().stream().anyMatch(n->{ return n.getCode().equals(fv.getValue());})) {
-								field.getPossibleValues().add(fv);
-							}
-						}
-					}
-					if(!codesLocation.isEmpty()){
-						String[] codeValues = codesLocation.stream().toArray(String[]::new);
-						document.addStringMultiField(field.getFieldName(), codeValues);
-					}
+                    processLocationElementType(document, element, field);
 					break;
 				case LIST:
 					IATIProcessorHelper.processListElementType(document, element, field);
@@ -533,6 +504,15 @@ public class IATI2XProcessor extends IATIProcessor {
 		return list;
 	}
 
+    @Override
+    protected String getNameFromElement(Element fieldElement) {
+        String name = extractNarrative(fieldElement, "name");
+        if (StringUtils.isBlank(name)) {
+            name = extractNarrative(fieldElement, "description");
+        }
+        return name;
+    }
+
     private String extractNarrative(Element e, String string) {
 		Node node = e.getElementsByTagName(string).item(0);
 		if(node != null && node.getChildNodes().getLength() > 0) {
@@ -545,6 +525,7 @@ public class IATI2XProcessor extends IATIProcessor {
 		}
 		return null;
 	}
+
 
 	private void clearUsedValues(){
 		for (Field field : getFields()) {
