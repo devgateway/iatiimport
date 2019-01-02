@@ -39,6 +39,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.devgateway.importtool.services.processor.helper.IATIProcessorHelper.getStringFromElement;
+
 @Component("IATI2X")
 @Scope("session")
 public class IATI2XProcessor extends IATIProcessor {
@@ -312,7 +314,7 @@ public class IATI2XProcessor extends IATIProcessor {
 
 			Element element = (Element) nodeList.item(i);
 			//we set the grouping criteria
-			document.setGrouping(IATIProcessorHelper.getStringFromElement(element,DEFAULT_GROUPING_FIELD,"ref"));
+			document.setGrouping(getStringFromElement(element,DEFAULT_GROUPING_FIELD,"ref"));
 
 			String currency = !("".equals(element.getAttribute("default-currency"))) ? element.getAttribute
 					("default-currency") : this.getDefaultCurrency();
@@ -326,13 +328,13 @@ public class IATI2XProcessor extends IATIProcessor {
                     processLocationElementType(document, element, field);
 					break;
 				case LIST:
-					IATIProcessorHelper.processListElementType(document, element, field);
+					processListElementType(document, element, field);
 					break;
 				case RECIPIENT_COUNTRY:
                     processRecipientCountryElementType(document, element, field);
                     break;
 				case STRING:
-					IATIProcessorHelper.processStringElementType(document, element, field);
+					processStringElementType(document, element, field);
 					break;
 				case ORGANIZATION:
                     processOrganizationElementType(document,element,field);

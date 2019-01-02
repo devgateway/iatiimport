@@ -279,7 +279,9 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 		actionStatus.setTotal(Long.valueOf(nodeList.getLength()));
 		this.clearUsedValues();
 		for (int i = 0; i < nodeList.getLength(); i++) {
+
 			actionStatus.incrementProcessed();
+
 			InternalDocument document = new InternalDocument();
 			Element element = (Element) nodeList.item(i);
 			String currency = !("".equals(element.getAttribute("default-currency"))) ? element.getAttribute
@@ -287,8 +289,6 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 			document.addStringField("default-currency", currency);	
 			String defaultLanguageCode = !("".equals(element.getAttribute("xml:lang"))) ? element.getAttribute
 					("xml:lang") : this.getDefaultLanguage();
-			
-			
 			NodeList fieldNodeList;			
 			for (Field field : getFields()) {
 				switch (field.getType()) {
@@ -296,13 +296,13 @@ abstract public class IATI1XProcessor extends IATIProcessor {
                     processLocationElementType(document, element, field);
 					break;
 				case LIST:
-					IATIProcessorHelper.processListElementType(document, element, field);
+					processListElementType(document, element, field);
 					break;
 				case RECIPIENT_COUNTRY:
                     processRecipientCountryElementType(document, element, field);
 					break;
 				case STRING:
-					IATIProcessorHelper.processStringElementType(document, element, field);
+					processStringElementType(document, element, field);
 					break;
 				case ORGANIZATION:
                     processOrganizationElementType(document,element,field);
