@@ -1698,8 +1698,18 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			fv.setCode(code);
 			fv.setValue(value);
 			if (node.get("extra_info") != null) {
-				fv.getProperties().put("extra_info", node.get("extra_info"));
+				fv.getProperties().put("extra_info", node.get("extra_info"));			
 			}
+			
+			if (node.get("translated-value") != null) {			        
+			    Iterator <Entry<String,JsonNode>> iter = node.get("translated-value").fields();			    
+                while(iter.hasNext()){
+                    Entry<String,JsonNode>lang = iter.next();                   
+                    fv.getTranslatedValue().put(lang.getKey(),lang.getValue().asText());
+                }
+            }
+			
+			
 			possibleValues.add(fv);
 		}
 		return possibleValues;
