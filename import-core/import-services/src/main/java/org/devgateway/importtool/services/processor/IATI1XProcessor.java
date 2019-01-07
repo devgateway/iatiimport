@@ -289,7 +289,7 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 			document.addStringField("default-currency", currency);	
 			String defaultLanguageCode = !("".equals(element.getAttribute("xml:lang"))) ? element.getAttribute
 					("xml:lang") : this.getDefaultLanguage();
-			NodeList fieldNodeList;			
+			NodeList fieldNodeList;
 			for (Field field : getFields()) {
 				switch (field.getType()) {
 				case LOCATION:
@@ -422,24 +422,8 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 					}
 					break;
 				case DATE:
-					try {
-						NodeList nodes;
-						nodes = (NodeList) xPath.evaluate("activity-date[@type='" + field.getSubType() + "']", element, XPathConstants.NODESET);
-						for (int j = 0; j < nodes.getLength(); ++j) {
-							Element e = (Element) nodes.item(j);
-							String localDate = e.getAttribute("iso-date");
-							String format = "yyyy-MM-dd";						 							
-							SimpleDateFormat sdf = new SimpleDateFormat(format);
-							if(localDate != null && !localDate.isEmpty()){
-								document.addDateField(field.getUniqueFieldName(), sdf.parse(localDate));
-							}
-							
-						}
-
-					} catch (XPathExpressionException | ParseException e1) {
-						e1.printStackTrace();
-					}
-					break;
+                    processDateElementType(document, element, field);
+                    break;
 				case CONTACT:					
 					/*NodeList contactNodes = element.getElementsByTagName(field.getFieldName());
 					if (contactNodes.getLength() > 0) {
@@ -474,8 +458,7 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 		return list;
 	}
 
-
-	private void clearUsedValues(){
+    private void clearUsedValues(){
 		for (Field field : getFields()) {
 			if(field.getPossibleValues() != null){
 				for(FieldValue fv : field.getPossibleValues()){
@@ -675,10 +658,16 @@ abstract public class IATI1XProcessor extends IATIProcessor {
         return name;
     }
 
-        protected String getStringOrgValue(Element fieldElement) {
+    protected String getStringOrgValue(Element fieldElement) {
         return fieldElement.getTextContent();
     }
-	public boolean isValidDate(String dateString) {
+
+    protected  String getDateSubtype(Field field) {
+        return field.getSubType();
+    }
+
+
+    public boolean isValidDate(String dateString) {
 		SimpleDateFormat df = new SimpleDateFormat(ISO_DATE);
 		try {
 			df.parse(dateString);

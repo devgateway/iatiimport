@@ -13,6 +13,7 @@ import org.devgateway.importtool.services.processor.helper.IATIProcessorHelper;
 import org.devgateway.importtool.services.processor.helper.InternalDocument;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StopWatch;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -307,8 +308,12 @@ public class IATI2XProcessor extends IATIProcessor {
 		NodeList nodeList = getActivities();
 		List<InternalDocument> list = new ArrayList<InternalDocument>();
 		actionStatus.setTotal(Long.valueOf(nodeList.getLength()));
-		this.clearUsedValues();
+        StopWatch swActivityDate = new StopWatch("iati activity processing");
+        swActivityDate.start("start processing");
+
+        this.clearUsedValues();
 		for (int i = 0; i < nodeList.getLength(); i++) {
+            id++;
 			actionStatus.incrementProcessed();
 			InternalDocument document = new InternalDocument();
 
@@ -322,7 +327,12 @@ public class IATI2XProcessor extends IATIProcessor {
 			String defaultLanguageCode = !("".equals(element.getAttribute("xml:lang"))) ? element.getAttribute
 					("xml:lang") : this.getDefaultLanguage();
 			NodeList fieldNodeList;
-			for (Field field : getFields()) {
+
+			/*getFields().stream().filter(distinctByKey(Field::getType)).forEach(field ->{
+                System.out.println(field.getType());
+            });*/
+
+            for (Field field : getFields()) {
 				switch (field.getType()) {
 				case LOCATION:
                     processLocationElementType(document, element, field);
@@ -476,25 +486,9 @@ public class IATI2XProcessor extends IATIProcessor {
 						throw new Exception("Document couldn't be parsed.");
 					}
 					break;
-				case DATE:
-					try {
-						NodeList nodes;
-						nodes = (NodeList) xPath.evaluate("activity-date[@type='" + dateTypes.get(field.getSubType()) + "']", element, XPathConstants.NODESET);
-						for (int j = 0; j < nodes.getLength(); ++j) {
-							Element e = (Element) nodes.item(j);
-							String localDate = e.getAttribute("iso-date");
-							String format = "yyyy-MM-dd";
-							SimpleDateFormat sdf = new SimpleDateFormat(format);
-							if (localDate != null && !localDate.isEmpty()){
-								document.addDateField(field.getUniqueFieldName(), sdf.parse(localDate));
-							}							
-						}
-
-					} catch (XPathExpressionException | ParseException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-					break;
+                    case DATE:
+                        processDateElementType(document, element, field);
+                        break;
 				default:
 					break;
 				}
@@ -502,9 +496,15 @@ public class IATI2XProcessor extends IATIProcessor {
 
 			list.add(document);
 		}
-
+        swActivityDate.stop();
+        System.out.println(swActivityDate.prettyPrint());
 		return list;
 	}
+
+	@Override
+    protected String getDateSubtype(Field field) {
+        return dateTypes.get(field.getSubType());
+    }
 
     @Override
     protected String getNameFromElement(Element fieldElement) {
