@@ -31,6 +31,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -41,6 +43,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import static org.devgateway.importtool.services.processor.helper.IATIProcessorHelper.getStringFromElement;
 
@@ -463,6 +468,7 @@ public abstract class IATIProcessor implements ISourceProcessor {
         if (fieldNodeList.getLength() > 0) {
             for (int j = 0; j < fieldNodeList.getLength(); j++) {
                 Element fieldElement = (Element) fieldNodeList.item(j);
+                //this can be generic not to process all the organization sub types and process them at the same moment
                 if (fieldElement.getAttribute("role").equals(field.getSubType()) || fieldElement.getAttribute("role").equals(field.getSubTypeCode())) {
                     final String stringOrgValue = getStringOrgValue(fieldElement);
 
@@ -564,6 +570,21 @@ public abstract class IATIProcessor implements ISourceProcessor {
             }
         }
     }
+    protected void processDateElementType(InternalDocument document, Element element, Field field) throws ParseException {
+        NodeList nodes = element.getElementsByTagName("activity-date");
+        for (int j = 0; j < nodes.getLength(); ++j) {
+            Element e = (Element) nodes.item(j);
+            if (getDateSubtype(field).equals(e.getAttribute("type"))) {
+                String localDate = e.getAttribute("iso-date");
+                String format = "yyyy-MM-dd";
+                SimpleDateFormat sdf = new SimpleDateFormat(format);
+                if (localDate != null && !localDate.isEmpty()) {
+                    document.addDateField(field.getUniqueFieldName(), sdf.parse(localDate));
+                }
+            }
+        }
+    }
+
     protected Boolean includedByFilter(List<String> filters, String codeValue) {
         if (filters.size() == 0)
             return true;
@@ -576,6 +597,7 @@ public abstract class IATIProcessor implements ISourceProcessor {
         return false;
     }
     protected abstract String getStringOrgValue(Element fieldElement);
+    protected abstract String getDateSubtype(Field field) ;
 
     /**
      * Search for name in the element, if not available return description. Otherwise return null
@@ -586,5 +608,9 @@ public abstract class IATIProcessor implements ISourceProcessor {
 
     protected abstract String getNameFromElement(Element fieldElement);
 
+    public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+        Set<Object> seen = ConcurrentHashMap.newKeySet();
+        return t -> seen.add(keyExtractor.apply(t));
+    }
 
 }
