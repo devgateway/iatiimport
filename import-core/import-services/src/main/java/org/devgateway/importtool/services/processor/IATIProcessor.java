@@ -4,12 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.model.Language;
-import org.devgateway.importtool.services.processor.helper.Constants;
-import org.devgateway.importtool.services.processor.helper.Field;
-import org.devgateway.importtool.services.processor.helper.FieldType;
-import org.devgateway.importtool.services.processor.helper.FieldValue;
-import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
-import org.devgateway.importtool.services.processor.helper.InternalDocument;
+import org.devgateway.importtool.services.processor.helper.*;
 import org.springframework.util.DigestUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -24,29 +19,18 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import static org.devgateway.importtool.services.processor.helper.FieldType.TRANSACTION;
 import static org.devgateway.importtool.services.processor.helper.IATIProcessorHelper.getStringFromElement;
 
 /**
@@ -79,22 +63,30 @@ public abstract class IATIProcessor implements ISourceProcessor {
     private List<Field> fieldList = new ArrayList<Field>();
     private List<Language> filterLanguages = new ArrayList<Language>();
 
+    private ActionStatus actionStatus;
+
 
     private boolean fromDatastore = false;
     public final static Set<String> IMPLEMENTED_VERSIONS = new HashSet<>
             (Arrays.asList("1.01", "1.03", "1.04", "1.05",
-            "2.01", "2.02","2.03"));
+                    "2.01", "2.02", "2.03"));
     //Variable that holds a MAP for tooltips and for fields translations
-    protected final static Map<String,Map<String,Map<String,Map<String,String>> >>langPack = new HashMap();
+    protected final static Map<String, Map<String, Map<String, Map<String, String>>>> langPack = new HashMap();
+
+    private static final String ISO_DATE = "yyyy-MM-dd";
+    private SimpleDateFormat df = new SimpleDateFormat(ISO_DATE);
+
 
     @Override
-    public  void setFromDataStore(boolean fromDatastore) {
+    public void setFromDataStore(boolean fromDatastore) {
         this.fromDatastore = fromDatastore;
     }
+
     @Override
     public void setInput(Document input) {
-            this.doc = input;
+        this.doc = input;
     }
+
     @Override
     public Document getDoc() {
         return doc;
@@ -149,7 +141,238 @@ public abstract class IATIProcessor implements ISourceProcessor {
     public List<Field> getFields() {
         return fieldList;
     }
-    protected void configureDefaults(){
+
+    @Override
+    public ActionStatus getActionStatus() {
+        return actionStatus;
+    }
+
+    @Override
+    public void setActionStatus(ActionStatus actionStatus) {
+        this.actionStatus = actionStatus;
+    }
+
+    public String getCodelistPath() {
+        return codelistPath;
+    }
+
+    public void setCodelistPath(String codelistPath) {
+        this.codelistPath = codelistPath;
+    }
+
+    @Override
+    public void setInput(InputStream input) {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setValidating(false);
+        factory.setIgnoringElementContentWhitespace(true);
+        try {
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            this.doc = builder.parse(input);
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            log.error("IOException Parsing Source File: " + e);
+        }
+    }
+    protected void instantiateStaticFields() {
+
+        // Text fields
+        getFields().add(new Field("IATI Identifier", "iati-identifier", FieldType.STRING,
+                false, getTooltipForField("iati-identifier"),getLabelsForField("iati-identifier")));
+
+        getFields().add(new Field("Title", "title", FieldType.MULTILANG_STRING, false,
+                getTooltipForField("title"),getLabelsForField("title")));
+
+        getFields().add(new Field("Description", "description", FieldType.MULTILANG_STRING,
+                true, getTooltipForField("description"), getLabelsForField("description")));
+
+        // Code Lists
+        Field activityStatus = new Field("Activity Status", "activity-status", FieldType.LIST,
+                true, getTooltipForField("activity-status"), getLabelsForField("activity-status"));
+        activityStatus.setPossibleValues(getCodeListValues("activity-status"));
+        getFields().add(activityStatus);
+        getFilterFieldList().add(activityStatus);
+
+        Field activityScope = new Field("Activity Scope", "activity-scope", FieldType.LIST,
+                true, getTooltipForField("activity-scope"), getLabelsForField("activity-scope"));
+        activityScope.setPossibleValues(getCodeListValues("activity-scope"));
+        getFields().add(activityScope);
+        getFilterFieldList().add(activityScope);
+
+        Field aidType = new Field("Aid Type", "default-aid-type", FieldType.LIST, true,
+                getTooltipForField("default-aid-type"), getLabelsForField("default-aid-type"));
+        aidType.setPossibleValues(getCodeListValues("default-aid-type"));
+        getFields().add(aidType);
+        getFilterFieldList().add(aidType);
+
+        Field financeType = new Field("Finance Type", "default-finance-type", FieldType.LIST,
+                true, getTooltipForField("default-finance-type"), getLabelsForField("default-finance-type"));
+        financeType.setPossibleValues(getCodeListValues("default-finance-type"));
+        getFields().add(financeType);
+        getFilterFieldList().add(financeType);
+
+        Field flowType = new Field("Flow Type", "default-flow-type", FieldType.LIST,
+                true, getTooltipForField("default-flow-type"), getLabelsForField("default-flow-type"));
+        flowType.setPossibleValues(getCodeListValues("default-flow-type"));
+        getFields().add(flowType);
+        getFilterFieldList().add(flowType);
+
+        Field tiedStatus = new Field("Tied Status", "default-tied-status", FieldType.LIST,
+                true, getTooltipForField("default-tied-status"), getLabelsForField("default-tied-status"));
+        tiedStatus.setPossibleValues(getCodeListValues("default-tied-status"));
+        getFields().add(tiedStatus);
+        getFilterFieldList().add(tiedStatus);
+
+        Field policyMarker = new Field("PolicyMarker", "policy-marker", FieldType.LIST,
+                true, getTooltipForField("policy-marker"), getLabelsForField("policy-marker"));
+        policyMarker.setPossibleValues(getCodeListValues("policy-marker"));
+        policyMarker.setMultiple(true);
+        getFields().add(policyMarker);
+        getFilterFieldList().add(policyMarker);
+
+        Field recipientCountry = new Field("Recipient Country", "recipient-country",
+                FieldType.RECIPIENT_COUNTRY, true, getTooltipForField("recipient-country"),
+                getLabelsForField("recipient-country"));
+        recipientCountry.setPossibleValues(getCodeListValues("recipient-country"));
+        recipientCountry.setExclusive(true);
+        recipientCountry.setFilterRequired(true);
+        getFields().add(recipientCountry);
+        getFilterFieldList().add(recipientCountry);
+
+        Field sector = new Field("Sector", "sector", FieldType.LIST, true,
+                getTooltipForField("sector"), getLabelsForField("sector"));
+        sector.setPossibleValues(getCodeListValues("sector"));
+        sector.setMultiple(true);
+        sector.setPercentage(true);
+        getFields().add(sector);
+        getFilterFieldList().add(sector);
+
+        Field location = new Field("Location", "location", FieldType.LOCATION, true,
+                getTooltipForField("location"), getLabelsForField("location"));
+        location.setPossibleValues(new ArrayList<FieldValue>());
+        location.setMultiple(true);
+        location.setPercentage(true);
+        getFields().add(location);
+
+        // Dates
+        Field activityDateStartPlanned = new Field("Activity Date Start Planned", "activity-date"
+                , FieldType.DATE, true,getTooltipForField("activity-date_start-planned"), getLabelsForField("activity" +
+                "-date_start-planned"));
+        activityDateStartPlanned.setSubType("start-planned");
+        getFields().add(activityDateStartPlanned);
+
+        Field activityDateEndPlanned = new Field("Activity Date End Planned", "activity-date",
+                FieldType.DATE, true, getTooltipForField("activity-date_end-planned"),
+                getLabelsForField("activity-date_end-planned"));
+        getFields().add(activityDateEndPlanned);
+        activityDateEndPlanned.setSubType("end-planned");
+
+        Field activityDateStartActual = new Field("Activity Date Start Actual", "activity-date",
+                FieldType.DATE, true, getTooltipForField("activity-date_start-actual"), getLabelsForField("activity" +
+                "-date_start-actual"));
+        activityDateStartActual.setSubType("start-actual");
+        getFields().add(activityDateStartActual);
+
+        Field activityDateEndActual = new Field("Activity Date End Actual", "activity-date",
+                FieldType.DATE, true, getTooltipForField("activity-date_end-actual"), getLabelsForField("activity" +
+                "-date_end-actual"));
+        getFields().add(activityDateEndActual);
+        activityDateEndActual.setSubType("end-actual");
+
+        // Transaction Fields
+        Field commitments = new Field("Commitments", "transaction", FieldType.TRANSACTION,
+                true, getTooltipForField("transaction_C"), getLabelsForField("transaction_C"));
+        commitments.setSubType("C");
+        commitments.setSubTypeCode("2");
+        getFields().add(commitments);
+
+        Field disbursements = new Field("Disbursements", "transaction", FieldType.TRANSACTION,
+                true, getTooltipForField("transaction_D"), getLabelsForField("transaction_D"));
+        disbursements.setSubType("D");
+        disbursements.setSubTypeCode("3");
+        getFields().add(disbursements);
+
+        // Organization Fields
+        Field participatingOrg = new Field(Constants.FUNDING_ORG_DISPLAY_NAME, "participating-org",
+                FieldType.ORGANIZATION, true, getTooltipForField("participating-org_"
+                + Constants.ORG_ROLE_FUNDING), getLabelsForField("participating-org_"
+                + Constants.ORG_ROLE_FUNDING));
+        participatingOrg.setSubType(Constants.ORG_ROLE_FUNDING);
+        participatingOrg.setSubTypeCode(Constants.ORG_ROLE_FUNDING_CODE);
+        getFields().add(participatingOrg);
+
+        Field accountableOrg = new Field(Constants.ACCOUNTABLE_ORG_DISPLAY_NAME, "participating-org",
+                FieldType.ORGANIZATION, true, getTooltipForField("participating-org_"
+                + Constants.ORG_ROLE_ACCOUNTABLE), getLabelsForField("participating-org_"
+                + Constants.ORG_ROLE_ACCOUNTABLE));
+        accountableOrg.setSubTypeCode(Constants.ORG_ROLE_ACCOUNTABLE_CODE);
+        accountableOrg.setSubType(Constants.ORG_ROLE_ACCOUNTABLE);
+        getFields().add(accountableOrg);
+
+        Field extendingOrg = new Field(Constants.EXTENDING_ORG_DISPLAY_NAME, "participating-org",
+                FieldType.ORGANIZATION, true, getTooltipForField("participating-org_"
+                + Constants.ORG_ROLE_EXTENDING), getLabelsForField("participating-org_"
+                + Constants.ORG_ROLE_EXTENDING));
+        extendingOrg.setSubTypeCode(Constants.ORG_ROLE_EXTENDING_CODE);
+        extendingOrg.setSubType(Constants.ORG_ROLE_EXTENDING);
+        getFields().add(extendingOrg);
+
+        Field implementingOrg = new Field(Constants.IMPLEMENTING_ORG_DISPLAY_NAME, "participating-org",
+                FieldType.ORGANIZATION, true, getTooltipForField("participating-org_"
+                + Constants.ORG_ROLE_IMPLEMENTING), getLabelsForField("participating-org_"
+                + Constants.ORG_ROLE_IMPLEMENTING));
+        implementingOrg.setSubTypeCode(Constants.ORG_ROLE_IMPLEMENTING_CODE);
+        implementingOrg.setSubType(Constants.ORG_ROLE_IMPLEMENTING);
+        getFields().add(implementingOrg);
+
+        // Provider Organization, within Transactions
+        Field providerOrg = new ProviderOganizationField(Constants.PROVIDER_ORG_DISPLAY_NAME, "provider-org",
+                FieldType.ORGANIZATION, false, getTooltipForField("provider-org"),
+                getLabelsForField("provider-org"));
+        providerOrg.setSubType("Provider");
+        getFields().add(providerOrg);
+        getFilterFieldList().add(providerOrg);
+    }
+
+    private List<FieldValue> getCodeListValues(String codeListName) {
+        return getCodeListValues(codeListName, false);
+    }
+
+    protected List<FieldValue> getCodeListValues(String codeListName, Boolean concatenate) {
+        String standardFieldName = IATIProcessorHelper.mappingNameFile.get(codeListName);
+        List<FieldValue> possibleValues = new ArrayList<>();
+        try {
+            Document doc = getDocument(this.getCodelistPath() + standardFieldName + ".xml");
+            NodeList nodeList = getNodeListForCodeListValues(doc, standardFieldName);
+            int index = 0;
+            for (int i = 0; i < nodeList.getLength(); i++) {
+                Node node = nodeList.item(i);
+                if (node.getNodeType() == Node.ELEMENT_NODE) {
+                    Element element = (Element) node;
+                    Element codeElement = (Element) element.getElementsByTagName("code").item(0);
+                    String code = codeElement.getChildNodes().item(0).getNodeValue();
+                    Element nameElement = (Element) element.getElementsByTagName("name").item(0);
+
+                    String name = extractNameElementForCodeListValues(nameElement);
+
+                    FieldValue fv = new FieldValue();
+                    fv.setIndex(index++);
+                    fv.setCode(code);
+                    if (concatenate) {
+                        fv.setValue(code + " - " + name);
+                    } else {
+                        fv.setValue(name);
+                    }
+
+                    possibleValues.add(fv);
+                }
+            }
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            log.error("IOException Parsing Source File: " + e);
+        }
+        return possibleValues;
+    }
+    protected abstract NodeList getNodeListForCodeListValues(Document doc, String  standardFieldName);
+    protected abstract String extractNameElementForCodeListValues(Element nameElement) ;
+    protected void configureDefaults() {
         InputStream propsStream = this.getClass().getResourceAsStream(this.getPropertiesFile());
         Properties properties = new Properties();
         try {
@@ -164,7 +387,7 @@ public abstract class IATIProcessor implements ISourceProcessor {
     protected NodeList getActivities() throws XPathExpressionException {
         XPath xPath = XPathFactory.newInstance().newXPath();
 
-        String xpathExtractActivities = (fromDatastore ? "/result" : "" )  + "/iati-activities/iati-activity[";
+        String xpathExtractActivities = (fromDatastore ? "/result" : "") + "/iati-activities/iati-activity[";
         final StringBuilder query = new StringBuilder(xpathExtractActivities);
         Field countryField = this.getFields().stream().filter(f -> {
             return f.getType().equals(FieldType.RECIPIENT_COUNTRY);
@@ -174,34 +397,34 @@ public abstract class IATIProcessor implements ISourceProcessor {
             return countryField.getFieldName().equals(n.getFieldName());
         }).findFirst().get();
 
-        if(countryFilters.getFilters().size() > 0){
-            String selectedCountry  = countryFilters.getFilters().get(0);
-            query.append("recipient-country[@code='"+ selectedCountry +"']");
+        if (countryFilters.getFilters().size() > 0) {
+            String selectedCountry = countryFilters.getFilters().get(0);
+            query.append("recipient-country[@code='" + selectedCountry + "']");
         }
 
 
         this.getFields().forEach(field -> {
-            if(field.getType().equals(FieldType.LIST)){
+            if (field.getType().equals(FieldType.LIST)) {
                 Optional<Field> optFilter = filterFieldList.stream().filter(n -> {
                     return field.getFieldName().equals(n.getFieldName());
                 }).findFirst();
 
                 Field filter = optFilter.isPresent() ? optFilter.get() : null;
-                if(filter != null && filter.getFilters().size() > 0){
-                    if(!("/iati-activities/iati-activity[".equals(query.toString()))){
+                if (filter != null && filter.getFilters().size() > 0) {
+                    if (!("/iati-activities/iati-activity[".equals(query.toString()))) {
                         query.append(" and ");
                     }
 
-                   if ("sector".equals(field.getFieldName())) {                    	
-                    	query.append(" (");                       
-                        query.append(buildFieldFilter("transaction/sector", filter));                        
-                        query.append(" | ");                        
-                        query.append(buildFieldFilter("sector", filter));                          
-                        query.append(") ");                        
+                    if ("sector".equals(field.getFieldName())) {
+                        query.append(" (");
+                        query.append(buildFieldFilter("transaction/sector", filter));
+                        query.append(" | ");
+                        query.append(buildFieldFilter("sector", filter));
+                        query.append(") ");
                     } else {
-                    	query.append(buildFieldFilter(field.getFieldName(), filter));                    	
+                        query.append(buildFieldFilter(field.getFieldName(), filter));
                     }
-                    
+
                 }
             }
 
@@ -212,27 +435,26 @@ public abstract class IATIProcessor implements ISourceProcessor {
             } else {
                 query.append(getExtraQueryVersion());
             }
-        }
-        else{
+        } else {
             if (!(xpathExtractActivities.equals(query.toString()))) {
                 query.append("]");
 
-            }else{
+            } else {
                 query.setLength(query.length() - 1);
             }
 
         }
 
-        NodeList activities = (NodeList)xPath.compile(query.toString()).evaluate(this.getDoc(), XPathConstants.NODESET);
+        NodeList activities = (NodeList) xPath.compile(query.toString()).evaluate(this.getDoc(), XPathConstants.NODESET);
         return activities;
     }
 
     private String buildFieldFilter(String fieldName, Field filter) {
-    	final StringBuilder query = new StringBuilder("");
+        final StringBuilder query = new StringBuilder("");
         query.append(fieldName + "[");
-        for (int i = 0;i < filter.getFilters().size(); i++) {
+        for (int i = 0; i < filter.getFilters().size(); i++) {
             String value = filter.getFilters().get(i);
-            if(i > 0){
+            if (i > 0) {
                 query.append(" or ");
             }
             query.append("@code='" + value + "'");
@@ -240,7 +462,7 @@ public abstract class IATIProcessor implements ISourceProcessor {
         query.append("]");
         return query.toString();
     }
- 
+
     @Override
     public Boolean isValidInput() {
         NodeList nodeList = doc.getElementsByTagName("iati-activities");
@@ -260,13 +482,14 @@ public abstract class IATIProcessor implements ISourceProcessor {
 
         return false;
     }
-    public String getExtraQueryVersion(){
-        return "@*[name()='iati-extra:version']='"+ PROCESSOR_VERSION +"']";
+
+    public String getExtraQueryVersion() {
+        return "@*[name()='iati-extra:version']='" + PROCESSOR_VERSION + "']";
     }
 
     protected Document getDocument(String fileName) throws ParserConfigurationException, SAXException, IOException {
         InputStream is = this.getClass().getResourceAsStream(fileName);
-        if(is == null){
+        if (is == null) {
             System.out.println("this field name is null:" + fileName);
         }
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -276,7 +499,7 @@ public abstract class IATIProcessor implements ISourceProcessor {
         return builder.parse(is);
     }
 
-    public List<String>  buildTooltipsFields() {
+    public List<String> buildTooltipsFields() {
         try {
             List<String> missing = new ArrayList<>();
             String descriptionXPath = "/*[name()='xsd:schema']/*[name()='xsd:element'][@name='%s']/*[name()='xsd:annotation']/*[name()" +
@@ -305,27 +528,29 @@ public abstract class IATIProcessor implements ISourceProcessor {
         }
     }
 
-    public NodeList getNodeListFromXpath(Document xDoc, String xPathExpresion)  {
+    public NodeList getNodeListFromXpath(Document xDoc, String xPathExpresion) {
 
         XPath xPath = XPathFactory.newInstance().newXPath();
         try {
-            Node node= (Node)xPath.compile(xPathExpresion).evaluate(xDoc,XPathConstants.NODE);
+            Node node = (Node) xPath.compile(xPathExpresion).evaluate(xDoc, XPathConstants.NODE);
             return (NodeList) xPath.compile(xPathExpresion).evaluate(xDoc, XPathConstants.NODESET);
         } catch (XPathExpressionException e) {
             log.error("Cannot evaluete xpath", e);
             return null;
         }
     }
-    public Map<String, String> getLabelsForField(String field){
+
+    public Map<String, String> getLabelsForField(String field) {
         return getLabelsForVersion(this.PROCESSOR_SUPER_VERSION).get(field);
     }
-    public Map<String, String> getTooltipForField(String field){
+
+    public Map<String, String> getTooltipForField(String field) {
         return getTooltipForVersion(this.PROCESSOR_VERSION).get(field);
     }
 
     @Override
     public List<Language> getFilterLanguages() {
-        if(this.filterLanguages.size() == 0){
+        if (this.filterLanguages.size() == 0) {
             List<Language> listLanguages = new ArrayList<Language>();
             this.getLanguages().stream().forEach(lang -> {
                 Locale tmp = new Locale(lang);
@@ -336,16 +561,17 @@ public abstract class IATIProcessor implements ISourceProcessor {
         return this.filterLanguages;
     }
 
-    public  Map<String, Map<String, String>> getTooltipForVersion(String version) {
+    public Map<String, Map<String, String>> getTooltipForVersion(String version) {
         return getLangPackForTypeAndVersion(version, Constants.LANG_PACK_TOOLTIPS);
     }
-    public  Map<String, Map<String, String>> getLabelsForVersion(String version) {
+
+    public Map<String, Map<String, String>> getLabelsForVersion(String version) {
         return getLangPackForTypeAndVersion(version, Constants.LANG_PACK_LABELS);
     }
 
     private Map<String, Map<String, String>> getLangPackForTypeAndVersion(String version, String langPackType) {
 
-        Map<String,Map<String,Map<String,String>> > descriptionTooltipsMap = getLangPack(langPackType);
+        Map<String, Map<String, Map<String, String>>> descriptionTooltipsMap = getLangPack(langPackType);
 
         if (descriptionTooltipsMap.get(version) == null) {
             //map that will hold the translation pack for a version
@@ -377,14 +603,14 @@ public abstract class IATIProcessor implements ISourceProcessor {
         return descriptionTooltipsMap.get(version);
     }
 
-    public Map<String,Map<String,Map<String,String>> > getLangPack(String langPackType) {
+    public Map<String, Map<String, Map<String, String>>> getLangPack(String langPackType) {
         if (langPack.get(langPackType) == null) {
             langPack.put(langPackType, new HashMap<>());
         }
         return langPack.get(langPackType);
     }
 
-    private String getPropertieFieldName(String lang,String langPackType) {
+    private String getPropertieFieldName(String lang, String langPackType) {
         String fileName;
         switch (langPackType) {
             case Constants.LANG_PACK_TOOLTIPS:
@@ -417,173 +643,346 @@ public abstract class IATIProcessor implements ISourceProcessor {
         }
         return list;
     }
-    protected void processStringElementType(InternalDocument document, Element element, Field field) {
-        String stringValue = getStringFromElement(element, field.getFieldName());
-        document.addStringField(field.getFieldName(), stringValue);
+    protected List<InternalDocument> extractDocuments(Document doc) throws Exception {
+        // Extract global values
+        XPath xPath = XPathFactory.newInstance().newXPath();
+        NodeList nodeList = getActivities();
+        List<InternalDocument> list = new ArrayList<>();
+        actionStatus.setTotal(Long.valueOf(nodeList.getLength()));
+        this.clearUsedValues();
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            actionStatus.incrementProcessed();
+            InternalDocument document = new InternalDocument();
+
+            Element iatiActivity = (Element) nodeList.item(i);
+            //we set the grouping criteria
+            document.setGrouping(getStringFromElement(iatiActivity, DEFAULT_GROUPING_FIELD, "ref"));
+
+            String currency = !("".equals(iatiActivity.getAttribute("default-currency"))) ? iatiActivity.getAttribute
+                    ("default-currency") : this.getDefaultCurrency();
+            document.addStringField("default-currency", currency);
+            String defaultLanguageCode = !("".equals(iatiActivity.getAttribute("xml:lang"))) ? iatiActivity.getAttribute
+                    ("xml:lang") : this.getDefaultLanguage();
+            NodeList fieldNodeList;
+
+            String xPathParticipatingOrg = "participating-org[@role=1]";
+            NodeList activityparticipatingOrgs = (NodeList) xPath.evaluate(xPathParticipatingOrg,
+                    iatiActivity, XPathConstants.NODESET);
+            Element activityParticipatingOrgrNode = null;
+            if (activityparticipatingOrgs.getLength() > 0) {
+                activityParticipatingOrgrNode = (Element) activityparticipatingOrgs.item(0);
+            }
+
+            processLocationElementType(document, iatiActivity);
+            processListElementType(document, iatiActivity);
+            processRecipientCountryElementType(document, iatiActivity);
+            processStringElementType(document, iatiActivity);
+            processOrganizationElementType(document, iatiActivity);
+            processMultiLangElementType(xPath, document, iatiActivity, defaultLanguageCode);
+            processTransactionElementType(document, iatiActivity, activityParticipatingOrgrNode);
+            processDateElementType(document, iatiActivity);
+
+            list.add(document);
+        }
+        return list;
+    }
+    protected abstract void processMultiLangElementType(XPath xPath, InternalDocument document, Element element,
+                                               String defaultLanguageCode) ;
+
+    protected void processStringElementType(InternalDocument document, Element element) {
+        processForEachFilteredByType(field -> {
+            String stringValue = getStringFromElement(element, field.getFieldName());
+            document.addStringField(field.getFieldName(), stringValue);
+        }, FieldType.STRING);
     }
 
+    protected void processForEachFilteredByType(Consumer<Field> action, FieldType fieldType) {
+        getFields().stream().filter(fieldFilter ->
+                fieldFilter.getType().equals(fieldType)
+        ).forEach(action);
+    }
 
-    protected void processListElementType(InternalDocument document, Element element, Field field) {
-        NodeList fieldNodeList;
-        if (field.isMultiple()) {
+    protected void processListElementType(InternalDocument document, Element element) {
+        Consumer<Field> listConsumer = field -> {
+            NodeList fieldNodeList;
+            if (field.isMultiple()) {
+                fieldNodeList = element.getElementsByTagName(field.getFieldName());
+                List<String> codes = new ArrayList<String>();
+                for (int j = 0; j < fieldNodeList.getLength(); j++) {
+                    Element fieldElement = (Element) fieldNodeList.item(j);
+                    String code = fieldElement.getAttribute("code");
+                    if (!code.isEmpty()) {
+                        codes.add(code);
+                        Optional<FieldValue> foundfv = field.getPossibleValues().stream().filter(n -> {
+                            return n.getCode().equals(code);
+                        }).findFirst();
+                        FieldValue fv = foundfv.isPresent() ? foundfv.get() : null;
+                        if (fv != null && fv.isSelected() != true) {
+                            fv.setSelected(true);
+                        }
+                    }
+                }
+                if (!codes.isEmpty()) {
+                    String[] codeValues = codes.stream().toArray(String[]::new);
+                    document.addStringMultiField(field.getFieldName(), codeValues);
+                }
+            } else {
+                fieldNodeList = element.getElementsByTagName(field.getFieldName());
+                if (fieldNodeList.getLength() > 0 && fieldNodeList.getLength() == 1) {
+                    Element fieldElement = (Element) fieldNodeList.item(0);
+                    String codeValue = fieldElement.getAttribute("code");
+                    if (!codeValue.isEmpty()) {
+                        Optional<FieldValue> foundfv = field.getPossibleValues().stream().filter(n -> {
+                            return n.getCode().equals(codeValue);
+                        }).findFirst();
+                        FieldValue fv = foundfv.isPresent() ? foundfv.get() : null;
+                        if (fv != null && fv.isSelected() != true) {
+                            fv.setSelected(true);
+                        }
+                        document.addStringField(field.getFieldName(), codeValue);
+                    }
+                }
+            }
+        };
+        processForEachFilteredByType(listConsumer, FieldType.LIST);
+    }
+
+    protected void processOrganizationElementType(InternalDocument document, Element element) {
+
+        Consumer<Field> organizationConsumer = field -> {
+            NodeList fieldNodeList;
             fieldNodeList = element.getElementsByTagName(field.getFieldName());
-            List<String> codes = new ArrayList<String>();
+            if (fieldNodeList.getLength() > 0) {
+                for (int j = 0; j < fieldNodeList.getLength(); j++) {
+                    Element fieldElement = (Element) fieldNodeList.item(j);
+                    //this can be generic not to process all the organization sub types and process them at the same moment
+                    if (fieldElement.getAttribute("role").equals(field.getSubType())
+                            || fieldElement.getAttribute("role").equals(field.getSubTypeCode())) {
+                        final String stringOrgValue = getStringOrgValue(fieldElement);
+
+                        final String ref = fieldElement.getAttribute("ref");
+
+                        if ((stringOrgValue != null && !stringOrgValue.trim().isEmpty())
+                                || (ref != null && !ref.trim().isEmpty())) {
+                            Map<String, String> orgFields = new HashMap<String, String>();
+                            orgFields.put("value", stringOrgValue);
+                            orgFields.put("role", field.getSubType());
+                            orgFields.put("ref", ref);
+                            orgFields.put("type", fieldElement.getAttribute("type"));
+                            FieldValue fv = new FieldValue();
+                            if (stringOrgValue != null && !stringOrgValue.isEmpty()) {
+                                fv.setCode(stringOrgValue);
+                                fv.setValue(stringOrgValue);
+                            } else {
+                                fv.setCode(ref);
+                                fv.setValue(ref);
+                            }
+                            fv.setSelected(true);
+                            int index = field.getPossibleValues() == null ? 0
+                                    : field.getPossibleValues().size();
+                            fv.setIndex(index);
+                            if (field.getPossibleValues() == null) {
+                                field.setPossibleValues(new ArrayList<FieldValue>());
+                            }
+                            if (!field.getPossibleValues().stream().anyMatch(n -> {
+                                return n.getCode().equals(stringOrgValue);
+                            })) {
+                                field.getPossibleValues().add(fv);
+                            }
+
+                            document.addOrganizationField(field.getFieldName() + "_" + field.getSubType() + "_"
+                                    + DigestUtils.md5DigestAsHex(fv.getValue().getBytes()), orgFields);
+
+                        }
+                    }
+                }
+            }
+        };
+        processForEachFilteredByType(organizationConsumer, FieldType.ORGANIZATION);
+    }
+
+    protected void processRecipientCountryElementType(InternalDocument document, Element element) {
+
+        Consumer<Field> recipientCountry = field -> {
+            NodeList fieldNodeList;
+            Field filtersField = getFilterFieldList().stream().filter(n -> {
+                return field.getFieldName().equals(n.getFieldName());
+            }).findFirst().get();
+
+            fieldNodeList = element.getElementsByTagName(field.getFieldName());
+            List<FieldValue> recipients = new ArrayList<>();
             for (int j = 0; j < fieldNodeList.getLength(); j++) {
                 Element fieldElement = (Element) fieldNodeList.item(j);
+                FieldValue recipient = new FieldValue();
                 String code = fieldElement.getAttribute("code");
-                if(!code.isEmpty()){
-                    codes.add(code);
-                    Optional<FieldValue> foundfv = field.getPossibleValues().stream().filter(n -> {return n.getCode().equals(code);}).findFirst();
-                    FieldValue fv  = foundfv.isPresent() ? foundfv.get() : null;
-                    if(fv != null && fv.isSelected() != true){
-                        fv.setSelected(true);
+                boolean includeCountry = includedByFilter(filtersField.getFilters(), code);
+                if (includeCountry) {
+                    recipient.setCode(code);
+                    Optional<FieldValue> fieldValue = field.getPossibleValues().stream().filter(f -> f.getCode().equals(code)).findFirst();
+                    if (fieldValue.isPresent()) {
+                        recipient.setValue(fieldValue.get().getValue());
                     }
+                    recipient.setPercentage(fieldElement.getAttribute("percentage"));
+                    recipients.add(recipient);
                 }
             }
-            if(!codes.isEmpty()){
-                String[] codeValues = codes.stream().toArray(String[]::new);
-                document.addStringMultiField(field.getFieldName(), codeValues);
-            }
-        } else {
-            fieldNodeList = element.getElementsByTagName(field.getFieldName());
-            if (fieldNodeList.getLength() > 0 && fieldNodeList.getLength() == 1) {
-                Element fieldElement = (Element) fieldNodeList.item(0);
-                String codeValue = fieldElement.getAttribute("code");
-                if(!codeValue.isEmpty()){
-                    Optional<FieldValue> foundfv = field.getPossibleValues().stream().filter( n -> {
-                        return n.getCode().equals(codeValue);
-                    }).findFirst();
-                    FieldValue fv  = foundfv.isPresent() ? foundfv.get() : null;
-                    if(fv != null && fv.isSelected() != true){
-                        fv.setSelected(true);
-                    }
-                    document.addStringField(field.getFieldName(), codeValue);
-                }
-            }
-        }
+            document.addRecepientCountryFields(field.getFieldName(), recipients);
+        };
+        processForEachFilteredByType(recipientCountry, FieldType.RECIPIENT_COUNTRY);
     }
-    protected void processOrganizationElementType(InternalDocument document, Element element, Field field) {
-        NodeList fieldNodeList;
-        fieldNodeList = element.getElementsByTagName(field.getFieldName());
-        if (fieldNodeList.getLength() > 0) {
+
+    protected void processLocationElementType(InternalDocument document, Element element) {
+        Consumer<Field> locationConsumer = field -> {
+            NodeList fieldNodeList = element.getElementsByTagName(field.getFieldName());
+            List<String> codesLocation = new ArrayList<>();
             for (int j = 0; j < fieldNodeList.getLength(); j++) {
                 Element fieldElement = (Element) fieldNodeList.item(j);
-                //this can be generic not to process all the organization sub types and process them at the same moment
-                if (fieldElement.getAttribute("role").equals(field.getSubType()) || fieldElement.getAttribute("role").equals(field.getSubTypeCode())) {
-                    final String stringOrgValue = getStringOrgValue(fieldElement);
+                String name = getNameFromElement(fieldElement);
 
-                    final String ref = fieldElement.getAttribute("ref");
-
-                    if ((stringOrgValue != null && !stringOrgValue.trim().isEmpty())
-                            || (ref != null && !ref.trim().isEmpty())) {
-                        Map<String, String> orgFields = new HashMap<String, String>();
-                        orgFields.put("value", stringOrgValue);
-                        orgFields.put("role", field.getSubType());
-                        orgFields.put("ref", ref);
-                        orgFields.put("type", fieldElement.getAttribute("type"));
-                        FieldValue fv = new FieldValue();
-                        if (stringOrgValue != null && !stringOrgValue.isEmpty()) {
-                            fv.setCode(stringOrgValue);
-                            fv.setValue(stringOrgValue);
-                        } else {
-                            fv.setCode(ref);
-                            fv.setValue(ref);
-                        }
+                if (!StringUtils.isBlank(name)) {
+                    codesLocation.add(name);
+                    FieldValue fv = new FieldValue();
+                    if (name != null && !name.isEmpty()) {
+                        fv.setCode(name);
+                        fv.setValue(name);
                         fv.setSelected(true);
-                        int index = field.getPossibleValues() == null ? 0
-                                : field.getPossibleValues().size();
-                        fv.setIndex(index);
-                        if (field.getPossibleValues() == null) {
-                            field.setPossibleValues(new ArrayList<FieldValue>());
-                        }
-                        if (!field.getPossibleValues().stream().anyMatch(n -> {
-                            return n.getCode().equals(stringOrgValue);
-                        })) {
-                            field.getPossibleValues().add(fv);
-                        }
-
-                        document.addOrganizationField(field.getFieldName() + "_" + field.getSubType() + "_"
-                                + DigestUtils.md5DigestAsHex(fv.getValue().getBytes()), orgFields);
-
+                    }
+                    int index = field.getPossibleValues() == null ? 0 : field.getPossibleValues().size();
+                    fv.setIndex(index);
+                    if (field.getPossibleValues() == null) {
+                        field.setPossibleValues(new ArrayList<FieldValue>());
+                    }
+                    if (!field.getPossibleValues().stream().anyMatch(n -> {
+                        return n.getCode().equals(fv.getValue());
+                    })) {
+                        field.getPossibleValues().add(fv);
                     }
                 }
-            }
-        }
-    }
-    protected  void processRecipientCountryElementType(InternalDocument document, Element element, Field field) {
-        NodeList fieldNodeList;
-        Field filtersField = getFilterFieldList().stream().filter(n -> {
-            return field.getFieldName().equals(n.getFieldName());
-        }).findFirst().get();
-
-        fieldNodeList = element.getElementsByTagName(field.getFieldName());
-        List<FieldValue> recipients = new ArrayList<>();
-        for (int j = 0; j < fieldNodeList.getLength(); j++) {
-            Element fieldElement = (Element) fieldNodeList.item(j);
-            FieldValue recipient = new FieldValue();
-            String code = fieldElement.getAttribute("code");
-            boolean includeCountry = includedByFilter(filtersField.getFilters(), code);
-            if(includeCountry){
-                recipient.setCode(code);
-                Optional<FieldValue> fieldValue = field.getPossibleValues().stream().filter(f -> f.getCode().equals(code)).findFirst();
-                if(fieldValue.isPresent()){
-                    recipient.setValue(fieldValue.get().getValue());
+                if (!codesLocation.isEmpty()) {
+                    String[] codeValues = codesLocation.stream().toArray(String[]::new);
+                    document.addStringMultiField(field.getFieldName(), codeValues);
                 }
-                recipient.setPercentage(fieldElement.getAttribute("percentage"));
-                recipients.add(recipient);
             }
-        }
-        document.addRecepientCountryFields(field.getFieldName(), recipients);
+        };
+        processForEachFilteredByType(locationConsumer, FieldType.LOCATION);
     }
 
-    protected void processLocationElementType(InternalDocument document, Element element, Field field) {
-
-        NodeList fieldNodeList = element.getElementsByTagName(field.getFieldName());
-        List<String> codesLocation = new ArrayList<String>();
-
-        for (int j = 0; j < fieldNodeList.getLength(); j++) {
-            Element fieldElement = (Element) fieldNodeList.item(j);
-            String name = getNameFromElement(fieldElement);
-
-            if (!StringUtils.isBlank(name)) {
-                codesLocation.add(name);
-                FieldValue fv = new FieldValue();
-                if (name != null && !name.isEmpty()) {
-                    fv.setCode(name);
-                    fv.setValue(name);
-                    fv.setSelected(true);
-                }
-                int index = field.getPossibleValues() == null ? 0 : field.getPossibleValues().size();
-                fv.setIndex(index);
-                if (field.getPossibleValues() == null) {
-                    field.setPossibleValues(new ArrayList<FieldValue>());
-                }
-                if (!field.getPossibleValues().stream().anyMatch(n -> {
-                    return n.getCode().equals(fv.getValue());
-                })) {
-                    field.getPossibleValues().add(fv);
-                }
-            }
-            if(!codesLocation.isEmpty()){
-                String[] codeValues = codesLocation.stream().toArray(String[]::new);
-                document.addStringMultiField(field.getFieldName(), codeValues);
-            }
-        }
-    }
-    protected void processDateElementType(InternalDocument document, Element element, Field field) throws ParseException {
+    protected void processDateElementType(InternalDocument document, Element element) throws ParseException {
         NodeList nodes = element.getElementsByTagName("activity-date");
         for (int j = 0; j < nodes.getLength(); ++j) {
             Element e = (Element) nodes.item(j);
-            if (getDateSubtype(field).equals(e.getAttribute("type"))) {
-                String localDate = e.getAttribute("iso-date");
+            Field field = getField(e, FieldType.DATE);
+            String localDate = e.getAttribute("iso-date");
                 String format = "yyyy-MM-dd";
                 SimpleDateFormat sdf = new SimpleDateFormat(format);
                 if (localDate != null && !localDate.isEmpty()) {
                     document.addDateField(field.getUniqueFieldName(), sdf.parse(localDate));
                 }
+        }
+    }
+
+
+    protected void processTransactionElementType(InternalDocument document, Element iatiActivity,
+                                                 Element activityProviderNode)  {
+        NodeList nodes;
+        nodes = iatiActivity.getElementsByTagName("transaction");
+        for (int j = 0; j < nodes.getLength(); ++j) {
+            String reference ;
+            Element e = (Element) nodes.item(j);
+            Field field = getField(e, TRANSACTION);
+
+            if(field == null) {
+                continue;
+            }
+            // Reference
+            reference = e.getAttribute("ref");
+            // Amount
+            String localValue = e.getElementsByTagName("value").item(0).getChildNodes().item(0).getNodeValue();
+            // Date
+            String localDate = "";
+            if(e.getElementsByTagName("transaction-date").item(0) != null) {
+                NodeList transactionDate = e.getElementsByTagName("transaction-date").item(0).getChildNodes();
+                if (transactionDate.getLength() == 0) {
+                    localDate = ((Element) transactionDate).getAttribute("iso-date");
+                } else {
+                    localDate = transactionDate.item(0).getNodeValue();
+
+                }
+                if (localDate != null && !isValidDate(localDate))
+                {
+                    localDate = e.getElementsByTagName("transaction-date").item(0).getAttributes().getNamedItem("iso-date").getNodeValue();
+                }
+            }
+
+            final String receivingOrganization = extractReceivingOrganization(e);
+
+            Element providerNode = e.getElementsByTagName("provider-org").item(0) != null
+                    ? (Element) e.getElementsByTagName("provider-org").item(0) : null;
+
+            // if no provider tag, check if we have participating-org with role 1 (funding
+            // if not use reporting org )
+            if (providerNode == null) {
+                if (activityProviderNode != null ) {
+                    providerNode = activityProviderNode;
+                } else {
+                    //this should be moved to iati since its per activity
+                    providerNode = iatiActivity.getElementsByTagName("reporting-org").item(0)
+                            != null ? (Element) iatiActivity.getElementsByTagName("reporting-org")
+                            .item(0) : null;
+                }
+            }
+            final String providingOrganization = extractProvidingOrganization(providerNode);
+
+
+            final String providerRef = (providerNode != null) ? providerNode.getAttribute("ref") : "";
+
+            // Get the field for provider org
+            Optional<Field> fieldValue = getFilterFieldList().stream().filter(n -> "provider-org".equals(n.getFieldName())).findFirst();
+            // If it has filters set, check if this transaction
+            // complies
+            if (fieldValue.isPresent() && fieldValue.get().getFilters().size() > 0) {
+                // See if the current transaction has the
+                // correct provider organization
+                Optional<String> optField = fieldValue.get().getFilters().stream().filter(n -> {
+                    return n.equals(providingOrganization);
+                }).findAny();
+                if (!optField.isPresent()) {
+                    // If it's not there, then move to the next
+                    // transaction
+                    continue;
+                }
+            }
+            if (StringUtils.isBlank(providingOrganization)) {
+                //if we don't have provider organization we should ingore the transaction
+                continue;
+            }
+
+            Map<String, String> transactionFields = new HashMap<String, String>();
+            transactionFields.put("date", localDate);
+            transactionFields.put("providing-org", providingOrganization);
+            transactionFields.put("receiving-org", receivingOrganization);
+            transactionFields.put("provider-org-ref", providerRef);
+            transactionFields.put("reference", reference);
+            transactionFields.put("value", localValue);
+            transactionFields.put("subtype", field.getSubType());
+            document.addTransactionField("transaction" + field.getSubType() + "_" + j,
+                    transactionFields);
+        }
+
+    }
+
+
+    private void clearUsedValues() {
+        for (Field field : getFields()) {
+            if (field.getPossibleValues() != null) {
+                for (FieldValue fv : field.getPossibleValues()) {
+                    fv.setSelected(false);
+                }
             }
         }
     }
+    protected abstract String extractProvidingOrganization(Element providerNode);
+    protected abstract String extractReceivingOrganization(Element e);
 
     protected Boolean includedByFilter(List<String> filters, String codeValue) {
         if (filters.size() == 0)
@@ -611,6 +1010,40 @@ public abstract class IATIProcessor implements ISourceProcessor {
     public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
         Set<Object> seen = ConcurrentHashMap.newKeySet();
         return t -> seen.add(keyExtractor.apply(t));
+    }
+
+    protected Predicate<? super Field> getFieldsPredicate(Element e, FieldType fieldType) {
+        switch (fieldType) {
+            case TRANSACTION:
+                String code = e.getElementsByTagName("transaction-type").item(0)
+                        .getAttributes().getNamedItem("code").getNodeValue();
+                return filteredField ->
+                        (filteredField.getType().equals(fieldType)
+                                && (filteredField.getSubType().equals(code)
+                                || code.equals(filteredField.getSubTypeCode())));
+            case DATE:
+                  return filteredField ->
+                       (filteredField.getType().equals(fieldType) &&
+                               getDateSubtype(filteredField).equals(e.getAttribute("type")));
+                default:
+                return null;
+        }
+    }
+    protected Field getField(Element element, FieldType fieldType){
+        return getFields().stream()
+                .filter(getFieldsPredicate(element, fieldType))
+                .reduce((a, b) -> {
+                    throw new IllegalStateException("Multiple elements: " + a + ", " + b);
+                }).orElse(null);
+    }
+
+    protected boolean isValidDate(String dateString) {
+        try {
+            df.parse(dateString);
+            return true;
+        } catch (ParseException e) {
+            return false;
+        }
     }
 
 }

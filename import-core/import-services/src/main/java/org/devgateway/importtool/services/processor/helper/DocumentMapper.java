@@ -159,7 +159,7 @@ public class DocumentMapper implements IDocumentMapper {
 			logger.error("Missing prerequirements to initialize this mapping " + mpex);			
 			this.updateStatus(EPMessages.ERROR_EXCTRACTING_PROJECT, Status.FAILED_WITH_ERROR);			
 		}catch (Exception e) {
-			logger.error("Error parsing document " + e);
+			logger.error("Error parsing document ", e);
 			this.updateStatus(EPMessages.ERROR_EXCTRACTING_PROJECT, Status.FAILED_WITH_ERROR);			
 		}		
 	}
