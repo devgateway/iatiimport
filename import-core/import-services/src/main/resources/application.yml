@@ -16,7 +16,7 @@ spring:
   dataSource:
     driverClassName : org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/import_tool
-    password : m0n1t0r
+    password : amp321
     username : amp
     
   jpa:
