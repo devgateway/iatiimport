@@ -74,7 +74,7 @@ public abstract class IATIProcessor implements ISourceProcessor {
     protected final static Map<String, Map<String, Map<String, Map<String, String>>>> langPack = new HashMap();
 
     private static final String ISO_DATE = "yyyy-MM-dd";
-    private static final String ISO_ATTRIBUTE = "setFromDataStore";
+    private static final String ISO_ATTRIBUTE = "iso-date";
     private SimpleDateFormat df = new SimpleDateFormat(ISO_DATE);
 
 
