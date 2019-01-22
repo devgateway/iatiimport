@@ -74,6 +74,7 @@ public abstract class IATIProcessor implements ISourceProcessor {
     protected final static Map<String, Map<String, Map<String, Map<String, String>>>> langPack = new HashMap();
 
     private static final String ISO_DATE = "yyyy-MM-dd";
+    private static final String ISO_ATTRIBUTE = "setFromDataStore";
     private SimpleDateFormat df = new SimpleDateFormat(ISO_DATE);
 
 
@@ -126,10 +127,6 @@ public abstract class IATIProcessor implements ISourceProcessor {
 
     public boolean isFromDatastore() {
         return fromDatastore;
-    }
-
-    public void setFromDatastore(boolean fromDatastore) {
-        this.fromDatastore = fromDatastore;
     }
 
     @Override
@@ -490,7 +487,7 @@ public abstract class IATIProcessor implements ISourceProcessor {
     protected Document getDocument(String fileName) throws ParserConfigurationException, SAXException, IOException {
         InputStream is = this.getClass().getResourceAsStream(fileName);
         if (is == null) {
-            System.out.println("this field name is null:" + fileName);
+            log.error("this field name is null:" + fileName);
         }
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setValidating(false);
@@ -532,7 +529,6 @@ public abstract class IATIProcessor implements ISourceProcessor {
 
         XPath xPath = XPathFactory.newInstance().newXPath();
         try {
-            Node node = (Node) xPath.compile(xPathExpresion).evaluate(xDoc, XPathConstants.NODE);
             return (NodeList) xPath.compile(xPathExpresion).evaluate(xDoc, XPathConstants.NODESET);
         } catch (XPathExpressionException e) {
             log.error("Cannot evaluete xpath", e);
@@ -663,7 +659,6 @@ public abstract class IATIProcessor implements ISourceProcessor {
             document.addStringField("default-currency", currency);
             String defaultLanguageCode = !("".equals(iatiActivity.getAttribute("xml:lang"))) ? iatiActivity.getAttribute
                     ("xml:lang") : this.getDefaultLanguage();
-            NodeList fieldNodeList;
 
             String xPathParticipatingOrg = "participating-org[@role=1]";
             NodeList activityparticipatingOrgs = (NodeList) xPath.evaluate(xPathParticipatingOrg,
@@ -872,8 +867,8 @@ public abstract class IATIProcessor implements ISourceProcessor {
         for (int j = 0; j < nodes.getLength(); ++j) {
             Element e = (Element) nodes.item(j);
             Field field = getField(e, FieldType.DATE);
-            String localDate = e.getAttribute("iso-date");
-                String format = "yyyy-MM-dd";
+            String localDate = e.getAttribute(ISO_ATTRIBUTE);
+                String format = ISO_DATE;
                 SimpleDateFormat sdf = new SimpleDateFormat(format);
                 if (localDate != null && !localDate.isEmpty()) {
                     document.addDateField(field.getUniqueFieldName(), sdf.parse(localDate));
@@ -888,36 +883,36 @@ public abstract class IATIProcessor implements ISourceProcessor {
         nodes = iatiActivity.getElementsByTagName("transaction");
         for (int j = 0; j < nodes.getLength(); ++j) {
             String reference ;
-            Element e = (Element) nodes.item(j);
-            Field field = getField(e, TRANSACTION);
+            Element transactionElement = (Element) nodes.item(j);
+            Field field = getField(transactionElement, TRANSACTION);
 
             if(field == null) {
                 continue;
             }
             // Reference
-            reference = e.getAttribute("ref");
+            reference = transactionElement.getAttribute("ref");
             // Amount
-            String localValue = e.getElementsByTagName("value").item(0).getChildNodes().item(0).getNodeValue();
+            String localValue = transactionElement.getElementsByTagName("value").item(0).getChildNodes().item(0).getNodeValue();
             // Date
             String localDate = "";
-            if(e.getElementsByTagName("transaction-date").item(0) != null) {
-                NodeList transactionDate = e.getElementsByTagName("transaction-date").item(0).getChildNodes();
+            if(transactionElement.getElementsByTagName("transaction-date").item(0) != null) {
+                NodeList transactionDate = transactionElement.getElementsByTagName("transaction-date").item(0).getChildNodes();
                 if (transactionDate.getLength() == 0) {
-                    localDate = ((Element) transactionDate).getAttribute("iso-date");
+                    localDate = ((Element) transactionDate).getAttribute(ISO_ATTRIBUTE);
                 } else {
                     localDate = transactionDate.item(0).getNodeValue();
 
                 }
                 if (localDate != null && !isValidDate(localDate))
                 {
-                    localDate = e.getElementsByTagName("transaction-date").item(0).getAttributes().getNamedItem("iso-date").getNodeValue();
+                    localDate = transactionElement.getElementsByTagName("transaction-date").item(0).getAttributes().getNamedItem(ISO_ATTRIBUTE).getNodeValue();
                 }
             }
 
-            final String receivingOrganization = extractReceivingOrganization(e);
+            final String receivingOrganization = extractReceivingOrganization(transactionElement);
 
-            Element providerNode = e.getElementsByTagName("provider-org").item(0) != null
-                    ? (Element) e.getElementsByTagName("provider-org").item(0) : null;
+            Element providerNode = transactionElement.getElementsByTagName("provider-org").item(0) != null
+                    ? (Element) transactionElement.getElementsByTagName("provider-org").item(0) : null;
 
             // if no provider tag, check if we have participating-org with role 1 (funding
             // if not use reporting org )
