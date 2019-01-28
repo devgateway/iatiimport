@@ -26,10 +26,52 @@ public class IATIProcessorHelper {
         mappingNameFile.put("policy-marker", "PolicyMarker");
         mappingNameFile.put("sector", "Sector");
     }
+    public static void processListElementType(InternalDocument document, Element element, Field field) {
+        NodeList fieldNodeList;
+        if (field.isMultiple()) {
+            fieldNodeList = element.getElementsByTagName(field.getFieldName());
+            List<String> codes = new ArrayList<String>();
+            for (int j = 0; j < fieldNodeList.getLength(); j++) {
+                Element fieldElement = (Element) fieldNodeList.item(j);
+                String code = fieldElement.getAttribute("code");
+                if(!code.isEmpty()){
+                    codes.add(code);
+                    Optional<FieldValue> foundfv = field.getPossibleValues().stream().filter(n -> {return n.getCode().equals(code);}).findFirst();
+                    FieldValue fv  = foundfv.isPresent() ? foundfv.get() : null;
+                    if(fv != null && fv.isSelected() != true){
+                        fv.setSelected(true);
+                    }
+                }
+            }
+            if(!codes.isEmpty()){
+                String[] codeValues = codes.stream().toArray(String[]::new);
+                document.addStringMultiField(field.getFieldName(), codeValues);
+            }
+        } else {
+            fieldNodeList = element.getElementsByTagName(field.getFieldName());
+            if (fieldNodeList.getLength() > 0 && fieldNodeList.getLength() == 1) {
+                Element fieldElement = (Element) fieldNodeList.item(0);
+                String codeValue = fieldElement.getAttribute("code");
+                if(!codeValue.isEmpty()){
+                    Optional<FieldValue> foundfv = field.getPossibleValues().stream().filter( n -> {
+                        return n.getCode().equals(codeValue);
+                    }).findFirst();
+                    FieldValue fv  = foundfv.isPresent() ? foundfv.get() : null;
+                    if(fv != null && fv.isSelected() != true){
+                        fv.setSelected(true);
+                    }
+                    document.addStringField(field.getFieldName(), codeValue);
+                }
+            }
+        }
+    }
+    public static void processStringElementType(InternalDocument document, Element element, Field field) {
+        String stringValue = getStringFromElement(element, field.getFieldName());
+        document.addStringField(field.getFieldName(), stringValue);
+    }
     public static String getStringFromElement(Element element, String field){
         return getStringFromElement(element, field, null);
     }
-
     public static String getStringFromElement(Element element, String field,String attribute) {
         NodeList fieldNodeList;
         String returnValue = "";
