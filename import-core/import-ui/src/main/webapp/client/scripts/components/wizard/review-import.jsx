@@ -66,7 +66,7 @@ var ReviewImport = React.createClass({
       this.props.eventHandlers.processNextVersion();  
     },
     render: function () {
-    	var statusMessage = this.props.statusMessage.length > 0 ? <div className="alert alert-info" role="alert">{this.props.statusMessage}</div> : "";
+        var statusMessage = this.props.statusMessage.length > 0 ? <div className="alert alert-info" role="alert">{this.props.statusMessage}</div> : "";
         return (
             <div className="panel panel-default">
                 <div className="panel-heading"><strong>{this.props.i18nLib.t('wizard.review_import.review_import')}</strong></div>
@@ -88,7 +88,7 @@ var ReviewImport = React.createClass({
                                <label><input type="radio" name="importOption" value={constants.REPLACE_DONOR_FUNDING} onChange={this.onImportOptionChange} checked={constants.REPLACE_DONOR_FUNDING === this.state.importOption}/>{this.props.i18nLib.t('wizard.review_import.import_option_replace')}</label><br/>
                                <label className="import-option-explanation">{this.props.i18nLib.t('wizard.review_import.import_option_replace_explanation')}</label>
                              </div>
-                               {this.props.showDisasterResponse &&
+                               {this.props.showDisasterResponse && this.state.importSummary.hasTransactions &&
                                    <div>
                                    <Tooltip i18nLib={this.props.i18nLib} tooltip={this.props.i18nLib.t('wizard.review_import.disaster_response_tooltip')}/><label>{this.props.i18nLib.t('wizard.review_import.disaster_response')}</label>                               
                                    <div className="radio">
