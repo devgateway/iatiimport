@@ -21,6 +21,7 @@ module.exports = {
   IMPORT_TYPE_MANUAL: 'manual',
   IMPORT_TYPE_AUTOMATIC: 'automatic',  
   ROLE_FUNDING: 'Funding',
+  LANGUAGE_PREFERENCE: ['en','fr', 'es'],
   FIELD_NAMES: {
 	  IATI_ID: 'iati-identifier',
 	  TITLE: 'title',
@@ -41,6 +42,6 @@ module.exports = {
       DEFAULT_FLOW_TYPE:'default-flow-type',
       DEFAULT_TIED_STATUS:'default-tied-status',
       SECTOR: 'sector',
-      POLICY_MARKER: 'policy-marker'
+      POLICY_MARKER: 'policy-marker'      
   }
 };
