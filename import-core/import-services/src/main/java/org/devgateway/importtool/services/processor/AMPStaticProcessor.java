@@ -224,7 +224,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		Map<String, String> languages = new HashMap<String, String>();
 		while (it.hasNext()) {
 			Entry<String, JsonNode> entry = it.next();
-			languages.put(entry.getKey(), entry.getValue().asText());
+			languages.put(entry.getKey().toLowerCase(), entry.getValue().asText());
 		}
 		
 		if (languages.isEmpty()) {
@@ -1483,6 +1483,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		}
 		// Currency
 		Field currency = new Field("Currency Code", "currency_code", FieldType.LIST, true);
+		currency.setMultiLangDisplayName(destinationFieldsListLabels.get("fundings~funding_details~currency"));
 		currency.setPossibleValues(getCodeListValues("fundings~funding_details~currency"));
 		fieldList.add(currency);
 
