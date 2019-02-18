@@ -3,6 +3,7 @@ package org.devgateway.importtool.services.processor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.model.Language;
+import org.devgateway.importtool.services.processor.helper.Constants;
 import org.devgateway.importtool.services.processor.helper.Field;
 import org.devgateway.importtool.services.processor.helper.FieldType;
 import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
@@ -19,12 +20,10 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -50,10 +49,12 @@ public abstract class IATIProcessor implements ISourceProcessor {
     public static final String DEFAULT_PATH_API = "/results/iati-activities/iati-activity";
     public static String DEFAULT_GROUPING_FIELD = "reporting-org";
     protected String PROCESSOR_VERSION = "";
+    protected String PROCESSOR_SUPER_VERSION;
     protected String codelistPath = "";
     protected String schemaPath = "";
     protected String activtySchemaName = "iati-activities-schema.xsd";
     protected String fieldsTooltipsLocation = null;
+    protected String labelsTranslationsLocation = null;
     // XML Document that will hold the entire imported file
     protected Document doc;
     protected String propertiesFile = "";
@@ -68,11 +69,11 @@ public abstract class IATIProcessor implements ISourceProcessor {
 
 
     private boolean fromDatastore = false;
-    public final static Set<String> IMPLEMENTED_VERSIONS = new HashSet
+    public final static Set<String> IMPLEMENTED_VERSIONS = new HashSet<>
             (Arrays.asList("1.01", "1.03", "1.04", "1.05",
             "2.01", "2.02","2.03"));
-    private final static Set<String> SUPPORTED_LOCALES= new HashSet<>(Arrays.asList("en","fr", "es"));
-    protected final static Map<String,Map<String,Map<String,String>> >descriptionTooltipsMap = new HashMap();
+    //Variable that holds a MAP for tooltips and for fields translations
+    protected final static Map<String,Map<String,Map<String,Map<String,String>> >>langPack = new HashMap();
 
     @Override
     public  void setFromDataStore(boolean fromDatastore) {
@@ -303,9 +304,11 @@ public abstract class IATIProcessor implements ISourceProcessor {
             return null;
         }
     }
-
-    public Map<String, String>getTranslationForField(String field){
-        return getTranslationsForVersion(this.PROCESSOR_VERSION).get(field);
+    public Map<String, String> getLabelsForField(String field){
+        return getLabelsForVersion(this.PROCESSOR_SUPER_VERSION).get(field);
+    }
+    public Map<String, String> getTooltipForField(String field){
+        return getTooltipForVersion(this.PROCESSOR_VERSION).get(field);
     }
 
     @Override
@@ -321,14 +324,25 @@ public abstract class IATIProcessor implements ISourceProcessor {
         return this.filterLanguages;
     }
 
-    public  Map<String, Map<String, String>> getTranslationsForVersion(String version) {
+    public  Map<String, Map<String, String>> getTooltipForVersion(String version) {
+        return getLangPackForTypeAndVersion(version, Constants.LANG_PACK_TOOLTIPS);
+    }
+    public  Map<String, Map<String, String>> getLabelsForVersion(String version) {
+        return getLangPackForTypeAndVersion(version, Constants.LANG_PACK_LABELS);
+    }
+
+    private Map<String, Map<String, String>> getLangPackForTypeAndVersion(String version, String langPackType) {
+
+        Map<String,Map<String,Map<String,String>> > descriptionTooltipsMap = getLangPack(langPackType);
+
         if (descriptionTooltipsMap.get(version) == null) {
             //map that will hold the translation pack for a version
             Map<String, Map<String, String>> mapForVersion = new HashMap<>();
-            SUPPORTED_LOCALES.stream().forEach(lang -> {
+            Constants.SUPPORTED_LOCALES.stream().forEach(lang -> {
                 try {
                     Properties properties = new Properties();
-                    properties.load(new InputStreamReader(this.getClass().getResource(getTooltipsFileName(lang))
+                    properties.load(new InputStreamReader(this.getClass().getResource(getPropertieFieldName(lang,
+                            langPackType))
                             .openStream(), Charset.forName("UTF-8")));
                     properties.stringPropertyNames().stream().forEach(property -> {
                         if (mapForVersion.get(property) == null) {
@@ -338,11 +352,10 @@ public abstract class IATIProcessor implements ISourceProcessor {
                         } else {
                             mapForVersion.get(property).put(lang, properties.getProperty(property));
                         }
-
                     });
-                } catch (IOException  ex ){
+                } catch (IOException ex) {
                     //we need to properly handle exceptions but we need to do it on scope of the refactoring
-                    //so we properly inform the user of the problem.
+                    //so we properly inform the user of the problem. T
                     log.error("Cannot process properties file " + this.fieldsTooltipsLocation +
                             "_" + lang + ".properties");
                 }
@@ -352,9 +365,27 @@ public abstract class IATIProcessor implements ISourceProcessor {
         return descriptionTooltipsMap.get(version);
     }
 
-    private String getTooltipsFileName(String lang) {
-        return this.fieldsTooltipsLocation + "_"
-                + lang + ".properties";
+    public Map<String,Map<String,Map<String,String>> > getLangPack(String langPackType) {
+        if (langPack.get(langPackType) == null) {
+            langPack.put(langPackType, new HashMap<>());
+        }
+        return langPack.get(langPackType);
+    }
+
+    private String getPropertieFieldName(String lang,String langPackType) {
+        String fileName;
+        switch (langPackType) {
+            case Constants.LANG_PACK_TOOLTIPS:
+                fileName = this.fieldsTooltipsLocation;
+                break;
+            case Constants.LANG_PACK_LABELS:
+                fileName = this.labelsTranslationsLocation;
+                break;
+            default:
+                throw new UnsupportedOperationException("LangPackType not supported");
+
+        }
+        return fileName + "_" + lang + ".properties";
     }
 
     protected List<String> extractLanguage(NodeList elementsByTagName) {

@@ -805,14 +805,14 @@ module.exports = {
 							'view_import': ' Visualiser le Téléchargement ',
 							'delete': ' Supprimer '
 						},
-						'select': 'Select',
+						'select': 'Sélectionnez',
 						'import_report':{
-							'import_process': 'Import Process',
-							'project_id': 'Project Id',
-							'operation': 'Operation',
-							'status': 'Status',
-							'message': 'Message/Project Title',
-							'close': 'Close'
+							'import_process': 'Processus d\'Importation',
+							'project_id': 'ID du Projet',
+							'operation': 'Opération',
+							'status': 'Statut',
+							'message': 'Message/Titre du Projet',
+							'close': 'Fermé'
 						},
 					},
 					'server_messages': {

@@ -5,23 +5,33 @@ var Cookies = require('js-cookie');
 var appConfig = require('./../conf');
 var appActions = require('./../actions');
 
+var Constants = require('./constants');
+
 module.exports = {
   getMultilangString: function(multilangFields, field, i18nLib){
-	  var language = i18nLib.lng() || 'en';
+	  var language = i18nLib.lng();
 	  var fieldData = multilangFields[field];
 	  var result = fieldData[language] ? fieldData[language] : null;
-	  if(result === null){
-	     for (var key in multilangFields[result]) {
-           if (multilangFields[field].hasOwnProperty(key)) {
-              if(result === null || result.length === 0){
-            	  result = multilangFields[field][key];
-              }
-           }
-         }
-	 }
 	  
+	  if (result === null){
+		  for (var i = 0; i < Constants.LANGUAGE_PREFERENCE.length; i++) {
+				 var langKey = Constants.LANGUAGE_PREFERENCE[i];
+				 result = fieldData[langKey];
+				 if (result) {
+					 return result;
+				 }				  
+			 }
+	  }	  
+ 
 	 return result;
-  },  
+  },
+  getDisplayValue: function(item, language) {
+    var displayValue = item.displayName;
+    if (item.multiLangDisplayName && item.multiLangDisplayName[language]) {
+      displayValue = item.multiLangDisplayName[language];
+    }
+    return displayValue;
+  },
   getFieldDisplayName: function(fieldData, fieldName) {
 	  var displayName = '';
 	  var field = _.find(fieldData, function(sourceField) { 

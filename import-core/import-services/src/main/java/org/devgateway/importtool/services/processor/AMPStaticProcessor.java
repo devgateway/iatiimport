@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import org.apache.commons.logging.Log;
@@ -60,6 +59,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	private Integer ampImplementationLevel;
 	private String fieldsEndpoint = "/rest/activity/fields";
 	private String allFieldsEndpoit = "/rest/activity/field/values";
+	private String translationEndPoints = "/rest/translations/translate?translations=";
 	private String documentsEndpoint = "/rest/activity/projects";
 
 	private List<Field> fieldList = new ArrayList<Field>();
@@ -68,6 +68,9 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	private Map<String, List<FieldValue>> allFieldValuesForDestinationProcessor; // this holds the list of possible
 	// values that wr retrive from the endpoint at once, instead of one by one
 	private HashMap<String, Map<String, String>> destinationFieldsListLabels = new HashMap<String, Map<String, String>>();
+	// translations we ask amp to translate for us
+	private Map<String, Map<String, String>> ampTranslations = new HashMap<>();
+
 
 	public List<String> getDestinationFieldsList() {
 		return destinationFieldsList;
@@ -116,6 +119,14 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 	public ActionStatus getActionStatus() {
 		return actionStatus;
+	}
+
+	public Map<String, Map<String, String>> getAmpTranslations() {
+		return ampTranslations;
+	}
+
+	public void setAmpTranslations(Map<String, Map<String, String>> ampTranslations) {
+		this.ampTranslations = ampTranslations;
 	}
 
 	public void setActionStatus(ActionStatus actionStatus) {
@@ -179,9 +190,10 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 					String id = node.get("internal_id").asText();
 					String internalId = node.get("amp_id").asText();
 					// Needs to be checked, since it's configurable it might not have a value
-					if (node.get(ampIatiIdField) != null) {
-						document.setIdentifier(node.get(ampIatiIdField).asText());
-						document.addStringField(ampIatiIdField, node.get(ampIatiIdField).asText());
+					JsonNode ampIatiId = node.get(ampIatiIdField);					
+					if (ampIatiId != null && !Constants.NULL_STRING.equals(ampIatiId.asText())) {
+					    document.setIdentifier(ampIatiId.asText());
+						document.addStringField(ampIatiIdField, ampIatiId.asText());
 					}
 					Map<String, String> title = extractMultilanguageText(node.get("project_title"));
 					String dateString = node.get("creation_date").asText();
@@ -212,7 +224,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		Map<String, String> languages = new HashMap<String, String>();
 		while (it.hasNext()) {
 			Entry<String, JsonNode> entry = it.next();
-			languages.put(entry.getKey(), entry.getValue().asText());
+			languages.put(entry.getKey().toLowerCase(), entry.getValue().asText());
 		}
 		
 		if (languages.isEmpty()) {
@@ -1248,12 +1260,14 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		// Transaction Fields
 		List<Field> trnDependencies = new ArrayList<Field>();
 		loadCodeListValues();
+		loadAmpTranslations();
 		// Fixed fields
 		fieldList.add(new Field("IATI Identifier", "iati-identifier", FieldType.STRING, false));
 		if (destinationFieldsList.contains("project_title")) {
 			Field projectTitle = new Field("Project Title", "project_title",
 					getFieldType(fieldProps.get("project_title")), false);
 			projectTitle.setAttributes(destinationFieldsListLabels.get("project_title"));
+			projectTitle.setMultiLangDisplayName(destinationFieldsListLabels.get("project_title"));
 			fieldList.add(projectTitle);
 		}
 
@@ -1301,7 +1315,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 		if (destinationFieldsList.contains("fundings~funding_details~transaction_type")) {
 			Field transactionType = new Field("Transaction Type", "transaction_type", FieldType.LIST, false);
-			transactionType.setPossibleValues(getCodeListValues("fundings~funding_details~transaction_type"));
+		transactionType.setPossibleValues(getCodeListValues("fundings~funding_details~transaction_type"));
 			transactionType.setMultiLangDisplayName(
 					destinationFieldsListLabels.get("fundings~funding_details~transaction_type"));
 			fieldList.add(transactionType);
@@ -1434,24 +1448,29 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			Field actualCommitments = new Field("Actual Commitments", "transaction", FieldType.TRANSACTION, true);
 			actualCommitments.setSubType(Constants.TRANSACTION_TYPE_ACTUAL_COMMITMENTS);
 			actualCommitments.setDependencies(trnDependencies);
+			actualCommitments.setMultiLangDisplayName(getAmpTranslations().get(Constants.ACTUAL + " "+ Constants.COMMITMENTS ));
 			fieldList.add(actualCommitments);
 		}
 		if(this.isTransactionTypeEnabled(Constants.TRANSACTION_TYPE_PLANNED_COMMITMENTS)) {
 			Field plannedCommitments = new Field("Planned Commitments", "transaction", FieldType.TRANSACTION, true);
 			plannedCommitments.setSubType(Constants.TRANSACTION_TYPE_PLANNED_COMMITMENTS);
 			plannedCommitments.setDependencies(trnDependencies);
+			plannedCommitments.setMultiLangDisplayName(getAmpTranslations().get(Constants.PLANNED + " "+ Constants.COMMITMENTS ));
 			fieldList.add(plannedCommitments);
 		}
 		if(this.isTransactionTypeEnabled(Constants.TRANSACTION_TYPE_ACTUAL_DISBURSEMENTS)) {
 			Field actualDisbursements = new Field("Actual Disbursements", "transaction", FieldType.TRANSACTION, true);
 			actualDisbursements.setSubType(Constants.TRANSACTION_TYPE_ACTUAL_DISBURSEMENTS);
 			actualDisbursements.setDependencies(trnDependencies);
+			actualDisbursements.setMultiLangDisplayName(getAmpTranslations().get(Constants.ACTUAL + " "+ Constants.DISBURSEMENTS ));
 			fieldList.add(actualDisbursements);
 		}
 		if(this.isTransactionTypeEnabled(Constants.TRANSACTION_TYPE_PLANNED_DISBURSEMENTS)) {
 			Field plannedDisbursements = new Field("Planned Disbursements", "transaction", FieldType.TRANSACTION, true);
 			plannedDisbursements.setSubType(Constants.TRANSACTION_TYPE_PLANNED_DISBURSEMENTS);
 			plannedDisbursements.setDependencies(trnDependencies);
+			plannedDisbursements.setMultiLangDisplayName(getAmpTranslations().get(Constants.PLANNED + " " + Constants.DISBURSEMENTS ));
+
 			fieldList.add(plannedDisbursements);
 		}
 		if(this.isTransactionTypeEnabled(Constants.TRANSACTION_TYPE_ACTUAL_EXPENDITURES)) {
@@ -1459,16 +1478,19 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 					true);
 			actualExpenditure.setSubType(Constants.TRANSACTION_TYPE_ACTUAL_EXPENDITURES);
 			actualExpenditure.setDependencies(trnDependencies);
+			actualExpenditure.setMultiLangDisplayName(getAmpTranslations().get(Constants.ACTUAL + " " + Constants.EXPENDITURES ));
 			fieldList.add(actualExpenditure);
 		}
 		if(this.isTransactionTypeEnabled(Constants.TRANSACTION_TYPE_PLANNED_EXPENDITURES)) {
 			Field plannedExpenditures = new Field(Constants.PLANNED_EXPENDITURES, "transaction", FieldType.TRANSACTION, true);
 			plannedExpenditures.setSubType(Constants.TRANSACTION_TYPE_PLANNED_EXPENDITURES);
 			plannedExpenditures.setDependencies(trnDependencies);
+			plannedExpenditures.setMultiLangDisplayName(getAmpTranslations().get(Constants.PLANNED + " " + Constants.EXPENDITURES ));
 			fieldList.add(plannedExpenditures);
 		}
 		// Currency
 		Field currency = new Field("Currency Code", "currency_code", FieldType.LIST, true);
+		currency.setMultiLangDisplayName(destinationFieldsListLabels.get("fundings~funding_details~currency"));
 		currency.setPossibleValues(getCodeListValues("fundings~funding_details~currency"));
 		fieldList.add(currency);
 		
@@ -1583,13 +1605,42 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		}
 
 	}
+	private void loadAmpTranslations() {
+
+		RestTemplate restTemplateForFields = getRestTemplate();
+		String result = restTemplateForFields.postForObject(baseURL + translationEndPoints
+						+ extractSupportedLocales(), Constants.TRANSACTION_FIELDS, String.class);
+		try {
+			ObjectMapper mapper = new ObjectMapper();
+			JsonNode jsonNode = mapper.readTree(result);
+			Iterator<String> keys = jsonNode.fieldNames();
+			while(keys.hasNext()){
+				String keyName = keys.next();
+				JsonNode jn = jsonNode.get(keyName);
+				Map<String,String> translationperField = new HashMap<>();
+				Iterator <Entry<String,JsonNode>> iter = jn.fields();
+				while(iter.hasNext()){
+					Entry<String,JsonNode>lang = iter.next();
+					translationperField.put(lang.getKey(),lang.getValue().asText());
+				}
+				ampTranslations.put(keyName, translationperField);
+			}
+
+		}catch(IOException ex){
+			// Its safe to Ignore, if translations can not be loaded we use default values(english)
+			log.error("cannot load transaltions from AMP", ex);
+		}
+	}
+	private String extractSupportedLocales(){
+		return String.join("|",Constants.SUPPORTED_LOCALES);
+	}
 	private void loadCodeListValues() {
 		// TODO this needs to be extracted to a static variable and abscract field configuration
 		// TODO but proper analysis is needed and its out of the scope of this ticket
 		// TODO also we need to move amp column names to constant and try to abstract configuration
 
 		List<String> allDestinationFieldValues = new ArrayList<>();
-			allDestinationFieldValues.add("activity_status");
+		allDestinationFieldValues.add("activity_status");
 		allDestinationFieldValues.add("A C Chapter");
 		allDestinationFieldValues.add("fundings~type_of_assistance");
 		allDestinationFieldValues.add("fundings~financing_instrument");
@@ -1618,8 +1669,8 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				allFieldValuesForDestinationProcessor.put(keyName, getPossibleValuesFromNode(jn.iterator()));
 			}
 		} catch (IOException e) {
+			//
 			log.error("cannot retrieve possible values");
-			throw new RuntimeException(e);
 		}
 	}
 
@@ -1660,8 +1711,18 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			fv.setCode(code);
 			fv.setValue(value);
 			if (node.get("extra_info") != null) {
-				fv.getProperties().put("extra_info", node.get("extra_info"));
+				fv.getProperties().put("extra_info", node.get("extra_info"));			
 			}
+			
+			if (node.get("translated-value") != null) {			        
+			    Iterator <Entry<String,JsonNode>> iter = node.get("translated-value").fields();			    
+                while(iter.hasNext()){
+                    Entry<String,JsonNode>lang = iter.next();                   
+                    fv.getTranslatedValue().put(lang.getKey(),lang.getValue().asText());
+                }
+            }
+			
+			
 			possibleValues.add(fv);
 		}
 		return possibleValues;

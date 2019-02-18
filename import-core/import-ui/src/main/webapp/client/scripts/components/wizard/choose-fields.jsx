@@ -16,6 +16,8 @@ var formActions = require('./../../actions/form');
 var appActions = require('./../../actions');
 var constants = require('./../../utils/constants');
 var Tooltip = require('./tooltip');
+var common = require('./../../utils/common');
+
 
 var ChooseFields = React.createClass({
 	mixins: [Reflux.ListenerMixin],
@@ -77,6 +79,8 @@ var ChooseFields = React.createClass({
 		this.errorMsg = "";
 		this.props.eventHandlers.showLoadingIcon();
 		appActions.loadDestinationFieldsData.triggerPromise().then(function(data) {
+		  debugger;
+
 			this.updateDestinationFields(data);
 			this.destDataLoaded = true;
 			this.hideLoadingIcon();
@@ -247,18 +251,23 @@ var ChooseFields = React.createClass({
 	},
     render: function() {
     	var rows = {};
-        if (this.state.destinationFieldsData && this.state.sourceFieldsData) {
+      var language = this.props.i18nLib.lng() || "en";
+      if (this.state.destinationFieldsData && this.state.sourceFieldsData) {
            var infoMessages = "";
            if(this.state.destinationFieldsData.length > 0) {
-                var requiredMessage = [];
+             var requiredMessage = [];
                 var dependenciesMessage = [];
                 _.map(this.state.destinationFieldsData, function(item) {
                         if(item.required) {
-                            requiredMessage.push(<div><strong>{item.displayName}</strong>{this.props.i18nLib.t('wizard.map_fields.msg_required_field',{field:item.displayName})}</div>);
+                            requiredMessage.push(<div><strong>{common.getDisplayValue(item, language)}</strong>{this.props.i18nLib.t('wizard.map_fields.msg_required_field',{field:common.getDisplayValue(item, language)})}</div>);
                         }
                         if(item.dependencies.length > 0){
-                            var dependencies = _.pluck(item.dependencies, 'displayName').join(", ");
-                            dependenciesMessage.push(<div ><strong>{item.displayName}</strong>{this.props.i18nLib.t('wizard.map_fields.msg_field_has_dependencies',{field:item.displayName, dependencies:dependencies})}</div>);
+                          var dependencies=
+                            _.map(item.dependencies, function(item, key)
+                          {
+                            return common.getDisplayValue(item, language) ;
+                          }).join(",");
+                            dependenciesMessage.push(<div ><strong>{common.getDisplayValue(item, language)}</strong>{this.props.i18nLib.t('wizard.map_fields.msg_field_has_dependencies',{field:common.getDisplayValue(item, language), dependencies:dependencies})}</div>);
                         }
                     }.bind(this));
                 if(requiredMessage.length > 0 || dependenciesMessage.length > 0) {
@@ -291,7 +300,7 @@ var ChooseFields = React.createClass({
                         </td>
                         <td>
                             <div className="table_cell">
-                            <Tooltip i18nLib={this.props.i18nLib} tooltip={item.description}/> {item.displayName}
+                            <Tooltip i18nLib={this.props.i18nLib} tooltip={item.description}/> {common.getDisplayValue(item, language)}
                             </div>
                         </td>
                         <td >
