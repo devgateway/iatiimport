@@ -67,4 +67,9 @@ public class Constants {
 			"Planned Expenditures"));
 	
 	public static final String NULL_STRING ="null";
+	
+	public static final String ISO8601_DATE_AND_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+	public static final String ISO_DATE_FORMAT = "yyyy-MM-dd";
+	
+	
 }
