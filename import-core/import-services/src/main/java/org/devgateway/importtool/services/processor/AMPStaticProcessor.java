@@ -3,7 +3,6 @@ package org.devgateway.importtool.services.processor;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -18,12 +17,16 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.assertj.core.util.Collections;
 import org.devgateway.importtool.endpoint.EPMessages;
 import org.devgateway.importtool.exceptions.CurrencyNotFoundException;
+import org.devgateway.importtool.services.dto.FundingDetail;
 import org.devgateway.importtool.services.processor.helper.*;
 import org.devgateway.importtool.services.request.ImportRequest;
+import org.parboiled.common.ImmutableList;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.web.client.HttpClientErrorException;
@@ -33,8 +36,6 @@ import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.springframework.util.StringUtils;
 
 // TODO: Sort methods, move classes to generic helpers for all processors if possible
 // TODO: Clean up code, find opportunities to reuse methods (example update/insert)
@@ -116,6 +117,16 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 		}
 	};
+	
+	protected static final Map<String, String> TRANSACTION_DESTINATION_PATH = new HashMap<String, String>() {
+		{
+			put(Constants.COMMITMENTS, "fundings~commitments");
+			put(Constants.DISBURSEMENTS, "fundings~disbursements");
+			put(Constants.EXPENDITURES, "fundings~expenditures");
+		}
+	};
+	
+	protected static final List<String> transactionList = ImmutableList.of("commitments", "disbursements", "expenditures");
 
 	public ActionStatus getActionStatus() {
 		return actionStatus;
@@ -477,13 +488,13 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			updateProject(project, source, fieldMapping, valueMapping, overrideTitle, importRequest);
 			result = executeOperation(project, source, destination, fieldMapping, valueMapping);
 		} catch (ValueMappingException e) {
-			log.error("Error importing activity " + e);
+			log.error("Error importing activity " + e, e);
 			result = new ActionResult("N/A", "ERROR", "ERROR", "Value Mapping Exception: " + e.getMessage());
 		} catch (CurrencyNotFoundException e) {
-			log.error("Error importing activity " + e);
+			log.error("Error importing activity " + e, e);
 			result = new ActionResult("N/A", "ERROR", "ERROR", "Currency Not Found Exception: " + e.getMessage());
 		} catch (Exception e) {
-			log.error("Error importing activity " + e);
+			log.error("Error importing activity " + e, e);
 			result = new ActionResult("N/A", "ERROR", "ERROR", "Description: " + e.getMessage());
 		}
 		return result;
@@ -736,10 +747,9 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		String currencyCode = source.getStringFields().get("default-currency");
 		String currencyIdString = getCurrencyId(currencyCode);
 		if (currencyIdString == null) {
-			throw new CurrencyNotFoundException("Currency code " + currencyCode + " could not be found in AMP");
+			throw new CurrencyNotFoundException("Currency " + currencyCode + " could not be found in AMP");
 		}
 
-		int currencyId = Integer.parseInt(currencyIdString);
 		Optional<FieldValue> optionalRecipientCountry = source.getRecepientCountryFields().get("recipient-country")
 				.stream().findFirst();
 
@@ -760,7 +770,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		}
 		Entry<String, Map<String, String>> organization = organizations.entrySet().stream().findFirst().get();
 
-		Map<String, List<JsonBean>> providerFundingDetails = new HashMap<>();
+		Map<String, List<FundingDetail>> providerFundingDetails = new HashMap<>();
 		for (FieldMapping mapping : fieldMappings) {
 			Field sourceField = mapping.getSourceField();
 			Field destinationField = mapping.getDestinationField();
@@ -769,45 +779,40 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 				String sourceSubType = sourceField.getSubType();
 				Map<String, Map<String, String>> transactions = source.getTransactionFields().entrySet().stream()
-						.filter(p -> {
-							return p.getValue().get("subtype").equals(sourceSubType);
-						}).collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
+						.filter(p ->  p.getValue().get("subtype").equals(sourceSubType))
+						.collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
 
 				// Now we need the mapping of the field
 				String destinationSubType = destinationField.getSubType();
 				// this maps transactions to donor organizations using the
 				// providing-org
 				for (Entry<String, Map<String, String>> entry : transactions.entrySet()) {
-					JsonBean fundingDetail = new JsonBean();
 					Map<String, String> value = entry.getValue();
-					String provider = value.get("providing-org");
-					// if no provider tag on transaction use first funding org
-					// in participating-orgs
-					if (StringUtils.isEmpty(provider.trim())) {
-						provider = organization.getValue().get("value");
-					}
+					String provider = StringUtils.isBlank(value.get("providing-org"))
+							? organization.getValue().get("value") : value.get("providing-org");
 
-					List<JsonBean> fundingDetails = providerFundingDetails.get(provider);
-					if (fundingDetails == null) {
-						fundingDetails = new ArrayList<JsonBean>();
-					}
-
-					String amount = value.get("value");
-					String dateString = value.get("date");
-					fundingDetail.set("transaction_type", getTransactionType(destinationSubType)); 
-					fundingDetail.set("adjustment_type", getAdjustmentType(destinationSubType));
-					fundingDetail.set("transaction_date", getTransactionDate(dateString));
-					fundingDetail.set("currency", currencyId);
-					fundingDetail.set("transaction_amount", getTransactionAmount(amount, percentage));
-					fundingDetails.add(fundingDetail);
+					List<FundingDetail> fundingDetails = providerFundingDetails
+							.getOrDefault(provider, new ArrayList<FundingDetail>());
+					
+					DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+					
+					FundingDetail fd = new FundingDetail();
+					fd.setTransactionType(tTNameSourceMap.get(destinationSubType));
+					fd.setTransactionAmount(getTransactionAmount(value.get("value"), percentage));
+					fd.setAdjustmentType(getAdjustmentType(destinationSubType));
+					fd.setTransactionDate(dateFormat.parse(value.get("date")));
+					fd.setCurrency(Integer.parseInt(currencyIdString));
+					
+					fundingDetails.add(fd);
 					providerFundingDetails.put(provider, fundingDetails);
 				}
 			}
 		}
-
+		
 		// create fundings and add transactions to the fundings
 		for (Entry<String, Map<String, String>> entry : organizations.entrySet()) {
-			List<JsonBean> fundingDetails = providerFundingDetails.get(entry.getValue().get("value"));
+			String providerId = entry.getValue().get("value");
+			List<FundingDetail> fundingDetails = providerFundingDetails.get(providerId);
 			if (fundingDetails != null) {
 				JsonBean funding = new JsonBean();
 				Integer donorId = getIdFromList(entry.getValue().get("value"), "participating-org", fieldMappings,
@@ -847,8 +852,34 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				if (destinationFieldsList.contains("fundings~source_role")) {
 					funding.set("source_role", 1);
 				}
+				
+				List<JsonBean> commitments = fundingDetails.stream()
+						.filter(fd -> fd.getTransactionType().equals(Constants.COMMITMENTS))
+						.map(FundingDetail::toJsonBean)
+						.collect(Collectors.toList());
+				
+				List<JsonBean> disbursements = fundingDetails.stream()
+						.filter(fd -> fd.getTransactionType().equals(Constants.DISBURSEMENTS))
+						.map(FundingDetail::toJsonBean)
+						.collect(Collectors.toList());
+				
+				List<JsonBean> expenditures = fundingDetails.stream()
+						.filter(fd -> fd.getTransactionType().equals(Constants.EXPENDITURES))
+						.map(FundingDetail::toJsonBean)
+						.collect(Collectors.toList());
+				
+				if (!Collections.isNullOrEmpty(commitments)) {
+					funding.set("commitments", commitments);
+				}
+				
+				if (!Collections.isNullOrEmpty(disbursements)) {
+					funding.set("disbursements", disbursements);
+				}
+				
+				if (!Collections.isNullOrEmpty(expenditures)) {
+					funding.set("expenditures", expenditures);
+				}
 
-				funding.set("funding_details", fundingDetails);
 				fundings.add(funding);
 			}
 		}
@@ -918,52 +949,30 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	private JsonBean getUpdatedFunding(JsonBean source, LinkedHashMap<String, Object> destFunding) {
 		JsonBean rebuiltDestFunding = new JsonBean();
 		for (Entry<String, Object> entry : destFunding.entrySet()) {
-			if ("funding_details".equals(entry.getKey())) {
-				List<JsonBean> fundingDetailsSource = (List<JsonBean>) source.get("funding_details");
-				List<Map<String, Object>> fundingDetailsDestination = new ArrayList<>();
+			if (transactionList.contains(entry.getKey())) {
+				List<JsonBean> fundingDetailsSource = (List<JsonBean>) source.get(entry.getKey());
+				List<Map<String, Object>> destTransactions = new ArrayList<>();
 				if (entry.getValue() != null) {
-					fundingDetailsDestination = (List<Map<String, Object>>) entry.getValue();
+					destTransactions = (List<Map<String, Object>>) entry.getValue();
 				}
 
 				for (JsonBean sourceTransaction : fundingDetailsSource) {
 					// if transaction is not found, add it to the funding
 					// details retrieved from amp
-					boolean transactionExists = transactionExistsInProject(fundingDetailsDestination,
-							sourceTransaction);
+					boolean transactionExists = ProcessorUtils.getInstance()
+							.transactionExistsInTransactionList(destTransactions, sourceTransaction);
+					
 					if (Boolean.FALSE.equals(transactionExists)) {
-						fundingDetailsDestination.add(sourceTransaction.any());
+						destTransactions.add(sourceTransaction.any());
 					}
 				}
-				rebuiltDestFunding.set("funding_details", fundingDetailsDestination);
+				rebuiltDestFunding.set(entry.getKey(), destTransactions);
 			} else {
 				rebuiltDestFunding.set(entry.getKey(), entry.getValue());
 			}
-
 		}
 
 		return rebuiltDestFunding;
-	}
-
-	/**
-	 * checks if a transaction from the IATI file exists in the funding details from
-	 * AMP. Since IATI transactions do not have a unique identifier, we compare the
-	 * fields to check if the transaction exists.
-	 * 
-	 * @param fundingDetailsDestination
-	 *            - funding details from AMP
-	 * @param sourceTransaction
-	 *            - transaction from IATI file
-	 * @return
-	 */
-	private boolean transactionExistsInProject(List<Map<String, Object>> fundingDetailsDestination,
-			JsonBean sourceTransaction) {
-		return fundingDetailsDestination.stream().anyMatch(n -> {
-			return n.get("transaction_type").equals(sourceTransaction.get("transaction_type"))
-					&& n.get("adjustment_type").equals(sourceTransaction.get("adjustment_type"))
-					&& n.get("transaction_date").equals(sourceTransaction.get("transaction_date"))
-					&& n.get("currency").equals(sourceTransaction.get("currency"))
-					&& n.get("transaction_amount").equals(sourceTransaction.get("transaction_amount"));
-		});
 	}
 
 	/**
@@ -1011,9 +1020,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	}
 
 	private String getCurrencyId(String currencyCode) {
-		Field currency = fieldList.stream().filter(n -> {
-			return n.getFieldName().equals("currency_code");
-		}).findFirst().get();
+		Field currency = fieldList.stream().filter(n -> n.getFieldName().equals("currency")).findFirst().get();
 
 		Optional<FieldValue> foundCurrency = currency.getPossibleValues().stream().filter(n -> {
 			return n.getValue().equalsIgnoreCase(currencyCode);
@@ -1028,7 +1035,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 	}
 
-	private Object getTransactionAmount(String amount, Double percentage) {
+		private Double getTransactionAmount(String amount, Double percentage) {
 		Double amountValue = Double.parseDouble(amount);
 		return (amountValue * percentage) / 100;
 	}
@@ -1074,55 +1081,15 @@ public class AMPStaticProcessor implements IDestinationProcessor {
         return Integer.parseInt(fvd.getCode());
 	}
 	
-	private String getTransactionDate(String dateString) {
-		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		Date inputDate;
-		try {
-			inputDate = dateFormat.parse(dateString);
-			DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-			String isoDate = df.format(inputDate);
-			return isoDate;
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-	private boolean isTransactionTypeEnabled(String transactionTypeValue) {
-		return getTransactionTypePossibleValue(transactionTypeValue) != null;
-	}
-	private FieldValue getTransactionTypePossibleValue(String transactionTypeValue) {
-		Field transactionType = this.getFields().stream().filter(n ->
-				n.getFieldName().equals("transaction_type")).findFirst().get();
+	private Integer getAdjustmentType(String value) {
+		Field adjustmentType = this.getFields().stream()
+				.filter(n -> n.getFieldName().equals("adjustment_type"))
+				.findFirst().get();
 
-		Optional<FieldValue> transactionFieldValue =
-				transactionType.getPossibleValues().stream().filter(n ->
-						n.getValue().equals(tTNameSourceMap.get(transactionTypeValue))).findFirst();
-
-		if (transactionFieldValue.isPresent()) {
-			return transactionFieldValue.get();
-		} else {
-			return null;
-		}
-	}
-	private int getTransactionType(String transactionTypeValue) {
-
-		FieldValue transactionTypeFieldValue =getTransactionTypePossibleValue(transactionTypeValue);
-		if(transactionTypeFieldValue == null){
-			throw new ValueNotEnabledException("The mapped value is not present in the destination system");
-		}
-
-		return Integer.parseInt(transactionTypeFieldValue.getCode());
-
-	}
-
-	private int getAdjustmentType(String value) {
-		Field adjustmentType = this.getFields().stream().filter(n -> {
-			return n.getFieldName().equals("adjustment_type");
-		}).findFirst().get();
-
-		String adjustmentTypeValue = adjustmentType.getPossibleValues().stream().filter(n -> {
-			return n.getValue().equals(aTNameDestinationMap.get(value));
-		}).findFirst().get().getCode();
+		String adjustmentTypeValue = adjustmentType.getPossibleValues().stream()
+				.filter(n -> n.getValue().equals(aTNameDestinationMap.get(value)))
+				.findFirst().get().getCode();
+		
 		return Integer.parseInt(adjustmentTypeValue);
 	}
 
@@ -1297,21 +1264,16 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			fieldList.add(financialInstrument);
 			trnDependencies.add(financialInstrument);
 		}
-
-		if (destinationFieldsList.contains("fundings~funding_details~adjustment_type")) {
+		
+		String adjustmentTypePath = destinationFieldsList.stream()
+				.filter(path -> path.startsWith("fundings~") && path.endsWith("~adjustment_type"))
+				.findAny().get();
+		
+		if (StringUtils.isNotBlank(adjustmentTypePath)) {
 			Field adjustmentType = new Field("Adjustment Type", "adjustment_type", FieldType.LIST, true);
-			adjustmentType.setPossibleValues(getCodeListValues("fundings~funding_details~adjustment_type"));
-			adjustmentType.setMultiLangDisplayName(
-					destinationFieldsListLabels.get("fundings~funding_details~adjustment_type"));
+			adjustmentType.setPossibleValues(getCodeListValues(adjustmentTypePath));
+			adjustmentType.setMultiLangDisplayName(destinationFieldsListLabels.get(adjustmentTypePath));
 			fieldList.add(adjustmentType);
-		}
-
-		if (destinationFieldsList.contains("fundings~funding_details~transaction_type")) {
-			Field transactionType = new Field("Transaction Type", "transaction_type", FieldType.LIST, false);
-		transactionType.setPossibleValues(getCodeListValues("fundings~funding_details~transaction_type"));
-			transactionType.setMultiLangDisplayName(
-					destinationFieldsListLabels.get("fundings~funding_details~transaction_type"));
-			fieldList.add(transactionType);
 		}
 
 		if (destinationFieldsList.contains("primary_sectors~sector")) {
@@ -1347,7 +1309,6 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 		// Multi-language strings
 		Map<String, String> multilangfields = new HashMap<String, String>();
-		multilangfields.put("project_comments", "Project Comments");
 		multilangfields.put("objective", "Objective");
 		multilangfields.put("document_space", "Document Space");
 		multilangfields.put("status_reason", "Status Reason");
@@ -1437,58 +1398,87 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		// Transactions
 		//we need to find a more generic way to only enable what is enabled in amp
 		//we should refactor this clases to be able to check all fields
-		if(this.isTransactionTypeEnabled(Constants.TRANSACTION_TYPE_ACTUAL_COMMITMENTS)) {
+		
+		if (isTransactionEnabled(Constants.COMMITMENTS, Constants.ACTUAL)) {
 			Field actualCommitments = new Field("Actual Commitments", "transaction", FieldType.TRANSACTION, true);
 			actualCommitments.setSubType(Constants.TRANSACTION_TYPE_ACTUAL_COMMITMENTS);
 			actualCommitments.setDependencies(trnDependencies);
-			actualCommitments.setMultiLangDisplayName(getAmpTranslations().get(Constants.ACTUAL + " "+ Constants.COMMITMENTS ));
+			actualCommitments.setMultiLangDisplayName(getAmpTranslations().get(Constants.ACTUAL + " " + Constants.COMMITMENTS));
 			fieldList.add(actualCommitments);
 		}
-		if(this.isTransactionTypeEnabled(Constants.TRANSACTION_TYPE_PLANNED_COMMITMENTS)) {
+		
+		if (isTransactionEnabled(Constants.COMMITMENTS, Constants.PLANNED)) {
 			Field plannedCommitments = new Field("Planned Commitments", "transaction", FieldType.TRANSACTION, true);
 			plannedCommitments.setSubType(Constants.TRANSACTION_TYPE_PLANNED_COMMITMENTS);
 			plannedCommitments.setDependencies(trnDependencies);
-			plannedCommitments.setMultiLangDisplayName(getAmpTranslations().get(Constants.PLANNED + " "+ Constants.COMMITMENTS ));
+			plannedCommitments.setMultiLangDisplayName(getAmpTranslations().get(Constants.PLANNED + " " + Constants.COMMITMENTS));
 			fieldList.add(plannedCommitments);
 		}
-		if(this.isTransactionTypeEnabled(Constants.TRANSACTION_TYPE_ACTUAL_DISBURSEMENTS)) {
+		
+		if (isTransactionEnabled(Constants.DISBURSEMENTS, Constants.ACTUAL)) {
 			Field actualDisbursements = new Field("Actual Disbursements", "transaction", FieldType.TRANSACTION, true);
 			actualDisbursements.setSubType(Constants.TRANSACTION_TYPE_ACTUAL_DISBURSEMENTS);
 			actualDisbursements.setDependencies(trnDependencies);
-			actualDisbursements.setMultiLangDisplayName(getAmpTranslations().get(Constants.ACTUAL + " "+ Constants.DISBURSEMENTS ));
+			actualDisbursements.setMultiLangDisplayName(getAmpTranslations().get(Constants.ACTUAL + " " + Constants.DISBURSEMENTS));
 			fieldList.add(actualDisbursements);
 		}
-		if(this.isTransactionTypeEnabled(Constants.TRANSACTION_TYPE_PLANNED_DISBURSEMENTS)) {
+		
+		if (isTransactionEnabled(Constants.DISBURSEMENTS, Constants.PLANNED)) {
 			Field plannedDisbursements = new Field("Planned Disbursements", "transaction", FieldType.TRANSACTION, true);
 			plannedDisbursements.setSubType(Constants.TRANSACTION_TYPE_PLANNED_DISBURSEMENTS);
 			plannedDisbursements.setDependencies(trnDependencies);
 			plannedDisbursements.setMultiLangDisplayName(getAmpTranslations().get(Constants.PLANNED + " " + Constants.DISBURSEMENTS ));
-
 			fieldList.add(plannedDisbursements);
 		}
-		if(this.isTransactionTypeEnabled(Constants.TRANSACTION_TYPE_ACTUAL_EXPENDITURES)) {
-			Field actualExpenditure = new Field(Constants.ACTUAL_EXPENDITURES, "transaction", FieldType.TRANSACTION,
-					true);
+		
+		if (isTransactionEnabled(Constants.EXPENDITURES, Constants.ACTUAL)) {
+			Field actualExpenditure = new Field(Constants.ACTUAL_EXPENDITURES, "transaction", FieldType.TRANSACTION, true);
 			actualExpenditure.setSubType(Constants.TRANSACTION_TYPE_ACTUAL_EXPENDITURES);
 			actualExpenditure.setDependencies(trnDependencies);
-			actualExpenditure.setMultiLangDisplayName(getAmpTranslations().get(Constants.ACTUAL + " " + Constants.EXPENDITURES ));
+			actualExpenditure.setMultiLangDisplayName(getAmpTranslations().get(Constants.ACTUAL + " " + Constants.EXPENDITURES));
 			fieldList.add(actualExpenditure);
 		}
-		if(this.isTransactionTypeEnabled(Constants.TRANSACTION_TYPE_PLANNED_EXPENDITURES)) {
+		
+		if (isTransactionEnabled(Constants.EXPENDITURES, Constants.PLANNED)) {
 			Field plannedExpenditures = new Field(Constants.PLANNED_EXPENDITURES, "transaction", FieldType.TRANSACTION, true);
 			plannedExpenditures.setSubType(Constants.TRANSACTION_TYPE_PLANNED_EXPENDITURES);
 			plannedExpenditures.setDependencies(trnDependencies);
 			plannedExpenditures.setMultiLangDisplayName(getAmpTranslations().get(Constants.PLANNED + " " + Constants.EXPENDITURES ));
 			fieldList.add(plannedExpenditures);
 		}
+		
+		String currencyPath = getCurrencyPath();
+		
 		// Currency
-		Field currency = new Field("Currency Code", "currency_code", FieldType.LIST, true);
-		currency.setMultiLangDisplayName(destinationFieldsListLabels.get("fundings~funding_details~currency"));
-		currency.setPossibleValues(getCodeListValues("fundings~funding_details~currency"));
+		Field currency = new Field("Currency", "currency", FieldType.LIST, true);
+		currency.setMultiLangDisplayName(destinationFieldsListLabels.get(currencyPath));
+		currency.setPossibleValues(getCodeListValues(currencyPath));
 		fieldList.add(currency);
-
 	}
-
+	
+	private boolean isTransactionEnabled(String transactionType, String adjType) {
+		String transactionPath = TRANSACTION_DESTINATION_PATH.get(transactionType);
+		return destinationFieldsList.contains(transactionPath) && isAdjustmentTypeEnabled(transactionPath, adjType);
+	}
+	
+	private  boolean isAdjustmentTypeEnabled(String transactionPath, String adjustmentType) {
+		String adjustmentTypePath = transactionPath + "~adjustment_type";
+		
+		if (destinationFieldsList.contains(adjustmentTypePath)) {
+			return getCodeListValues(adjustmentTypePath).stream()
+					.filter(cv -> cv.getValue().equals(adjustmentType))
+					.findAny().isPresent();
+		}
+		
+		return false;
+	}
+	
+	private String getCurrencyPath() {
+		return destinationFieldsList.stream()
+				.filter(fieldName -> fieldName.startsWith("fundings~") && fieldName.endsWith("~currency"))
+				.findFirst().get();
+	}
+	
 	private boolean existFieldInAmp(String fieldName) {
 		return destinationFieldsList.stream().anyMatch(field-> field.equals(fieldName));
 	}
@@ -1632,15 +1622,12 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		allDestinationFieldValues.add("A C Chapter");
 		allDestinationFieldValues.add("fundings~type_of_assistance");
 		allDestinationFieldValues.add("fundings~financing_instrument");
-		allDestinationFieldValues.add("fundings~funding_details~adjustment_type");
-		allDestinationFieldValues.add("fundings~funding_details~transaction_type");
 		allDestinationFieldValues.add("primary_sectors~sector");
 		allDestinationFieldValues.add("secondary_sectors~sector");
 		allDestinationFieldValues.add("tertiary_sectors~sector");
 		allDestinationFieldValues.add("locations~location");
 		allDestinationFieldValues.add("fundings~donor_organization_id");
 		allDestinationFieldValues.add("fundings~donor_organization_id");
-		allDestinationFieldValues.add("fundings~funding_details~currency");
 		allDestinationFieldValues.retainAll(destinationFieldsList);
 
 		allFieldValuesForDestinationProcessor = new HashMap<>();

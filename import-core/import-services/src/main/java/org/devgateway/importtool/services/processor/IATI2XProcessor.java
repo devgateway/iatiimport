@@ -6,6 +6,7 @@ import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.model.Language;
 import org.devgateway.importtool.services.processor.helper.ActionStatus;
 import org.devgateway.importtool.services.processor.helper.Constants;
+import org.devgateway.importtool.services.processor.helper.DateUtils;
 import org.devgateway.importtool.services.processor.helper.Field;
 import org.devgateway.importtool.services.processor.helper.FieldType;
 import org.devgateway.importtool.services.processor.helper.FieldValue;
@@ -39,11 +40,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import org.springframework.util.DigestUtils;
+import scala.collection.immutable.Stream;
+
 @Component("IATI2X")
 @Scope("session")
 public class IATI2XProcessor extends IATIProcessor {
-
-	private static final String ISO_DATE = "yyyy-MM-dd";
 
 	private Log log = LogFactory.getLog(getClass());
 
@@ -494,7 +495,7 @@ public class IATI2XProcessor extends IATIProcessor {
 								localDate = el.item(0).getNodeValue();
 
 							}
-							if (localDate != null && !isValidDate(localDate)) // TODO: Make it
+							if (localDate != null && !DateUtils.isValidDate(localDate)) // TODO: Make it
 							// defensive
 							{
 								localDate = e.getElementsByTagName("transaction-date").item(0).getAttributes().getNamedItem("iso-date").getNodeValue();
@@ -801,15 +802,4 @@ public class IATI2XProcessor extends IATIProcessor {
 
 	}
 
-	public boolean isValidDate(String dateString) {
-		SimpleDateFormat df = new SimpleDateFormat(ISO_DATE);
-		try {
-			df.parse(dateString);
-			return true;
-		} catch (ParseException e) {
-			return false;
-		}
-	}
-
-	
 }
