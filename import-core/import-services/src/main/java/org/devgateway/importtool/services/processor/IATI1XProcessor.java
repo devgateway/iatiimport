@@ -6,6 +6,7 @@ import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.model.Language;
 import org.devgateway.importtool.services.processor.helper.ActionStatus;
 import org.devgateway.importtool.services.processor.helper.Constants;
+import org.devgateway.importtool.services.processor.helper.DateUtils;
 import org.devgateway.importtool.services.processor.helper.Field;
 import org.devgateway.importtool.services.processor.helper.FieldType;
 import org.devgateway.importtool.services.processor.helper.FieldValue;
@@ -43,8 +44,6 @@ import java.util.Set;
 @Component("IATI1X")
 @Scope("session")
 abstract public class IATI1XProcessor extends IATIProcessor {
-
-	protected static final String ISO_DATE = "yyyy-MM-dd";
 
 	protected Log log = LogFactory.getLog(getClass());
 
@@ -457,7 +456,7 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 							if(e.getElementsByTagName("transaction-date").item(0) != null && e.getElementsByTagName("transaction-date").item(0).getChildNodes().item(0) != null){
 								localDate = e.getElementsByTagName("transaction-date").item(0).getChildNodes().item(0).getNodeValue();
 							}														
-							if (!isValidDate(localDate)){
+							if (!DateUtils.isValidDate(localDate)){
 								localDate = (e.getElementsByTagName("transaction-date").item(0) != null && e.getElementsByTagName("transaction-date").item(0).getAttributes() != null) ? e.getElementsByTagName("transaction-date").item(0).getAttributes().getNamedItem("iso-date").getNodeValue() : "";
 							}
 
@@ -772,13 +771,4 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 
 	}
 
-	public boolean isValidDate(String dateString) {
-		SimpleDateFormat df = new SimpleDateFormat(ISO_DATE);
-		try {
-			df.parse(dateString);
-			return true;
-		} catch (ParseException e) {
-			return false;
-		}
-	}
 }
