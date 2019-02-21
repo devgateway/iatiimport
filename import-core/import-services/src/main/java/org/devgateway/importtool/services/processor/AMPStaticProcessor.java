@@ -803,8 +803,8 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 					fd.setAdjustmentType(getAdjustmentType(destinationSubType));
 					fd.setTransactionDate(dateFormat.parse(value.get("date")));
 					fd.setCurrency(Integer.parseInt(currencyIdString));
-					
-					if (destinationFieldsList.contains("fundings~funding_details~disaster_response") && (Constants.DISBURSEMENTS.equals(sourceField.getDisplayName()) || Constants.COMMITMENTS.equals(sourceField.getDisplayName()) )) {
+										
+					if (this.isDisasterReponseEnabled() && (Constants.DISBURSEMENTS.equals(sourceField.getDisplayName()) || Constants.COMMITMENTS.equals(sourceField.getDisplayName()) )) {
 					    fd.setDisasterResponse(importRequest.getDisasterResponse());                    
 	                }
 					
@@ -890,6 +890,12 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		}
 
 		return fundings;
+	}
+	
+	private boolean isDisasterReponseEnabled() {
+        return destinationFieldsList.contains("fundings~disbursements~disaster_response")
+                || destinationFieldsList.contains("fundings~expenditures~disaster_response")
+                || destinationFieldsList.contains("fundings~commitments~disaster_response");
 	}
 
 	/**
@@ -1460,7 +1466,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		currency.setPossibleValues(getCodeListValues(currencyPath));
 		fieldList.add(currency);
 		
-		 if (destinationFieldsList.contains("fundings~funding_details~disaster_response")) {
+		 if (this.isDisasterReponseEnabled()) {
 		     Field disasterResponse = new Field("Disaster Response", "disaster_response", FieldType.BOOLEAN, false);
 		     fieldList.add(disasterResponse);
           }
@@ -1583,7 +1589,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				JsonNode child = childFields.next();
 				String childFieldName = child.get("field_name").asText();
 				Map<String, String> childFieldLabel = extractMultilanguageText(child.get("field_label"));
-				String name = fieldName + "~" + childFieldName;
+				String name = fieldName + "~" + childFieldName;				             
 				destinationFieldsList.add(name);
 				destinationFieldsListLabels.put(name, childFieldLabel);
 				if (node.get("children") != null) {
