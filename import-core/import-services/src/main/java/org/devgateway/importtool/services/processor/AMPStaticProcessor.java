@@ -803,9 +803,13 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 					fd.setAdjustmentType(getAdjustmentType(destinationSubType));
 					fd.setTransactionDate(dateFormat.parse(value.get("date")));
 					fd.setCurrency(Integer.parseInt(currencyIdString));
-										
-					if (this.isDisasterReponseEnabled() && (Constants.DISBURSEMENTS.equals(sourceField.getDisplayName()) || Constants.COMMITMENTS.equals(sourceField.getDisplayName()) )) {
-					    fd.setDisasterResponse(importRequest.getDisasterResponse());                    
+									
+					boolean disasterReponseEnabledOnCommitments = destinationFieldsList.contains("fundings~commitments~disaster_response") && Constants.COMMITMENTS.equals(sourceField.getDisplayName());
+					boolean disasterReponseEnabledOnDisbursements = destinationFieldsList.contains("fundings~disbursements~disaster_response") && (Constants.DISBURSEMENTS.equals(sourceField.getDisplayName()));
+					boolean disasterReponseEnabledOnExpenditures = destinationFieldsList.contains("fundings~expenditures~disaster_response") && (Constants.EXPENDITURES.equals(sourceField.getDisplayName()));
+					        
+					if (disasterReponseEnabledOnCommitments || disasterReponseEnabledOnDisbursements || disasterReponseEnabledOnExpenditures) {
+					    fd.setDisasterResponse(importRequest.getDisasterResponse());
 	                }
 					
 					fundingDetails.add(fd);
