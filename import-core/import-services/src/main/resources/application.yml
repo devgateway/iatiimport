@@ -23,5 +23,5 @@ spring:
     database : POSTGRESQL
     hibernate:
       ddl-auto : update
-      show-sql: falseF
+      show-sql: false
 
