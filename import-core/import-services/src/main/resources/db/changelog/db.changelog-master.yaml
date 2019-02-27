@@ -1,0 +1,16 @@
+databaseChangeLog:
+  - changeSet:
+      id: modify_uploaded_file
+      author: jdeanquin
+      preConditions:
+          - onFail: MARK_RAN
+          - tableExists:
+                tableName: uploaded_file
+      changes:
+        - sqlFile:
+            comment: changes table
+            dbms: postgresql
+            endDelimiter: ;
+            splitStatements: true
+            path: db/sql/IATIIMPORT-237-modify-column-type.sql
+            stripComments: true
