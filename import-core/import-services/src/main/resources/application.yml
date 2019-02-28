@@ -28,9 +28,9 @@ spring:
   profiles: test
   dataSource:
     driverClassName : org.postgresql.Driver
-    url: jdbc:postgresql://db:5432/import_tool
-    password : amp321
-    username : amp
+    url: jdbc:postgresql://db:5432/postgres
+    username : postgres
+    password : 
 
   jpa:
     database : POSTGRESQL
