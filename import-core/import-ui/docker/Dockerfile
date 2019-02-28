@@ -17,7 +17,7 @@ WORKDIR /opt/importer
 RUN apk add --no-cache bash gawk sed grep bc coreutils
 
 ADD wait-for-it.sh .
-ADD application.yml .
+#ADD application.yml .
 
 EXPOSE 8081
 
@@ -32,6 +32,7 @@ ENTRYPOINT ./wait-for-it.sh db:5432 -t 0 -- \
         -DAMPStaticProcessor.processor_version=$PROCESSOR_VERSION \
         -DIATIProcessor.default_country=$COUNTRY \
         -XX:HeapDumpPath=/opt/heapdumps -XX:+HeapDumpOnOutOfMemoryError \
+        -Dspring.profiles.active=test \
         -jar importer.jar
 
 LABEL "pull-request"=$PULL_REQUEST
