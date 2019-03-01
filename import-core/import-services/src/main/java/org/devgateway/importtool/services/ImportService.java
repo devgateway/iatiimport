@@ -19,7 +19,9 @@ import org.devgateway.importtool.model.Workflow;
 import org.devgateway.importtool.security.ImportSessionToken;
 import org.devgateway.importtool.services.processor.XMLGenericProcessor;
 import org.devgateway.importtool.services.processor.helper.ActionResult;
+import org.devgateway.importtool.services.processor.helper.DocumentMapping;
 import org.devgateway.importtool.services.processor.helper.Field;
+import org.devgateway.importtool.services.processor.helper.FieldType;
 import org.devgateway.importtool.services.processor.helper.FieldValueMapping;
 import org.devgateway.importtool.services.processor.helper.IDestinationProcessor;
 import org.devgateway.importtool.services.processor.helper.IDocumentMapper;
@@ -52,6 +54,16 @@ public class ImportService {
 		importSummmary.setProjectCount(projectCount);
 		importSummmary.setFieldMappingCount(documentMapper.getFieldMappingObject().size());
 
+		boolean transactionFieldMapped = documentMapper.getFieldMappingObject().stream().filter(mapping -> {
+		    return FieldType.TRANSACTION.equals(mapping.getSourceField().getType());
+		}).count() > 0;
+		
+		boolean hasTransactionData = documentMapper.getDocumentMappings().stream().filter(docMapping -> {
+		    return docMapping.getSourceDocument().getTransactionFields().size() > 0;
+		}).count() > 0;
+		        
+		importSummmary.setHasTransactions(transactionFieldMapped && hasTransactionData);
+		
 		if (fileRepository != null || importSessionToken != null) {
 			importSummmary.setFileCount(fileRepository.countBySessionId(importSessionToken.getImportTokenSessionId()));
 		}

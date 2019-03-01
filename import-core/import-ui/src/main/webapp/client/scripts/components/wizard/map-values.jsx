@@ -13,6 +13,7 @@ var valueMappingTemplateStore = require('./../../stores/ValueMappingTemplateStor
 var _ = require('lodash/dist/lodash.underscore');
 var FieldMappingsDropdown = require('./mappings-dropdown.jsx');
 var constants = require('./../../utils/constants');
+var common = require('./../../utils/common');
 
 var MapValues = React.createClass({
     mixins: [Reflux.ListenerMixin],
@@ -135,6 +136,7 @@ var MapValues = React.createClass({
 	return notMapped.length == 0
   },
   render: function() {
+    var language = this.props.i18nLib.lng() || "en";
     var sourceFields = [];
     var message = "";
     if(!_.some(this.state.mappings, function(v){ return v.sourceField.type == 'LIST' || v.sourceField.type == 'ORGANIZATION' })) {
@@ -147,7 +149,7 @@ var MapValues = React.createClass({
     $.map(this.state.mappings, function(mapping, i) {
       if (mapping.sourceField && mapping.destinationField && mapping.sourceField.fieldName && mapping.destinationField.fieldName && (mapping.sourceField.type == "LIST" || mapping.sourceField.type == "ORGANIZATION" || mapping.sourceField.type == "LOCATION")) {
         sourceFields.push({
-          tabName : mapping.sourceField.displayName,
+          tabName : common.getDisplayValue(mapping.sourceField, language),
           tooltip: mapping.sourceField.description,
           children: [<MappingTableSimple key={i} mapping={mapping} handleUpdates={this.updateValueMappings} {...this.props}/>],
           classes : {}

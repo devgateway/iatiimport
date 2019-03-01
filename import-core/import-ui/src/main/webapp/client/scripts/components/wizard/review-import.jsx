@@ -3,18 +3,18 @@ var reactAsync = require('react-async');
 var Reflux = require('reflux');
 var appActions = require('./../../actions');
 var Router = require('react-router');
-
 var constants = require('./../../utils/constants');
 var importSummaryStore = require('./../../stores/ImportSummaryStore');
+var Tooltip = require('./tooltip');
 
 var ReviewImport = React.createClass({
 	mixins: [Reflux.ListenerMixin],
 	getInitialState: function() {
-		return {importSummary:{}, importOption: constants.OVERWRITE_ALL_FUNDING};
+		return {importSummary:{}, importOption: constants.OVERWRITE_ALL_FUNDING, disasterResponse: false};
 	 },
 	componentDidMount: function() {
 		this.props.eventHandlers.updateCurrentStep(constants.REVIEW_IMPORT);
-		this.listenTo(importSummaryStore, this.updateLanguages);
+		this.listenTo(importSummaryStore, this.updateImportSummary);
 		this.loadData();
 	}, 
 	updateImportSummary: function(data){
@@ -44,14 +44,19 @@ var ReviewImport = React.createClass({
          this.setState({importOption:event.target.value})
       }
     }, 
+    onDisasterReponseChange: function(event) {
+        if(event.target.checked) {              
+            this.setState({disasterResponse: event.target.value === constants.YES })
+         }
+       }, 
     import: function() {
      if (this.state.importOption === constants.OVERWRITE_ALL_FUNDING || this.state.importOption === constants.REPLACE_DONOR_FUNDING) {
        var message = this.state.importOption === constants.OVERWRITE_ALL_FUNDING ? this.props.i18nLib.t('wizard.review_import.import_option_overwrite_prompt') : this.props.i18nLib.t('wizard.review_import.import_option_replace_prompt');
        if (confirm(message)) {
-           this.props.eventHandlers.launchImport(this.state.importOption);
+           this.props.eventHandlers.launchImport(this.state.importOption, this.state.disasterResponse);
        }
      } else {
-       this.props.eventHandlers.launchImport(this.state.importOption);
+       this.props.eventHandlers.launchImport(this.state.importOption, this.state.disasterResponse);
      }       
     },  
     hasMoreVersions: function() {
@@ -61,7 +66,7 @@ var ReviewImport = React.createClass({
       this.props.eventHandlers.processNextVersion();  
     },
     render: function () {
-    	var statusMessage = this.props.statusMessage.length > 0 ? <div className="alert alert-info" role="alert">{this.props.statusMessage}</div> : "";
+        var statusMessage = this.props.statusMessage.length > 0 ? <div className="alert alert-info" role="alert">{this.props.statusMessage}</div> : "";
         return (
             <div className="panel panel-default">
                 <div className="panel-heading"><strong>{this.props.i18nLib.t('wizard.review_import.review_import')}</strong></div>
@@ -83,8 +88,24 @@ var ReviewImport = React.createClass({
                                <label><input type="radio" name="importOption" value={constants.REPLACE_DONOR_FUNDING} onChange={this.onImportOptionChange} checked={constants.REPLACE_DONOR_FUNDING === this.state.importOption}/>{this.props.i18nLib.t('wizard.review_import.import_option_replace')}</label><br/>
                                <label className="import-option-explanation">{this.props.i18nLib.t('wizard.review_import.import_option_replace_explanation')}</label>
                              </div>
+                               {this.props.showDisasterResponse && this.state.importSummary.hasTransactions &&
+                                   <div>
+                                   <Tooltip i18nLib={this.props.i18nLib} tooltip={this.props.i18nLib.t('wizard.review_import.disaster_response_tooltip')}/><label>{this.props.i18nLib.t('wizard.review_import.disaster_response')}</label>                               
+                                   <div className="radio">
+                                     <label><input type="radio" name="disasterResponse" value={constants.YES} onChange={this.onDisasterReponseChange} checked={true === this.state.disasterResponse}/>{this.props.i18nLib.t('wizard.review_import.yes')}</label><br/>
+                                   </div>
+                                   
+                                   <div className="radio">
+                                     <label><input type="radio" name="disasterResponse" value={constants.NO} onChange={this.onDisasterReponseChange} checked={false === this.state.disasterResponse}/>{this.props.i18nLib.t('wizard.review_import.no')}</label><br/>
+                                   </div>
+                                   </div>     
+                               }                              
                           </div>
                         </div>
+                        <div>                              
+                               
+                          </div>
+                                                 
                         <div className="col-sm-6 col-md-6">
                             <div className="form-group has-success has-feedback">
                             

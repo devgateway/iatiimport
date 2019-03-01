@@ -1,5 +1,6 @@
 package org.devgateway.importtool.services.processor.helper;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -10,9 +11,11 @@ public class FieldValue {
 	private boolean selected = false;
 	private String percentage = "";
 	private Properties properties;
-
+	private Map<String, String> translatedValue;
+	
 	public FieldValue() {
 		 this.properties = new Properties();
+		 this.translatedValue = new HashMap<>();
 	}
 	
 	public String getCode() {
@@ -55,6 +58,14 @@ public class FieldValue {
 	public void setProperties(Properties properties) {
 		this.properties = properties;
 	}
+
+    public Map<String, String> getTranslatedValue() {
+        return translatedValue;
+    }
+
+    public void setTranslatedValue(Map<String, String> translatedValue) {
+        this.translatedValue = translatedValue;
+    }
 
 
 }

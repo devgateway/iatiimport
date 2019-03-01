@@ -224,7 +224,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		Map<String, String> languages = new HashMap<String, String>();
 		while (it.hasNext()) {
 			Entry<String, JsonNode> entry = it.next();
-			languages.put(entry.getKey(), entry.getValue().asText());
+			languages.put(entry.getKey().toLowerCase(), entry.getValue().asText());
 		}
 		
 		if (languages.isEmpty()) {
@@ -347,13 +347,13 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			List<JsonBean> fundings = null;
 			switch (importRequest.getImportOption()) {
 			case OVERWRITE_ALL_FUNDING:
-				fundings = getSourceFundings(source, fieldMappings, valueMappings);
+				fundings = getSourceFundings(source, fieldMappings, valueMappings, importRequest);
 				break;
 			case ONLY_ADD_NEW_FUNDING:
-				fundings = addNewFunding(source, fieldMappings, valueMappings, project);
+				fundings = addNewFunding(source, fieldMappings, valueMappings, project, importRequest);
 				break;
 			case REPLACE_DONOR_FUNDING:
-				fundings = replaceDonorTransactions(source, fieldMappings, valueMappings, project);
+				fundings = replaceDonorTransactions(source, fieldMappings, valueMappings, project, importRequest);
 				break;
 			default:
 				break;
@@ -491,11 +491,11 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 	@Override
 	public ActionResult insert(InternalDocument source, List<FieldMapping> fieldMapping,
-			List<FieldValueMapping> valueMapping) {
+			List<FieldValueMapping> valueMapping, ImportRequest importRequest) {
 		ActionResult result;
 		RestTemplate restTemplate = getRestTemplate();
 		try {
-			JsonBean project = transformProject(source, fieldMapping, valueMapping);
+			JsonBean project = transformProject(source, fieldMapping, valueMapping, importRequest);
 			result = executeOperation(project, source, null, fieldMapping, valueMapping);
 
 		} catch (ValueMappingException e) {
@@ -590,7 +590,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	}
 
 	private JsonBean transformProject(InternalDocument source, List<FieldMapping> fieldMappings,
-			List<FieldValueMapping> valueMappings) throws ValueMappingException, CurrencyNotFoundException, Exception {
+			List<FieldValueMapping> valueMappings, ImportRequest importRequest) throws ValueMappingException, CurrencyNotFoundException, Exception {
 		Boolean hasTransactions = false;
 		JsonBean project = new JsonBean();
 		project.set(ampIatiIdField, source.getIdentifier());
@@ -671,7 +671,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 		// Process transactions
 		if (hasTransactions) {
-			List<JsonBean> fundings = getSourceFundings(source, fieldMappings, valueMappings);
+			List<JsonBean> fundings = getSourceFundings(source, fieldMappings, valueMappings, importRequest);
 			if (fundings != null) {
 				project.set("fundings", fundings);
 				project.set("donor_organization", getDonorOrgs(fundings));
@@ -731,7 +731,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	}
 
 	private List<JsonBean> getSourceFundings(InternalDocument source, List<FieldMapping> fieldMappings,
-			List<FieldValueMapping> valueMappings) throws Exception {
+			List<FieldValueMapping> valueMappings, ImportRequest importRequest) throws Exception {
 		List<JsonBean> fundings = new ArrayList<>();
 		String currencyCode = source.getStringFields().get("default-currency");
 		String currencyIdString = getCurrencyId(currencyCode);
@@ -799,6 +799,13 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 					fundingDetail.set("transaction_date", getTransactionDate(dateString));
 					fundingDetail.set("currency", currencyId);
 					fundingDetail.set("transaction_amount", getTransactionAmount(amount, percentage));
+					
+					
+					
+					if (destinationFieldsList.contains("fundings~funding_details~disaster_response") && (Constants.DISBURSEMENTS.equals(sourceField.getDisplayName()) || Constants.COMMITMENTS.equals(sourceField.getDisplayName()) )) {
+					   fundingDetail.set("disaster_response", importRequest.getDisasterResponse());
+	                }
+					
 					fundingDetails.add(fundingDetail);
 					providerFundingDetails.put(provider, fundingDetails);
 				}
@@ -871,9 +878,9 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	 * @throws CurrencyNotFoundException
 	 */
 	private List<JsonBean> addNewFunding(InternalDocument source, List<FieldMapping> fieldMappings,
-			List<FieldValueMapping> valueMappings, JsonBean project)
+			List<FieldValueMapping> valueMappings, JsonBean project, ImportRequest importRequest)
 			throws ValueMappingException, CurrencyNotFoundException, Exception {
-		List<JsonBean> sourceFundings = getSourceFundings(source, fieldMappings, valueMappings);
+		List<JsonBean> sourceFundings = getSourceFundings(source, fieldMappings, valueMappings, importRequest);
 		List<LinkedHashMap<String, Object>> destinationFundings = null;
 		if (project.get("fundings") != null) {
 			destinationFundings = (List<LinkedHashMap<String, Object>>) project.get("fundings");
@@ -981,9 +988,9 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	 * @throws CurrencyNotFoundException
 	 */
 	private List<JsonBean> replaceDonorTransactions(InternalDocument source, List<FieldMapping> fieldMappings,
-			List<FieldValueMapping> valueMappings, JsonBean project)
+			List<FieldValueMapping> valueMappings, JsonBean project, ImportRequest importRequest)
 			throws ValueMappingException, CurrencyNotFoundException, Exception {
-		List<JsonBean> sourceFundings = getSourceFundings(source, fieldMappings, valueMappings);
+		List<JsonBean> sourceFundings = getSourceFundings(source, fieldMappings, valueMappings, importRequest);
 		List<LinkedHashMap<String, Object>> destinationFundings = new ArrayList<>();
 		if (project.get("fundings") != null) {
 			destinationFundings = (List<LinkedHashMap<String, Object>>) project.get("fundings");
@@ -1483,8 +1490,14 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		}
 		// Currency
 		Field currency = new Field("Currency Code", "currency_code", FieldType.LIST, true);
+		currency.setMultiLangDisplayName(destinationFieldsListLabels.get("fundings~funding_details~currency"));
 		currency.setPossibleValues(getCodeListValues("fundings~funding_details~currency"));
 		fieldList.add(currency);
+		
+		 if (destinationFieldsList.contains("fundings~funding_details~disaster_response")) {
+		     Field disasterResponse = new Field("Disaster Response", "disaster_response", FieldType.BOOLEAN, false);
+		     fieldList.add(disasterResponse);
+          }
 
 	}
 
@@ -1701,6 +1714,19 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			/*if (node.get("extra_info") != null) {
 				fv.getProperties().put("extra_info", node.get("extra_info"));
 			}*/
+			if (node.get("extra_info") != null) {
+				fv.getProperties().put("extra_info", node.get("extra_info"));			
+			}
+			
+			if (node.get("translated-value") != null) {			        
+			    Iterator <Entry<String,JsonNode>> iter = node.get("translated-value").fields();			    
+                while(iter.hasNext()){
+                    Entry<String,JsonNode>lang = iter.next();                   
+                    fv.getTranslatedValue().put(lang.getKey(),lang.getValue().asText());
+                }
+            }
+			
+			
 			possibleValues.add(fv);
 		}
 		return possibleValues;
