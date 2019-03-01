@@ -358,13 +358,13 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			List<JsonBean> fundings = null;
 			switch (importRequest.getImportOption()) {
 			case OVERWRITE_ALL_FUNDING:
-				fundings = getSourceFundings(source, fieldMappings, valueMappings);
+				fundings = getSourceFundings(source, fieldMappings, valueMappings, importRequest);
 				break;
 			case ONLY_ADD_NEW_FUNDING:
-				fundings = addNewFunding(source, fieldMappings, valueMappings, project);
+				fundings = addNewFunding(source, fieldMappings, valueMappings, project, importRequest);
 				break;
 			case REPLACE_DONOR_FUNDING:
-				fundings = replaceDonorTransactions(source, fieldMappings, valueMappings, project);
+				fundings = replaceDonorTransactions(source, fieldMappings, valueMappings, project, importRequest);
 				break;
 			default:
 				break;
@@ -502,11 +502,11 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 	@Override
 	public ActionResult insert(InternalDocument source, List<FieldMapping> fieldMapping,
-			List<FieldValueMapping> valueMapping) {
+			List<FieldValueMapping> valueMapping, ImportRequest importRequest) {
 		ActionResult result;
 		RestTemplate restTemplate = getRestTemplate();
 		try {
-			JsonBean project = transformProject(source, fieldMapping, valueMapping);
+			JsonBean project = transformProject(source, fieldMapping, valueMapping, importRequest);
 			result = executeOperation(project, source, null, fieldMapping, valueMapping);
 
 		} catch (ValueMappingException e) {
@@ -601,7 +601,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	}
 
 	private JsonBean transformProject(InternalDocument source, List<FieldMapping> fieldMappings,
-			List<FieldValueMapping> valueMappings) throws ValueMappingException, CurrencyNotFoundException, Exception {
+			List<FieldValueMapping> valueMappings, ImportRequest importRequest) throws ValueMappingException, CurrencyNotFoundException, Exception {
 		Boolean hasTransactions = false;
 		JsonBean project = new JsonBean();
 		project.set(ampIatiIdField, source.getIdentifier());
@@ -682,7 +682,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 		// Process transactions
 		if (hasTransactions) {
-			List<JsonBean> fundings = getSourceFundings(source, fieldMappings, valueMappings);
+			List<JsonBean> fundings = getSourceFundings(source, fieldMappings, valueMappings, importRequest);
 			if (fundings != null) {
 				project.set("fundings", fundings);
 				project.set("donor_organization", getDonorOrgs(fundings));
@@ -742,7 +742,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	}
 
 	private List<JsonBean> getSourceFundings(InternalDocument source, List<FieldMapping> fieldMappings,
-			List<FieldValueMapping> valueMappings) throws Exception {
+			List<FieldValueMapping> valueMappings, ImportRequest importRequest) throws Exception {
 		List<JsonBean> fundings = new ArrayList<>();
 		String currencyCode = source.getStringFields().get("default-currency");
 		String currencyIdString = getCurrencyId(currencyCode);
@@ -791,6 +791,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 					String provider = StringUtils.isBlank(value.get("providing-org"))
 							? organization.getValue().get("value") : value.get("providing-org");
 
+
 					List<FundingDetail> fundingDetails = providerFundingDetails
 							.getOrDefault(provider, new ArrayList<FundingDetail>());
 					
@@ -802,6 +803,14 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 					fd.setAdjustmentType(getAdjustmentType(destinationSubType));
 					fd.setTransactionDate(dateFormat.parse(value.get("date")));
 					fd.setCurrency(Integer.parseInt(currencyIdString));
+									
+					boolean disasterReponseEnabledOnCommitments = destinationFieldsList.contains("fundings~commitments~disaster_response") && Constants.COMMITMENTS.equals(sourceField.getDisplayName());
+					boolean disasterReponseEnabledOnDisbursements = destinationFieldsList.contains("fundings~disbursements~disaster_response") && (Constants.DISBURSEMENTS.equals(sourceField.getDisplayName()));
+					boolean disasterReponseEnabledOnExpenditures = destinationFieldsList.contains("fundings~expenditures~disaster_response") && (Constants.EXPENDITURES.equals(sourceField.getDisplayName()));
+					        
+					if (disasterReponseEnabledOnCommitments || disasterReponseEnabledOnDisbursements || disasterReponseEnabledOnExpenditures) {
+					    fd.setDisasterResponse(importRequest.getDisasterResponse());
+	                }
 					
 					fundingDetails.add(fd);
 					providerFundingDetails.put(provider, fundingDetails);
@@ -886,6 +895,12 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 		return fundings;
 	}
+	
+	private boolean isDisasterReponseEnabled() {
+        return destinationFieldsList.contains("fundings~disbursements~disaster_response")
+                || destinationFieldsList.contains("fundings~expenditures~disaster_response")
+                || destinationFieldsList.contains("fundings~commitments~disaster_response");
+	}
 
 	/**
 	 * This is used when the import option is "ONLY_ADD_NEW_FUNDING". Updates the
@@ -902,9 +917,9 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	 * @throws CurrencyNotFoundException
 	 */
 	private List<JsonBean> addNewFunding(InternalDocument source, List<FieldMapping> fieldMappings,
-			List<FieldValueMapping> valueMappings, JsonBean project)
+			List<FieldValueMapping> valueMappings, JsonBean project, ImportRequest importRequest)
 			throws ValueMappingException, CurrencyNotFoundException, Exception {
-		List<JsonBean> sourceFundings = getSourceFundings(source, fieldMappings, valueMappings);
+		List<JsonBean> sourceFundings = getSourceFundings(source, fieldMappings, valueMappings, importRequest);
 		List<LinkedHashMap<String, Object>> destinationFundings = null;
 		if (project.get("fundings") != null) {
 			destinationFundings = (List<LinkedHashMap<String, Object>>) project.get("fundings");
@@ -990,9 +1005,9 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	 * @throws CurrencyNotFoundException
 	 */
 	private List<JsonBean> replaceDonorTransactions(InternalDocument source, List<FieldMapping> fieldMappings,
-			List<FieldValueMapping> valueMappings, JsonBean project)
+			List<FieldValueMapping> valueMappings, JsonBean project, ImportRequest importRequest)
 			throws ValueMappingException, CurrencyNotFoundException, Exception {
-		List<JsonBean> sourceFundings = getSourceFundings(source, fieldMappings, valueMappings);
+		List<JsonBean> sourceFundings = getSourceFundings(source, fieldMappings, valueMappings, importRequest);
 		List<LinkedHashMap<String, Object>> destinationFundings = new ArrayList<>();
 		if (project.get("fundings") != null) {
 			destinationFundings = (List<LinkedHashMap<String, Object>>) project.get("fundings");
@@ -1454,6 +1469,11 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		currency.setMultiLangDisplayName(destinationFieldsListLabels.get(currencyPath));
 		currency.setPossibleValues(getCodeListValues(currencyPath));
 		fieldList.add(currency);
+		
+		 if (this.isDisasterReponseEnabled()) {
+		     Field disasterResponse = new Field("Disaster Response", "disaster_response", FieldType.BOOLEAN, false);
+		     fieldList.add(disasterResponse);
+          }
 	}
 	
 	private boolean isTransactionEnabled(String transactionType, String adjType) {
@@ -1573,7 +1593,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				JsonNode child = childFields.next();
 				String childFieldName = child.get("field_name").asText();
 				Map<String, String> childFieldLabel = extractMultilanguageText(child.get("field_label"));
-				String name = fieldName + "~" + childFieldName;
+				String name = fieldName + "~" + childFieldName;				             
 				destinationFieldsList.add(name);
 				destinationFieldsListLabels.put(name, childFieldLabel);
 				if (node.get("children") != null) {

@@ -17,6 +17,8 @@ public class FundingDetail {
     
     private Double transactionAmount;
     
+    private Boolean disasterResponse;
+    
     public String getTransactionType() {
         return transactionType;
     }
@@ -57,13 +59,24 @@ public class FundingDetail {
         this.transactionAmount = transactionAmount;
     }
     
+    public Boolean getDisasterResponse() {
+        return disasterResponse;
+    }
+
+    public void setDisasterResponse(Boolean disasterResponse) {
+        this.disasterResponse = disasterResponse;
+    }
+
     public JsonBean toJsonBean() {
         JsonBean fundingDetail = new JsonBean();
     
         fundingDetail.set("adjustment_type", adjustmentType);
         fundingDetail.set("currency", currency);
         fundingDetail.set("transaction_date", DateUtils.getDateTimeFormatter().format(transactionDate));
-        fundingDetail.set("transaction_amount", transactionAmount);
+        fundingDetail.set("transaction_amount", transactionAmount); 
+        if (disasterResponse != null) {
+            fundingDetail.set("disaster_response", disasterResponse); 
+        }    
         
         return fundingDetail;
     }
