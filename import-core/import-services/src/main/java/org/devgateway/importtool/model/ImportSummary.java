@@ -6,8 +6,15 @@ public class ImportSummary {
 	private long filterCount;
 	private int fieldMappingCount;
 	private int valueMappingCount;
+	private boolean hasTransactions = false;
 	
-	public long getFileCount() {
+	public boolean getHasTransactions() {
+        return hasTransactions;
+    }
+    public void setHasTransactions(boolean hasTransactions) {
+        this.hasTransactions = hasTransactions;
+    }
+    public long getFileCount() {
 		return fileCount;
 	}
 	public void setFileCount(long fileCount) {

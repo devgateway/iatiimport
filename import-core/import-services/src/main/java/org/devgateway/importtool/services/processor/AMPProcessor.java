@@ -295,7 +295,7 @@ public class AMPProcessor implements IDestinationProcessor {
 	}
 
 	@Override
-	public ActionResult insert(InternalDocument source, List<FieldMapping> fieldMapping, List<FieldValueMapping> valueMapping) {
+	public ActionResult insert(InternalDocument source, List<FieldMapping> fieldMapping, List<FieldValueMapping> valueMapping, ImportRequest importRequest) {
 		ActionResult result = new ActionResult("1", "INSERT", "OK", "Project has been inserted");
 		log.debug("Update new document in destination system");
 		return result;
