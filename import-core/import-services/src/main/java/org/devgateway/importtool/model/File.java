@@ -21,7 +21,7 @@ public class File implements Identifiable<Long>, Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "file_sequence")
-	@SequenceGenerator(name="file_sequence", sequenceName = "uploaded_file_seq")
+	@SequenceGenerator(name = "file_sequence", sequenceName = "uploaded_file_seq", allocationSize = 1)
 	@Column(name = "id", unique = true, nullable = false)
 	private Long id;
 
