@@ -45,7 +45,7 @@ public class DocumentMapperTests {
 	
 	@Test
 	public void testExecute() throws Exception {
-		
+				//Tests needs to be fixed since they depende on old amp processor and on a hardcoded token
 		        IATI104Processor sourceProcessor = new IATI104Processor();
 		        AMPProcessor destinationProcessor = new AMPProcessor();
 				destinationProcessor.setTestMode(true);

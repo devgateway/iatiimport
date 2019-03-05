@@ -60,6 +60,16 @@ public class Constants {
 	public static final String ACCOUNTABLE_ORG_DISPLAY_NAME = "Accountable Organization";
 	public static final Set<String> SUPPORTED_LOCALES= new HashSet<>(Arrays.asList("en","fr", "es"));
 
+	public static final Integer AMP_PUSH_BATCH_SIZE = 1;
+	public static final Integer AMP_PULL_BATCH_SIZE = 100;
+	public static final String AMP_ACTIVITY_ENDPOINT = "rest/activity";
+
+	//AMP FIELDS to be moved to its own property field
+	public static final String AMP_INTERNAL_ID = "internal_id";
+
+	public static final String AMP_UPDATE_OPERATION = "UPDATE";
+	public static final String AMP_INSERT_OPERATION = "INSERT";
+
 	public static final String LANG_PACK_TOOLTIPS="TOOLTIPS";
 	public static final String LANG_PACK_LABELS="LABELS";
 	public static final List<String> TRANSACTION_FIELDS = new ArrayList<>(Arrays.asList("Actual Commitments",
