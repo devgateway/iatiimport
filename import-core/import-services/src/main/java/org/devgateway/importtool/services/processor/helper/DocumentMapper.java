@@ -97,7 +97,7 @@ public class DocumentMapper implements IDocumentMapper {
 		List<String> listOfAmpIds = filtered.stream().filter(update->
 			update.getDestinationDocument()!=null
 		).map(doc -> doc.getDestinationDocument().getStringFields().get("internalId")).collect(Collectors.toList());
-
+		documentProcessingStopWatch.stop();
 		//with this list of amp_ods we got and load projects from amp
 
 		if(listOfAmpIds !=null && listOfAmpIds.size() >0) {
