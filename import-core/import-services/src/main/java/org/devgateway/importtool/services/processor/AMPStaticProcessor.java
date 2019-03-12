@@ -5,31 +5,23 @@ import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.Properties;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.endpoint.EPMessages;
 import org.devgateway.importtool.exceptions.CurrencyNotFoundException;
+import org.devgateway.importtool.services.dto.JsonBean;
+import org.devgateway.importtool.services.dto.MappedProject;
 import org.devgateway.importtool.services.processor.helper.*;
 import org.devgateway.importtool.services.request.ImportRequest;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpServerErrorException;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.*;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -80,6 +72,12 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	public void setDestinationFieldsList(List<String> destinationFieldsList) {
 		this.destinationFieldsList = destinationFieldsList;
 	}
+
+	//list of projects to be sent to the AMP
+	private List<MappedProject> projectsReadyToBePosted;
+	//List of projects to be updated into the amp. Will be loaded in batches
+	List<JsonBean> projectsToBeUpdated;
+
 	@Override
 	public String getProcessorVersion() {
 		return processorVersion;
@@ -89,7 +87,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		this.processorVersion = processorVersion;
 	}
 
-	private RestTemplate template;
+	private RestTemplate restTemplate;
 
 	private ActionStatus actionStatus;
 
@@ -134,8 +132,9 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	}
 
 	public AMPStaticProcessor(String authenticationToken) {
-		// this.properties = initProps();
+
 		this.setAuthenticationToken(authenticationToken);
+		this.restTemplate = getRestTemplate();
 
 		baseURL = System.getProperty(BASEURL_PROPERTY);
 		if (StringUtils.isEmpty(baseURL)) {
@@ -152,8 +151,13 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		} else {
 			ampImplementationLevel = AMP_IMPLEMENTATION_LEVEL_ID_DEFAULT_VALUE;
 		}
-
+		initializeProjectsLists();
 		instantiateStaticFields();
+	}
+
+	private void initializeProjectsLists() {
+		this.projectsReadyToBePosted = new ArrayList<>();
+		this.projectsToBeUpdated = new ArrayList<>();
 	}
 
 	@Override
@@ -171,12 +175,10 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 		try {
 			if (jsonNode == null) {
-				RestTemplate restTemplate = getRestTemplate();
-
-				// we go only once to fetch docuemts since it make no sense to fetch 3k project
+				// we go only once to fetch documents since it make no sense to fetch 3k project
 				// twice. if its faster ill save the list of editable and non editable on init and will only return
 				// the list filtered
-				result = restTemplate.getForObject(baseURL + this.getDocumentsEndpoint(), String.class);
+				result = this.restTemplate.getForObject(baseURL + this.getDocumentsEndpoint(), String.class);
 				ObjectMapper mapper = new ObjectMapper();
 
 				jsonNode = mapper.readTree(result);
@@ -234,12 +236,12 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	}
 
 	private RestTemplate getRestTemplate() {
-		if (template == null) {
-			template = new RestTemplate();
-		    template.getMessageConverters().add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
-		    template.setInterceptors(this.interceptors);
+		if (restTemplate == null) {
+			restTemplate = new RestTemplate();
+			restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
+			restTemplate.setInterceptors(this.interceptors);
 		}
-		return template;
+		return restTemplate;
 	}
 
 	@Override
@@ -276,7 +278,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 	private void updateProject(JsonBean project, InternalDocument source, List<FieldMapping> fieldMappings,
 			List<FieldValueMapping> valueMappings, boolean overrideTitle, ImportRequest importRequest)
-			throws ValueMappingException, CurrencyNotFoundException, Exception {
+			throws ValueMappingException, CurrencyNotFoundException {
 		if (overrideTitle) {
 			project.set("project_title", getMultilangString(source, "project_title", "title"));
 		}
@@ -369,7 +371,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 	private void processOrganization(JsonBean project, InternalDocument source, List<FieldMapping> fieldMappings,
 									 List<FieldValueMapping> valueMappings, FieldMapping mapping, Field sourceField,
-									 Field destinationField) throws Exception {
+									 Field destinationField)  throws ValueMappingException{
 		if (!Constants.FUNDING_ORG_DISPLAY_NAME.equals(sourceField.getDisplayName())
 				&& !Constants.PROVIDER_ORG_DISPLAY_NAME.equals(sourceField.getDisplayName())) {
 
@@ -404,7 +406,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	}
 
 	   private List<JsonBean> getOrgsByRole(InternalDocument source, String role, List<FieldMapping> fieldMappings,
-	            List<FieldValueMapping> valueMappings, String fieldDisplayName, Boolean percentage) throws Exception {
+	            List<FieldValueMapping> valueMappings, String fieldDisplayName, Boolean percentage) throws ValueMappingException {
 	        List<JsonBean> orgs = new ArrayList<JsonBean>();
 	       
 	        Map<String, Map<String, String>> organizations = source.getOrganizationFields().entrySet().stream()
@@ -452,14 +454,23 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		}
 	}
 
+	@Override
+	public void loadProjectsForUpdate(List<String> listOfAmpIds) {
+		for (int startIndex = 0; startIndex < listOfAmpIds.size(); startIndex += Constants.AMP_PULL_BATCH_SIZE) {
+			int endIndex = Math.min(listOfAmpIds.size(), startIndex + Constants.AMP_PULL_BATCH_SIZE);
+
+			String result = this.restTemplate.postForObject(baseURL + "/rest/activity/projects",
+					listOfAmpIds.subList(startIndex, endIndex), String.class);
+			List<JsonBean> lJsb = JsonBean.getListOfJsoBeanFromString(result);
+			projectsToBeUpdated.addAll(lJsb);
+
+		}
+	}
+
 	private JsonBean getProject(String documentId) {
-		JsonBean projectObject = null;
-		RestTemplate restTemplate = getRestTemplate();
-
-		String result = restTemplate.getForObject(baseURL + "/rest/activity/projects/" + documentId, String.class);
-		projectObject = JsonBean.getJsonBeanFromString(result);
-
-		return projectObject;
+		JsonBean jb = projectsToBeUpdated.stream().filter(p-> p.getString("amp_id").equals(documentId)).
+				findFirst().orElse(null);
+		return jb;
 	}
 
 	@Override
@@ -467,130 +478,127 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 		return this.descriptiveName;
 	}
-
+	private MappedProject getMappedProjectfromSource(InternalDocument source, JsonBean project){
+		MappedProject mappedProject = new MappedProject();
+		mappedProject.setGroupingCriteria(source.getGrouping());
+		mappedProject.setProjectIdentifier(source.getIdentifier());
+		mappedProject.setProject(project);
+		return mappedProject;
+	}
 	@Override
-	public ActionResult update(InternalDocument source, InternalDocument destination, List<FieldMapping> fieldMapping,
-			List<FieldValueMapping> valueMapping, boolean overrideTitle, ImportRequest importRequest) {
-		ActionResult result = null;
-		JsonBean project = getProject(destination.getStringFields().get("id"));
-		try {
-			updateProject(project, source, fieldMapping, valueMapping, overrideTitle, importRequest);
-			result = executeOperation(project, source, destination, fieldMapping, valueMapping);
-		} catch (ValueMappingException e) {
-			log.error("Error importing activity " + e);
-			result = new ActionResult("N/A", "ERROR", "ERROR", "Value Mapping Exception: " + e.getMessage());
-		} catch (CurrencyNotFoundException e) {
-			log.error("Error importing activity " + e);
-			result = new ActionResult("N/A", "ERROR", "ERROR", "Currency Not Found Exception: " + e.getMessage());
-		} catch (Exception e) {
-			log.error("Error importing activity " + e);
-			result = new ActionResult("N/A", "ERROR", "ERROR", "Description: " + e.getMessage());
-		}
-		return result;
+	public void update(InternalDocument source, InternalDocument destination, List<FieldMapping> fieldMapping,
+			List<FieldValueMapping> valueMapping, boolean overrideTitle, ImportRequest importRequest)
+			throws  ValueMappingException, CurrencyNotFoundException {
+		JsonBean project = getProject(destination.getStringFields().get("internalId"));
+		updateProject(project, source, fieldMapping, valueMapping, overrideTitle, importRequest);
+		projectsReadyToBePosted.add(getMappedProjectfromSource(source, project));
 	}
 
 	@Override
-	public ActionResult insert(InternalDocument source, List<FieldMapping> fieldMapping,
-			List<FieldValueMapping> valueMapping, ImportRequest importRequest) {
-		ActionResult result;
-		RestTemplate restTemplate = getRestTemplate();
-		try {
-			JsonBean project = transformProject(source, fieldMapping, valueMapping, importRequest);
-			result = executeOperation(project, source, null, fieldMapping, valueMapping);
-
-		} catch (ValueMappingException e) {
-			log.error("Error importing activity " + e);
-			result = new ActionResult("N/A", "ERROR", "ERROR", "Value Mapping Exception: " + e.getMessage());
-		} catch (CurrencyNotFoundException e) {
-			log.error("Error importing activity " + e);
-			result = new ActionResult("N/A", "ERROR", "ERROR", "Currency Not Found Exception: " + e.getMessage());
-		} catch (Exception e) {
-			log.error("Error importing activity", e);
-			result = new ActionResult("N/A", "ERROR", "ERROR", "Error: " + e.getMessage());
-		}
-		return result;
+	public void insert(InternalDocument source, List<FieldMapping> fieldMapping,
+			List<FieldValueMapping> valueMapping, ImportRequest importRequest) throws ValueMappingException,
+			CurrencyNotFoundException {
+		JsonBean project = transformProject(source, fieldMapping, valueMapping, importRequest);
+		projectsReadyToBePosted.add(getMappedProjectfromSource(source, project));
 	}
 
-	public ActionResult executeOperation(JsonBean project, InternalDocument source, InternalDocument destination,
-			List<FieldMapping> fieldMapping, List<FieldValueMapping> valueMapping) {
-		log.info(project);
-		ActionResult result = null;
-		RestTemplate restTemplate = getRestTemplate();
-		try {
-			JsonBean resultPost = null;
-			String operation = "";
-			if (destination == null) {
-				resultPost = restTemplate.postForObject(baseURL + "/rest/activity", project, JsonBean.class);
-				operation = "INSERT";
-			} else {
-				resultPost = restTemplate.postForObject(
-						baseURL + "/rest/activity/" + destination.getStringFields().get("id"), project, JsonBean.class);
-				operation = "UPDATE";
-			}
-			Object errorNode = resultPost.get("error");
+	@Override
+	public List<ActionResult> processProjectsInBatch(ActionStatus importStatus) {
 
-			if (errorNode == null) {
-				Integer id = (int) resultPost.get("internal_id");
-				String message = "";
-				if (resultPost.get("project_title") instanceof Map) {
-					@SuppressWarnings("unchecked")
-					Map<String, String> titleMultilang = (Map<String, String>) resultPost.get("project_title");
-					message = (String) titleMultilang.entrySet().stream().map(i -> i.getValue())
-							.collect(Collectors.joining(", "));
-				} else {
-					message = resultPost.getString("project_title");
-				}
-				result = new ActionResult(id.toString(), operation, "OK", message,
-						null, null);
-			} else {
-				String error = errorNode.toString();
-				result = new ActionResult("N/A", "REJECT", "ERROR", "Error: " + error);
-			}
+		List<ActionResult> finalResults = new ArrayList<>();
 
-		} catch (RestClientException e) {
-			log.error("Error importing activity " + e);
-			e.printStackTrace();
-			if (e.getClass().equals(HttpServerErrorException.class)) {
-				HttpServerErrorException ex = (HttpServerErrorException) e;
-				JsonBean resultPost = JsonBean.getJsonBeanFromString(ex.getResponseBodyAsString());
-				if (resultPost != null) {
-					Object errorNode = resultPost.get("error");
-					Map<?, ?> activity = (Map<?, ?>) resultPost.get("activity");
-					Object projectTitle = (activity != null && activity.get("project_title") != null)
-							? activity.get("project_title")
-							: "";
-					result = new ActionResult("N/A", "ERROR", "ERROR",
-							"REST Exception:" + projectTitle + " " + errorNode);
-				} else {
-					result = new ActionResult("N/A", "ERROR", "ERROR", "REST Exception:" + e.getMessage());
-				}
-			} else if (e.getClass().equals(HttpClientErrorException.class)) {
-				HttpClientErrorException ex = (HttpClientErrorException) e;
-				JsonBean resultPost = JsonBean.getJsonBeanFromString(ex.getResponseBodyAsString());
-				if (resultPost != null) {
-					Object errorNode = resultPost.get("error");
-					Map<?, ?> activity = (Map<?, ?>) resultPost.get("activity");
-					Object projectTitle = (activity != null && activity.get("project_title") != null)
-							? activity.get("project_title")
-							: "";
-					result = new ActionResult("N/A", "ERROR", "ERROR",
-							"REST Exception:" + projectTitle + " " + errorNode);
-				} else {
-					result = new ActionResult("N/A", "ERROR", "ERROR", "REST Exception:" + e.getMessage());
-				}
-			} else {
-				result = new ActionResult("N/A", "ERROR", "ERROR", "REST Exception:" + e.getMessage());
-			}
+		for (int fromIndex = 0; fromIndex < projectsReadyToBePosted.size(); fromIndex += Constants.AMP_PUSH_BATCH_SIZE) {
+			int end = Math.min(projectsReadyToBePosted.size(), fromIndex + Constants.AMP_PUSH_BATCH_SIZE);
+			importStatus.setProcessed(end);
+			List<MappedProject> currentActivities = projectsReadyToBePosted.subList(fromIndex, end);
 
-		} catch (Exception e) {
-			log.error("Error importing activity " + e);
-			result = new ActionResult("N/A", "ERROR", "ERROR", "Import failed with an error");
+			List<CompletableFuture<ActionResult>> projectsToBePosted =
+					currentActivities.stream()
+							.map(project -> postProjects(project))
+							.collect(Collectors.toList());
+
+			List<ActionResult> result =
+					projectsToBePosted.stream()
+							.map(CompletableFuture::join)
+							.collect(Collectors.toList());
+			finalResults.addAll(result);
 		}
-		return result;
+		//once processed we need to remove what is being processed since the user can click on process again
+		initializeProjectsLists();
+		return finalResults;
+	}
+
+
+	private CompletableFuture<ActionResult> postProjects(MappedProject mappedProject) {
+		CompletableFuture<ActionResult> future = CompletableFuture.supplyAsync(new Supplier<ActionResult>() {
+			@Override
+			public ActionResult get() {
+				ActionResult result;
+
+				String operation = Constants.AMP_INSERT_OPERATION;
+				String url = Constants.AMP_ACTIVITY_ENDPOINT;
+				if (mappedProject.getProject().get(Constants.AMP_INTERNAL_ID) != null) {
+					operation = Constants.AMP_UPDATE_OPERATION;
+					url += "/" + mappedProject.getProject().getString(Constants.AMP_INTERNAL_ID);
+				}
+				try {
+					JsonBean resultPost = restTemplate.postForObject(baseURL + url, mappedProject.getProject(), JsonBean.class);
+
+					Object errorNode = resultPost.get("error");
+
+					if (errorNode == null) {
+						Integer id = (int) resultPost.get("internal_id");
+						String message = "";
+						if (resultPost.get("project_title") instanceof Map) {
+							@SuppressWarnings("unchecked")
+							Map<String, String> titleMultilang = (Map<String, String>) resultPost.get("project_title");
+							message = (String) titleMultilang.entrySet().stream().map(i -> i.getValue())
+									.collect(Collectors.joining(", "));
+						} else {
+							message = resultPost.getString("project_title");
+						}
+						result = new ActionResult(id.toString(), operation, "OK", message,
+								null, null);
+					} else {
+						String error = errorNode.toString();
+						result = new ActionResult("N/A", "REJECT", "ERROR", "Error: " + error);
+					}
+				} catch (RestClientException e) {
+					log.error("Error importing activity ", e);
+					if (e instanceof HttpStatusCodeException) {
+						HttpStatusCodeException ex = (HttpStatusCodeException) e;
+						JsonBean resultPost = JsonBean.getJsonBeanFromString(ex.getResponseBodyAsString());
+						if (resultPost != null) {
+							Object errorNode = resultPost.get("error");
+							Map<?, ?> activity = (Map<?, ?>) resultPost.get("activity");
+							Object projectTitle = (activity != null && activity.get("project_title") != null)
+									? activity.get("project_title")
+									: "";
+							result = new ActionResult("N/A", "ERROR", "ERROR",
+									"REST Exception:" + projectTitle + " " + errorNode);
+						} else {
+							result = new ActionResult("N/A", "ERROR", "ERROR", "REST Exception:" + e.getMessage());
+						}
+					} else {
+						result = new ActionResult("N/A", "ERROR", "ERROR", "REST Exception:" + e.getMessage());
+					}
+				} catch (Exception e) {
+					log.error("Error importing activity " + e);
+					result = new ActionResult("N/A", "ERROR", "ERROR", "Import failed with an error");
+				}
+				//we set the iati_identifier
+				//we set the grouping criteira
+				result.setSourceProjectIdentifier(mappedProject.getProjectIdentifier());
+				result.setSourceGroupingCriteria(mappedProject.getGroupingCriteria());
+				return result;
+			}
+		});
+
+		return future;
 	}
 
 	private JsonBean transformProject(InternalDocument source, List<FieldMapping> fieldMappings,
-			List<FieldValueMapping> valueMappings, ImportRequest importRequest) throws ValueMappingException, CurrencyNotFoundException, Exception {
+			List<FieldValueMapping> valueMappings, ImportRequest importRequest) throws ValueMappingException, CurrencyNotFoundException {
 		Boolean hasTransactions = false;
 		JsonBean project = new JsonBean();
 		project.set(ampIatiIdField, source.getIdentifier());
@@ -731,7 +739,8 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	}
 
 	private List<JsonBean> getSourceFundings(InternalDocument source, List<FieldMapping> fieldMappings,
-			List<FieldValueMapping> valueMappings, ImportRequest importRequest) throws Exception {
+			List<FieldValueMapping> valueMappings, ImportRequest importRequest)  throws CurrencyNotFoundException,
+			ValueMappingException{
 		List<JsonBean> fundings = new ArrayList<>();
 		String currencyCode = source.getStringFields().get("default-currency");
 		String currencyIdString = getCurrencyId(currencyCode);
@@ -756,7 +765,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				}).collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
 
 		if(organizations.size() == 0) {
-			throw new Exception("Provider organization missing. Project ID: " + source.getIdentifier());
+			throw new RuntimeException("Provider organization missing. Project ID: " + source.getIdentifier());
 		}
 		Entry<String, Map<String, String>> organization = organizations.entrySet().stream().findFirst().get();
 
@@ -879,7 +888,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	 */
 	private List<JsonBean> addNewFunding(InternalDocument source, List<FieldMapping> fieldMappings,
 			List<FieldValueMapping> valueMappings, JsonBean project, ImportRequest importRequest)
-			throws ValueMappingException, CurrencyNotFoundException, Exception {
+			throws  CurrencyNotFoundException, ValueMappingException{
 		List<JsonBean> sourceFundings = getSourceFundings(source, fieldMappings, valueMappings, importRequest);
 		List<LinkedHashMap<String, Object>> destinationFundings = null;
 		if (project.get("fundings") != null) {
@@ -989,7 +998,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	 */
 	private List<JsonBean> replaceDonorTransactions(InternalDocument source, List<FieldMapping> fieldMappings,
 			List<FieldValueMapping> valueMappings, JsonBean project, ImportRequest importRequest)
-			throws ValueMappingException, CurrencyNotFoundException, Exception {
+			throws  CurrencyNotFoundException, ValueMappingException {
 		List<JsonBean> sourceFundings = getSourceFundings(source, fieldMappings, valueMappings, importRequest);
 		List<LinkedHashMap<String, Object>> destinationFundings = new ArrayList<>();
 		if (project.get("fundings") != null) {
@@ -1607,8 +1616,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	}
 	private void loadAmpTranslations() {
 
-		RestTemplate restTemplateForFields = getRestTemplate();
-		String result = restTemplateForFields.postForObject(baseURL + translationEndPoints
+		String result = restTemplate.postForObject(baseURL + translationEndPoints
 						+ extractSupportedLocales(), Constants.TRANSACTION_FIELDS, String.class);
 		try {
 			ObjectMapper mapper = new ObjectMapper();
@@ -1631,9 +1639,11 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			log.error("cannot load transaltions from AMP", ex);
 		}
 	}
+
 	private String extractSupportedLocales(){
 		return String.join("|",Constants.SUPPORTED_LOCALES);
 	}
+
 	private void loadCodeListValues() {
 		// TODO this needs to be extracted to a static variable and abscract field configuration
 		// TODO but proper analysis is needed and its out of the scope of this ticket
@@ -1655,10 +1665,13 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		allDestinationFieldValues.add("fundings~funding_details~currency");
 		allDestinationFieldValues.retainAll(destinationFieldsList);
 
+
+
 		allFieldValuesForDestinationProcessor = new HashMap<>();
-		RestTemplate restTemplateForFields = getRestTemplate();
-		String result = restTemplateForFields.postForObject(baseURL + getAllFieldsEndpoit(),
+
+		String result = restTemplate.postForObject(baseURL + getAllFieldsEndpoit(),
 				allDestinationFieldValues, String.class);
+
 		ObjectMapper mapper = new ObjectMapper();
 		try {
 			JsonNode jsonNode = mapper.readTree(result);
@@ -1681,7 +1694,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			if(possibleValues == null) {
 			String result = "";
 			possibleValues = new ArrayList<>();
-			RestTemplate restTemplate = getRestTemplate();
+		//	RestTemplate restTemplate = getRestTemplate();
 			result = restTemplate.getForObject(baseURL + this.getFieldsEndpoint() + "/" + codeListName, String.class);
 
 			try {
@@ -1712,11 +1725,8 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			fv.setValue(value);
 			//TODO THIS IS A WORKAROUND TO BE FIXED BEFORE THE RELEASE
 			/*if (node.get("extra_info") != null) {
-				fv.getProperties().put("extra_info", node.get("extra_info"));
-			}*/
-			if (node.get("extra_info") != null) {
 				fv.getProperties().put("extra_info", node.get("extra_info"));			
-			}
+			}*/
 			
 			if (node.get("translated-value") != null) {			        
 			    Iterator <Entry<String,JsonNode>> iter = node.get("translated-value").fields();			    

@@ -6,14 +6,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.endpoint.ApiMessage;
 import org.devgateway.importtool.endpoint.EPMessages;
+import org.devgateway.importtool.exceptions.CurrencyNotFoundException;
 import org.devgateway.importtool.exceptions.MissingPrerequisitesException;
 import org.devgateway.importtool.services.request.ImportRequest;
 import org.apache.commons.text.similarity.LevenshteinDistance;
+import org.springframework.util.StopWatch;
 
 
 public class DocumentMapper implements IDocumentMapper {
@@ -30,7 +33,7 @@ public class DocumentMapper implements IDocumentMapper {
 	private ActionStatus documentMappingStatus;
 	private Log logger = LogFactory.getLog(getClass());
 	private static Integer SIMILARITY_EDIT_DISTANCE = 10;
-		
+
 	public ActionStatus getImportStatus() {
 		return importStatus;
 	}
@@ -82,31 +85,62 @@ public class DocumentMapper implements IDocumentMapper {
 				documentMappings.stream().filter(m -> m.getSelected() == true).count(),
 				EPMessages.IMPORT_STATUS_MESSAGE.getCode());
 		importStatus.setStatus(Status.IN_PROGRESS);
+		StopWatch documentProcessingStopWatch = new StopWatch("document processing");
+		results = new ArrayList<>();
 
-		results = new ArrayList<ActionResult>();
-		for (DocumentMapping doc : documentMappings) {
-			if (doc.getSelected()) {
-				importStatus.incrementProcessed();
+		//we only fetch the list of documents that have been selected
+		List<DocumentMapping> filtered = documentMappings.stream().filter(d -> d.getSelected())
+				.collect(Collectors.toList());
+		//for the ones that have destination documents, we go and get the list of ampids
+		documentProcessingStopWatch.start("Fetch projects by amp id");
 
-				// if activity was mapped to an existing AMP activity, modify
-				// the operation to UPDATE
-				if (doc.getDestinationDocument() != null) {
-					doc.setOperation(OperationType.UPDATE);
-				}
+		List<String> listOfAmpIds = filtered.stream().filter(update->
+			update.getDestinationDocument()!=null
+		).map(doc -> doc.getDestinationDocument().getStringFields().get("internalId")).collect(Collectors.toList());
+		documentProcessingStopWatch.stop();
+		//with this list of amp_ods we got and load projects from amp
 
-				results.add(processDocumentMapping(doc, importRequest));
-			}
+		if(listOfAmpIds !=null && listOfAmpIds.size() >0) {
+			this.destinationProcessor.loadProjectsForUpdate(listOfAmpIds);
 		}
-		importStatus.setStatus(Status.COMPLETED);
 
+		documentProcessingStopWatch.start("Document processing");
+
+		filtered.stream().forEach(doc -> {
+			// if activity was mapped to an existing AMP activity, modify
+			// the operation to UPDATE
+			if (doc.getDestinationDocument() != null) {
+				doc.setOperation(OperationType.UPDATE);
+			}
+			try {
+				processDocumentMapping(doc, importRequest);
+			} catch (ValueMappingException | CurrencyNotFoundException e) {
+				//we need to find a better way to processs exceptions
+				results.add(getActionResultFromException(doc, e));
+			}
+		});
+		documentProcessingStopWatch.stop();
+
+		documentProcessingStopWatch.start("Document processing processing");
+
+		results.addAll(this.destinationProcessor.processProjectsInBatch(importStatus));
+		documentProcessingStopWatch.stop();
+		importStatus.setStatus(Status.COMPLETED);
+		//the stop watch will be remove once the ticket is merged into hotfix branch
+		logger.error(documentProcessingStopWatch.prettyPrint());
 		return results;
 	}
 
-	private ActionResult processDocumentMapping(DocumentMapping doc, ImportRequest importRequest) {
+	private ActionResult getActionResultFromException(DocumentMapping doc, Exception e) {
+		logger.error("Error importing activity ", e);
+		return new ActionResult(doc.getSourceDocument().getIdentifier(), "ERROR", "ERROR",
+				"Value Mapping Exception" + e.getMessage());
+	}
+
+	private void processDocumentMapping(DocumentMapping doc, ImportRequest importRequest)
+			throws CurrencyNotFoundException, ValueMappingException {
 		InternalDocument source = doc.getSourceDocument();
 		InternalDocument destination = doc.getDestinationDocument();
-		ActionResult result = null;
-		
 		//if source project is mapped to an existing project, update the existing project
 		if (destination != null) {
 			doc.setOperation(OperationType.UPDATE);
@@ -115,11 +149,11 @@ public class DocumentMapper implements IDocumentMapper {
 		switch (doc.getOperation()) {
 		case INSERT:
 			// For now, we pass the mapping. Find a better more efficient way.
-			result = this.destinationProcessor.insert(source, this.getFieldMappingObject(),
+			 this.destinationProcessor.insert(source, this.getFieldMappingObject(),
 					this.getValueMappingObject(), importRequest);
 			break;
 		case UPDATE:
-			result = this.destinationProcessor.update(source, destination, this.getFieldMappingObject(),
+			 this.destinationProcessor.update(source, destination, this.getFieldMappingObject(),
 					this.getValueMappingObject(), doc.isOverrideTitle(), importRequest);
 			break;
 		case NOOP:
@@ -127,31 +161,28 @@ public class DocumentMapper implements IDocumentMapper {
 		default:
 			break;
 		}
-		result.setSourceProjectIdentifier(source.getIdentifier());
-		result.setSourceGroupingCriteria(source.getGrouping());
-		return result;
 	}
 
 	public void setValueMapping(Field firstFieldSource, String valueSrc, String valueDest) {
 
 	}
 
-	public void initialize(){		
+	public void initialize(){
 		try{
 			if (sourceProcessor == null || destinationProcessor == null) {
 				throw new MissingPrerequisitesException("Missing prerequirements to initialize this mapping");
 			}
-			this.setDocumentMappings(new ArrayList<DocumentMapping>());		
-			//parse file			
-			this.updateStatus(EPMessages.PARSING_IN_PROGRESS, Status.IN_PROGRESS);			
+			this.setDocumentMappings(new ArrayList<DocumentMapping>());
+			//parse file
+			this.updateStatus(EPMessages.PARSING_IN_PROGRESS, Status.IN_PROGRESS);
 			this.sourceProcessor.setActionStatus(this.documentMappingStatus);
 			List<InternalDocument> sourceDocuments = this.sourceProcessor.getDocuments();
-			
+
 			//fetchFetchFromDataStore destination system projects
 			this.updateStatus(EPMessages.FETCHING_DESTINATION_PROJECTS, Status.IN_PROGRESS);
-			this.destinationProcessor.setActionStatus(this.documentMappingStatus);			
-			List<InternalDocument> destinationDocuments = this.destinationProcessor.getDocuments(false);	
-			
+			this.destinationProcessor.setActionStatus(this.documentMappingStatus);
+			List<InternalDocument> destinationDocuments = this.destinationProcessor.getDocuments(false);
+
 			//map projects
 			this.mapProjects(sourceDocuments, destinationDocuments);
 			this.setInitialized(true);

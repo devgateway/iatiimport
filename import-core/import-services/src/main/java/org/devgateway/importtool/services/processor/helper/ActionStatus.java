@@ -4,7 +4,7 @@ package org.devgateway.importtool.services.processor.helper;
 public class ActionStatus {
 	private Status status = Status.NOT_STARTED;
 	private long total = 0L;
-	private long processed = 0L;
+	private Integer processed = 0;
 	private String message = "";
 	private Integer code;
 	
@@ -27,8 +27,11 @@ public class ActionStatus {
 	public void setTotal(long total) {
 		this.total = total;
 	}
+	public void setProcessed(Integer newProcessed) {
+		 processed = newProcessed ;
+	}
 
-	public long getProcessed() {
+	public Integer getProcessed() {
 		return processed;
 	}
 
@@ -36,10 +39,7 @@ public class ActionStatus {
 		++this.processed;
 	}
 	
-	public void resetProcessed() {
-		this.processed = 0L;
-	}
-		public Integer getCode() {
+	public Integer getCode() {
 		return code;
 	}
 
