@@ -564,8 +564,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 						result = new ActionResult("N/A", "REJECT", "ERROR", "Error: " + error);
 					}
 				} catch (RestClientException e) {
-					log.error("Error importing activity " + e);
-					e.printStackTrace();
+					log.error("Error importing activity ", e);
 					if (e instanceof HttpStatusCodeException) {
 						HttpStatusCodeException ex = (HttpStatusCodeException) e;
 						JsonBean resultPost = JsonBean.getJsonBeanFromString(ex.getResponseBodyAsString());
@@ -1617,7 +1616,6 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	}
 	private void loadAmpTranslations() {
 
-		//RestTemplate restTemplateForFields = getRestTemplate();
 		String result = restTemplate.postForObject(baseURL + translationEndPoints
 						+ extractSupportedLocales(), Constants.TRANSACTION_FIELDS, String.class);
 		try {
@@ -1641,9 +1639,11 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			log.error("cannot load transaltions from AMP", ex);
 		}
 	}
+
 	private String extractSupportedLocales(){
 		return String.join("|",Constants.SUPPORTED_LOCALES);
 	}
+
 	private void loadCodeListValues() {
 		// TODO this needs to be extracted to a static variable and abscract field configuration
 		// TODO but proper analysis is needed and its out of the scope of this ticket
@@ -1668,11 +1668,9 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 
 		allFieldValuesForDestinationProcessor = new HashMap<>();
-		//RestTemplate restTemplateForFields = getRestTemplate();
+
 		String result = restTemplate.postForObject(baseURL + getAllFieldsEndpoit(),
 				allDestinationFieldValues, String.class);
-		/*ParameterizedTypeReference<HashMap<String, String>> responseType =
-				new ParameterizedTypeReference<HashMap<String, String>>() {};*/
 
 		ObjectMapper mapper = new ObjectMapper();
 		try {
