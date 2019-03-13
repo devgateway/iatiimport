@@ -3,18 +3,8 @@ package org.devgateway.importtool.services.processor;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.Properties;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -24,6 +14,7 @@ import org.assertj.core.util.Collections;
 import org.devgateway.importtool.endpoint.EPMessages;
 import org.devgateway.importtool.exceptions.CurrencyNotFoundException;
 import org.devgateway.importtool.services.dto.FundingDetail;
+import org.devgateway.importtool.services.processor.dto.APIField;
 import org.devgateway.importtool.services.processor.helper.*;
 import org.devgateway.importtool.services.request.ImportRequest;
 import org.parboiled.common.ImmutableList;
@@ -36,6 +27,8 @@ import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import javax.xml.soap.SOAPFactory;
 
 // TODO: Sort methods, move classes to generic helpers for all processors if possible
 // TODO: Clean up code, find opportunities to reuse methods (example update/insert)
@@ -67,6 +60,9 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	private List<ClientHttpRequestInterceptor> interceptors = new ArrayList<ClientHttpRequestInterceptor>();
 	private List<String> destinationFieldsList = new ArrayList<String>(); // fields returned by current AMP installation
 	private Map<String, List<FieldValue>> allFieldValuesForDestinationProcessor; // this holds the list of possible
+	private List<APIField> ampFieldsDefinition;
+	private Map<String,Boolean> areTransactionDatesTimeStamps;
+
 	// values that wr retrive from the endpoint at once, instead of one by one
 	private HashMap<String, Map<String, String>> destinationFieldsListLabels = new HashMap<String, Map<String, String>>();
 	// translations we ask amp to translate for us
@@ -163,7 +159,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		} else {
 			ampImplementationLevel = AMP_IMPLEMENTATION_LEVEL_ID_DEFAULT_VALUE;
 		}
-
+		areTransactionDatesTimeStamps = new HashMap<>();
 		instantiateStaticFields();
 	}
 
@@ -794,14 +790,13 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 					List<FundingDetail> fundingDetails = providerFundingDetails
 							.getOrDefault(provider, new ArrayList<FundingDetail>());
-					
-					DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-					
+
 					FundingDetail fd = new FundingDetail();
 					fd.setTransactionType(tTNameSourceMap.get(destinationSubType));
 					fd.setTransactionAmount(getTransactionAmount(value.get("value"), percentage));
+					fd.setTransactionDateTimeStamp(isTransactionDateTimeStam("fundings~"+ sourceField.getDisplayName().toLowerCase() + "~transaction_date"));
 					fd.setAdjustmentType(getAdjustmentType(destinationSubType));
-					fd.setTransactionDate(dateFormat.parse(value.get("date")));
+					fd.setTransactionDate(DateUtils.parseDate(fd.getTransactionDateTimeStamp(),value.get("date")));
 					fd.setCurrency(Integer.parseInt(currencyIdString));
 									
 					boolean disasterReponseEnabledOnCommitments = destinationFieldsList.contains("fundings~commitments~disaster_response") && Constants.COMMITMENTS.equals(sourceField.getDisplayName());
@@ -1115,11 +1110,10 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	private String getFormattedDateFromString(InternalDocument source, FieldMapping mapping) {
 		String uniqueFieldName = mapping.getSourceField().getUniqueFieldName();
 		Date date = source.getDateFields().get(uniqueFieldName);
-		if (date == null)
+		if (date == null) {
 			return null;
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-		String nowAsISO = df.format(date);
-		return nowAsISO;
+		}
+		return DateUtils.formatDate(mapping.getDestinationField().getType() == FieldType.TIMES_STAMP, date);
 	}
 
 	private Object getMapFromString(InternalDocument source, String destinationFieldName, FieldMapping mapping) {
@@ -1231,8 +1225,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 	private void instantiateStaticFields() {
 
-		Map<String, Properties> fieldProps = getFieldProps();
-		// Transaction Fields
+		loadFieldProps();
 		List<Field> trnDependencies = new ArrayList<Field>();
 		loadCodeListValues();
 		loadAmpTranslations();
@@ -1240,7 +1233,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		fieldList.add(new Field("IATI Identifier", "iati-identifier", FieldType.STRING, false));
 		if (destinationFieldsList.contains("project_title")) {
 			Field projectTitle = new Field("Project Title", "project_title",
-					getFieldType(fieldProps.get("project_title")), false);
+					getFieldType(getFieldProps("project_title")), false);
 			projectTitle.setAttributes(destinationFieldsListLabels.get("project_title"));
 			projectTitle.setMultiLangDisplayName(destinationFieldsListLabels.get("project_title"));
 			fieldList.add(projectTitle);
@@ -1279,11 +1272,11 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			fieldList.add(financialInstrument);
 			trnDependencies.add(financialInstrument);
 		}
-		
+
 		String adjustmentTypePath = destinationFieldsList.stream()
 				.filter(path -> path.startsWith("fundings~") && path.endsWith("~adjustment_type"))
 				.findAny().get();
-		
+
 		if (StringUtils.isNotBlank(adjustmentTypePath)) {
 			Field adjustmentType = new Field("Adjustment Type", "adjustment_type", FieldType.LIST, true);
 			adjustmentType.setPossibleValues(getCodeListValues(adjustmentTypePath));
@@ -1338,10 +1331,10 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 		multilangfields.forEach((name, label) -> {
 			if (destinationFieldsList.contains(name)) {
-				FieldType ftDescription = getFieldType(fieldProps.get(name));
+				FieldType ftDescription = getFieldType(getFieldProps(name));
 				if (ftDescription != null) {
 					Field newField = new Field(label, name, ftDescription, true);
-					int fieldLength = getFieldLength(fieldProps.get(name));
+					int fieldLength = getFieldLength(getFieldProps(name));
 					newField.setLength(fieldLength);
 					newField.setMultiLangDisplayName(destinationFieldsListLabels.get(name));
 					fieldList.add(newField);
@@ -1350,7 +1343,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		});
 
 		// Dates
-		Map<String, String> dateFields = new HashMap<String, String>();
+		Map<String, String> dateFields = new HashMap<>();
 		dateFields.put("actual_start_date", "Actual Start Date");
 		dateFields.put("actual_completion_date", "Actual Completion Date");
 		dateFields.put("actual_approval_date", "Actual Approval Date");
@@ -1360,12 +1353,12 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		dateFields.put("planned_start_date", "Planned Start Date");
 		dateFields.put("original_completion_date", "Original Completion Date");
 
-		Field actualStartDate = new Field("", "actual_start_date", FieldType.DATE, true);
 		dateFields.forEach((name, label) -> {
-			if (fieldProps.get(name) != null) {
-				FieldType ftDescription = getFieldType(fieldProps.get(name));
-				if (ftDescription != null) {
-					Field newField = new Field(label, name, FieldType.DATE, true);
+			APIField dateField = getFieldProps(name);
+			if (dateField != null) {
+				FieldType fieldType = getFieldType(dateField);
+				if (fieldType != null) {
+					Field newField = new Field(label, name, fieldType, true);
 					newField.setMultiLangDisplayName(destinationFieldsListLabels.get(name));
 					fieldList.add(newField);
 				}
@@ -1388,10 +1381,8 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			if (destinationFieldsList.contains(name)) {
 				Field org = new Field(label, name, FieldType.ORGANIZATION, true);
 				org.setMultiLangDisplayName(destinationFieldsListLabels.get(name));
-				org.setPossibleValues(getCodeListValues("fundings~donor_organization_id"));
-				if (fieldProps.get(name) != null && fieldProps.get(name).getProperty("percentage_constraint") != null) {
-					org.setPercentage(true);
-				}
+				org.setPossibleValues(getCodeListValues(name));
+				org.setPercentage(getOrganisationPercentage(name));
 				fieldList.add(org);
 			}
 		});
@@ -1402,10 +1393,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			fundingOrganization.setPossibleValues(getCodeListValues("fundings~donor_organization_id"));
 			fundingOrganization
 					.setMultiLangDisplayName(destinationFieldsListLabels.get("fundings~donor_organization_id"));
-			if (fieldProps.get("donor_organization") != null
-					&& fieldProps.get("donor_organization").getProperty("percentage_constraint") != null) {
-				fundingOrganization.setPercentage(true);
-			}
+			fundingOrganization.setPercentage(getOrganisationPercentage("donor_organization"));
 			fieldList.add(fundingOrganization);
 			trnDependencies.add(fundingOrganization);
 		}
@@ -1413,7 +1401,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		// Transactions
 		//we need to find a more generic way to only enable what is enabled in amp
 		//we should refactor this clases to be able to check all fields
-		
+
 		if (isTransactionEnabled(Constants.COMMITMENTS, Constants.ACTUAL)) {
 			Field actualCommitments = new Field("Actual Commitments", "transaction", FieldType.TRANSACTION, true);
 			actualCommitments.setSubType(Constants.TRANSACTION_TYPE_ACTUAL_COMMITMENTS);
@@ -1421,7 +1409,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			actualCommitments.setMultiLangDisplayName(getAmpTranslations().get(Constants.ACTUAL + " " + Constants.COMMITMENTS));
 			fieldList.add(actualCommitments);
 		}
-		
+
 		if (isTransactionEnabled(Constants.COMMITMENTS, Constants.PLANNED)) {
 			Field plannedCommitments = new Field("Planned Commitments", "transaction", FieldType.TRANSACTION, true);
 			plannedCommitments.setSubType(Constants.TRANSACTION_TYPE_PLANNED_COMMITMENTS);
@@ -1429,7 +1417,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			plannedCommitments.setMultiLangDisplayName(getAmpTranslations().get(Constants.PLANNED + " " + Constants.COMMITMENTS));
 			fieldList.add(plannedCommitments);
 		}
-		
+
 		if (isTransactionEnabled(Constants.DISBURSEMENTS, Constants.ACTUAL)) {
 			Field actualDisbursements = new Field("Actual Disbursements", "transaction", FieldType.TRANSACTION, true);
 			actualDisbursements.setSubType(Constants.TRANSACTION_TYPE_ACTUAL_DISBURSEMENTS);
@@ -1437,7 +1425,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			actualDisbursements.setMultiLangDisplayName(getAmpTranslations().get(Constants.ACTUAL + " " + Constants.DISBURSEMENTS));
 			fieldList.add(actualDisbursements);
 		}
-		
+
 		if (isTransactionEnabled(Constants.DISBURSEMENTS, Constants.PLANNED)) {
 			Field plannedDisbursements = new Field("Planned Disbursements", "transaction", FieldType.TRANSACTION, true);
 			plannedDisbursements.setSubType(Constants.TRANSACTION_TYPE_PLANNED_DISBURSEMENTS);
@@ -1445,7 +1433,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			plannedDisbursements.setMultiLangDisplayName(getAmpTranslations().get(Constants.PLANNED + " " + Constants.DISBURSEMENTS ));
 			fieldList.add(plannedDisbursements);
 		}
-		
+
 		if (isTransactionEnabled(Constants.EXPENDITURES, Constants.ACTUAL)) {
 			Field actualExpenditure = new Field(Constants.ACTUAL_EXPENDITURES, "transaction", FieldType.TRANSACTION, true);
 			actualExpenditure.setSubType(Constants.TRANSACTION_TYPE_ACTUAL_EXPENDITURES);
@@ -1453,7 +1441,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			actualExpenditure.setMultiLangDisplayName(getAmpTranslations().get(Constants.ACTUAL + " " + Constants.EXPENDITURES));
 			fieldList.add(actualExpenditure);
 		}
-		
+
 		if (isTransactionEnabled(Constants.EXPENDITURES, Constants.PLANNED)) {
 			Field plannedExpenditures = new Field(Constants.PLANNED_EXPENDITURES, "transaction", FieldType.TRANSACTION, true);
 			plannedExpenditures.setSubType(Constants.TRANSACTION_TYPE_PLANNED_EXPENDITURES);
@@ -1461,21 +1449,30 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			plannedExpenditures.setMultiLangDisplayName(getAmpTranslations().get(Constants.PLANNED + " " + Constants.EXPENDITURES ));
 			fieldList.add(plannedExpenditures);
 		}
-		
+
 		String currencyPath = getCurrencyPath();
-		
+
 		// Currency
 		Field currency = new Field("Currency", "currency", FieldType.LIST, true);
 		currency.setMultiLangDisplayName(destinationFieldsListLabels.get(currencyPath));
 		currency.setPossibleValues(getCodeListValues(currencyPath));
 		fieldList.add(currency);
-		
+
 		 if (this.isDisasterReponseEnabled()) {
 		     Field disasterResponse = new Field("Disaster Response", "disaster_response", FieldType.BOOLEAN, false);
 		     fieldList.add(disasterResponse);
           }
 	}
-	
+
+	private boolean getOrganisationPercentage(String organisationPath) {
+		boolean percentage = false;
+		APIField donorOrganisation = getFieldProps(organisationPath);
+		if (donorOrganisation != null && donorOrganisation.getPercentageConstraint() != null) {
+			percentage = true;
+		}
+		return percentage;
+	}
+
 	private boolean isTransactionEnabled(String transactionType, String adjType) {
 		String transactionPath = TRANSACTION_DESTINATION_PATH.get(transactionType);
 		return destinationFieldsList.contains(transactionPath) && isAdjustmentTypeEnabled(transactionPath, adjType);
@@ -1502,89 +1499,112 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	private boolean existFieldInAmp(String fieldName) {
 		return destinationFieldsList.stream().anyMatch(field-> field.equals(fieldName));
 	}
-
-	private int getFieldLength(Properties properties) {
-		if (properties == null || properties.get("length") == null) {
+	private int getFieldLength(APIField apiField){
+		if (apiField == null || apiField.getFieldLength() == null) {
 			return 0;
+		}else{
+			return apiField.getFieldLength();
 		}
-		String value = (String) properties.get("length");
-		int fieldLength = Integer.parseInt(value);
-		return fieldLength;
+
 	}
 
-	private FieldType getFieldType(Properties properties) {
-		if (properties == null || properties.get("field_type") == null) {
+	private FieldType getFieldType(APIField apiField) {
+		if (apiField == null || apiField.getApiType().getFieldType() == null) {
 			return null;
 		}
-		FieldType ft = FieldType.STRING;
-		String fieldType = (String) properties.get("field_type");
-		switch (fieldType) {
-		case "list":
-			ft = FieldType.LIST;
-			break;
-		case "string":
-			if (Boolean.parseBoolean((String) properties.get("translatable"))) {
-				ft = FieldType.MULTILANG_STRING;
-			} else {
-				ft = FieldType.STRING;
-			}
-			break;
-		case "date":
-			ft = FieldType.DATE;
-			break;
+		switch (apiField.getApiType().getFieldType()) {
+			case "list":
+				return FieldType.LIST;
+			case "string":
+				if (apiField.getTranslatable()) {
+					return FieldType.MULTILANG_STRING;
+				} else {
+					return FieldType.STRING;
+				}
+			case "date":
+				return FieldType.DATE;
+			case "timestamp":
+				return FieldType.TIMES_STAMP;
 		}
-		return ft;
+		return FieldType.STRING;
 	}
 
-	private Map<String, Properties> getFieldProps() {
-		// Map<String, FieldType> map = new HashMap<String, FieldType>();
-		Map<String, Properties> fieldProperties = new HashMap<String, Properties>();
-
-		String result = "";
-		RestTemplate restTemplate = getRestTemplate();
-		result = restTemplate.getForObject(baseURL + this.getFieldsEndpoint(), String.class);
+	private void loadFieldProps() {
+		String result = getRestTemplate().getForObject(baseURL
+				+ this.getFieldsEndpoint(), String.class);
+		ampFieldsDefinition = APIField.getApiFieldListFromString(result);
+		loadDestinationFieldListAndTransaltions(result);
+	}
+	@Deprecated
+	/**
+	 * TODO both destinationFieldsList and destinationFieldsListLabels can be obtained from
+	 * TODO ampFieldsDefinition but that refactoring is out of the scope of this ticket
+	 * TODO will create a new ticket to tackle this refactoring
+	 */
+	private void loadDestinationFieldListAndTransaltions(String fieldsDefinitions) {
 		try {
 			ObjectMapper mapper = new ObjectMapper();
-			JsonNode jsonNode = mapper.readTree(result);
-
+			JsonNode jsonNode = mapper.readTree(fieldsDefinitions);
 			if (jsonNode.isArray()) {
 				Iterator<JsonNode> mainNode = jsonNode.elements();
 				while (mainNode.hasNext()) {
 					JsonNode node = mainNode.next();
 					String fieldName = node.get("field_name").asText();
-					String fieldType = node.get("field_type").asText();
-					
 					Map<String, String> fieldLabel = extractMultilanguageText(node.get("field_label"));
 					destinationFieldsList.add(fieldName);
 					destinationFieldsListLabels.put(fieldName, fieldLabel);
 					addChildrenToDestinationFieldList(node, fieldName);
-
-					JsonNode translatable = node.get("translatable");
-					JsonNode percentageConstraint = node.get("percentage_constraint");
-					JsonNode length = node.get("field_length");
-
-					Properties prop = new Properties();
-					prop.setProperty("field_type", fieldType);
-					if(length != null) {
-						prop.setProperty("length", length.asText());
-					}
-					if (translatable != null) {
-						prop.setProperty("translatable", translatable.asText());
-					}
-					if (percentageConstraint != null) {
-						prop.setProperty("percentage_constraint", percentageConstraint.asText());
-					}
-					fieldProperties.put(fieldName, prop);
-
 				}
 			}
-
 		} catch (Exception e) {
-			log.error("Couldn't retrieve field properties from endpoint. Exception: " + e.getMessage());
+			log.error("Couldn't retrieve field properties from endpoint. Exception: ", e);
+			throw new RuntimeException("cannot load definitions, cannot continue", e);
 		}
-		return fieldProperties;
 	}
 
+	/**
+	 * this method with ~
+	 * @param path
+	 * @return
+	 */
+	private APIField getFieldProps(String path) {
+		if (path == null || path.trim().length() == 0) {
+			return null;
+		} else {
+			return getFieldsDefinition(StringUtils.split(path, "~"));
+		}
+	}
+	private APIField getFieldsDefinition(String... path) {
+		if (path == null || path.length == 0) {
+			return null;
+		} else {
+			return getFieldsDefinition(ampFieldsDefinition, path);
+		}
+	}
+	private APIField getFieldsDefinition(List<APIField> apFieldsDefinitions, String... path) {
+		APIField apiField = apFieldsDefinitions.stream().filter(f -> f.getFieldName().equals(path[0])).findAny().orElse(null);
+		if (path.length == 1 || apiField == null) {
+			return apiField;
+		} else {
+			if (apiField.getChildren() != null) {
+				return getFieldsDefinition(apiField.getChildren(), Arrays.copyOfRange(path, 1, path.length));
+			} else {
+				return null;
+			}
+		}
+	}
+
+	private boolean isTransactionDateTimeStam(String path) {
+		if (areTransactionDatesTimeStamps.get(path) == null) {
+			Boolean isTimeStamp = Boolean.FALSE;
+			APIField af = getFieldProps(path);
+			if (af == null && af.getApiType().getFieldType().equals("timestamp")) {
+				isTimeStamp = Boolean.TRUE;
+			}
+			areTransactionDatesTimeStamps.put(path, isTimeStamp);
+		}
+		return areTransactionDatesTimeStamps.get(path);
+	}
 	private void addChildrenToDestinationFieldList(JsonNode node, String fieldName) {
 		JsonNode children = node.get("children");
 		if (children != null && children.isArray()) {
@@ -1603,6 +1623,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		}
 
 	}
+
 	private void loadAmpTranslations() {
 
 		RestTemplate restTemplateForFields = getRestTemplate();
