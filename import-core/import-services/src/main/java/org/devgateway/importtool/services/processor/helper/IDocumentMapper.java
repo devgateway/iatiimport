@@ -1,6 +1,8 @@
 package org.devgateway.importtool.services.processor.helper;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.devgateway.importtool.services.request.ImportRequest;
 
@@ -38,7 +40,5 @@ public interface IDocumentMapper {
 
 	ActionStatus getImportStatus();
 
-
-	
-
+    Map<String, Set<String>> getValuesUsedInSelectedProjects();   
 }
