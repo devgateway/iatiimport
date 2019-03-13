@@ -67,15 +67,19 @@ public class DataService {
                 || fieldMapping.getSourceField().getType() == FieldType.LOCATION) {
             
             Field source = fieldMapping.getSourceField();
-            source.getPossibleValues().stream().forEach(fieldValue -> {
-                if (fieldValue.isSelected() && valuesUsedInSelectedSourceProjects != null
-                        && (valuesUsedInSelectedSourceProjects.contains(fieldValue.getCode())
-                                || valuesUsedInSelectedSourceProjects.contains(fieldValue.getValue()))) {
+            if (source.getPossibleValues() != null) {
+                source.getPossibleValues().stream().forEach(fieldValue -> {
                     
-                    fvm.getValueIndexMapping().put(fieldValue.getIndex(), null);
+                    boolean isUsedInSelectedProjects = false;
+                    if (valuesUsedInSelectedSourceProjects != null) {
+                        isUsedInSelectedProjects = valuesUsedInSelectedSourceProjects.contains(fieldValue.getCode());                              
+                    }                       
                     
-                }
-            });
+                    if (fieldValue.isSelected() && isUsedInSelectedProjects) {                    
+                        fvm.getValueIndexMapping().put(fieldValue.getIndex(), null);                    
+                    }
+                });
+            }            
         }
         
         documentMapper.getValueMappingObject().add(fvm);

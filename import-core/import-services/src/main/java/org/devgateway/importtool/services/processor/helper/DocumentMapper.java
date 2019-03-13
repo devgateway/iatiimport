@@ -329,7 +329,7 @@ public class DocumentMapper implements IDocumentMapper {
      */
     public Map<String, Set<String>> getValuesUsedInSelectedProjects() {
         valuesInSelectedProjects = new HashMap<>();
-        List<DocumentMapping> selectedActivities = getDocumentMappings().stream().filter(m -> { return Boolean.TRUE.equals(m.getSelected());}).collect(Collectors.toList());
+        List<DocumentMapping> selectedActivities = getDocumentMappings().stream().filter(m -> Boolean.TRUE.equals(m.getSelected())).collect(Collectors.toList());
         
         for (DocumentMapping docMapping : selectedActivities) {            
             addSelectedStringMultiFieldValues(docMapping);
@@ -342,54 +342,54 @@ public class DocumentMapper implements IDocumentMapper {
 
     private void addSelectedStringMultiFieldValues(DocumentMapping docMapping) {
         for (Entry<String, String[]> entry : docMapping.getSourceDocument().getStringMultiFields().entrySet()) {
-            Set<String> valuesSet = valuesInSelectedProjects.get(entry.getKey());               
-            if (valuesSet == null) {
-                valuesSet = new HashSet<>();
-                valuesInSelectedProjects.put(entry.getKey(), valuesSet);
-            }                       
             
+            Set<String> valuesSet = getValuesSet(entry.getKey());            
             String[] stringValues = (String[]) entry.getValue();
             if (stringValues != null ) {
                 valuesSet.addAll(Arrays.asList(entry.getValue())); 
-            }               
+            }    
+            
+            valuesInSelectedProjects.put(entry.getKey(), valuesSet);
         }   
     }
     
     private void addSelectedStringFieldValues(DocumentMapping docMapping) {
         for (Entry<String, String> entry : docMapping.getSourceDocument().getStringFields().entrySet()) {
-            Set<String> valuesSet = valuesInSelectedProjects.get(entry.getKey());               
-            if (valuesSet == null) {
-                valuesSet = new HashSet<>();
-                valuesInSelectedProjects.put(entry.getKey(), valuesSet);
-            }                       
             
+            Set<String> valuesSet = getValuesSet(entry.getKey());           
             String stringValue = (String) entry.getValue();
             if (stringValue != null ) {
                 valuesSet.add(entry.getValue()); 
-            }               
+            }
+            
+            valuesInSelectedProjects.put(entry.getKey(), valuesSet);
         }  
     }
     
     private void addSelectedOrganizationFieldValues(DocumentMapping docMapping) {
         for (Entry<String, Map<String, String>> entry : docMapping.getSourceDocument().getOrganizationFields().entrySet()) {
             
-            String fieldKey = entry.getKey().substring(0, entry.getKey().lastIndexOf("_"));                
-            Set<String> valuesSet = valuesInSelectedProjects.get(fieldKey);               
-            if (valuesSet == null) {
-                valuesSet = new HashSet<>();
-                valuesInSelectedProjects.put(fieldKey, valuesSet);
-            }                       
-            
+            String fieldKey = entry.getKey().substring(0, entry.getKey().lastIndexOf("_"));            
+            Set<String> valuesSet = getValuesSet(fieldKey);              
             Map<String, String> values =  entry.getValue();
             if (values != null ) {
                 for (Entry<String, String> org : values.entrySet()) {                         
                     if ("value".equals(org.getKey())) {                           
                         valuesSet.add(org.getValue());
-                    }
-                      
-                }
-                 
-            }               
+                    }                     
+                }                
+            } 
+            
+            valuesInSelectedProjects.put(fieldKey, valuesSet);
         }    
-    }    
+    } 
+    
+   private Set<String> getValuesSet(String fieldName) {
+       Set<String> valuesSet = valuesInSelectedProjects.get(fieldName);               
+       if (valuesSet == null) {
+           valuesSet = new HashSet<>();           
+       } 
+       
+       return valuesSet;
+   }
 }
