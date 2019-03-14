@@ -308,15 +308,15 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				if (locations != null) {
 					project.set(destinationField.getFieldName(), locations);
 				}
-				//TODO THIS IS A WORKAROUND TO BE FIXED BEFORE THE RELEASE
-				/*Properties props = getExtraInfo(source, optValueMappingLocation.get(), false);
+				
+				Properties props = getExtraInfo(source, optValueMappingLocation.get(), false);
 				if (props != null) {
 					@SuppressWarnings("unchecked")
 					LinkedHashMap<String, Integer> hm = (LinkedHashMap<String, Integer>) props.get("extra_info");
 					Integer implementationLocation = hm.get("implementation_level_id");
 					project.set("implementation_location", implementationLocation);
 					project.set("implementation_level", ampImplementationLevel);
-				}*/
+				}
 				break;
 			case RECIPIENT_COUNTRY:
 			case LIST:
@@ -1665,7 +1665,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			}
 		} catch (IOException e) {
 			//
-			log.error("cannot retrieve possible values", e);
+			log.error("cannot retrieve possible values");
 		}
 	}
 
@@ -1705,10 +1705,9 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			fv.setIndex(index++);
 			fv.setCode(code);
 			fv.setValue(value);
-			//TODO THIS IS A WORKAROUND TO BE FIXED BEFORE THE RELEASE
-			/*if (node.get("extra_info") != null) {
-				fv.getProperties().put("extra_info", node.get("extra_info"));
-			}*/
+			if (node.get("extra_info") != null) {
+				fv.getProperties().put("extra_info", node.get("extra_info"));			
+			}
 			
 			if (node.get("translated-value") != null) {			        
 			    Iterator <Entry<String,JsonNode>> iter = node.get("translated-value").fields();			    
