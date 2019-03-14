@@ -14,3 +14,123 @@ databaseChangeLog:
             splitStatements: true
             path: db/sql/IATIIMPORT-237-modify-column-type.sql
             stripComments: true
+  - changeSet:
+      id: add_uploaded_file_sequence
+      author: jdeanquin
+      preConditions:
+        - onFail: MARK_RAN
+        - tableExists:
+            tableName: uploaded_file
+      changes:
+        - sqlFile:
+            comment: changes table
+            dbms: postgresql
+            endDelimiter: ;
+            splitStatements: true
+            path: db/sql/IATIIMPORT-239-create-uploaded-file-sequence.sql
+            stripComments: true
+  - changeSet:
+      id: add_project_sequence
+      author: jdeanquin
+      preConditions:
+        - onFail: MARK_RAN
+        - tableExists:
+            tableName: project
+      changes:
+        - sqlFile:
+            comment: changes table
+            dbms: postgresql
+            endDelimiter: ;
+            splitStatements: true
+            path: db/sql/IATIIMPORT-239-create-project-sequence.sql
+            stripComments: true
+  - changeSet:
+      id: add_custom_datasource_sequence
+      author: jdeanquin
+      preConditions:
+        - onFail: MARK_RAN
+        - tableExists:
+            tableName: custom_data_source
+      changes:
+        - sqlFile:
+            comment: changes table
+            dbms: postgresql
+            endDelimiter: ;
+            splitStatements: true
+            path: db/sql/IATIIMPORT-239-create-custom_datasource-sequence.sql
+            stripComments: true
+  - changeSet:
+      id: add_datasource_sequence
+      author: jdeanquin
+      preConditions:
+        - onFail: MARK_RAN
+        - tableExists:
+            tableName: data_source
+      changes:
+        - sqlFile:
+            comment: changes table
+            dbms: postgresql
+            endDelimiter: ;
+            splitStatements: true
+            path: db/sql/IATIIMPORT-239-create-data_source-sequence.sql
+            stripComments: true
+  - changeSet:
+      id: add_mapping_template_sequence
+      author: jdeanquin
+      preConditions:
+        - onFail: MARK_RAN
+        - tableExists:
+            tableName: field_mapping_template
+      changes:
+        - sqlFile:
+            comment: changes table
+            dbms: postgresql
+            endDelimiter: ;
+            splitStatements: true
+            path: db/sql/IATIIMPORT-239-create-mapping_template.sql
+            stripComments: true
+  - changeSet:
+      id: add_reporting_organization_sequence
+      author: jdeanquin
+      preConditions:
+        - onFail: MARK_RAN
+        - tableExists:
+            tableName: reporting_organization
+      changes:
+        - sqlFile:
+            comment: changes table
+            dbms: postgresql
+            endDelimiter: ;
+            splitStatements: true
+            path: db/sql/IATIIMPORT-239-create-reporting_organization-sequence.sql
+            stripComments: true
+  - changeSet:
+      id: add_user_sequence
+      author: jdeanquin
+      preConditions:
+        - onFail: MARK_RAN
+        - tableExists:
+            tableName: user_account
+      changes:
+        - sqlFile:
+            comment: changes table
+            dbms: postgresql
+            endDelimiter: ;
+            splitStatements: true
+            path: db/sql/IATIIMPORT-239-create-user-sequence.sql
+            stripComments: true
+  - changeSet:
+      id: add_value_mapping_sequence
+      author: jdeanquin
+      preConditions:
+        - onFail: MARK_RAN
+        - tableExists:
+            tableName: value_mapping_template
+      changes:
+        - sqlFile:
+            comment: changes table
+            dbms: postgresql
+            endDelimiter: ;
+            splitStatements: true
+            path: db/sql/IATIIMPORT-239-create-value_mapping-sequence.sql
+            stripComments: true

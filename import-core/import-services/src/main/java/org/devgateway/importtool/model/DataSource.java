@@ -3,16 +3,7 @@ package org.devgateway.importtool.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -21,7 +12,8 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 @Table(name = "data_source")
 public class DataSource {	
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "datasource_sequence")
+	@SequenceGenerator(name="datasource_sequence", sequenceName = "datasource_seq")
 	@Column(name = "id", unique = true, nullable = false)
 	private Long id;
 	

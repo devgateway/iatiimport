@@ -20,7 +20,8 @@ public class TokenHeaderInterceptor implements ClientHttpRequestInterceptor {
 			ClientHttpRequestExecution execution) throws IOException {
 
 	    HttpRequestWrapper requestWrapper = new HttpRequestWrapper(request);
-	    
+	    //since we are pooling the request can already contain the header
+		requestWrapper.getHeaders().remove("X-Auth-Token");
 	    requestWrapper.getHeaders().add("X-Auth-Token", token);
 		return execution.execute(requestWrapper, body);
 	}
