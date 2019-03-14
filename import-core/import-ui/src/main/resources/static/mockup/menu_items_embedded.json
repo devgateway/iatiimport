@@ -79,5 +79,25 @@
                 "url": "#/wizard/IATI201/AMP"
             }
         ]
+    },
+    
+    {   "i18n-key":"header.nav.menu.admin",
+        "name": "admin",
+        "label": " Admin",
+        "enabled": true,
+        "position": "navbar-left",
+        "iconClass":"glyphicon-cog",
+        "url": "/",
+        "children": [
+            {    
+                "i18n-key":"header.nav.menu.submenu.data_source",
+                "name": "data_source",
+                "label": "Data Source Manager",
+                "enabled": true,
+                "type":"menu-item",
+                "url": "#/admin/datasource"
+            }
+            
+        ]
     }
 ]
