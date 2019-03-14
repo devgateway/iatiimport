@@ -3,7 +3,6 @@ package org.devgateway.importtool.services.dto;
 import java.util.Date;
 
 import org.devgateway.importtool.services.processor.helper.DateUtils;
-import org.devgateway.importtool.services.processor.helper.JsonBean;
 
 public class FundingDetail {
     

@@ -3,10 +3,8 @@ package org.devgateway.importtool.services;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.nio.charset.Charset;
+import java.util.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -18,23 +16,21 @@ import org.devgateway.importtool.model.Project;
 import org.devgateway.importtool.model.Workflow;
 import org.devgateway.importtool.security.ImportSessionToken;
 import org.devgateway.importtool.services.processor.XMLGenericProcessor;
-import org.devgateway.importtool.services.processor.helper.ActionResult;
-import org.devgateway.importtool.services.processor.helper.DocumentMapping;
-import org.devgateway.importtool.services.processor.helper.Field;
+import org.devgateway.importtool.services.processor.helper.*;
 import org.devgateway.importtool.services.processor.helper.FieldType;
-import org.devgateway.importtool.services.processor.helper.FieldValueMapping;
-import org.devgateway.importtool.services.processor.helper.IDestinationProcessor;
-import org.devgateway.importtool.services.processor.helper.IDocumentMapper;
-import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
 import org.devgateway.importtool.services.request.ImportRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.web.client.RestTemplate;
 
 @EnableAsync
 @org.springframework.stereotype.Service
 public class ImportService {
+
 	@Autowired
 	private FileRepository fileRepository;
 	@Autowired
@@ -119,7 +115,7 @@ public class ImportService {
 		project.setNotes(result.getOperation());
 		project.setStatus(result.getStatus());
 		project.setProjectIdentifier(result.getSourceProjectIdentifier());
-			project.setGroupingCriteria(result.getSourceGroupingCriteria());
+		project.setGroupingCriteria(result.getSourceGroupingCriteria());
 		project.setLastSyncedOn(new Date());
 		projectRepository.save(project);
 	}

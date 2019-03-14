@@ -99,11 +99,12 @@ module.exports = {
       Cookies.set('WORKSPACE', null);
       appConfig.DESTINATION_AUTH_TOKEN_EXPIRATION = null;
  },
+  //the token expires in 30 minutes, so 2 minutes check is more than enough
  refreshToken: function() {
 	 var self = this;
 	 self.setIntervalTokenId = setInterval(function(){
 		 self.checkTokenStatus();
-	}, 1000); 
+	}, 12000);
  },
  checkTokenStatus: function() {
 		var currentTime = (new Date()).getTime();

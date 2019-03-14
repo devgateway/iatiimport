@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.devgateway.importtool.services.dto.FundingDetail;
+import org.devgateway.importtool.services.dto.JsonBean;
 
 public class ProcessorUtils {
     

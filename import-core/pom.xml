@@ -203,6 +203,16 @@
 				<artifactId>spring-social-web</artifactId>
 				<version>${spring-social.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>org.liquibase</groupId>
+				<artifactId>liquibase-core</artifactId>
+				<version>3.4.1</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>httpclient</artifactId>
+				<version>4.5.2</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 

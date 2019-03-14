@@ -6,8 +6,8 @@ import java.text.ParseException;
 import java.util.Map;
 
 import org.devgateway.importtool.services.dto.FundingDetail;
+import org.devgateway.importtool.services.dto.JsonBean;
 import org.devgateway.importtool.services.processor.helper.DateUtils;
-import org.devgateway.importtool.services.processor.helper.JsonBean;
 import org.devgateway.importtool.services.processor.helper.ProcessorUtils;
 import org.junit.Test;
 
