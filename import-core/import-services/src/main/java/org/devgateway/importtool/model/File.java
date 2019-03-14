@@ -3,6 +3,7 @@ package org.devgateway.importtool.model;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.hibernate.annotations.Type;
 import org.springframework.hateoas.Identifiable;
 
 import javax.persistence.*;
@@ -33,6 +34,7 @@ public class File implements Identifiable<Long>, Serializable {
 	@Column(name = "author")
 	private String author;
 
+	@Type(type = "pg-uuid")
 	@Column(name = "session_id")
 	private UUID sessionId;
 
