@@ -1665,7 +1665,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			}
 		} catch (IOException e) {
 			//
-			log.error("cannot retrieve possible values");
+			log.error("cannot retrieve possible values", e);
 		}
 	}
 
@@ -1709,9 +1709,6 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			/*if (node.get("extra_info") != null) {
 				fv.getProperties().put("extra_info", node.get("extra_info"));
 			}*/
-			if (node.get("extra_info") != null) {
-				fv.getProperties().put("extra_info", node.get("extra_info"));			
-			}
 			
 			if (node.get("translated-value") != null) {			        
 			    Iterator <Entry<String,JsonNode>> iter = node.get("translated-value").fields();			    
