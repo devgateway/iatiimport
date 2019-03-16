@@ -1,11 +1,13 @@
 package org.devgateway.importtool.services.processor.helper;
 
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+//TODO this constant files needs to be split in modules
 public class Constants {
 	public static final String SOURCE_PROCESSOR = "SOURCE_PROCESSOR";
 	public static final String IATI_STORE_ACTIVITIES = "IATI_STORE_ACTIVITIES";
@@ -69,7 +71,6 @@ public class Constants {
 	public static final String NULL_STRING ="null";
 	
 	public static final String ISO8601_DATE_AND_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
-	public static final String ISO_DATE_FORMAT = "yyyy-MM-dd";
-	
-	
+	public static final String ISO8601_DATE_FORMAT = "yyyy-MM-dd";
+
 }
