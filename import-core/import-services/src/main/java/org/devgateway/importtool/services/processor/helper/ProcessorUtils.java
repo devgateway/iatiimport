@@ -54,18 +54,21 @@ public class ProcessorUtils {
         fd.setAdjustmentType(Integer.valueOf(data.getString("adjustment_type")));
         fd.setCurrency(Integer.valueOf(data.getString("currency")));
         fd.setTransactionAmount(Double.valueOf(data.getString("transaction_amount")));
-        fd.setTransactionDate(DateUtils.getDateTimeFormatter().parse(data.getString("transaction_date")));
-        
+
+        fd.setTransactionDate(DateUtils.parseDate(data.get("field_type") != null &&
+                data.get("field_type").equals("timestamp"), data.getString("transaction_date")));
+
         return fd;
     }
     
     public FundingDetail getFundingDetailFromMap(Map<String, Object> data) throws ParseException {
+
         FundingDetail fd = new FundingDetail();
         fd.setAdjustmentType((Integer) data.get("adjustment_type"));
         fd.setCurrency((Integer) data.get("currency"));
         fd.setTransactionAmount((Double)data.get("transaction_amount"));
-        fd.setTransactionDate(DateUtils.getDateTimeFormatter().parse((String) data.get("transaction_date")));
-    
+        DateUtils.parseDate((data.get("field_type") != null && data.get("field_type").equals("timestamp")),
+                (String) data.get(data.get("transaction_date")));
         return fd;
     }
     

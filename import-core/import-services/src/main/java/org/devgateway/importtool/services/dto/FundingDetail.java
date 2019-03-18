@@ -17,6 +17,8 @@ public class FundingDetail {
     private Double transactionAmount;
     
     private Boolean disasterResponse;
+
+    Boolean isTransactionDateTimeStamp;
     
     public String getTransactionType() {
         return transactionType;
@@ -66,12 +68,20 @@ public class FundingDetail {
         this.disasterResponse = disasterResponse;
     }
 
+    public Boolean getTransactionDateTimeStamp() {
+        return isTransactionDateTimeStamp;
+    }
+
+    public void setTransactionDateTimeStamp(Boolean transactionDateTimeStamp) {
+        isTransactionDateTimeStamp = transactionDateTimeStamp;
+    }
+
     public JsonBean toJsonBean() {
         JsonBean fundingDetail = new JsonBean();
     
         fundingDetail.set("adjustment_type", adjustmentType);
         fundingDetail.set("currency", currency);
-        fundingDetail.set("transaction_date", DateUtils.getDateTimeFormatter().format(transactionDate));
+        fundingDetail.set("transaction_date", DateUtils.formatDate(isTransactionDateTimeStamp, transactionDate));
         fundingDetail.set("transaction_amount", transactionAmount); 
         if (disasterResponse != null) {
             fundingDetail.set("disaster_response", disasterResponse); 

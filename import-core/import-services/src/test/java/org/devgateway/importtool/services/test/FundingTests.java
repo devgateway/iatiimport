@@ -24,11 +24,11 @@ public class FundingTests {
         FundingDetail fd = new FundingDetail();
         fd.setAdjustmentType(200);
         fd.setCurrency(20);
-        fd.setTransactionDate(DateUtils.getDateFormatter().parse("2009-09-07"));
+        fd.setTransactionDate(DateUtils.parseDate(Boolean.FALSE,"2009-09-07"));
         fd.setTransactionAmount(400000d);
     
         JsonBean transactionJsonBean = JsonBean.getJsonBeanFromString(transactionJson);
-        
+
         assertEquals(fd, processorUtils.getFundingDetailFromJsonBean(transactionJsonBean));
     }
     
@@ -38,11 +38,9 @@ public class FundingTests {
         FundingDetail fd = new FundingDetail();
         fd.setAdjustmentType(200);
         fd.setCurrency(20);
-        fd.setTransactionDate(DateUtils.getDateFormatter().parse("2009-09-07"));
+        fd.setTransactionDate(DateUtils.parseDate(Boolean.FALSE,"2009-09-07"));
         fd.setTransactionAmount(400000d);
-        
         Map<String, Object> transactionMap = JsonBean.getJsonBeanFromString(transactionJson).any();
-        
         assertEquals(fd, processorUtils.getFundingDetailFromMap(transactionMap));
     }
     
@@ -53,7 +51,7 @@ public class FundingTests {
         FundingDetail fd = new FundingDetail();
         fd.setAdjustmentType(200);
         fd.setCurrency(20);
-        fd.setTransactionDate(DateUtils.getDateFormatter().parse("2009-09-07"));
+        fd.setTransactionDate(DateUtils.parseDate(Boolean.FALSE,"2009-09-07"));
         fd.setTransactionAmount(400000d);
         
         Map<String, Object> transactionMap = JsonBean.getJsonBeanFromString(transactionJson).any();
