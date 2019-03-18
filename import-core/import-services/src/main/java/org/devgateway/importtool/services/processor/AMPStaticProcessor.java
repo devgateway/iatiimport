@@ -2,11 +2,14 @@ package org.devgateway.importtool.services.processor;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -14,6 +17,9 @@ import org.assertj.core.util.Collections;
 import org.devgateway.importtool.endpoint.EPMessages;
 import org.devgateway.importtool.exceptions.CurrencyNotFoundException;
 import org.devgateway.importtool.services.dto.FundingDetail;
+import org.devgateway.importtool.services.dto.JsonBean;
+import org.devgateway.importtool.services.dto.MappedProject;
+import org.devgateway.importtool.services.dto.SerializationHelper;
 import org.devgateway.importtool.services.processor.dto.APIField;
 import org.devgateway.importtool.services.processor.helper.*;
 import org.devgateway.importtool.services.request.ImportRequest;
@@ -24,8 +30,6 @@ import org.springframework.web.client.*;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import javax.xml.soap.SOAPFactory;
 
 // TODO: Sort methods, move classes to generic helpers for all processors if possible
 // TODO: Clean up code, find opportunities to reuse methods (example update/insert)
@@ -469,14 +473,24 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	}
 
 	@Override
-	public void loadProjectsForUpdate(List<String> listOfAmpIds) {
+	public void loadProjectsForUpdate(List<String> listOfAmpIds)  {
 		for (int startIndex = 0; startIndex < listOfAmpIds.size(); startIndex += Constants.AMP_PULL_BATCH_SIZE) {
 			int endIndex = Math.min(listOfAmpIds.size(), startIndex + Constants.AMP_PULL_BATCH_SIZE);
 
 			String result = this.restTemplate.postForObject(baseURL + "/rest/activity/projects",
 					listOfAmpIds.subList(startIndex, endIndex), String.class);
-			List<JsonBean> lJsb = JsonBean.getListOfJsoBeanFromString(result);
-			projectsToBeUpdated.addAll(lJsb);
+			List<JsonBean> lJsb = null;
+			try {
+				lJsb = SerializationHelper.getDefaultMapper().
+						readValue(result, new TypeReference<List<JsonBean>>() {
+						});
+			}catch(IOException ex){
+				log.error("Projects could not be deserialized",ex);
+				//Its not good to swallow the exception, proper handling of initialization shall be provided
+			}
+			if(lJsb!=null) {
+				projectsToBeUpdated.addAll(lJsb);
+			}
 
 		}
 	}
@@ -1549,7 +1563,15 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	private void loadFieldProps() {
 		String result = getRestTemplate().getForObject(baseURL
 				+ this.getFieldsEndpoint(), String.class);
-		ampFieldsDefinition = APIField.getApiFieldListFromString(result);
+		try {
+			ampFieldsDefinition = SerializationHelper.getDefaultMapper().
+					readValue(result, new TypeReference<List<APIField>>() {
+					});
+		}catch (IOException ex){
+			log.error("cannot deserialize fields definition",ex);
+			//TODO Again its not good to Swallow the exception but a general error handling should be provided
+			//TODO and improved
+		}
 		loadDestinationFieldListAndTransaltions(result);
 	}
 	@Deprecated
