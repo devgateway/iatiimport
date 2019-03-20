@@ -295,17 +295,18 @@ public class AMPProcessor implements IDestinationProcessor {
 	}
 
 	@Override
-	public ActionResult insert(InternalDocument source, List<FieldMapping> fieldMapping, List<FieldValueMapping> valueMapping, ImportRequest importRequest) {
+	public void insert(InternalDocument source, List<FieldMapping> fieldMapping, List<FieldValueMapping> valueMapping,
+                       ImportRequest importRequest) {
 		ActionResult result = new ActionResult("1", "INSERT", "OK", "Project has been inserted");
 		log.debug("Update new document in destination system");
-		return result;
+		//return result;
 	}
 
 	@Override
-	public ActionResult update(InternalDocument source, InternalDocument destination, List<FieldMapping> fieldMapping, List<FieldValueMapping> valueMapping, boolean overrideTitle, ImportRequest importRequest) {
+	public void update(InternalDocument source, InternalDocument destination, List<FieldMapping> fieldMapping, List<FieldValueMapping> valueMapping, boolean overrideTitle, ImportRequest importRequest) {
 		ActionResult result = new ActionResult("1", "UPDATE", "OK", "Project has been updated");
 		log.debug("Update new document in destination system");
-		return result;
+		//return result;
 	}
 
 	@Override
@@ -338,6 +339,16 @@ public class AMPProcessor implements IDestinationProcessor {
 	public List<DocumentMapping>  preImportProcessing(List<DocumentMapping> documentMappings){
 		return documentMappings;
 	}
-	
+
+    @Override
+    public void loadProjectsForUpdate(List<String> listOfAmpIds) {
+
+    }
+
+    @Override
+    public List<ActionResult> processProjectsInBatch(ActionStatus importStatus) {
+        return null;
+    }
+
 
 }

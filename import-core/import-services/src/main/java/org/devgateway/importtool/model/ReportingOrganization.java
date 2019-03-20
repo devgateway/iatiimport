@@ -2,14 +2,7 @@ package org.devgateway.importtool.model;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, isGetterVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.ANY)
 @Entity
@@ -28,7 +21,8 @@ import javax.persistence.Table;
 })
 public class ReportingOrganization {
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "reporting_org_sequence")
+	@SequenceGenerator(name="reporting_org_sequence", sequenceName = "reporting_org_seq")
 	@Column(name = "id", unique = true, nullable = false)
 	private Long id;
 

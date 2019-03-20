@@ -3,6 +3,7 @@ package org.devgateway.importtool.model;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.hibernate.annotations.Type;
 import org.springframework.hateoas.Identifiable;
 
 import javax.persistence.*;
@@ -19,7 +20,8 @@ public class File implements Identifiable<Long>, Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "file_sequence")
+	@SequenceGenerator(name = "file_sequence", sequenceName = "uploaded_file_seq", allocationSize = 1)
 	@Column(name = "id", unique = true, nullable = false)
 	private Long id;
 
@@ -33,6 +35,7 @@ public class File implements Identifiable<Long>, Serializable {
 	@Column(name = "author")
 	private String author;
 
+	@Type(type = "pg-uuid")
 	@Column(name = "session_id")
 	private UUID sessionId;
 

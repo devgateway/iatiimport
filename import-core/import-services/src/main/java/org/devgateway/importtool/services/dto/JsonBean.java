@@ -1,9 +1,11 @@
-package org.devgateway.importtool.services.processor.helper;
+package org.devgateway.importtool.services.dto;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
@@ -60,16 +62,14 @@ public class JsonBean {
 			if (jb == null) {
 				return null;
 			}
-			ObjectMapper mapper11 = new ObjectMapper();
-			mapper11.configure(DeserializationFeature.UNWRAP_ROOT_VALUE,false);
-			mapper11.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false);
-
+			ObjectMapper mapper11 = SerializationHelper.getDefaultMapper();
 			return mapper11.readValue(jb, JsonBean.class);
 		} catch (IOException e) {
 			logger.error("Cannot deserialize json bean", e);
 			return null;
 		}
 	}
+
 
 	@Override
 	public String toString() {
