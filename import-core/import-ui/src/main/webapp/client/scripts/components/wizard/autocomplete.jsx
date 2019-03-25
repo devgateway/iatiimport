@@ -11,6 +11,13 @@ var AutoComplete = React.createClass({
     	 this.initializeValuesAutocomplete();
      }
     },
+    removeAccents: function(str) {
+       if (str) {
+           return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+       }
+       
+       return str;
+    },
     initializeProjectsAutocomplete: function(){
     	  var self = this;
     	  var language = this.props.language;
@@ -18,9 +25,12 @@ var AutoComplete = React.createClass({
           var searchEngine = new Bloodhound({
               limit: 100,
               datumTokenizer: function (d) {
-                  return Bloodhound.tokenizers.whitespace(d.multilangFields.title[language]);
+                  var title = d.multilangFields.title[language];
+                  return Bloodhound.tokenizers.whitespace(self.removeAccents(title));
               },
-              queryTokenizer: Bloodhound.tokenizers.whitespace,
+              queryTokenizer: function(query) {
+                  return Bloodhound.tokenizers.whitespace(self.removeAccents(query));
+              }, 
               local: this.props.options
           });
           searchEngine.initialize();
@@ -42,14 +52,16 @@ var AutoComplete = React.createClass({
           }
     },
     initializeValuesAutocomplete: function(){
-
+        var self = this;
     	var $el = $(this.refs[this.props.refId].getDOMNode());
     	var bloodhound = new Bloodhound({
         limit: 100,
     		datumTokenizer: function(item) {
-    		      return Bloodhound.tokenizers.whitespace(item.label);
-    		  },
-    		queryTokenizer: Bloodhound.tokenizers.whitespace,
+    		     return Bloodhound.tokenizers.whitespace(self.removeAccents(item.label));
+    		  },    		 
+    		queryTokenizer: function(query) {
+    		     return Bloodhound.tokenizers.whitespace(self.removeAccents(query));
+    		 },    		   
     		local: this.props.options
     	});
 
@@ -57,9 +69,9 @@ var AutoComplete = React.createClass({
     	bloodhound.initialize();
     	$el.typeahead({
     		hint: true,
-    		highlight: true,
+    		highlight: false,
     		minLength: 1
-    	},
+    	},    	
     	{
     		name: 'values',
     		displayKey: function(item) {
@@ -74,8 +86,6 @@ var AutoComplete = React.createClass({
     			        ].join('\n')
     		}
     	});
-
-    	var self = this;
 
       $el.bind('typeahead:selected', function (obj, datum, name) {
     		self.props.handleChange(self.props.data, datum.value);
