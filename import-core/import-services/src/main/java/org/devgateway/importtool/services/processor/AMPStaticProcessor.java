@@ -10,6 +10,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -294,19 +295,30 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		this.documentsEndpoint = documentsEndpoint;
 	}
 
+	private void failIfFieldTypeNotSupported(Field destinationField) throws UnsupportedFieldTypeException {	    
+	    String name = destinationField.getType().equals(FieldType.TRANSACTION) ? "fundings" : destinationField.getFieldName();
+	    String fullName = destinationFieldsList.stream().filter(field -> field.endsWith(name)).findAny().orElse(null);
+	    
+	    FieldType type = getFieldType(getFieldProps(fullName));	    
+        if (type == null) {
+            throw new UnsupportedFieldTypeException("The field type of " + destinationField + " is not supported. ");
+        }
+	}
+	
 	private void updateProject(JsonBean project, InternalDocument source, List<FieldMapping> fieldMappings,
 			List<FieldValueMapping> valueMappings, boolean overrideTitle, ImportRequest importRequest)
-			throws ValueMappingException, CurrencyNotFoundException, ParseException {
+			throws ValueMappingException, CurrencyNotFoundException, UnsupportedFieldTypeException, ParseException {
 		if (overrideTitle) {
 			project.set("project_title", getMultilangString(source, "project_title", "title"));
 		}
 		project.set(ampIatiIdField, source.getIdentifier());
 
-		Boolean hasTransactions = false;
+		Boolean hasTransactions = false;		
 		for (FieldMapping mapping : fieldMappings) {
 			Field sourceField = mapping.getSourceField();
 			Field destinationField = mapping.getDestinationField();
-
+			
+			failIfFieldTypeNotSupported(destinationField);
 			switch (sourceField.getType()) {
 			case LOCATION:
 				Optional<FieldValueMapping> optValueMappingLocation = valueMappings.stream().filter(n -> {
@@ -516,7 +528,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	@Override
 	public void update(InternalDocument source, InternalDocument destination, List<FieldMapping> fieldMapping,
 			List<FieldValueMapping> valueMapping, boolean overrideTitle, ImportRequest importRequest)
-			throws  ValueMappingException, CurrencyNotFoundException, ParseException {
+			throws  ValueMappingException, CurrencyNotFoundException, ParseException, UnsupportedFieldTypeException {
 		JsonBean project = getProject(destination.getStringFields().get("internalId"));
 		updateProject(project, source, fieldMapping, valueMapping, overrideTitle, importRequest);
 		projectsReadyToBePosted.add(getMappedProjectfromSource(source, project));
@@ -525,7 +537,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	@Override
 	public void insert(InternalDocument source, List<FieldMapping> fieldMapping,
 			List<FieldValueMapping> valueMapping, ImportRequest importRequest) throws ValueMappingException,
-			CurrencyNotFoundException, ParseException {
+			CurrencyNotFoundException, ParseException, UnsupportedFieldTypeException {
 		JsonBean project = transformProject(source, fieldMapping, valueMapping, importRequest);
 		projectsReadyToBePosted.add(getMappedProjectfromSource(source, project));
 	}
@@ -627,7 +639,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 	private JsonBean transformProject(InternalDocument source, List<FieldMapping> fieldMappings,
 			List<FieldValueMapping> valueMappings, ImportRequest importRequest) throws ValueMappingException,
-			CurrencyNotFoundException, ParseException {
+			CurrencyNotFoundException, ParseException, UnsupportedFieldTypeException {
 		Boolean hasTransactions = false;
 		JsonBean project = new JsonBean();
 		project.set(ampIatiIdField, source.getIdentifier());
@@ -648,11 +660,12 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			String projectTitleValue = projectTitle.length() > 255 ? projectTitle.substring(0, 255) : projectTitle;
 			project.set("project_title", projectTitleValue);
 		}
-		
+				
 		for (FieldMapping mapping : fieldMappings) {
 			Field sourceField = mapping.getSourceField();
 			Field destinationField = mapping.getDestinationField();
-
+			
+			failIfFieldTypeNotSupported(destinationField);
 			switch (sourceField.getType()) {
 			case LOCATION:
 				Optional<FieldValueMapping> optValueMappingLocation = valueMappings.stream().filter(n -> {
@@ -1543,6 +1556,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		if (apiField == null || apiField.getApiType().getFieldType() == null) {
 			return null;
 		}
+		
 		switch (apiField.getApiType().getFieldType()) {
 			case "list":
 				return FieldType.LIST;
@@ -1552,12 +1566,15 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				} else {
 					return FieldType.STRING;
 				}
+			case "long":
+			 return FieldType.INTEGER;
 			case "date":
 				return FieldType.DATE;
 			case "timestamp":
-				return FieldType.TIMES_STAMP;
+				return FieldType.TIMES_STAMP;			
 		}
-		return FieldType.STRING;
+		
+		return null;
 	}
 
 	private void loadFieldProps() {
