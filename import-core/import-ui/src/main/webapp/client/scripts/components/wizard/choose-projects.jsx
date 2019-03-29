@@ -14,6 +14,8 @@ var _ = require('lodash/dist/lodash.underscore');
 var constants = require('./../../utils/constants');
 var sourceFieldsStore = require('./../../stores/SourceFieldsStore');
 var Tooltip = require('./tooltip');
+var OPERATION_INSERT = 'INSERT';
+var OPERATION_UPDATE = 'UPDATE';
 
 var ChooseProjects = React.createClass({
     mixins: [
@@ -77,14 +79,14 @@ var ChooseProjects = React.createClass({
        this.props.eventHandlers.selectProject(event);
     },
     selectAllNew: function(event){
-        this.selectAll(event.target.checked, 'INSERT');
+        this.selectAll(event.target.checked, OPERATION_INSERT);
     },
     selectAllExisting: function(){
-        this.selectAll(event.target.checked, 'UPDATE');
+        this.selectAll(event.target.checked, OPERATION_UPDATE);
     },
     selectAll: function(checked, operation){
     	_.each(this.state.projectData, function(item){
-    	    if(item.operation === operation && ((operation == 'UPDATE' && item.destinationDocument.allowEdit === true) || operation == 'INSERT')){
+    	    if(item.operation === operation && ((operation == OPERATION_UPDATE && item.destinationDocument.allowEdit === true) || operation == OPERATION_INSERT)){
     		    item.selected = checked;
     		}
     	});
@@ -98,9 +100,12 @@ var ChooseProjects = React.createClass({
     	 item.overrideTitle = event.target.checked;
          this.forceUpdate();
     },
-    overrideTitleAll: function(event){
-    	_.each(this.state.projectData, function(item){
-    			item.overrideTitle = event.target.checked;
+    overrideTitleAll: function(operation, event){
+         var projects = _.where(this.state.projectData, {operation: operation});
+    	_.each(projects, function(item){    	    
+    	    if((operation == OPERATION_UPDATE && item.destinationDocument.allowEdit === true) || operation == OPERATION_INSERT){
+    	        item.overrideTitle = event.target.checked;
+            }    			
     	});
     	this.forceUpdate();
     },
@@ -255,7 +260,7 @@ var ChooseProjects = React.createClass({
 
         if (this.state.projectData) {
            $.map(this.state.projectData, function (item, i) {
-                if (item.operation == 'INSERT') {
+                if (item.operation == OPERATION_INSERT) {
                     newProjects.push(<tr key={i} className={this.projectHasBeenUpdated(item.sourceDocument.identifier) ? "updated-project" : ""}>
                         <td>
                            <input aria-label="Source" className="source"  type="checkbox" checked={item.selected} onChange={this.handleToggle.bind(this, item)} />
@@ -342,7 +347,7 @@ var ChooseProjects = React.createClass({
                                 <thead>
                                     <tr>
                                         <th>
-                                            <input type="checkbox" checked={this.checkAll('INSERT')} onChange={this.selectAllNew} />
+                                            <input type="checkbox" checked={this.checkAll(OPERATION_INSERT)} onChange={this.selectAllNew} />
                                             {this.props.i18nLib.t('wizard.choose_projects.import')}
                                         </th>
                                          <th></th>
@@ -359,7 +364,7 @@ var ChooseProjects = React.createClass({
                                         <th></th>
                                           <th><Tooltip i18nLib={this.props.i18nLib} tooltip={this.props.i18nLib.t('wizard.choose_projects.similar_titles_tooltip')}/>{this.props.i18nLib.t('wizard.choose_projects.similar_titles')}</th>
                                         <th>
-                                        <Tooltip i18nLib={this.props.i18nLib} tooltip={this.props.i18nLib.t('wizard.choose_projects.override_title_tooltip')}/> <input type="checkbox" checked={this.overrideAll('INSERT')} onChange={this.overrideTitleAll} />
+                                        <Tooltip i18nLib={this.props.i18nLib} tooltip={this.props.i18nLib.t('wizard.choose_projects.override_title_tooltip')}/> <input type="checkbox" checked={this.overrideAll(OPERATION_INSERT)} onChange={this.overrideTitleAll.bind(this, OPERATION_INSERT)} />
                                         {this.props.i18nLib.t('wizard.choose_projects.override_title')}
                                         </th>
                                     </tr>
@@ -378,7 +383,7 @@ var ChooseProjects = React.createClass({
                                 <thead>
                                     <tr>
                                         <th>
-                                            <input type="checkbox" checked={this.checkAll('UPDATE')} onChange={this.selectAllExisting} />
+                                            <input type="checkbox" checked={this.checkAll(OPERATION_UPDATE)} onChange={this.selectAllExisting} />
                                             {this.props.i18nLib.t('wizard.choose_projects.update')}
                                         </th>
                                         <th> </th>
@@ -393,7 +398,7 @@ var ChooseProjects = React.createClass({
                                             <Tooltip i18nLib={this.props.i18nLib} tooltip={this.props.i18nLib.t('wizard.choose_projects.destination_project_tooltip')}/> {this.props.i18nLib.t('wizard.choose_projects.destination_project')}
                                         </th>
                                         <th>
-                                            <Tooltip i18nLib={this.props.i18nLib} tooltip={this.props.i18nLib.t('wizard.choose_projects.override_title_tooltip')}/><input type="checkbox" checked={this.overrideAll('UPDATE')} onChange={this.overrideTitleAll} />
+                                            <Tooltip i18nLib={this.props.i18nLib} tooltip={this.props.i18nLib.t('wizard.choose_projects.override_title_tooltip')}/><input type="checkbox" checked={this.overrideAll(OPERATION_UPDATE)} onChange={this.overrideTitleAll.bind(this, OPERATION_UPDATE)} />
                                         {this.props.i18nLib.t('wizard.choose_projects.override_title')}
                                         </th>
                                     </tr>
