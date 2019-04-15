@@ -68,6 +68,8 @@ public class Constants {
 
 	//AMP FIELDS to be moved to its own property field
 	public static final String AMP_INTERNAL_ID = "internal_id";
+	public static final String IS_DRAFT = "is_draft";
+	public static final String CAN_UPGRADE_TO_DRAFT="can-downgrade-to-draft";
 
 	public static final String AMP_UPDATE_OPERATION = "UPDATE";
 	public static final String AMP_INSERT_OPERATION = "INSERT";
@@ -82,5 +84,6 @@ public class Constants {
 	
 	public static final String ISO8601_DATE_AND_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 	public static final String ISO8601_DATE_FORMAT = "yyyy-MM-dd";
+
 
 }

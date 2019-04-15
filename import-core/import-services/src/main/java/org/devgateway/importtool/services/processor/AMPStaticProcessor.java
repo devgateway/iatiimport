@@ -20,6 +20,8 @@ import org.devgateway.importtool.services.dto.FundingDetail;
 import org.devgateway.importtool.services.dto.JsonBean;
 import org.devgateway.importtool.services.dto.MappedProject;
 import org.devgateway.importtool.services.dto.SerializationHelper;
+import org.devgateway.importtool.services.processor.config.AmpStaticProcessorConfig;
+import org.devgateway.importtool.services.processor.config.DestinationProcessorConfiguration;
 import org.devgateway.importtool.services.processor.dto.APIField;
 import org.devgateway.importtool.services.processor.helper.*;
 import org.devgateway.importtool.services.request.ImportRequest;
@@ -36,6 +38,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 // TODO: Add default values when mappings are missing, reading them from configuration db or files
 // TODO: Better error handling to the end user. Friendlier user messages, specially when referencing a missing dependency
 
+
 public class AMPStaticProcessor implements IDestinationProcessor {
 	private String descriptiveName = "AMP";
 	static final String BASEURL_PROPERTY = "AMPStaticProcessor.baseURL";
@@ -47,6 +50,8 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	static final Integer AMP_IMPLEMENTATION_LEVEL_ID_DEFAULT_VALUE = 70; //Coming form common AMP configuration
     private Log log = LogFactory.getLog(getClass());
 	// AMP Configuration Details
+	AmpStaticProcessorConfig ampConfigurationDetails;
+
 	private String DEFAULT_ID_FIELD = "amp-identifier";
 	private String DEFAULT_TITLE_FIELD = "project_title";
 	private String baseURL;
@@ -88,7 +93,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	public String getProcessorVersion() {
 		return processorVersion;
 	}
-	@Override
+
 	public void setProcessorVersion(String processorVersion) {
 		this.processorVersion = processorVersion;
 	}
@@ -147,9 +152,23 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		this.actionStatus = actionStatus;
 	}
 
-	public AMPStaticProcessor(String authenticationToken) {
+	public AmpStaticProcessorConfig getAmpConfigurationDetails() {
+		return ampConfigurationDetails;
+	}
 
-		this.setAuthenticationToken(authenticationToken);
+	public void setAmpConfigurationDetails(AmpStaticProcessorConfig ampConfigurationDetails) {
+		this.ampConfigurationDetails = ampConfigurationDetails;
+	}
+
+	public AMPStaticProcessor(DestinationProcessorConfiguration destinationProcessorConfig){
+
+		AmpStaticProcessorConfig config = (AmpStaticProcessorConfig)destinationProcessorConfig;
+
+		this.setProcessorVersion(config.getProcessorVersion());
+		this.setAmpConfigurationDetails(config);
+
+		this.setAuthenticationToken(config.getAuthenticationToken());
+
 		this.restTemplate = getRestTemplate();
 
 		baseURL = System.getProperty(BASEURL_PROPERTY);
@@ -174,8 +193,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	private void initializeProjectsLists() {
 		this.projectsReadyToBePosted = new ArrayList<>();
 		this.projectsToBeUpdated = new ArrayList<>();
-		areTransactionDatesTimeStamps = new HashMap<>();
-		instantiateStaticFields();
+		this.areTransactionDatesTimeStamps = new HashMap<>();
 	}
 
 	@Override
@@ -542,7 +560,8 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 			List<CompletableFuture<ActionResult>> projectsToBePosted =
 					currentActivities.stream()
-							.map(project -> postProjects(project))
+							.map(project -> postProjects(project,
+									this.getAmpConfigurationDetails().getCanUpgradeToDraft()))
 							.collect(Collectors.toList());
 
 			List<ActionResult> result =
@@ -557,11 +576,10 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	}
 
 
-	private CompletableFuture<ActionResult> postProjects(MappedProject mappedProject) {
+	private CompletableFuture<ActionResult> postProjects(MappedProject mappedProject, boolean canUpgradeToDraft) {
 		CompletableFuture<ActionResult> future = CompletableFuture.supplyAsync(new Supplier<ActionResult>() {
 			@Override
 			public ActionResult get() {
-				ActionResult result;
 
 				String operation = Constants.AMP_INSERT_OPERATION;
 				String url = Constants.AMP_ACTIVITY_ENDPOINT;
@@ -569,6 +587,9 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 					operation = Constants.AMP_UPDATE_OPERATION;
 					url += "/" + mappedProject.getProject().getString(Constants.AMP_INTERNAL_ID);
 				}
+				url +="?" + Constants.CAN_UPGRADE_TO_DRAFT+ "="+ canUpgradeToDraft;
+
+				ActionResult result;
 				try {
 					JsonBean resultPost = restTemplate.postForObject(baseURL + url, mappedProject.getProject(), JsonBean.class);
 
@@ -632,6 +653,10 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		JsonBean project = new JsonBean();
 		project.set(ampIatiIdField, source.getIdentifier());
 		project.set("project_title", getMultilangString(source, "project_title", "title"));
+		//TODO this Could be part of a new processor if we want the tool to be compatible with different versions of
+		//TODO and configure that based on processor.
+
+		project.set(Constants.IS_DRAFT, this.getAmpConfigurationDetails().getDraft());
 
 		// Check for project title length and trim them
 		if (project.get("project_title") instanceof Map) {

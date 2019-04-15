@@ -13,7 +13,7 @@ public interface IDestinationProcessor {
 
 	public void setAuthenticationToken(String authToken);
 
-	public List<Field> getFields();
+    public List<Field> getFields();
 
 	public List<InternalDocument> getDocuments(Boolean summary);
 
@@ -29,8 +29,6 @@ public interface IDestinationProcessor {
 	public String getTitleField();
 
 	String getProcessorVersion();
-
-	void setProcessorVersion(String processorVersion);
 
     public void setActionStatus(ActionStatus documentMappingStatus);
 	public List<DocumentMapping> preImportProcessing(List<DocumentMapping> documentMappings);

@@ -3,7 +3,6 @@ package org.devgateway.importtool.services;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.charset.Charset;
 import java.util.*;
 
 import org.apache.commons.logging.Log;
@@ -15,17 +14,17 @@ import org.devgateway.importtool.model.ImportSummary;
 import org.devgateway.importtool.model.Project;
 import org.devgateway.importtool.model.Workflow;
 import org.devgateway.importtool.security.ImportSessionToken;
+import org.devgateway.importtool.services.processor.config.AmpStaticProcessorConfig;
 import org.devgateway.importtool.services.processor.XMLGenericProcessor;
+import org.devgateway.importtool.services.processor.config.DestinationProcessorConfiguration;
 import org.devgateway.importtool.services.processor.helper.*;
 import org.devgateway.importtool.services.processor.helper.FieldType;
 import org.devgateway.importtool.services.request.ImportRequest;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.client.ClientHttpRequestInterceptor;
-import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.web.client.RestTemplate;
 
 @EnableAsync
 @org.springframework.stereotype.Service
@@ -146,6 +145,8 @@ public class ImportService {
 	}
 	
 	public IDestinationProcessor getDestinationProcessor(String processorName, String authenticationToken) {
+
+		DestinationProcessorConfiguration configuration = null;
 		IDestinationProcessor processor = null;
 		List<Workflow> workflows = workflowService.getWorkflows();
 
@@ -154,10 +155,19 @@ public class ImportService {
 
 		if (optional.isPresent()) {
 			try {
-				Constructor<?> c = Class.forName(optional.get().getDestinationProcessor().getClassName()).getDeclaredConstructor(String.class);
+
+				configuration = beanFactory.getBean(optional.get().getDestinationProcessor().getName(), DestinationProcessorConfiguration.class);
+				//TODO if we have a processor that does not requires this data
+				//TODO then the config needs to be taken from a factory to make it generic
+				configuration.setAuthenticationToken(authenticationToken);
+				configuration.setProcessorVersion(processorVersion);
+
+				Constructor<?> c = Class.forName(optional.get().getDestinationProcessor().getClassName()).getDeclaredConstructor(DestinationProcessorConfiguration.class);
 				c.setAccessible(true);
-				processor = (IDestinationProcessor) c.newInstance(new Object[]{authenticationToken});
-				processor.setProcessorVersion(processorVersion);
+				processor = (IDestinationProcessor) c.newInstance(new Object[]{configuration});
+
+
+
 			} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException e) {
 				e.printStackTrace();
 				log.error("Error loading destination processor class: " + optional.get().getDestinationProcessor().getClassName() + " " + e);
