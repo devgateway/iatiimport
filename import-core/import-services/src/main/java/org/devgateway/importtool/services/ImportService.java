@@ -40,6 +40,8 @@ public class ImportService {
 
 	@Value("${AMPStaticProcessor.processor_version}")
 	private String processorVersion;
+	@Autowired
+	BeanFactory beanFactory;
 
 	private Log log = LogFactory.getLog(getClass());
 	
