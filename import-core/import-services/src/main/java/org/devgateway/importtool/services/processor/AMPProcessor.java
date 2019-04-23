@@ -237,11 +237,6 @@ public class AMPProcessor implements IDestinationProcessor {
 	}
 
 	@Override
-	public String getIdField() {
-		return DEFAULT_ID_FIELD;
-	}
-
-	@Override
 	public String getTitleField() {
 		return DEFAULT_TITLE_FIELD;
 	}
