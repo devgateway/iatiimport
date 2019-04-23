@@ -251,7 +251,7 @@ public class AMPProcessor implements IDestinationProcessor {
 		return null;
 	}
 
-	@Override
+
 	public void setProcessorVersion(String processorVersion) {
 
 	}
