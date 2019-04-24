@@ -17,8 +17,6 @@ public interface IDestinationProcessor {
 
 	public List<InternalDocument> getDocuments(Boolean summary);
 
-	public String getIdField();
-
 	void insert(InternalDocument source, List<FieldMapping> fieldMapping, List<FieldValueMapping> valueMapping,
 				ImportRequest importRequest) throws ValueMappingException, CurrencyNotFoundException, ParseException;
 

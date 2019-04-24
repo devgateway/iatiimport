@@ -70,6 +70,8 @@ public class Constants {
 	public static final String AMP_INTERNAL_ID = "internal_id";
 	public static final String IS_DRAFT = "is_draft";
 	public static final String CAN_UPGRADE_TO_DRAFT="can-downgrade-to-draft";
+	public static final String AMP_IATI_ID_FIELD= "iati_identifier";
+
 
 	public static final String AMP_UPDATE_OPERATION = "UPDATE";
 	public static final String AMP_INSERT_OPERATION = "INSERT";
