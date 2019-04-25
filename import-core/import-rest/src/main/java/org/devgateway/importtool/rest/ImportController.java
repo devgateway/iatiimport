@@ -82,8 +82,11 @@ class ImportController  {
 	private String defaultCountry;
 
 	@RequestMapping(method = RequestMethod.GET, value = "/new/{sourceProcessorName}/{destinationProcessorName}/{authenticationToken}/{userName}")
-	ResponseEntity<ImportSessionToken> initiateImport(@PathVariable String sourceProcessorName, @PathVariable String destinationProcessorName, @PathVariable String authenticationToken, @PathVariable String userName,
-			HttpServletRequest request) {
+	ResponseEntity<ImportSessionToken> initiateImport(@PathVariable String sourceProcessorName,
+													  @PathVariable String destinationProcessorName,
+													  @PathVariable String authenticationToken,
+													  @PathVariable String userName,
+													  HttpServletRequest request) {
 		log.debug("Initialized import");
 		request.getSession().removeAttribute(SOURCE_PROCESSOR);
 		request.getSession().removeAttribute(DESTINATION_PROCESSOR);
