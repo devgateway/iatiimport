@@ -25,6 +25,8 @@ import org.devgateway.importtool.services.processor.config.AmpStaticProcessorCon
 import org.devgateway.importtool.services.processor.config.DestinationProcessorConfiguration;
 import org.devgateway.importtool.services.processor.dto.APIField;
 import org.devgateway.importtool.services.processor.helper.*;
+import org.devgateway.importtool.services.processor.helper.interceptors.TokenHeaderInterceptor;
+import org.devgateway.importtool.services.processor.helper.interceptors.UserAgentInterceptor;
 import org.devgateway.importtool.services.request.ImportRequest;
 import org.parboiled.common.ImmutableList;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
@@ -307,6 +309,8 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	public void setAuthenticationToken(String authToken) {
 		this.interceptors.clear();
 		this.interceptors.add(new TokenHeaderInterceptor(authToken));
+		this.interceptors.add(new UserAgentInterceptor(this.ampConfigurationDetails.getAppName(),
+				this.ampConfigurationDetails.getAppversion()));
 	}
 
 	public String getDocumentsEndpoint() {
