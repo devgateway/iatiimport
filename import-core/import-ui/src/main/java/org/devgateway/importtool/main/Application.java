@@ -14,6 +14,7 @@ import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
@@ -21,9 +22,10 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @Configuration
 @EnableScheduling
 @EnableWebMvc
+@EnableAspectJAutoProxy
 @SpringBootApplication(scanBasePackages ={ "org.devgateway.importtool.main",
 		"org.devgateway.importtool.services", "org.devgateway.importtool.rest," +
-		"org.devgateway.importtool.scheduler" } )
+		"org.devgateway.importtool.scheduler","org.devgateway.importtool.rest.error" } )
 public class Application extends WebMvcAutoConfiguration {
 	public static void main(String[] args) {
         System.setProperty("server.tomcat.max-threads","200");
