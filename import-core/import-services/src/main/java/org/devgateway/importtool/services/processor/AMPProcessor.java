@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.devgateway.importtool.exceptions.MissingPrerequisitesException;
 import org.devgateway.importtool.services.processor.helper.ActionStatus;
 import org.devgateway.importtool.services.processor.helper.DocumentMapping;
 import org.devgateway.importtool.services.processor.helper.Field;
@@ -60,6 +61,11 @@ public class AMPProcessor implements IDestinationProcessor {
 		this.setDocumentsEndpoint("/rest/activity/projects");
 		this.setDocumentsTestEndpoint("activity_list.json");
 		this.setPossibleValuesEndpoint("_possiblevalues.json");
+	}
+
+	@Override
+	public void initialize() {
+
 	}
 
 	@Override

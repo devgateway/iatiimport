@@ -71,7 +71,7 @@ public class Constants {
 	public static final String IS_DRAFT = "is_draft";
 	public static final String CAN_UPGRADE_TO_DRAFT="can-downgrade-to-draft";
 	public static final String AMP_IATI_ID_FIELD= "iati_identifier";
-
+	public static final String IATI_IDENTIFIER_NOT_CONFIGURED_KEY = "iati_identifier_not_configured";
 
 	public static final String AMP_UPDATE_OPERATION = "UPDATE";
 	public static final String AMP_INSERT_OPERATION = "INSERT";

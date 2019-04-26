@@ -168,9 +168,13 @@ public class ImportService {
 				c.setAccessible(true);
 				processor = (IDestinationProcessor) c.newInstance(new Object[]{configuration});
 
+				processor.initialize();
 
 
-			} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException e) {
+			} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | NoSuchMethodException |
+					SecurityException | IllegalArgumentException | InvocationTargetException e) {
+				//TODO DO NOT swallow this exception, properly handle now that we can notifiy the importer
+				//TODO what the problem was
 				e.printStackTrace();
 				log.error("Error loading destination processor class: " + optional.get().getDestinationProcessor().getClassName() + " " + e);
 			}

@@ -16,6 +16,7 @@ import org.apache.commons.logging.LogFactory;
 import org.assertj.core.util.Collections;
 import org.devgateway.importtool.endpoint.EPMessages;
 import org.devgateway.importtool.exceptions.CurrencyNotFoundException;
+import org.devgateway.importtool.exceptions.MissingPrerequisitesException;
 import org.devgateway.importtool.services.dto.FundingDetail;
 import org.devgateway.importtool.services.dto.JsonBean;
 import org.devgateway.importtool.services.dto.MappedProject;
@@ -180,6 +181,20 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		} else {
 			ampImplementationLevel = AMP_IMPLEMENTATION_LEVEL_ID_DEFAULT_VALUE;
 		}
+	}
+
+	private void validatePreRequisites() {
+		loadFieldProps();
+		APIField iatiIdentifier =  ampFieldsDefinition.stream().filter(fd->fd.getFieldName().
+				equals(Constants.AMP_IATI_ID_FIELD)).findAny().orElse(null);
+		if(iatiIdentifier == null || !iatiIdentifier.getImportable()) {
+			throw new MissingPrerequisitesException(Constants.IATI_IDENTIFIER_NOT_CONFIGURED_KEY);
+		}
+	}
+
+	@Override
+	public void initialize(){
+		validatePreRequisites();
 		initializeProjectsLists();
 		instantiateStaticFields();
 	}
@@ -223,7 +238,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 					String internalId = node.get("amp_id").asText();
 					// Needs to be checked, since it's configurable it might not have a value
 					JsonNode ampIatiId = node.get(Constants.AMP_IATI_ID_FIELD);
-					if (ampIatiId != null && !Constants.NULL_STRING.equals(ampIatiId.asText())) {
+						if (ampIatiId != null && !Constants.NULL_STRING.equals(ampIatiId.asText())) {
 					    document.setIdentifier(ampIatiId.asText());
 						document.addStringField(Constants.AMP_IATI_ID_FIELD, ampIatiId.asText());
 					}
@@ -1272,7 +1287,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 	private void instantiateStaticFields() {
 
-		loadFieldProps();
+
 		List<Field> trnDependencies = new ArrayList<Field>();
 		loadCodeListValues();
 		loadAmpTranslations();
@@ -1577,18 +1592,20 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	}
 
 	private void loadFieldProps() {
-		String result = getRestTemplate().getForObject(baseURL
-				+ this.getFieldsEndpoint(), String.class);
-		try {
-			ampFieldsDefinition = SerializationHelper.getDefaultMapper().
-					readValue(result, new TypeReference<List<APIField>>() {
-					});
-		}catch (IOException ex){
-			log.error("cannot deserialize fields definition",ex);
-			//TODO Again its not good to Swallow the exception but a general error handling should be provided
-			//TODO and improved
+		if(ampFieldsDefinition == null || ampFieldsDefinition.size() == 0) {
+			String result = getRestTemplate().getForObject(baseURL
+					+ this.getFieldsEndpoint(), String.class);
+			try {
+				ampFieldsDefinition = SerializationHelper.getDefaultMapper().
+						readValue(result, new TypeReference<List<APIField>>() {
+						});
+			} catch (IOException ex) {
+				log.error("cannot deserialize fields definition", ex);
+				//TODO Again its not good to Swallow the exception but a general error handling should be provided
+				//TODO and improved
+			}
+			loadDestinationFieldListAndTransaltions(result);
 		}
-		loadDestinationFieldListAndTransaltions(result);
 	}
 	@Deprecated
 	/**
