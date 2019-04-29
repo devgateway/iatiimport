@@ -103,7 +103,6 @@ var Wizard = React.createClass({
 		$(this.refs.message.getDOMNode()).html(msg);
 		var box = $(this.refs.messageBox.getDOMNode());
 		box.show();
-		console.log('error');
 	},
 	// Steps and transitions
 	uploadFile: function() {
