@@ -215,7 +215,10 @@ module.exports = {
 					  104: 'Error uploading file. Check if the initial steps are done.',
 					  105: 'Error uploading file.',
 					  106: 'Importing __processed__ of __total__ projects',
-					  107: 'Mapping __processed__ of __total__'
+					  107: 'Mapping __processed__ of __total__',
+            'iati_identifier_not_configured':'Import Process cannot start, since the API field, iati_identifier,  ' +
+              'is not configured to store the \'iati-identifier\'. Please contact the administrator for further ' +
+              ' assistance.'
 				  },
 				  'previous_imports' : {
 					   'title': 'Previous Imports',
@@ -519,7 +522,10 @@ module.exports = {
 					  104: 'Error al cargar el archivo. Verificar que los primeros pasos hayan sido completados.',
 					  105: 'Error al cargar el archivo.',
 					  106: 'Importando __processed__ proyecto de __total__',
-					  107: 'Mapping __processed__ of __total__'
+					  107: 'Mapping __processed__ of __total__',
+            'iati_identifier_not_configured':'El proceso de importación no puede comenzar debido a que el ' +
+              'campo \'iati_identifier\' no esta configurado para poder alojar el identificador de IATI. Por favor ' +
+              'contacte al administrador del sistema para asistencia adicional.'
 				  },
 				  'previous_imports' : {
 					   'title': 'Importaciones previas',
@@ -822,7 +828,10 @@ module.exports = {
 						  104: "Une erreur s'est produite dans le téléchargement du fichier. Veuillez vérifier les étapes initiales.",
 						  105: "Une erreur s'est produite dans le téléchargement du fichier.",
 						  106: 'Chargement de __processed__ sur __total__ projets',
-						  107: 'Correspondance  __processed__ sur __total__ projets'
+						  107: 'Correspondance  __processed__ sur __total__ projets',
+             'iati_identifier_not_configured':'Le processus d’import ne pas débuter, parce que le CHAMP API, ' +
+              'iati_identifier, ne peut pas être configuré pour sauvegarder \'iati-identifier\'.  Veuillez contacter ' +
+              'votre administrateur.'
 					  },
 					  'previous_imports' : {
 						   'title': 'Previous Imports',
