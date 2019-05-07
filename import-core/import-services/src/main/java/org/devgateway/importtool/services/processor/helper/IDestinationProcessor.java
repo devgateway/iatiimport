@@ -20,11 +20,11 @@ public interface IDestinationProcessor {
 	public String getIdField();
 
 	void insert(InternalDocument source, List<FieldMapping> fieldMapping, List<FieldValueMapping> valueMapping,
-				ImportRequest importRequest) throws ValueMappingException, CurrencyNotFoundException, ParseException;
+				ImportRequest importRequest) throws ValueMappingException, CurrencyNotFoundException, ParseException, UnsupportedFieldTypeException;
 
 	void update(InternalDocument source, InternalDocument destination, List<FieldMapping> fieldMapping,
 				List<FieldValueMapping> valueMapping, boolean overrideTitle, ImportRequest importRequest)
-			throws ValueMappingException, CurrencyNotFoundException, ParseException;
+			throws ValueMappingException, CurrencyNotFoundException, ParseException, UnsupportedFieldTypeException;
 
 	public String getTitleField();
 

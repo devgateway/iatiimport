@@ -120,7 +120,7 @@ public class DocumentMapper implements IDocumentMapper {
 			}
 			try {
 				processDocumentMapping(doc, importRequest);
-			} catch (ValueMappingException | CurrencyNotFoundException |ParseException e) {
+			} catch (ValueMappingException | CurrencyNotFoundException |ParseException | UnsupportedFieldTypeException e) {
 				//we need to find a better way to process exceptions
 				results.add(getActionResultFromException(doc, e));
 			}
@@ -144,7 +144,7 @@ public class DocumentMapper implements IDocumentMapper {
 	}
 
 	private void processDocumentMapping(DocumentMapping doc, ImportRequest importRequest)
-			throws CurrencyNotFoundException, ValueMappingException, ParseException {
+			throws CurrencyNotFoundException, ValueMappingException, ParseException, UnsupportedFieldTypeException {
 		InternalDocument source = doc.getSourceDocument();
 		InternalDocument destination = doc.getDestinationDocument();
 		//if source project is mapped to an existing project, update the existing project
