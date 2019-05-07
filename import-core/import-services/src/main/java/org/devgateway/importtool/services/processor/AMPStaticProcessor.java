@@ -54,7 +54,6 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	// AMP Configuration Details
 	AmpStaticProcessorConfig ampConfigurationDetails;
 
-	private String DEFAULT_ID_FIELD = "amp-identifier";
 	private String DEFAULT_TITLE_FIELD = "project_title";
 	private String baseURL;
 	private Integer ampImplementationLevel;
