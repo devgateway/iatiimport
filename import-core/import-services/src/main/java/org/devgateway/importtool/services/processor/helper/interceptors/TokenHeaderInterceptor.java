@@ -1,4 +1,4 @@
-package org.devgateway.importtool.services.processor.helper;
+package org.devgateway.importtool.services.processor.helper.interceptors;
 
 import java.io.IOException;
 
@@ -8,7 +8,7 @@ import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.support.HttpRequestWrapper;
 
-public class TokenHeaderInterceptor implements ClientHttpRequestInterceptor {
+public class TokenHeaderInterceptor extends AbstractHttpInterceptor implements ClientHttpRequestInterceptor {
 
 	private final String token;
 	
@@ -19,10 +19,7 @@ public class TokenHeaderInterceptor implements ClientHttpRequestInterceptor {
 	public ClientHttpResponse intercept(HttpRequest request, byte[] body,
 			ClientHttpRequestExecution execution) throws IOException {
 
-	    HttpRequestWrapper requestWrapper = new HttpRequestWrapper(request);
-	    //since we are pooling the request can already contain the header
-		requestWrapper.getHeaders().remove("X-Auth-Token");
-	    requestWrapper.getHeaders().add("X-Auth-Token", token);
+		HttpRequestWrapper requestWrapper = addHeader(request, "X-Auth-Token", token);
 		return execution.execute(requestWrapper, body);
 	}
 

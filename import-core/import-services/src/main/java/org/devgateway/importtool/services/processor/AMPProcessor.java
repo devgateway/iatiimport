@@ -22,7 +22,7 @@ import org.devgateway.importtool.services.processor.helper.FieldValueMapping;
 import org.devgateway.importtool.services.processor.helper.IDestinationProcessor;
 import org.devgateway.importtool.services.processor.helper.InternalDocument;
 import org.devgateway.importtool.services.processor.helper.ActionResult;
-import org.devgateway.importtool.services.processor.helper.TokenHeaderInterceptor;
+import org.devgateway.importtool.services.processor.helper.interceptors.TokenHeaderInterceptor;
 import org.devgateway.importtool.services.request.ImportRequest;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.stereotype.Component;
@@ -60,6 +60,11 @@ public class AMPProcessor implements IDestinationProcessor {
 		this.setDocumentsEndpoint("/rest/activity/projects");
 		this.setDocumentsTestEndpoint("activity_list.json");
 		this.setPossibleValuesEndpoint("_possiblevalues.json");
+	}
+
+	@Override
+	public void initialize() {
+
 	}
 
 	@Override
@@ -234,11 +239,6 @@ public class AMPProcessor implements IDestinationProcessor {
 			template = new RestTemplate();
 		template.setInterceptors(this.interceptors);
 		return template;
-	}
-
-	@Override
-	public String getIdField() {
-		return DEFAULT_ID_FIELD;
 	}
 
 	@Override

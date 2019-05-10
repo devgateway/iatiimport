@@ -7,11 +7,19 @@ import org.springframework.stereotype.Component;
 public class AmpStaticProcessorConfig implements DestinationProcessorConfiguration{
 
     @Value("${AMPStaticProcessor.canUpgradeToDraft:true}")
-    //Can upgarde to draft default value is true in case its not specified in application.properties
+    //Can upgrade to draft default value is true in case its not specified in application.properties
     private Boolean canUpgradeToDraft;
+
     //Is draft default value false in case its not specified in application.properties
     @Value("${AMPStaticProcessor.isDraft:false}")
     private Boolean isDraft;
+
+    @Value("${app.version}")
+    private String appversion;
+    
+    @Value("${app.name}")
+    private String appName;
+
 
     private String authenticationToken;
 
@@ -52,5 +60,21 @@ public class AmpStaticProcessorConfig implements DestinationProcessorConfigurati
     @Override
     public void setProcessorVersion(String processorVersion) {
         this.processorVersion = processorVersion;
+    }
+
+    public String getAppversion() {
+        return appversion;
+    }
+
+    public void setAppversion(String appversion) {
+        this.appversion = appversion;
+    }
+
+    public String getAppName() {
+        return appName;
+    }
+
+    public void setAppName(String appName) {
+        this.appName = appName;
     }
 }

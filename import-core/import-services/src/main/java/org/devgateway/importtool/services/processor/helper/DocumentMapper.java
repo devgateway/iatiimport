@@ -206,15 +206,14 @@ public class DocumentMapper implements IDocumentMapper {
 		for (InternalDocument srcDoc : sourceDocuments) {
 			this.documentMappingStatus.incrementProcessed();
 			String sourceIdField = this.sourceProcessor.getIdField();
-			String destinationIdField = this.destinationProcessor.getIdField();
 			String sourceIdValue = srcDoc.getStringFields().get(sourceIdField);
 			srcDoc.setIdentifier(sourceIdValue);
 			Optional<InternalDocument> optionalDestDoc = destinationDocuments.stream().filter(n -> {
-				return sourceIdValue.equals(n.getStringFields().get(destinationIdField));
+				return sourceIdValue.equals(n.getStringFields().get(Constants.AMP_IATI_ID_FIELD));
 			}).findFirst();
 			if (optionalDestDoc.isPresent()) {
 				InternalDocument destDoc = optionalDestDoc.get();
-				String destinationIdValue = (String) destDoc.getStringFields().get(destinationIdField);
+				String destinationIdValue = (String) destDoc.getStringFields().get(Constants.AMP_IATI_ID_FIELD);
 				destDoc.setIdentifier(destinationIdValue);
 				this.addDocumentMapping(srcDoc, destDoc, OperationType.UPDATE);
 			} else {

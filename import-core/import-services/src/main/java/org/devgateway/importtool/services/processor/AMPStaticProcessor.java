@@ -17,6 +17,7 @@ import org.apache.commons.logging.LogFactory;
 import org.assertj.core.util.Collections;
 import org.devgateway.importtool.endpoint.EPMessages;
 import org.devgateway.importtool.exceptions.CurrencyNotFoundException;
+import org.devgateway.importtool.exceptions.MissingPrerequisitesException;
 import org.devgateway.importtool.services.dto.FundingDetail;
 import org.devgateway.importtool.services.dto.JsonBean;
 import org.devgateway.importtool.services.dto.MappedProject;
@@ -25,6 +26,8 @@ import org.devgateway.importtool.services.processor.config.AmpStaticProcessorCon
 import org.devgateway.importtool.services.processor.config.DestinationProcessorConfiguration;
 import org.devgateway.importtool.services.processor.dto.APIField;
 import org.devgateway.importtool.services.processor.helper.*;
+import org.devgateway.importtool.services.processor.helper.interceptors.TokenHeaderInterceptor;
+import org.devgateway.importtool.services.processor.helper.interceptors.UserAgentInterceptor;
 import org.devgateway.importtool.services.request.ImportRequest;
 import org.parboiled.common.ImmutableList;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
@@ -44,8 +47,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	private String descriptiveName = "AMP";
 	static final String BASEURL_PROPERTY = "AMPStaticProcessor.baseURL";
 	static final String BASEURL_DEFAULT_VALUE = "http://localhost:8081";
-	static final String AMP_IATI_ID_FIELD_PROPERTY = "AMPStaticProcessor.ampIatiIdField";
-	static final String AMP_IATI_ID_FIELD_DEFAULT_VALUE = "project_code";
+
 	private static final String DEFAULT_LANGUAGE_CODE = "en";
 	static final String AMP_IMPLEMENTATION_LEVEL_ID_FIELD_PROPERTY= "AMPStaticProcessor.implementationLevel";
 	static final Integer AMP_IMPLEMENTATION_LEVEL_ID_DEFAULT_VALUE = 70; //Coming form common AMP configuration
@@ -53,10 +55,8 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	// AMP Configuration Details
 	AmpStaticProcessorConfig ampConfigurationDetails;
 
-	private String DEFAULT_ID_FIELD = "amp-identifier";
 	private String DEFAULT_TITLE_FIELD = "project_title";
 	private String baseURL;
-	private String ampIatiIdField;
 	private Integer ampImplementationLevel;
 	private String fieldsEndpoint = "/rest/activity/fields";
 	private String allFieldsEndpoit = "/rest/activity/field/values";
@@ -177,16 +177,26 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			this.baseURL = BASEURL_DEFAULT_VALUE;
 		}
 
-		ampIatiIdField = System.getProperty(AMP_IATI_ID_FIELD_PROPERTY);
-		if (StringUtils.isEmpty(ampIatiIdField)) {
-			ampIatiIdField = AMP_IATI_ID_FIELD_DEFAULT_VALUE;
-		}
 		String ampImplementationLevelProperty = System.getProperty(AMP_IMPLEMENTATION_LEVEL_ID_FIELD_PROPERTY);
 		if (ampImplementationLevelProperty != null) {
 			ampImplementationLevel = Integer.parseInt(ampImplementationLevelProperty);
 		} else {
 			ampImplementationLevel = AMP_IMPLEMENTATION_LEVEL_ID_DEFAULT_VALUE;
 		}
+	}
+
+	private void validatePreRequisites() {
+		loadFieldProps();
+		APIField iatiIdentifier =  ampFieldsDefinition.stream().filter(fd->fd.getFieldName().
+				equals(Constants.AMP_IATI_ID_FIELD)).findAny().orElse(null);
+		if(iatiIdentifier == null || !iatiIdentifier.getImportable()) {
+			throw new MissingPrerequisitesException(Constants.IATI_IDENTIFIER_NOT_CONFIGURED_KEY);
+		}
+	}
+
+	@Override
+	public void initialize(){
+		validatePreRequisites();
 		initializeProjectsLists();
 		instantiateStaticFields();
 	}
@@ -229,10 +239,10 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 					String id = node.get("internal_id").asText();
 					String internalId = node.get("amp_id").asText();
 					// Needs to be checked, since it's configurable it might not have a value
-					JsonNode ampIatiId = node.get(ampIatiIdField);					
-					if (ampIatiId != null && !Constants.NULL_STRING.equals(ampIatiId.asText())) {
+					JsonNode ampIatiId = node.get(Constants.AMP_IATI_ID_FIELD);
+						if (ampIatiId != null && !Constants.NULL_STRING.equals(ampIatiId.asText())) {
 					    document.setIdentifier(ampIatiId.asText());
-						document.addStringField(ampIatiIdField, ampIatiId.asText());
+						document.addStringField(Constants.AMP_IATI_ID_FIELD, ampIatiId.asText());
 					}
 					Map<String, String> title = extractMultilanguageText(node.get("project_title"));
 					String dateString = node.get("creation_date").asText();
@@ -281,10 +291,6 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		return restTemplate;
 	}
 
-	@Override
-	public String getIdField() {
-		return ampIatiIdField;
-	}
 
 	@Override
 	public String getTitleField() {
@@ -303,6 +309,8 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	public void setAuthenticationToken(String authToken) {
 		this.interceptors.clear();
 		this.interceptors.add(new TokenHeaderInterceptor(authToken));
+		this.interceptors.add(new UserAgentInterceptor(this.ampConfigurationDetails.getAppName(),
+				this.ampConfigurationDetails.getAppversion()));
 	}
 
 	public String getDocumentsEndpoint() {
@@ -329,7 +337,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		if (overrideTitle) {
 			project.set("project_title", getMultilangString(source, "project_title", "title"));
 		}
-		project.set(ampIatiIdField, source.getIdentifier());
+		project.set(Constants.AMP_IATI_ID_FIELD, source.getIdentifier());
 
 		Boolean hasTransactions = false;		
 		for (FieldMapping mapping : fieldMappings) {
@@ -603,7 +611,8 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 				ActionResult result;
 				try {
-					JsonBean resultPost = restTemplate.postForObject(baseURL + url, mappedProject.getProject(), JsonBean.class);
+					JsonBean resultPost = restTemplate.postForObject(baseURL + url, mappedProject.getProject(),
+							JsonBean.class);
 
 					Object errorNode = resultPost.get("error");
 
@@ -663,7 +672,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			CurrencyNotFoundException, ParseException, UnsupportedFieldTypeException {
 		Boolean hasTransactions = false;
 		JsonBean project = new JsonBean();
-		project.set(ampIatiIdField, source.getIdentifier());
+		project.set(Constants.AMP_IATI_ID_FIELD, source.getIdentifier());
 		project.set("project_title", getMultilangString(source, "project_title", "title"));
 		//TODO this Could be part of a new processor if we want the tool to be compatible with different versions of
 		//TODO and configure that based on processor.
@@ -1294,7 +1303,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 	private void instantiateStaticFields() {
 
-		loadFieldProps();
+
 		List<Field> trnDependencies = new ArrayList<Field>();
 		loadCodeListValues();
 		loadAmpTranslations();
@@ -1603,18 +1612,20 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	}
 
 	private void loadFieldProps() {
-		String result = getRestTemplate().getForObject(baseURL
-				+ this.getFieldsEndpoint(), String.class);
-		try {
-			ampFieldsDefinition = SerializationHelper.getDefaultMapper().
-					readValue(result, new TypeReference<List<APIField>>() {
-					});
-		}catch (IOException ex){
-			log.error("cannot deserialize fields definition",ex);
-			//TODO Again its not good to Swallow the exception but a general error handling should be provided
-			//TODO and improved
+		if(ampFieldsDefinition == null || ampFieldsDefinition.size() == 0) {
+			String result = getRestTemplate().getForObject(baseURL
+					+ this.getFieldsEndpoint(), String.class);
+			try {
+				ampFieldsDefinition = SerializationHelper.getDefaultMapper().
+						readValue(result, new TypeReference<List<APIField>>() {
+						});
+			} catch (IOException ex) {
+				log.error("cannot deserialize fields definition", ex);
+				//TODO Again its not good to Swallow the exception but a general error handling should be provided
+				//TODO and improved
+			}
+			loadDestinationFieldListAndTransaltions(result);
 		}
-		loadDestinationFieldListAndTransaltions(result);
 	}
 	@Deprecated
 	/**
