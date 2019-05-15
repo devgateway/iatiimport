@@ -60,7 +60,7 @@ public class Constants {
 	public static final String ACCOUNTABLE_ORG_DISPLAY_NAME = "Accountable Organization";
 	public static final Set<String> SUPPORTED_LOCALES= new HashSet<>(Arrays.asList("en","fr", "es"));
 
-	public static final Integer AMP_PUSH_BATCH_SIZE = 1;
+	public static final Integer AMP_PUSH_BATCH_SIZE = 3;
 	public static final Integer AMP_PULL_BATCH_SIZE = 100;
 	public static final String AMP_ACTIVITY_ENDPOINT = "rest/activity";
 
