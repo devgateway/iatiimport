@@ -1461,7 +1461,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				org.setMultiLangDisplayName(destinationFieldsListLabels.get(name));
 				//To fetch list of values for related organisations we need to append ~organization
 				//to the field name, all the rest shall remain the same
-				//FIXME when we come up with a more generic solution if it of type org we should append it automatically
+				//FIXME when we come up with a more generic solution if it's of type org we should append it automatically
 				org.setPossibleValues(getCodeListValues(name + "~"+ Constants.RELATED_ORGANIZATION_CODE_LIST_POST_FIX));
 				org.setPercentage(getOrganisationPercentage(name));
 				fieldList.add(org);
