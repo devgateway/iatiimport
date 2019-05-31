@@ -1459,7 +1459,10 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			if (destinationFieldsList.contains(name)) {
 				Field org = new Field(label, name, FieldType.ORGANIZATION, true);
 				org.setMultiLangDisplayName(destinationFieldsListLabels.get(name));
-				org.setPossibleValues(getCodeListValues(name));
+				//To fetch list of values for related organisations we need to append ~organization
+				//to the field name, all the rest shall remain the same
+				//FIXME when we come up with a more generic solution if it's of type org we should append it automatically
+				org.setPossibleValues(getCodeListValues(name + "~"+ Constants.RELATED_ORGANIZATION_CODE_LIST_POST_FIX));
 				org.setPercentage(getOrganisationPercentage(name));
 				fieldList.add(org);
 			}
@@ -1761,7 +1764,14 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		allDestinationFieldValues.add("tertiary_sectors~sector");
 		allDestinationFieldValues.add("locations~location");
 		allDestinationFieldValues.add("fundings~donor_organization_id");
-		allDestinationFieldValues.add("fundings~donor_organization_id");
+		allDestinationFieldValues.add("implementing_agency~organization");
+		allDestinationFieldValues.add("responsible_organization~organization");
+		allDestinationFieldValues.add("executing_agency~organization");
+		allDestinationFieldValues.add("beneficiary_agency~organization");
+		allDestinationFieldValues.add("contracting_agency~organization");
+		allDestinationFieldValues.add("regional_group~organization");
+		allDestinationFieldValues.add("sector_group~organization");
+
 		allDestinationFieldValues.retainAll(destinationFieldsList);
 
 
