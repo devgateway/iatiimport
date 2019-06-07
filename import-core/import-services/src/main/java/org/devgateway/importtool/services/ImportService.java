@@ -40,6 +40,7 @@ public class ImportService {
 
 	@Value("${AMPStaticProcessor.processor_version}")
 	private String processorVersion;
+
 	@Autowired
 	BeanFactory beanFactory;
 
@@ -159,21 +160,16 @@ public class ImportService {
 			try {
 
 				configuration = beanFactory.getBean(optional.get().getDestinationProcessor().getName(), DestinationProcessorConfiguration.class);
-				//TODO if we have a processor that does not requires this data
-				//TODO then the config needs to be taken from a factory to make it generic
-				configuration.setAuthenticationToken(authenticationToken);
-				configuration.setProcessorVersion(processorVersion);
 
-				Constructor<?> c = Class.forName(optional.get().getDestinationProcessor().getClassName()).getDeclaredConstructor(DestinationProcessorConfiguration.class);
+				Constructor<?> c = Class.forName(optional.get().getDestinationProcessor().getClassName()).getDeclaredConstructor(DestinationProcessorConfiguration.class, String.class
+						, String.class);
 				c.setAccessible(true);
-				processor = (IDestinationProcessor) c.newInstance(new Object[]{configuration});
-
+				processor = (IDestinationProcessor) c.newInstance(new Object[]{configuration,  processorVersion, authenticationToken});
 				processor.initialize();
-
 
 			} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | NoSuchMethodException |
 					SecurityException | IllegalArgumentException | InvocationTargetException e) {
-				//TODO DO NOT swallow this exception, properly handle now that we can notifiy the importer
+				//TODO DO NOT swallow this exception, properly handle now that we can notify the importer
 				//TODO what the problem was
 				e.printStackTrace();
 				log.error("Error loading destination processor class: " + optional.get().getDestinationProcessor().getClassName() + " " + e);

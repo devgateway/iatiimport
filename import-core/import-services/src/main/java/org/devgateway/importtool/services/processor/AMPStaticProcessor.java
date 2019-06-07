@@ -161,14 +161,12 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		this.ampConfigurationDetails = ampConfigurationDetails;
 	}
 
-	public AMPStaticProcessor(DestinationProcessorConfiguration destinationProcessorConfig){
+	public AMPStaticProcessor(DestinationProcessorConfiguration destinationProcessorConfig, String processorVersion,
+							  String authenticationToken){
 
-		AmpStaticProcessorConfig config = (AmpStaticProcessorConfig)destinationProcessorConfig;
-
-		this.setProcessorVersion(config.getProcessorVersion());
-		this.setAmpConfigurationDetails(config);
-
-		this.setAuthenticationToken(config.getAuthenticationToken());
+		this.setAmpConfigurationDetails((AmpStaticProcessorConfig) destinationProcessorConfig);
+		this.setProcessorVersion(processorVersion);
+		this.setAuthenticationToken(authenticationToken);
 
 		this.restTemplate = getRestTemplate();
 
