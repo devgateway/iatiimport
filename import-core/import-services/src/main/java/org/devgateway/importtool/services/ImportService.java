@@ -19,6 +19,7 @@ import org.devgateway.importtool.services.processor.XMLGenericProcessor;
 import org.devgateway.importtool.services.processor.helper.*;
 import org.devgateway.importtool.services.processor.helper.FieldType;
 import org.devgateway.importtool.services.request.ImportRequest;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
@@ -41,6 +42,9 @@ public class ImportService {
 
 	@Value("${AMPStaticProcessor.processor_version}")
 	private String processorVersion;
+
+	@Autowired
+	private BeanFactory beanFactory;
 
 	private Log log = LogFactory.getLog(getClass());
 	
@@ -153,15 +157,18 @@ public class ImportService {
 				getName().equals(processorName)).findFirst();
 
 		if (optional.isPresent()) {
-			try {
-				Constructor<?> c = Class.forName(optional.get().getDestinationProcessor().getClassName()).getDeclaredConstructor(String.class);
-				c.setAccessible(true);
-				processor = (IDestinationProcessor) c.newInstance(new Object[]{authenticationToken});
-				processor.setProcessorVersion(processorVersion);
-			} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException e) {
+			/*try {*/
+			processor = beanFactory.getBean(optional.get().getDestinationProcessor().getName() + "_PROCESSOR", IDestinationProcessor.class);
+			processor.setProcessorVersion(processorVersion);
+			processor.initialize(authenticationToken);
+			//Constructor<?> c = Class.forName(optional.get().getDestinationProcessor().getClassName()).getDeclaredConstructor(String.class);
+			//c.setAccessible(true);
+			//processor = (IDestinationProcessor) c.newInstance(new Object[]{authenticationToken});
+
+			/*} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException e) {
 				e.printStackTrace();
 				log.error("Error loading destination processor class: " + optional.get().getDestinationProcessor().getClassName() + " " + e);
-			}
+			}*/
 		}
 		return processor;
 	}

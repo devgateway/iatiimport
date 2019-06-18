@@ -1,73 +1,91 @@
 package org.devgateway.importtool.services.processor;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.endpoint.EPMessages;
 import org.devgateway.importtool.exceptions.CurrencyNotFoundException;
 import org.devgateway.importtool.services.dto.JsonBean;
 import org.devgateway.importtool.services.dto.MappedProject;
-import org.devgateway.importtool.services.processor.helper.*;
+import org.devgateway.importtool.services.processor.destination.TokenCookieHeaderInterceptor;
+import org.devgateway.importtool.services.processor.helper.ActionResult;
+import org.devgateway.importtool.services.processor.helper.ActionStatus;
+import org.devgateway.importtool.services.processor.helper.Constants;
+import org.devgateway.importtool.services.processor.helper.DocumentMapping;
+import org.devgateway.importtool.services.processor.helper.Field;
+import org.devgateway.importtool.services.processor.helper.FieldMapping;
+import org.devgateway.importtool.services.processor.helper.FieldType;
+import org.devgateway.importtool.services.processor.helper.FieldValue;
+import org.devgateway.importtool.services.processor.helper.FieldValueMapping;
+import org.devgateway.importtool.services.processor.helper.IDestinationProcessor;
+import org.devgateway.importtool.services.processor.helper.InternalDocument;
+import org.devgateway.importtool.services.processor.helper.ValueMappingException;
+import org.devgateway.importtool.services.processor.helper.ValueNotEnabledException;
 import org.devgateway.importtool.services.request.ImportRequest;
+import org.springframework.context.annotation.Scope;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.web.client.*;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import org.springframework.stereotype.Component;
+import org.springframework.util.StopWatch;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
+
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+
+import static org.devgateway.importtool.services.processor.destination.AmpStaticProcessorConstants.*;
 
 // TODO: Sort methods, move classes to generic helpers for all processors if possible
 // TODO: Clean up code, find opportunities to reuse methods (example update/insert)
 // TODO: Add default values when mappings are missing, reading them from configuration db or files
 // TODO: Better error handling to the end user. Friendlier user messages, specially when referencing a missing dependency
-
+@Component("AMP_PROCESSOR")
+@Scope("session")
 public class AMPStaticProcessor implements IDestinationProcessor {
 	private String descriptiveName = "AMP";
-	static final String BASEURL_PROPERTY = "AMPStaticProcessor.baseURL";
-	static final String BASEURL_DEFAULT_VALUE = "http://localhost:8081";
-	static final String AMP_IATI_ID_FIELD_PROPERTY = "AMPStaticProcessor.ampIatiIdField";
-	static final String AMP_IATI_ID_FIELD_DEFAULT_VALUE = "project_code";
-	private static final String DEFAULT_LANGUAGE_CODE = "en";
-	static final String AMP_IMPLEMENTATION_LEVEL_ID_FIELD_PROPERTY= "AMPStaticProcessor.implementationLevel";
-	static final Integer AMP_IMPLEMENTATION_LEVEL_ID_DEFAULT_VALUE = 70; //Coming form common AMP configuration
+
+
     private Log log = LogFactory.getLog(getClass());
 	// AMP Configuration Details
-	private String DEFAULT_ID_FIELD = "amp-identifier";
-	private String DEFAULT_TITLE_FIELD = "project_title";
 	private String baseURL;
 	private String ampIatiIdField;
 	private Integer ampImplementationLevel;
-	private String fieldsEndpoint = "/rest/activity/fields";
-	private String allFieldsEndpoit = "/rest/activity/field/values";
-	private String translationEndPoints = "/rest/translations/translate?translations=";
-	private String documentsEndpoint = "/rest/activity/projects";
 
 	private List<Field> fieldList = new ArrayList<Field>();
 	private List<ClientHttpRequestInterceptor> interceptors = new ArrayList<ClientHttpRequestInterceptor>();
+
 	private List<String> destinationFieldsList = new ArrayList<String>(); // fields returned by current AMP installation
 	private Map<String, List<FieldValue>> allFieldValuesForDestinationProcessor; // this holds the list of possible
-	// values that wr retrive from the endpoint at once, instead of one by one
+	// values that wr retrieve from the endpoint at once, instead of one by one
 	private HashMap<String, Map<String, String>> destinationFieldsListLabels = new HashMap<String, Map<String, String>>();
 	// translations we ask amp to translate for us
 	private Map<String, Map<String, String>> ampTranslations = new HashMap<>();
-
 
 	public List<String> getDestinationFieldsList() {
 		return destinationFieldsList;
 	}
 	private String processorVersion;
+
 
 	public void setDestinationFieldsList(List<String> destinationFieldsList) {
 		this.destinationFieldsList = destinationFieldsList;
@@ -91,30 +109,6 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 	private ActionStatus actionStatus;
 
-	protected static final Map<String, String> tTNameSourceMap = new HashMap<String, String>() {
-		{
-			put("AC", Constants.COMMITMENTS);
-			put("AD", Constants.DISBURSEMENTS);
-			put("AE", Constants.EXPENDITURES);
-			put("PC", Constants.COMMITMENTS);
-			put("PD", Constants.DISBURSEMENTS);
-			put("PE", Constants.EXPENDITURES);
-		}
-	};
-
-	protected static final Map<String, String> aTNameDestinationMap = new HashMap<String, String>() {
-		{
-			put("AC", Constants.ACTUAL);
-			put("AD", Constants.ACTUAL);
-			put("AE", Constants.ACTUAL);
-			put("PC", Constants.PLANNED);
-			put("PD", Constants.PLANNED);
-			put("PE", Constants.PLANNED);
-
-
-		}
-	};
-
 	public ActionStatus getActionStatus() {
 		return actionStatus;
 	}
@@ -130,13 +124,17 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	public void setActionStatus(ActionStatus actionStatus) {
 		this.actionStatus = actionStatus;
 	}
+	public AMPStaticProcessor(){
 
-	public AMPStaticProcessor(String authenticationToken) {
+	}
+	@Override
+	public void initialize(String authenticationToken) {
 
 		this.setAuthenticationToken(authenticationToken);
 		this.restTemplate = getRestTemplate();
 
 		baseURL = System.getProperty(BASEURL_PROPERTY);
+
 		if (StringUtils.isEmpty(baseURL)) {
 			this.baseURL = BASEURL_DEFAULT_VALUE;
 		}
@@ -153,6 +151,25 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		}
 		initializeProjectsLists();
 		instantiateStaticFields();
+	}
+
+	@Override
+	public void reset(){
+		baseURL = null;
+		ampIatiIdField = null;
+		ampImplementationLevel = null;
+		fieldList =  new ArrayList<>();
+		interceptors.clear();
+		destinationFieldsList = new ArrayList<>();
+		allFieldValuesForDestinationProcessor = null;
+		destinationFieldsListLabels = new HashMap<String, Map<String, String>>();
+		ampTranslations = new HashMap<>();
+		processorVersion = null;
+		projectsReadyToBePosted = new ArrayList<>();
+		projectsToBeUpdated = new ArrayList<>();
+		restTemplate = null;
+		actionStatus = null;
+		jsonNode = null;
 	}
 
 	private void initializeProjectsLists() {
@@ -178,7 +195,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				// we go only once to fetch documents since it make no sense to fetch 3k project
 				// twice. if its faster ill save the list of editable and non editable on init and will only return
 				// the list filtered
-				result = this.restTemplate.getForObject(baseURL + this.getDocumentsEndpoint(), String.class);
+				result = this.restTemplate.getForObject(baseURL + DOCUMENTS_END_POINT, String.class);
 				ObjectMapper mapper = new ObjectMapper();
 
 				jsonNode = mapper.readTree(result);
@@ -254,27 +271,12 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		return DEFAULT_TITLE_FIELD;
 	}
 
-	private String getFieldsEndpoint() {
-		return fieldsEndpoint;
-	}
-
-	public String getAllFieldsEndpoit() {
-		return allFieldsEndpoit;
-	}
-
 	@Override
 	public void setAuthenticationToken(String authToken) {
 		this.interceptors.clear();
-		this.interceptors.add(new TokenHeaderInterceptor(authToken));
+		this.interceptors.add(new TokenCookieHeaderInterceptor(authToken));
 	}
 
-	public String getDocumentsEndpoint() {
-		return documentsEndpoint;
-	}
-
-	public void setDocumentsEndpoint(String documentsEndpoint) {
-		this.documentsEndpoint = documentsEndpoint;
-	}
 
 	private void updateProject(JsonBean project, InternalDocument source, List<FieldMapping> fieldMappings,
 			List<FieldValueMapping> valueMappings, boolean overrideTitle, ImportRequest importRequest)
@@ -1553,7 +1555,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 		String result = "";
 		RestTemplate restTemplate = getRestTemplate();
-		result = restTemplate.getForObject(baseURL + this.getFieldsEndpoint(), String.class);
+		result = restTemplate.getForObject(baseURL + FIELDS_ENDPOINT, String.class);
 		try {
 			ObjectMapper mapper = new ObjectMapper();
 			JsonNode jsonNode = mapper.readTree(result);
@@ -1616,7 +1618,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	}
 	private void loadAmpTranslations() {
 
-		String result = restTemplate.postForObject(baseURL + translationEndPoints
+		String result = restTemplate.postForObject(baseURL + TRANSLATIONS_END_POINT
 						+ extractSupportedLocales(), Constants.TRANSACTION_FIELDS, String.class);
 		try {
 			ObjectMapper mapper = new ObjectMapper();
@@ -1648,7 +1650,6 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		// TODO this needs to be extracted to a static variable and abscract field configuration
 		// TODO but proper analysis is needed and its out of the scope of this ticket
 		// TODO also we need to move amp column names to constant and try to abstract configuration
-
 		List<String> allDestinationFieldValues = new ArrayList<>();
 		allDestinationFieldValues.add("activity_status");
 		allDestinationFieldValues.add("A C Chapter");
@@ -1665,12 +1666,10 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		allDestinationFieldValues.add("fundings~funding_details~currency");
 		allDestinationFieldValues.retainAll(destinationFieldsList);
 
-
-
 		allFieldValuesForDestinationProcessor = new HashMap<>();
 
-		String result = restTemplate.postForObject(baseURL + getAllFieldsEndpoit(),
-				allDestinationFieldValues, String.class);
+		String result = restTemplate.postForObject(baseURL + ALL_FIELDS_ENDPOINT, allDestinationFieldValues,
+				String.class);
 
 		ObjectMapper mapper = new ObjectMapper();
 		try {
@@ -1692,10 +1691,10 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		// TODO individually. After the release is safe to remove the else and only call from the map
 		List<FieldValue> possibleValues = allFieldValuesForDestinationProcessor.get(codeListName);
 			if(possibleValues == null) {
-			String result = "";
+			String result;
 			possibleValues = new ArrayList<>();
-		//	RestTemplate restTemplate = getRestTemplate();
-			result = restTemplate.getForObject(baseURL + this.getFieldsEndpoint() + "/" + codeListName, String.class);
+
+			result = restTemplate.getForObject(baseURL + FIELDS_ENDPOINT + "/" + codeListName, String.class);
 
 			try {
 				ObjectMapper mapper = new ObjectMapper();

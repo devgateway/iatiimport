@@ -131,6 +131,12 @@ class ImportController  {
 
 	@RequestMapping(method = RequestMethod.GET, value = "/wipeall", produces = { MediaType.APPLICATION_JSON_VALUE })
 	public ResponseEntity<String> wipe(HttpServletRequest request) {
+		IDestinationProcessor destinationProcessor =
+				(IDestinationProcessor)request.getSession().getAttribute(DESTINATION_PROCESSOR);
+		//since the destinationProcessor is a bean managed by Spring LifeCycle we need to rest its values to default
+		if(destinationProcessor!=null) {
+			destinationProcessor.reset();
+		}
 		request.getSession().removeAttribute(SOURCE_PROCESSOR);
 		request.getSession().removeAttribute(DESTINATION_PROCESSOR);
 		request.getSession().removeAttribute(SESSION_TOKEN);
