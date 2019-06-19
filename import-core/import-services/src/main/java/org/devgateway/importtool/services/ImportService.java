@@ -157,18 +157,9 @@ public class ImportService {
 				getName().equals(processorName)).findFirst();
 
 		if (optional.isPresent()) {
-			/*try {*/
 			processor = beanFactory.getBean(optional.get().getDestinationProcessor().getName() + "_PROCESSOR", IDestinationProcessor.class);
 			processor.setProcessorVersion(processorVersion);
 			processor.initialize(authenticationToken);
-			//Constructor<?> c = Class.forName(optional.get().getDestinationProcessor().getClassName()).getDeclaredConstructor(String.class);
-			//c.setAccessible(true);
-			//processor = (IDestinationProcessor) c.newInstance(new Object[]{authenticationToken});
-
-			/*} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException e) {
-				e.printStackTrace();
-				log.error("Error loading destination processor class: " + optional.get().getDestinationProcessor().getClassName() + " " + e);
-			}*/
 		}
 		return processor;
 	}
