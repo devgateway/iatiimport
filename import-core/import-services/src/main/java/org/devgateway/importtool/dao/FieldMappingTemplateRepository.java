@@ -1,6 +1,7 @@
 package org.devgateway.importtool.dao;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.transaction.Transactional;
 
@@ -13,8 +14,8 @@ public interface FieldMappingTemplateRepository extends PagingAndSortingReposito
 	
 	List<FieldMappingTemplate> findAll();
 	@Transactional
-	FieldMappingTemplate findById(@Param("id") Long id);
+	Optional<FieldMappingTemplate> findById(@Param("id") Long id);
 	@Transactional
-	FieldMappingTemplate findByName(@Param("name") String name);
+	Optional<FieldMappingTemplate> findByName(@Param("name") String name);
 	
 }

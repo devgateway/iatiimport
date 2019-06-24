@@ -5,6 +5,7 @@ package org.devgateway.importtool.rest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -37,16 +38,21 @@ class FieldMappingTemplateController {
 	private Log log = LogFactory.getLog(getClass());
 	
 	@RequestMapping(method = RequestMethod.POST, value = "/save")
-	public ResponseEntity<String> save(@RequestBody FieldMappingTemplateRequest fieldMappingTemplateRequest, HttpServletRequest request) {	
-		FieldMappingTemplate fieldMappingTemplate = fieldMappingTemplateRepository
-				.findById(fieldMappingTemplateRequest.getId());
-		if (fieldMappingTemplate == null) {
-			fieldMappingTemplate = fieldMappingTemplateRepository.findByName(fieldMappingTemplateRequest.getName());
-			if (fieldMappingTemplate != null) {
+	public ResponseEntity<String> save(@RequestBody FieldMappingTemplateRequest fieldMappingTemplateRequest, HttpServletRequest request) {
+		Optional<FieldMappingTemplate> findFieldMappingTemplate = fieldMappingTemplateRequest.getId() != null ? fieldMappingTemplateRepository
+				.findById(fieldMappingTemplateRequest.getId()) : Optional.empty();
+
+		FieldMappingTemplate fieldMappingTemplate;
+
+		if (!findFieldMappingTemplate.isPresent()) {
+			findFieldMappingTemplate = fieldMappingTemplateRepository.findByName(fieldMappingTemplateRequest.getName());
+			if (findFieldMappingTemplate.isPresent()) {
 				return new ResponseEntity<>("{\"error\": \"mapping_exists\"}", HttpStatus.OK);
 			} else {
 				fieldMappingTemplate = new FieldMappingTemplate();
 			}
+		}else {
+			fieldMappingTemplate = findFieldMappingTemplate.get();
 		}
 		fieldMappingTemplate.setName(fieldMappingTemplateRequest.getName());
 
@@ -82,24 +88,26 @@ class FieldMappingTemplateController {
 	public ResponseEntity<FieldMappingTemplateReponse> findById(@PathVariable Long id, HttpServletRequest request) {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
-		FieldMappingTemplate  fieldMappingTemplate = fieldMappingTemplateRepository.findById(id);		
 		FieldMappingTemplateReponse fieldMappingTemplateReponse = new FieldMappingTemplateReponse();
-	    try{
-	        List<FieldMapping> fieldMappings = mapper.readValue(fieldMappingTemplate.getMappingTemplate(), mapper.getTypeFactory().constructCollectionType(List.class, FieldMapping.class));
-			fieldMappingTemplateReponse.setFieldMapping(fieldMappings);
-	     }catch(IOException ioex){
+		fieldMappingTemplateRepository.findById(id).ifPresent(fieldMappingTemplate -> {
+			try {
+				List<FieldMapping> fieldMappings = mapper.readValue(fieldMappingTemplate.getMappingTemplate(),
+						mapper.getTypeFactory().constructCollectionType(List.class, FieldMapping.class));
+				fieldMappingTemplateReponse.setFieldMapping(fieldMappings);
+			} catch (IOException ioex) {
 				log.error(ioex.getMessage());
 				ioex.printStackTrace();
-		}			
-	    fieldMappingTemplateReponse.setId(fieldMappingTemplate.getId());
-		fieldMappingTemplateReponse.setName(fieldMappingTemplate.getName());			
-		
+			}
+			fieldMappingTemplateReponse.setId(fieldMappingTemplate.getId());
+			fieldMappingTemplateReponse.setName(fieldMappingTemplate.getName());
+		});
+		//FIXME Handle when the template was not found and return an error
 		return new ResponseEntity<>(fieldMappingTemplateReponse, HttpStatus.OK);
 	}
 	
 	@RequestMapping(method = RequestMethod.DELETE, value = "/delete/{id}")
 	public ResponseEntity<String> delete(@PathVariable Long id, HttpServletRequest request) {
-		fieldMappingTemplateRepository.delete(id);	
+		fieldMappingTemplateRepository.deleteById(id);
 		return new ResponseEntity<>("{}", HttpStatus.OK);
 	}
 	

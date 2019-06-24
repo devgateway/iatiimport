@@ -250,7 +250,7 @@ class ImportController  {
 	@RequestMapping(method = RequestMethod.DELETE, value = "/delete/{id}")
 	public ResponseEntity<String> delete(@PathVariable Long id, HttpServletRequest request) {
 		projectRepository.deleteByFileId(id);
-		repository.delete(id);
+		repository.deleteById(id);
 		return new ResponseEntity<>("{}", HttpStatus.OK);
 	}
 
