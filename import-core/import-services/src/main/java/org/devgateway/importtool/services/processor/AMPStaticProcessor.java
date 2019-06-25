@@ -23,6 +23,7 @@ import org.devgateway.importtool.services.processor.helper.InternalDocument;
 import org.devgateway.importtool.services.processor.helper.ValueMappingException;
 import org.devgateway.importtool.services.processor.helper.ValueNotEnabledException;
 import org.devgateway.importtool.services.request.ImportRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.converter.StringHttpMessageConverter;
@@ -72,7 +73,8 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	private Integer ampImplementationLevel;
 
 	private List<Field> fieldList = new ArrayList<Field>();
-	private List<ClientHttpRequestInterceptor> interceptors = new ArrayList<ClientHttpRequestInterceptor>();
+	private List<ClientHttpRequestInterceptor> interceptors = new ArrayList<>();
+
 
 	private List<String> destinationFieldsList = new ArrayList<String>(); // fields returned by current AMP installation
 	private Map<String, List<FieldValue>> allFieldValuesForDestinationProcessor; // this holds the list of possible
@@ -107,6 +109,9 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 	private RestTemplate restTemplate;
 
+	@Autowired
+	private RestTemplate awRestTemplate;
+
 	private ActionStatus actionStatus;
 
 	public ActionStatus getActionStatus() {
@@ -129,7 +134,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	}
 	@Override
 	public void initialize(String authenticationToken) {
-
+		initializeRestTemplate();
 		this.setAuthenticationToken(authenticationToken);
 		this.restTemplate = getRestTemplate();
 
@@ -153,6 +158,11 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		instantiateStaticFields();
 	}
 
+	private void initializeRestTemplate() {
+		awRestTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
+		this.awRestTemplate.getInterceptors().clear();
+	}
+
 	@Override
 	public void reset(){
 		baseURL = null;
@@ -160,6 +170,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		ampImplementationLevel = null;
 		fieldList =  new ArrayList<>();
 		interceptors.clear();
+		this.awRestTemplate.getInterceptors().clear();
 		destinationFieldsList = new ArrayList<>();
 		allFieldValuesForDestinationProcessor = null;
 		destinationFieldsListLabels = new HashMap<String, Map<String, String>>();
@@ -195,7 +206,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				// we go only once to fetch documents since it make no sense to fetch 3k project
 				// twice. if its faster ill save the list of editable and non editable on init and will only return
 				// the list filtered
-				result = this.restTemplate.getForObject(baseURL + DOCUMENTS_END_POINT, String.class);
+				result = this.awRestTemplate.getForObject(baseURL + DOCUMENTS_END_POINT, String.class);
 				ObjectMapper mapper = new ObjectMapper();
 
 				jsonNode = mapper.readTree(result);
@@ -274,6 +285,8 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	@Override
 	public void setAuthenticationToken(String authToken) {
 		this.interceptors.clear();
+		this.awRestTemplate.getInterceptors().clear();
+		this.awRestTemplate.getInterceptors().add(new TokenCookieHeaderInterceptor(authToken));
 		this.interceptors.add(new TokenCookieHeaderInterceptor(authToken));
 	}
 
@@ -544,7 +557,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 					url += "/" + mappedProject.getProject().getString(Constants.AMP_INTERNAL_ID);
 				}
 				try {
-					JsonBean resultPost = restTemplate.postForObject(baseURL + url, mappedProject.getProject(), JsonBean.class);
+					JsonBean resultPost = awRestTemplate.postForObject(baseURL + url, mappedProject.getProject(), JsonBean.class);
 
 					Object errorNode = resultPost.get("error");
 

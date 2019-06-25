@@ -15,7 +15,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @Configuration
 @EnableScheduling
 @SpringBootApplication(scanBasePackages ={ "org.devgateway.importtool.main",
-		"org.devgateway.importtool.services", "org.devgateway.importtool.rest," +
+		"org.devgateway.importtool.services", "org.devgateway.importtool.rest","org.devgateway.importtool.rest.conf" +
 		"org.devgateway.importtool.scheduler" } )
 public class Application extends WebMvcAutoConfiguration {
 	public static void main(String[] args) {

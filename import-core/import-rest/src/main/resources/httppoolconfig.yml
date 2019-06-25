@@ -1,0 +1,6 @@
+httppool:
+maxPerRoute: 100
+maxTotal: 1000
+connectionRequestTimeout: 300
+connectTimeout: 300
+socketTimeout: 1500
