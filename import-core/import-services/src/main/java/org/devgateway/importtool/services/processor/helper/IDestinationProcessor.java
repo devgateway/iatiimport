@@ -11,6 +11,8 @@ public interface IDestinationProcessor {
 
 	public void setAuthenticationToken(String authToken);
 
+	void reset();
+
 	public List<Field> getFields();
 
 	public List<InternalDocument> getDocuments(Boolean summary);
@@ -37,4 +39,6 @@ public interface IDestinationProcessor {
     void loadProjectsForUpdate(List<String> listOfAmpIds);
 
 	List<ActionResult> processProjectsInBatch(ActionStatus importStatus);
+
+	void initialize (String token);
 }
