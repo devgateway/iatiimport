@@ -59,7 +59,7 @@ var SelectVersion = React.createClass({
                 </div>
                 <div className="buttons">
                     <div className="col-md-6"><button className="btn btn-success navbar-btn btn-custom btn-previous" type="button" onClick={this.handlePrevious}>{this.props.i18nLib.t('wizard.previous')}</button></div>
-                    <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.handleNext}>{this.props.i18nLib.t('wizard.next')}</button>
+                    <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.handleNext} disabled={this.props.versions.length == 0}>{this.props.i18nLib.t('wizard.next')}</button>
                 </div>
             </div>
             );
