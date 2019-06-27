@@ -151,6 +151,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		}
 		initializeProjectsLists();
 		instantiateStaticFields();
+		fetchDestinationDocuments();
 	}
 
 	@Override
@@ -175,6 +176,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	private void initializeProjectsLists() {
 		this.projectsReadyToBePosted = new ArrayList<>();
 		this.projectsToBeUpdated = new ArrayList<>();
+		jsonNode = null;
 	}
 
 	@Override
@@ -182,23 +184,28 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		return fieldList;
 	}
 	JsonNode jsonNode;
+	private void fetchDestinationDocuments()  {
+		String result ;
+		try {
+			result = this.restTemplate.getForObject(baseURL + DOCUMENTS_END_POINT, String.class);
+			ObjectMapper mapper = new ObjectMapper();
+			jsonNode = mapper.readTree(result);
+		}
+		catch(Exception ex){
+			log.error("cannot get project list from amp");
+			// FIXME this expception should not be swollen Ill but so far initilizacion errors are not properly reported
+			// FIXME in next refactoring ticket ill try to fix this and report to the client
+		}
+	}
 	@Override
 	// Updated!
 	public List<InternalDocument> getDocuments(Boolean onlyEditable) {
 		actionStatus = new ActionStatus(EPMessages.FETCHING_DESTINATION_PROJECTS.getDescription(), 0L,
 				EPMessages.FETCHING_DESTINATION_PROJECTS.getCode());
-		List<InternalDocument> list = new ArrayList<InternalDocument>();
-		String result = "";
-
+		List<InternalDocument> list = new ArrayList<>();
 		try {
 			if (jsonNode == null) {
-				// we go only once to fetch documents since it make no sense to fetch 3k project
-				// twice. if its faster ill save the list of editable and non editable on init and will only return
-				// the list filtered
-				result = this.restTemplate.getForObject(baseURL + DOCUMENTS_END_POINT, String.class);
-				ObjectMapper mapper = new ObjectMapper();
-
-				jsonNode = mapper.readTree(result);
+				fetchDestinationDocuments();
 			}
 			if (jsonNode.isArray()) {
 				jsonNode.forEach((JsonNode node) -> {

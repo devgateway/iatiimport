@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(value = "/users")
+// FIXME This is not in use remove before closing the feature
 class UserController {
 
     private final UserRepository repository;
@@ -27,17 +28,17 @@ class UserController {
     }
 
     @RequestMapping(method = RequestMethod.DELETE, value = "/{user}")
-    ResponseEntity<User> deleteUser(@PathVariable Long user) {
-    	
-    	User userObject = repository.findOne((Long) user);
-    	repository.delete(userObject);
-        return new ResponseEntity<>(userObject, HttpStatus.NOT_FOUND);
+    ResponseEntity<String> deleteUser(@PathVariable Long userId) {
+    	repository.findById((Long) userId).ifPresent(user->{
+            repository.delete(user);
+        });
+        return new ResponseEntity<String>("{}", HttpStatus.NOT_FOUND);
     }
 
     @RequestMapping(method = GET, value = "/{user}")
     ResponseEntity<User> loadUser(@PathVariable Long user) {
-        return Optional.of(repository.findById(user))
-                .map(u -> new ResponseEntity<>(u, HttpStatus.OK))
+        Optional<User> findUserOptional = repository.findById(user);
+        return findUserOptional.map(u -> new ResponseEntity<>(u, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
