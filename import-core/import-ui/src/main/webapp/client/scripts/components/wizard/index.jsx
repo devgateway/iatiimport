@@ -80,6 +80,7 @@ var Wizard = React.createClass({
 	           common.refreshToken();            
 	    }.bind(this))["catch"](function(err) {
 	            common.resetAuthCookies();
+	            this.goHome();
 	    }.bind(this));
 	        
 	                
