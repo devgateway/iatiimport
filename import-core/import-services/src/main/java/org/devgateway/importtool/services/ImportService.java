@@ -1,9 +1,6 @@
 package org.devgateway.importtool.services;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.nio.charset.Charset;
 import java.util.*;
 
 import org.apache.commons.logging.Log;
@@ -22,11 +19,9 @@ import org.devgateway.importtool.services.request.ImportRequest;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.client.ClientHttpRequestInterceptor;
-import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.web.client.RestTemplate;
+
 
 @EnableAsync
 @org.springframework.stereotype.Service
@@ -112,21 +107,22 @@ public class ImportService {
 	}
 		
 	public void insertLog(ActionResult result, Long id) {
-		Project project = new Project();
-		File file = fileRepository.findById(id);
-		project.setFile(file);
-		project.setTitle(result.getMessage());
-		project.setNotes(result.getOperation());
-		project.setStatus(result.getStatus());
-		project.setProjectIdentifier(result.getSourceProjectIdentifier());
-		project.setGroupingCriteria(result.getSourceGroupingCriteria());
-		project.setLastSyncedOn(new Date());
-		projectRepository.save(project);
+		fileRepository.findById(id).ifPresent(file->{
+			Project project = new Project();
+			project.setFile(file);
+			project.setTitle(result.getMessage());
+			project.setNotes(result.getOperation());
+			project.setStatus(result.getStatus());
+			project.setProjectIdentifier(result.getSourceProjectIdentifier());
+			project.setGroupingCriteria(result.getSourceGroupingCriteria());
+			project.setLastSyncedOn(new Date());
+			projectRepository.save(project);
+		});
 	}
 	
 	public void deleteImport(Long id){
 		projectRepository.deleteByFileId(id);
-		fileRepository.delete(id);
+		fileRepository.deleteById(id);
 	}
 	
 	@SuppressWarnings("unchecked")
