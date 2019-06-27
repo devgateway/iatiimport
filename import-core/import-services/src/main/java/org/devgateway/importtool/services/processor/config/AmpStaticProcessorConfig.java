@@ -20,11 +20,6 @@ public class AmpStaticProcessorConfig implements DestinationProcessorConfigurati
     @Value("${app.name}")
     private String appName;
 
-
-    private String authenticationToken;
-
-    private String processorVersion;
-
     public AmpStaticProcessorConfig(){
 
     }
@@ -43,23 +38,6 @@ public class AmpStaticProcessorConfig implements DestinationProcessorConfigurati
 
     public void setDraft(Boolean draft) {
         isDraft = draft;
-    }
-
-    public String getAuthenticationToken() {
-        return authenticationToken;
-    }
-
-    public void setAuthenticationToken(String authenticationToken) {
-        this.authenticationToken = authenticationToken;
-    }
-
-    public String getProcessorVersion() {
-        return processorVersion;
-    }
-
-    @Override
-    public void setProcessorVersion(String processorVersion) {
-        this.processorVersion = processorVersion;
     }
 
     public String getAppversion() {
