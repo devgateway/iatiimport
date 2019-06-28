@@ -8,8 +8,6 @@ import org.devgateway.importtool.model.ReportingOrganization;
 import org.devgateway.importtool.services.dto.IatiOrganizationsOutput;
 import org.devgateway.importtool.services.dto.ResultEntry;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.util.StopWatch;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
