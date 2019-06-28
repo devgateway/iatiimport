@@ -1319,7 +1319,8 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		}
 
 		if (existFieldInAmp("fundings~funding_details~adjustment_type")) {
-			Field adjustmentType = new Field("Adjustment Type", "adjustment_type", FieldType.LIST, true);
+			Field adjustmentType = new Field("Adjustment Type", "adjustment_type", FieldType.LIST,
+					false);
 			adjustmentType.setPossibleValues(getCodeListValues("fundings~funding_details~adjustment_type"));
 			adjustmentType
 					.setMultiLangDisplayName(getFieldLable("fundings~funding_details~adjustment_type"));
