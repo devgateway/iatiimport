@@ -75,6 +75,11 @@ public class Constants {
 	public static final List<String> TRANSACTION_FIELDS = new ArrayList<>(Arrays.asList("Actual Commitments",
 			"Actual Disbursements","Actual Expenditures","Planned Commitments", "Planned Disbursements",
 			"Planned Expenditures"));
-	
+	public static final List<String> LIST_OF_VALUES_TO_FETCH = new ArrayList(Arrays.asList("activity_status",
+			"A C Chapter", "fundings~type_of_assistance", "fundings~financing_instrument",
+			"fundings~funding_details~adjustment_type", "fundings~funding_details~transaction_type",
+			"primary_sectors~sector", "secondary_sectors~sector", "tertiary_sectors~sector", "locations~location",
+			"fundings~donor_organization_id", "fundings~funding_details~currency"));
+
 	public static final String NULL_STRING ="null";
 }

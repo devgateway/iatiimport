@@ -11,6 +11,7 @@ import org.devgateway.importtool.services.dto.JsonBean;
 import org.devgateway.importtool.services.dto.MappedProject;
 import org.devgateway.importtool.services.processor.destination.TokenCookieHeaderInterceptor;
 import org.devgateway.importtool.services.processor.dto.APIField;
+import org.devgateway.importtool.services.processor.dto.PossibleValue;
 import org.devgateway.importtool.services.processor.helper.ActionResult;
 import org.devgateway.importtool.services.processor.helper.ActionStatus;
 import org.devgateway.importtool.services.processor.helper.Constants;
@@ -26,6 +27,10 @@ import org.devgateway.importtool.services.processor.helper.ValueMappingException
 import org.devgateway.importtool.services.processor.helper.ValueNotEnabledException;
 import org.devgateway.importtool.services.request.ImportRequest;
 import org.springframework.context.annotation.Scope;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Component;
@@ -300,15 +305,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				if (locations != null) {
 					project.set(destinationField.getFieldName(), locations);
 				}
-				//TODO THIS IS A WORKAROUND TO BE FIXED BEFORE THE RELEASE
-				/*Properties props = getExtraInfo(source, optValueMappingLocation.get(), false);
-				if (props != null) {
-					@SuppressWarnings("unchecked")
-					LinkedHashMap<String, Integer> hm = (LinkedHashMap<String, Integer>) props.get("extra_info");
-					Integer implementationLocation = hm.get("implementation_level_id");
-					project.set("implementation_location", implementationLocation);
-					project.set("implementation_level", ampImplementationLevel);
-				}*/
+				getLocationFromExtraInfo(project, getExtraInfo(source, optValueMappingLocation.get(), false));
 				break;
 			case RECIPIENT_COUNTRY:
 			case LIST:
@@ -635,15 +632,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				if (locations != null) {
 					project.set(destinationField.getFieldName(), locations);
 				}
-				
-				Properties props = getExtraInfo(source, optValueMappingLocation.get(), false);
-				if (props != null) {
-					@SuppressWarnings("unchecked")
-					LinkedHashMap<String, Integer> hm = (LinkedHashMap<String, Integer>) props.get("extra_info");
-					Integer implementationLocation = hm.get("implementation_level_id");
-					project.set("implementation_location", implementationLocation);
-					project.set("implementation_level", ampImplementationLevel);
-				}
+				getLocationFromExtraInfo(project, getExtraInfo(source, optValueMappingLocation.get(), false));
 				break;
 			case RECIPIENT_COUNTRY:
 			case LIST:
@@ -688,6 +677,13 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		}
 
 		return project;
+	}
+
+	private void getLocationFromExtraInfo(JsonBean project, Map<Object, Object> props) {
+		if (props != null) {
+			project.set("implementation_location", props.get("implementation_level_id"));
+			project.set("implementation_level", ampImplementationLevel);
+		}
 	}
 
 	private void processListDestinationProjects(InternalDocument source, List<FieldValueMapping> valueMappings,
@@ -1166,7 +1162,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		return getCodesFromList(source, mapping, true);
 	}
 
-	private Properties getExtraInfo(InternalDocument source, FieldValueMapping mapping, Boolean suffix) {
+	private Map<Object,Object> getExtraInfo(InternalDocument source, FieldValueMapping mapping, Boolean suffix) {
 		Object value = source.getStringMultiFields().get(mapping.getSourceField().getFieldName());
 		Map<Integer, Integer> valueMapIndex = mapping.getValueIndexMapping();
 		List<FieldValue> sourcePossibleValues = mapping.getSourceField().getPossibleValues();
@@ -1648,21 +1644,19 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	private void loadCodeListValues() {
 		allFieldValuesForDestinationProcessor = new HashMap<>();
 		// TODO only get codelist that we need
-		// TODO Refactor to use an object instead of iterating JsonNodes
-		String result = restTemplate.postForObject(baseURL + ALL_FIELDS_ENDPOINT, getEnabledFieldsPlain(),
-				String.class);
-		ObjectMapper mapper = new ObjectMapper();
-		try {
-			JsonNode jsonNode = mapper.readTree(result);
-			Iterator<String> keys = jsonNode.fieldNames();
-			while (keys.hasNext()) {
-				String keyName = keys.next();
-				JsonNode jn = jsonNode.get(keyName);
-				allFieldValuesForDestinationProcessor.put(keyName, getPossibleValuesFromNode(jn.iterator()));
-			}
-		} catch (IOException e) {
-			log.error("cannot retrieve possible values");
-		}
+		// TODO Refactor to use an object instead of iterating JsonNodes\
+		ParameterizedTypeReference<Map<String, List<PossibleValue>> > responseType =
+				new ParameterizedTypeReference<Map<String, List<PossibleValue>> >() {};
+		List<String> fieldsToFetch = (new ArrayList(Constants.LIST_OF_VALUES_TO_FETCH));
+		fieldsToFetch.retainAll(getEnabledFieldsPlain());
+		HttpEntity l = new HttpEntity(fieldsToFetch);
+		ResponseEntity<Map<String, List<PossibleValue>> >response=
+		restTemplate.exchange(baseURL + ALL_FIELDS_ENDPOINT, HttpMethod.POST,l,responseType);
+
+		response.getBody().forEach((keyName, lPossibleValues)->{
+			allFieldValuesForDestinationProcessor.put(keyName,getPossibleValuesFromNode(lPossibleValues));
+		});
+
 	}
 
 	private List<FieldValue> getCodeListValues(String codeListName) {
@@ -1673,31 +1667,18 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		return possibleValues;
 	}
 
-	private List<FieldValue> getPossibleValuesFromNode(Iterator<JsonNode> mainNode) {
-		List<FieldValue> possibleValues = new ArrayList<FieldValue>();
+	private List<FieldValue> getPossibleValuesFromNode(List<PossibleValue> lPossibleValues) {
+		List<FieldValue> possibleValues = new ArrayList<>();
 		int index = 0;
-		while (mainNode.hasNext()) {
-			JsonNode node = mainNode.next();
-			String code = node.get("id").asText();
-			String value = node.get("value").asText();
+		for(PossibleValue p:lPossibleValues){
+
 			FieldValue fv = new FieldValue();
 			fv.setIndex(index++);
-			fv.setCode(code);
-			fv.setValue(value);
+			fv.setCode(p.getId().toString());
+			fv.setValue(p.getValue());
 			//TODO THIS IS A WORKAROUND TO BE FIXED BEFORE THE RELEASE
-			/*if (node.get("extra_info") != null) {
-				fv.getProperties().put("extra_info", node.get("extra_info"));			
-			}*/
-			
-			if (node.get("translated-value") != null) {			        
-			    Iterator <Entry<String,JsonNode>> iter = node.get("translated-value").fields();			    
-                while(iter.hasNext()){
-                    Entry<String,JsonNode>lang = iter.next();                   
-                    fv.getTranslatedValue().put(lang.getKey(),lang.getValue().asText());
-                }
-            }
-			
-			
+			fv.setProperties(p.getExtraInfo());
+			fv.setTranslatedValue(p.getTranslatedValues());
 			possibleValues.add(fv);
 		}
 		return possibleValues;
