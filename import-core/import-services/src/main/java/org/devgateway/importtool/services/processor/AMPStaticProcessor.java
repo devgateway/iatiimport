@@ -1288,70 +1288,70 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			fieldList.add(activityStatus);
 		}
 
-		if (existFieldInAmp(A_C_CHAPTER)) {
-			Field acChapter = new Field("AC Chapter", A_C_CHAPTER, FieldType.LIST, true);
-			acChapter.setPossibleValues(getCodeListValues(A_C_CHAPTER));
+		if (existFieldInAmp(AMP_A_C_CHAPTER)) {
+			Field acChapter = new Field("AC Chapter", AMP_A_C_CHAPTER, FieldType.LIST, true);
+			acChapter.setPossibleValues(getCodeListValues(AMP_A_C_CHAPTER));
 			acChapter.setRequired(false);
-			acChapter.setMultiLangDisplayName(getFieldLable(A_C_CHAPTER));
+			acChapter.setMultiLangDisplayName(getFieldLable(AMP_A_C_CHAPTER));
 			fieldList.add(acChapter);
 		}
 
-		if (existFieldInAmp(FUNDINGS_TYPE_OF_ASSISTANCE)) {
-			Field typeOfAssistence = new Field("Type of Assistance", TYPE_OF_ASSISTANCE, FieldType.LIST, true);
-			typeOfAssistence.setPossibleValues(getCodeListValues(FUNDINGS_TYPE_OF_ASSISTANCE));
-			typeOfAssistence.setMultiLangDisplayName(getFieldLable(FUNDINGS_TYPE_OF_ASSISTANCE));
+		if (existFieldInAmp(AMP_FUNDINGS_TYPE_OF_ASSISTANCE)) {
+			Field typeOfAssistence = new Field("Type of Assistance", AMP_TYPE_OF_ASSISTANCE, FieldType.LIST, true);
+			typeOfAssistence.setPossibleValues(getCodeListValues(AMP_FUNDINGS_TYPE_OF_ASSISTANCE));
+			typeOfAssistence.setMultiLangDisplayName(getFieldLable(AMP_FUNDINGS_TYPE_OF_ASSISTANCE));
 			fieldList.add(typeOfAssistence);
 			trnDependencies.add(typeOfAssistence);
 		}
 
-		if (existFieldInAmp(FUNDINGS_FINANCING_INSTRUMENT)) {
-			Field financialInstrument = new Field("Aid Modality", FINANCING_INSTRUMENT, FieldType.LIST, true);
-			financialInstrument.setPossibleValues(getCodeListValues(FUNDINGS_FINANCING_INSTRUMENT));
+		if (existFieldInAmp(AMP_FUNDINGS_FINANCING_INSTRUMENT)) {
+			Field financialInstrument = new Field("Aid Modality", AMP_FINANCING_INSTRUMENT, FieldType.LIST, true);
+			financialInstrument.setPossibleValues(getCodeListValues(AMP_FUNDINGS_FINANCING_INSTRUMENT));
 			financialInstrument
-					.setMultiLangDisplayName(getFieldLable(FUNDINGS_FINANCING_INSTRUMENT));
+					.setMultiLangDisplayName(getFieldLable(AMP_FUNDINGS_FINANCING_INSTRUMENT));
 
 			fieldList.add(financialInstrument);
 			trnDependencies.add(financialInstrument);
 		}
 
-		if (existFieldInAmp(FUNDINGS_FUNDING_DETAILS_ADJUSTMENT_TYPE)) {
+		if (existFieldInAmp(AMP_FUNDINGS_FUNDING_DETAILS_ADJUSTMENT_TYPE)) {
 			Field adjustmentType = new Field("Adjustment Type", "adjustment_type", FieldType.LIST,
 					false);
-			adjustmentType.setPossibleValues(getCodeListValues(FUNDINGS_FUNDING_DETAILS_ADJUSTMENT_TYPE));
+			adjustmentType.setPossibleValues(getCodeListValues(AMP_FUNDINGS_FUNDING_DETAILS_ADJUSTMENT_TYPE));
 			adjustmentType
-					.setMultiLangDisplayName(getFieldLable(FUNDINGS_FUNDING_DETAILS_ADJUSTMENT_TYPE));
+					.setMultiLangDisplayName(getFieldLable(AMP_FUNDINGS_FUNDING_DETAILS_ADJUSTMENT_TYPE));
 			fieldList.add(adjustmentType);
 		}
 
-		if (existFieldInAmp(FUNDINGS_FUNDING_DETAILS_TRANSACTION_TYPE)) {
-			Field transactionType = new Field("Transaction Type", TRANSACTION_TYPE, FieldType.LIST, false);
-		transactionType.setPossibleValues(getCodeListValues(FUNDINGS_FUNDING_DETAILS_TRANSACTION_TYPE));
+		if (existFieldInAmp(AMP_FUNDINGS_FUNDING_DETAILS_TRANSACTION_TYPE)) {
+			Field transactionType = new Field("Transaction Type", AMP_TRANSACTION_TYPE, FieldType.LIST, false);
+		transactionType.setPossibleValues(getCodeListValues(AMP_FUNDINGS_FUNDING_DETAILS_TRANSACTION_TYPE));
 			transactionType
-					.setMultiLangDisplayName(getFieldLable(FUNDINGS_FUNDING_DETAILS_TRANSACTION_TYPE));
+					.setMultiLangDisplayName(getFieldLable(AMP_FUNDINGS_FUNDING_DETAILS_TRANSACTION_TYPE));
 			fieldList.add(transactionType);
 		}
 
-		if (existFieldInAmp(PRIMARY_SECTORS_SECTOR)) {
-			Field primarySector = new Field("Primary Sector", PRIMARY_SECTORS, FieldType.LIST, true);
-			primarySector.setPossibleValues(getCodeListValues(PRIMARY_SECTORS_SECTOR));
+		if (existFieldInAmp(AMP_PRIMARY_SECTORS_SECTOR)) {
+			Field primarySector = new Field("Primary Sector", AMP_PRIMARY_SECTORS, FieldType.LIST, true);
+			primarySector.setPossibleValues(getCodeListValues(AMP_PRIMARY_SECTORS_SECTOR));
 			primarySector.setMultiple(true);
 			primarySector
-					.setMultiLangDisplayName(getFieldLable(PRIMARY_SECTORS));
+					.setMultiLangDisplayName(getFieldLable(AMP_PRIMARY_SECTORS));
 			fieldList.add(primarySector);
 		}
 
-		if (existFieldInAmp(SECONDARY_SECTORS_SECTOR)) {
-			Field secondarySector = new Field("Secondary Sector", SECONDARY_SECTORS, FieldType.LIST, true);
-			secondarySector.setPossibleValues(getCodeListValues(SECONDARY_SECTORS_SECTOR));
+		if (existFieldInAmp(AMP_SECONDARY_SECTORS_SECTOR)) {
+			Field secondarySector = new Field("Secondary Sector", AMP_SECONDARY_SECTORS, FieldType.LIST, true);
+			secondarySector.setPossibleValues(getCodeListValues(AMP_SECONDARY_SECTORS_SECTOR));
 			secondarySector
-					.setMultiLangDisplayName(getFieldLable(SECONDARY_SECTORS));
+					.setMultiLangDisplayName(getFieldLable(AMP_SECONDARY_SECTORS));
 			fieldList.add(secondarySector);
 		}
 
-		if (existFieldInAmp(TERTIARY_SECTORS_SECTOR)) {
-			Field tertiarySector = new Field("Tertiary Sector", TERTIARY_SECTORS, FieldType.LIST, true);
-			tertiarySector.setPossibleValues(getCodeListValues("TERTIARY_SECTORS_SECTOR"));
-			tertiarySector.setMultiLangDisplayName(getFieldLable(TERTIARY_SECTORS));
+		if (existFieldInAmp(AMP_TERTIARY_SECTORS_SECTOR)) {
+			Field tertiarySector = new Field("Tertiary Sector", AMP_TERTIARY_SECTORS, FieldType.LIST, true);
+			tertiarySector.setPossibleValues(getCodeListValues("AMP_TERTIARY_SECTORS_SECTOR"));
+			tertiarySector.setMultiLangDisplayName(getFieldLable(AMP_TERTIARY_SECTORS));
 			fieldList.add(tertiarySector);
 		}
 
@@ -1433,19 +1433,19 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				Field org = new Field(label, name, FieldType.ORGANIZATION, true);
 				org.setMultiLangDisplayName(getFieldLable(name));
 				//TODO REVIEW THIS
-				org.setPossibleValues(getCodeListValues(FUNDINGS_DONOR_ORGANIZATION_ID));
+				org.setPossibleValues(getCodeListValues(AMP_FUNDINGS_DONOR_ORGANIZATION_ID));
 
 				org.setPercentage(getOrganisationPercentage(name));
 				fieldList.add(org);
 			}
 		});
 
-		if (existFieldInAmp(FUNDINGS_DONOR_ORGANIZATION_ID)) {
+		if (existFieldInAmp(AMP_FUNDINGS_DONOR_ORGANIZATION_ID)) {
 			Field fundingOrganization = new Field("Funding Organization", "donor_organization", FieldType.ORGANIZATION,
 					true);
-			fundingOrganization.setPossibleValues(getCodeListValues(FUNDINGS_DONOR_ORGANIZATION_ID));
+			fundingOrganization.setPossibleValues(getCodeListValues(AMP_FUNDINGS_DONOR_ORGANIZATION_ID));
 			fundingOrganization
-					.setMultiLangDisplayName(getFieldLable(FUNDINGS_DONOR_ORGANIZATION_ID));
+					.setMultiLangDisplayName(getFieldLable(AMP_FUNDINGS_DONOR_ORGANIZATION_ID));
 			fundingOrganization.setPercentage(getOrganisationPercentage("donor_organization"));
 			fieldList.add(fundingOrganization);
 			trnDependencies.add(fundingOrganization);
@@ -1500,8 +1500,8 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		}
 		// Currency
 		Field currency = new Field("Currency Code", "currency_code", FieldType.LIST, true);
-		currency.setMultiLangDisplayName(getFieldLable(FUNDINGS_FUNDING_DETAILS_CURRENCY));
-		currency.setPossibleValues(getCodeListValues(FUNDINGS_FUNDING_DETAILS_CURRENCY));
+		currency.setMultiLangDisplayName(getFieldLable(AMP_FUNDINGS_FUNDING_DETAILS_CURRENCY));
+		currency.setPossibleValues(getCodeListValues(AMP_FUNDINGS_FUNDING_DETAILS_CURRENCY));
 		fieldList.add(currency);
 		
 		 if (existFieldInAmp("fundings~funding_details~disaster_response")) {
