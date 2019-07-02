@@ -22,7 +22,7 @@ var ReviewImport = React.createClass({
 	 },
 	loadData: function(){
 		    this.props.eventHandlers.showLoadingIcon();
-			appActions.loadImportSummary.triggerPromise().then(function(data) {                            
+        appActions.loadImportSummary.triggerPromise().then(function(data) {
 				this.updateImportSummary(data); 			
 				this.props.eventHandlers.hideLoadingIcon();
 			}.bind(this))["catch"](function(err) {       
@@ -134,14 +134,14 @@ var ReviewImport = React.createClass({
                     
                     <div className="row">                          
                     <div className="col-md-6">                
-                       <button ref="previousButton"   className="btn btn-success navbar-btn btn-custom btn-previous" type="button" onClick={this.handlePrevious}>{this.props.i18nLib.t('wizard.review_import.previous')}</button>
+                       <button ref="previousButton"   className="btn btn-success navbar-btn btn-custom btn-previous" disabled={this.props.importExecuted} type="button" onClick={this.handlePrevious}>{this.props.i18nLib.t('wizard.review_import.previous')}</button>
                      </div>
                    <div className="col-md-6">                
                        {this.hasMoreVersions() &&
                            <button className="btn btn-warning navbar-btn btn-custom" type="button" onClick={this.processNextVersion}>{this.props.i18nLib.t('wizard.review_import.process_next_version')}</button>
                        }
                     &nbsp;<button className="btn btn-warning navbar-btn btn-custom" type="button" onClick={this.goHome}>{this.props.i18nLib.t('wizard.review_import.restart')}</button>&nbsp;
-                   <button className="btn btn-success navbar-btn btn-custom" type="button" onClick={this.import}>{this.props.i18nLib.t('wizard.review_import.proceed_import')}</button>               
+                   <button className="btn btn-success navbar-btn btn-custom" type="button" disabled={this.props.importExecuted} onClick={this.import}>{this.props.i18nLib.t('wizard.review_import.proceed_import')}</button>
                    </div>
                    </div>                        
                    </div>
