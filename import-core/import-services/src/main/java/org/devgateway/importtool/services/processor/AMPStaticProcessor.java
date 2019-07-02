@@ -55,12 +55,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static org.devgateway.importtool.services.processor.destination.AmpStaticProcessorConstants.*;
+import static org.devgateway.importtool.services.processor.helper.Constants.*;
 
 // TODO: Sort methods, move classes to generic helpers for all processors if possible
 // TODO: Clean up code, find opportunities to reuse methods (example update/insert)
@@ -1280,86 +1280,86 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		}
 
 		// Code Lists
-		if (existFieldInAmp("activity_status")) {
-			Field activityStatus = new Field("Activity Status", "activity_status", FieldType.LIST, true);
-			activityStatus.setPossibleValues(getCodeListValues("activity_status"));
+		if (existFieldInAmp(AMP_ACTIVITY_STATUS)) {
+			Field activityStatus = new Field("Activity Status", AMP_ACTIVITY_STATUS, FieldType.LIST, true);
+			activityStatus.setPossibleValues(getCodeListValues(AMP_ACTIVITY_STATUS));
 			activityStatus.setRequired(true);
-			activityStatus.setMultiLangDisplayName(getFieldLable("activity_status"));
+			activityStatus.setMultiLangDisplayName(getFieldLable(AMP_ACTIVITY_STATUS));
 			fieldList.add(activityStatus);
 		}
 
-		if (existFieldInAmp("A C Chapter")) {
-			Field acChapter = new Field("AC Chapter", "A C Chapter", FieldType.LIST, true);
-			acChapter.setPossibleValues(getCodeListValues("A C Chapter"));
+		if (existFieldInAmp(A_C_CHAPTER)) {
+			Field acChapter = new Field("AC Chapter", A_C_CHAPTER, FieldType.LIST, true);
+			acChapter.setPossibleValues(getCodeListValues(A_C_CHAPTER));
 			acChapter.setRequired(false);
-			acChapter.setMultiLangDisplayName(getFieldLable("A C Chapter"));
+			acChapter.setMultiLangDisplayName(getFieldLable(A_C_CHAPTER));
 			fieldList.add(acChapter);
 		}
 
-		if (existFieldInAmp("fundings~type_of_assistance")) {
-			Field typeOfAssistence = new Field("Type of Assistance", "type_of_assistance", FieldType.LIST, true);
-			typeOfAssistence.setPossibleValues(getCodeListValues("fundings~type_of_assistance"));
-			typeOfAssistence.setMultiLangDisplayName(getFieldLable("fundings~type_of_assistance"));
+		if (existFieldInAmp(FUNDINGS_TYPE_OF_ASSISTANCE)) {
+			Field typeOfAssistence = new Field("Type of Assistance", TYPE_OF_ASSISTANCE, FieldType.LIST, true);
+			typeOfAssistence.setPossibleValues(getCodeListValues(FUNDINGS_TYPE_OF_ASSISTANCE));
+			typeOfAssistence.setMultiLangDisplayName(getFieldLable(FUNDINGS_TYPE_OF_ASSISTANCE));
 			fieldList.add(typeOfAssistence);
 			trnDependencies.add(typeOfAssistence);
 		}
 
-		if (existFieldInAmp("fundings~financing_instrument")) {
-			Field financialInstrument = new Field("Aid Modality", "financing_instrument", FieldType.LIST, true);
-			financialInstrument.setPossibleValues(getCodeListValues("fundings~financing_instrument"));
+		if (existFieldInAmp(FUNDINGS_FINANCING_INSTRUMENT)) {
+			Field financialInstrument = new Field("Aid Modality", FINANCING_INSTRUMENT, FieldType.LIST, true);
+			financialInstrument.setPossibleValues(getCodeListValues(FUNDINGS_FINANCING_INSTRUMENT));
 			financialInstrument
-					.setMultiLangDisplayName(getFieldLable("fundings~financing_instrument"));
+					.setMultiLangDisplayName(getFieldLable(FUNDINGS_FINANCING_INSTRUMENT));
 
 			fieldList.add(financialInstrument);
 			trnDependencies.add(financialInstrument);
 		}
 
-		if (existFieldInAmp("fundings~funding_details~adjustment_type")) {
+		if (existFieldInAmp(FUNDINGS_FUNDING_DETAILS_ADJUSTMENT_TYPE)) {
 			Field adjustmentType = new Field("Adjustment Type", "adjustment_type", FieldType.LIST,
 					false);
-			adjustmentType.setPossibleValues(getCodeListValues("fundings~funding_details~adjustment_type"));
+			adjustmentType.setPossibleValues(getCodeListValues(FUNDINGS_FUNDING_DETAILS_ADJUSTMENT_TYPE));
 			adjustmentType
-					.setMultiLangDisplayName(getFieldLable("fundings~funding_details~adjustment_type"));
+					.setMultiLangDisplayName(getFieldLable(FUNDINGS_FUNDING_DETAILS_ADJUSTMENT_TYPE));
 			fieldList.add(adjustmentType);
 		}
 
-		if (existFieldInAmp("fundings~funding_details~transaction_type")) {
-			Field transactionType = new Field("Transaction Type", "transaction_type", FieldType.LIST, false);
-		transactionType.setPossibleValues(getCodeListValues("fundings~funding_details~transaction_type"));
+		if (existFieldInAmp(FUNDINGS_FUNDING_DETAILS_TRANSACTION_TYPE)) {
+			Field transactionType = new Field("Transaction Type", TRANSACTION_TYPE, FieldType.LIST, false);
+		transactionType.setPossibleValues(getCodeListValues(FUNDINGS_FUNDING_DETAILS_TRANSACTION_TYPE));
 			transactionType
-					.setMultiLangDisplayName(getFieldLable("fundings~funding_details~transaction_type"));
+					.setMultiLangDisplayName(getFieldLable(FUNDINGS_FUNDING_DETAILS_TRANSACTION_TYPE));
 			fieldList.add(transactionType);
 		}
 
-		if (existFieldInAmp("primary_sectors~sector")) {
-			Field primarySector = new Field("Primary Sector", "primary_sectors", FieldType.LIST, true);
-			primarySector.setPossibleValues(getCodeListValues("primary_sectors~sector"));
+		if (existFieldInAmp(PRIMARY_SECTORS_SECTOR)) {
+			Field primarySector = new Field("Primary Sector", PRIMARY_SECTORS, FieldType.LIST, true);
+			primarySector.setPossibleValues(getCodeListValues(PRIMARY_SECTORS_SECTOR));
 			primarySector.setMultiple(true);
 			primarySector
-					.setMultiLangDisplayName(getFieldLable("primary_sectors"));
+					.setMultiLangDisplayName(getFieldLable(PRIMARY_SECTORS));
 			fieldList.add(primarySector);
 		}
 
-		if (existFieldInAmp("secondary_sectors~sector")) {
-			Field secondarySector = new Field("Secondary Sector", "secondary_sectors", FieldType.LIST, true);
-			secondarySector.setPossibleValues(getCodeListValues("secondary_sectors~sector"));
+		if (existFieldInAmp(SECONDARY_SECTORS_SECTOR)) {
+			Field secondarySector = new Field("Secondary Sector", SECONDARY_SECTORS, FieldType.LIST, true);
+			secondarySector.setPossibleValues(getCodeListValues(SECONDARY_SECTORS_SECTOR));
 			secondarySector
-					.setMultiLangDisplayName(getFieldLable("secondary_sectors"));
+					.setMultiLangDisplayName(getFieldLable(SECONDARY_SECTORS));
 			fieldList.add(secondarySector);
 		}
 
-		if (existFieldInAmp("tertiary_sectors~sector")) {
-			Field tertiarySector = new Field("Tertiary Sector", "tertiary_sectors", FieldType.LIST, true);
-			tertiarySector.setPossibleValues(getCodeListValues("tertiary_sectors~sector"));
-			tertiarySector.setMultiLangDisplayName(getFieldLable("tertiary_sectors"));
+		if (existFieldInAmp(TERTIARY_SECTORS_SECTOR)) {
+			Field tertiarySector = new Field("Tertiary Sector", TERTIARY_SECTORS, FieldType.LIST, true);
+			tertiarySector.setPossibleValues(getCodeListValues("TERTIARY_SECTORS_SECTOR"));
+			tertiarySector.setMultiLangDisplayName(getFieldLable(TERTIARY_SECTORS));
 			fieldList.add(tertiarySector);
 		}
 
 		// locations, locations~location, locations~location_percentage
-		if (existFieldInAmp("locations~location")) {
+		if (existFieldInAmp(LOCATIONS_LOCATION)) {
 			Field location = new Field("Location", "locations", FieldType.LOCATION, true);
-			location.setPossibleValues(getCodeListValues("locations~location"));
-			location.setMultiLangDisplayName(getFieldLable("locations~location"));
+			location.setPossibleValues(getCodeListValues(LOCATIONS_LOCATION));
+			location.setMultiLangDisplayName(getFieldLable(LOCATIONS_LOCATION));
 			location.setMultiple(true);
 			fieldList.add(location);
 		}
@@ -1433,19 +1433,19 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				Field org = new Field(label, name, FieldType.ORGANIZATION, true);
 				org.setMultiLangDisplayName(getFieldLable(name));
 				//TODO REVIEW THIS
-				org.setPossibleValues(getCodeListValues("fundings~donor_organization_id"));
+				org.setPossibleValues(getCodeListValues(FUNDINGS_DONOR_ORGANIZATION_ID));
 
 				org.setPercentage(getOrganisationPercentage(name));
 				fieldList.add(org);
 			}
 		});
 
-		if (existFieldInAmp("fundings~donor_organization_id")) {
+		if (existFieldInAmp(FUNDINGS_DONOR_ORGANIZATION_ID)) {
 			Field fundingOrganization = new Field("Funding Organization", "donor_organization", FieldType.ORGANIZATION,
 					true);
-			fundingOrganization.setPossibleValues(getCodeListValues("fundings~donor_organization_id"));
+			fundingOrganization.setPossibleValues(getCodeListValues(FUNDINGS_DONOR_ORGANIZATION_ID));
 			fundingOrganization
-					.setMultiLangDisplayName(getFieldLable("fundings~donor_organization_id"));
+					.setMultiLangDisplayName(getFieldLable(FUNDINGS_DONOR_ORGANIZATION_ID));
 			fundingOrganization.setPercentage(getOrganisationPercentage("donor_organization"));
 			fieldList.add(fundingOrganization);
 			trnDependencies.add(fundingOrganization);
@@ -1500,8 +1500,8 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		}
 		// Currency
 		Field currency = new Field("Currency Code", "currency_code", FieldType.LIST, true);
-		currency.setMultiLangDisplayName(getFieldLable("fundings~funding_details~currency"));
-		currency.setPossibleValues(getCodeListValues("fundings~funding_details~currency"));
+		currency.setMultiLangDisplayName(getFieldLable(FUNDINGS_FUNDING_DETAILS_CURRENCY));
+		currency.setPossibleValues(getCodeListValues(FUNDINGS_FUNDING_DETAILS_CURRENCY));
 		fieldList.add(currency);
 		
 		 if (existFieldInAmp("fundings~funding_details~disaster_response")) {

@@ -1,5 +1,6 @@
 package org.devgateway.importtool.services.test;
 
+import static org.devgateway.importtool.services.processor.helper.Constants.AMP_ACTIVITY_STATUS;
 import static org.hamcrest.CoreMatchers.is;
 
 import java.io.InputStream;
@@ -136,7 +137,7 @@ public class TestService {
 		}).findFirst();
 
 		Optional<Field> optDstField = destinationFields.stream().filter(n -> {
-			return n.getFieldName().equals("activity_status");
+			return n.getFieldName().equals(AMP_ACTIVITY_STATUS);
 		}).findFirst();
 
 		if (optSrcField.isPresent() && optDstField.isPresent()) {
@@ -227,7 +228,7 @@ public class TestService {
 		}).findFirst();
 
 		Optional<Field> optDstField = destinationFields.stream().filter(n -> {
-			return n.getFieldName().equals("activity_status");
+			return n.getFieldName().equals(AMP_ACTIVITY_STATUS);
 		}).findFirst();
 
 		if (optSrcField.isPresent() && optDstField.isPresent()) {

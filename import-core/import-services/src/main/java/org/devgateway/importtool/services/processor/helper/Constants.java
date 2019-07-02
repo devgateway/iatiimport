@@ -75,11 +75,37 @@ public class Constants {
 	public static final List<String> TRANSACTION_FIELDS = new ArrayList<>(Arrays.asList("Actual Commitments",
 			"Actual Disbursements","Actual Expenditures","Planned Commitments", "Planned Disbursements",
 			"Planned Expenditures"));
-	public static final List<String> LIST_OF_VALUES_TO_FETCH = new ArrayList(Arrays.asList("activity_status",
-			"A C Chapter", "fundings~type_of_assistance", "fundings~financing_instrument",
-			"fundings~funding_details~adjustment_type", "fundings~funding_details~transaction_type",
-			"primary_sectors~sector", "secondary_sectors~sector", "tertiary_sectors~sector", "locations~location",
-			"fundings~donor_organization_id", "fundings~funding_details~currency"));
+	public static final String AMP_ACTIVITY_STATUS = "activity_status";
+	public static final String A_C_CHAPTER = "A C Chapter";
+	public static final String FUNDINGS ="fundings";
+	public static final String FUNDING_DETAILS="funding_details";
+	public static final String TYPE_OF_ASSISTANCE = "type_of_assistance";
+	public static final String FUNDINGS_TYPE_OF_ASSISTANCE = FUNDINGS + "~"+ TYPE_OF_ASSISTANCE;
+	public static final String FINANCING_INSTRUMENT = "financing_instrument";
+	public static final String ADJUSTMENT_TYPE = "adjustment_type";
+	public static final String TRANSACTION_TYPE = "transaction_type";
+	public static final String FUNDINGS_FUNDING_DETAILS_ADJUSTMENT_TYPE = FUNDINGS + "~" + FUNDING_DETAILS
+			+ "~" + ADJUSTMENT_TYPE;
+	public static final String FUNDINGS_FINANCING_INSTRUMENT = FUNDINGS + "~" + FINANCING_INSTRUMENT;
+	public static final String FUNDINGS_FUNDING_DETAILS_TRANSACTION_TYPE = FUNDINGS + "~"+ FUNDING_DETAILS + "~"
+			+ TRANSACTION_TYPE;
+	public static final String PRIMARY_SECTORS = "primary_sectors";
+	public static final String SECTOR = "sector";
+	public static final String PRIMARY_SECTORS_SECTOR = PRIMARY_SECTORS + "~" + SECTOR;
+	public static final String SECONDARY_SECTORS = "secondary_sectors";
+	public static final String TERTIARY_SECTORS = "tertiary_sectors";
+	public static final String CURRENCY = "currency";
+	public static final String SECONDARY_SECTORS_SECTOR = SECONDARY_SECTORS + "~" + SECTOR;
+	public static final String TERTIARY_SECTORS_SECTOR = TERTIARY_SECTORS + "~" + SECTOR;
+	public static final String LOCATIONS_LOCATION = "locations~location";
+	public static final String DONOR_ORGANIZATION_ID = "donor_organization_id";
+	public static final String FUNDINGS_DONOR_ORGANIZATION_ID = FUNDINGS +  "~" + DONOR_ORGANIZATION_ID;
+	public static final String FUNDINGS_FUNDING_DETAILS_CURRENCY = FUNDINGS + "~"+ FUNDING_DETAILS + "~" + CURRENCY;
+	public static final List<String> LIST_OF_VALUES_TO_FETCH = new ArrayList<>(Arrays.asList(AMP_ACTIVITY_STATUS,
+			A_C_CHAPTER,FUNDINGS_TYPE_OF_ASSISTANCE , FUNDINGS_FINANCING_INSTRUMENT,
+			FUNDINGS_FUNDING_DETAILS_ADJUSTMENT_TYPE, FUNDINGS_FUNDING_DETAILS_TRANSACTION_TYPE,
+			PRIMARY_SECTORS_SECTOR, SECONDARY_SECTORS_SECTOR, TERTIARY_SECTORS_SECTOR,LOCATIONS_LOCATION ,
+			FUNDINGS_DONOR_ORGANIZATION_ID, FUNDINGS_FUNDING_DETAILS_CURRENCY));
 
 	public static final String NULL_STRING ="null";
 }
