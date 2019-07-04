@@ -792,6 +792,11 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 					if (StringUtils.isEmpty(provider.trim())) {
 						provider = organization.getValue().get("value");
 					}
+					if(provider == null){
+						break;
+					}
+					//TODO we should search organizations by ref and no by value
+					provider = provider.toUpperCase();
 
 					List<JsonBean> fundingDetails = providerFundingDetails.get(provider);
 					if (fundingDetails == null) {
