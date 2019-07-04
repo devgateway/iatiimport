@@ -5,9 +5,11 @@ package org.devgateway.importtool.rest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.dao.ValueMappingTemplateRepository;
@@ -38,30 +40,34 @@ class ValueMappingTemplateController {
 	private Log log = LogFactory.getLog(getClass());
 	
 	@RequestMapping(method = RequestMethod.POST, value = "/save")
-	public ResponseEntity<String> save(@RequestBody ValueMappingTemplateRequest valueMappingTemplateRequest, HttpServletRequest request) {	
-		
-		ValueMappingTemplate  valueMappingTemplate = valueMappingTemplateRepository.findById(valueMappingTemplateRequest.getId());
-		if(valueMappingTemplate == null) {
+	public ResponseEntity<String> save(@RequestBody ValueMappingTemplateRequest valueMappingTemplateRequest,
+									   HttpServletRequest request) {
+		Optional<ValueMappingTemplate> findValueMappingTemplate = valueMappingTemplateRequest.getId() != null ?
+				valueMappingTemplateRepository.findById(valueMappingTemplateRequest.getId()) : Optional.empty();
+
+		ValueMappingTemplate valueMappingTemplate;
+
+		if (!findValueMappingTemplate.isPresent()) {
 			valueMappingTemplate = valueMappingTemplateRepository.findByName(valueMappingTemplateRequest.getName());
 			if (valueMappingTemplate != null) {
 				return new ResponseEntity<>("{\"error\": \"mapping_exists\"}", HttpStatus.OK);
 			} else {
 				valueMappingTemplate = new ValueMappingTemplate();
 			}
+		} else {
+			valueMappingTemplate = findValueMappingTemplate.get();
 		}
-		
 		valueMappingTemplate.setName(valueMappingTemplateRequest.getName());
-		ObjectMapper mapper = new ObjectMapper();  
-		try{
-		   String mapping = mapper.writeValueAsString(valueMappingTemplateRequest.getFieldValueMapping());
-		   valueMappingTemplate.setMappingTemplate(mapping);
-		   valueMappingTemplateRepository.save(valueMappingTemplate);		
-		} catch (Exception e) {
-			log.error(e.getMessage());
-			e.printStackTrace();
-			return new ResponseEntity<>("{\"error\": \"Error saving template.\"}",HttpStatus.OK);
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			String mapping = mapper.writeValueAsString(valueMappingTemplateRequest.getFieldValueMapping());
+			valueMappingTemplate.setMappingTemplate(mapping);
+			valueMappingTemplateRepository.save(valueMappingTemplate);
+		} catch (JsonProcessingException e) {
+			log.error(e);
+			return new ResponseEntity<>("{\"error\": \"Error saving template.\"}", HttpStatus.OK);
 		}
-		
+
 		return new ResponseEntity<>("{\"id\": " + valueMappingTemplate.getId() + ", \"name\": \"" + valueMappingTemplate.getName() + "\" }", HttpStatus.OK);
 	}
 	
@@ -82,24 +88,27 @@ class ValueMappingTemplateController {
 	public ResponseEntity<ValueMappingTemplateReponse> findById(@PathVariable Long id, HttpServletRequest request) {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
-		ValueMappingTemplate  valueMappingTemplate = valueMappingTemplateRepository.findById(id);		
-		ValueMappingTemplateReponse valueMappingTemplateReponse = new ValueMappingTemplateReponse();
-	    try{
-			List<FieldValueMapping> valueMappings = mapper.readValue(valueMappingTemplate.getMappingTemplate(), mapper.getTypeFactory().constructCollectionType(List.class, FieldValueMapping.class));
-			valueMappingTemplateReponse.setFieldValueMapping(valueMappings);
-	     }catch(IOException ioex){
-				log.error(ioex.getMessage());
-				ioex.printStackTrace();
-		}			
-	    valueMappingTemplateReponse.setId(valueMappingTemplate.getId());
-		valueMappingTemplateReponse.setName(valueMappingTemplate.getName());			
-		
-		return new ResponseEntity<>(valueMappingTemplateReponse, HttpStatus.OK);
+		return valueMappingTemplateRepository.findById(id).map(valueMappingTemplate -> {
+			ValueMappingTemplateReponse valueMappingTemplateReponse = new ValueMappingTemplateReponse();
+			try {
+				List<FieldValueMapping> valueMappings = mapper.readValue(valueMappingTemplate.getMappingTemplate(),
+						mapper.getTypeFactory().constructCollectionType(List.class, FieldValueMapping.class));
+				valueMappingTemplateReponse.setFieldValueMapping(valueMappings);
+			} catch (IOException ioex) {
+				log.error(ioex);
+				throw new RuntimeException("Template cannot be deserialized", ioex);
+			}
+			valueMappingTemplateReponse.setId(valueMappingTemplate.getId());
+			valueMappingTemplateReponse.setName(valueMappingTemplate.getName());
+
+			return new ResponseEntity<>(valueMappingTemplateReponse, HttpStatus.OK);
+
+		}).orElseThrow(() -> new RuntimeException("Cannot find template by id"));
 	}
 	
 	@RequestMapping(method = RequestMethod.DELETE, value = "/delete/{id}")
 	public ResponseEntity<String> delete(@PathVariable Long id, HttpServletRequest request) {
-		valueMappingTemplateRepository.delete(id);	
+		valueMappingTemplateRepository.deleteById(id);
 		return new ResponseEntity<>("{}", HttpStatus.OK);
 	}
 	

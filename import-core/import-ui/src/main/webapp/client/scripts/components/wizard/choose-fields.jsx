@@ -79,8 +79,6 @@ var ChooseFields = React.createClass({
 		this.errorMsg = "";
 		this.props.eventHandlers.showLoadingIcon();
 		appActions.loadDestinationFieldsData.triggerPromise().then(function(data) {
-		  debugger;
-
 			this.updateDestinationFields(data);
 			this.destDataLoaded = true;
 			this.hideLoadingIcon();

@@ -19,13 +19,11 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = IATI105ProcessorTests.TestIATI105ProcessorConfiguration.class)
 @Transactional
-@TransactionConfiguration
 public class IATI105ProcessorTests {
 		
 	@Before

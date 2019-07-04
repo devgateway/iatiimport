@@ -1,5 +1,6 @@
 package org.devgateway.importtool.services.test;
 
+import static org.devgateway.importtool.services.processor.helper.Constants.AMP_ACTIVITY_STATUS;
 import static org.hamcrest.CoreMatchers.is;
 
 import java.io.InputStream;
@@ -33,13 +34,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = TestService.TestServiceConfiguration.class)
 @Transactional
-@TransactionConfiguration
 /***
  * Sample test
  * @author Fernando
@@ -138,7 +137,7 @@ public class TestService {
 		}).findFirst();
 
 		Optional<Field> optDstField = destinationFields.stream().filter(n -> {
-			return n.getFieldName().equals("activity_status");
+			return n.getFieldName().equals(AMP_ACTIVITY_STATUS);
 		}).findFirst();
 
 		if (optSrcField.isPresent() && optDstField.isPresent()) {
@@ -229,7 +228,7 @@ public class TestService {
 		}).findFirst();
 
 		Optional<Field> optDstField = destinationFields.stream().filter(n -> {
-			return n.getFieldName().equals("activity_status");
+			return n.getFieldName().equals(AMP_ACTIVITY_STATUS);
 		}).findFirst();
 
 		if (optSrcField.isPresent() && optDstField.isPresent()) {

@@ -11,7 +11,8 @@ var LandingPage = React.createClass({
     ],
     getInitialState: function() {
 		return {
-		    reportingOrgsWithUpdates: []
+		  reportingOrgsWithUpdates: [],
+      hasValidSession: false
 		};
 	}, 
 	updateReportingOrgsWithUpdates: function(data) {        
@@ -25,8 +26,14 @@ var LandingPage = React.createClass({
 	     }.bind(this));      
 	},
     componentDidMount: function() {
-       this.loadData();
-	   this.resetSession();	   
+      let hasValidSession = common.hasValidSession();
+      this.setState({hasValidSession:hasValidSession});
+      if(hasValidSession){
+        this.loadData();
+        this.resetSession();
+        common.refreshToken();
+      }
+
 	},
 	resetSession: function() {
 	    $.get('/importer/import/wipeall', function(){}); 
@@ -43,8 +50,9 @@ var LandingPage = React.createClass({
            return (<div></div>);
         }                  
                 
-        return (<div className="container"> 
-                {common.hasValidSession() &&
+        return (<div className="container">
+            {console.log(this.state)}
+                {this.state.hasValidSession &&
                     <div className="row">
                     <div className="col-md-2">
                     </div>   
@@ -84,7 +92,7 @@ var LandingPage = React.createClass({
                    </div>                   
                 }
                 
-                {(common.hasValidSession() == false) &&
+                {(!this.state.hasValidSession) &&
                     <div className="container"><br/><div className="alert alert-danger server-status-message" role="alert" ><span className="glyphicon glyphicon-exclamation-sign error-box" aria-hidden="true"></span><span className="sr-only">Error:</span><span > {window.i18nLib.t('wizard.invalid_session')}</span> </div></div>
                 }
         		 

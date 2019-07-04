@@ -60,7 +60,7 @@ public class Constants {
 	public static final String ACCOUNTABLE_ORG_DISPLAY_NAME = "Accountable Organization";
 	public static final Set<String> SUPPORTED_LOCALES= new HashSet<>(Arrays.asList("en","fr", "es"));
 
-	public static final Integer AMP_PUSH_BATCH_SIZE = 1;
+	public static final Integer AMP_PUSH_BATCH_SIZE = 3;
 	public static final Integer AMP_PULL_BATCH_SIZE = 100;
 	public static final String AMP_ACTIVITY_ENDPOINT = "rest/activity";
 
@@ -75,6 +75,40 @@ public class Constants {
 	public static final List<String> TRANSACTION_FIELDS = new ArrayList<>(Arrays.asList("Actual Commitments",
 			"Actual Disbursements","Actual Expenditures","Planned Commitments", "Planned Disbursements",
 			"Planned Expenditures"));
-	
+	public static final String AMP_ACTIVITY_STATUS = "activity_status";
+	public static final String AMP_A_C_CHAPTER = "A C Chapter";
+	public static final String AMP_FUNDINGS ="fundings";
+	public static final String AMP_FUNDING_DETAILS ="funding_details";
+	public static final String AMP_TYPE_OF_ASSISTANCE = "type_of_assistance";
+	public static final String AMP_FUNDINGS_TYPE_OF_ASSISTANCE = AMP_FUNDINGS + "~"+ AMP_TYPE_OF_ASSISTANCE;
+	public static final String AMP_FINANCING_INSTRUMENT = "financing_instrument";
+	public static final String AMP_ADJUSTMENT_TYPE = "adjustment_type";
+	public static final String AMP_TRANSACTION_TYPE = "transaction_type";
+
+	public static final String AMP_PRIMARY_SECTORS = "primary_sectors";
+	public static final String AMP_SECTOR = "sector";
+	public static final String AMP_SECONDARY_SECTORS = "secondary_sectors";
+	public static final String AMP_TERTIARY_SECTORS = "tertiary_sectors";
+	public static final String AMP_CURRENCY = "currency";
+	public static final String LOCATIONS_LOCATION = "locations~location";
+	public static final String DONOR_ORGANIZATION_ID = "donor_organization_id";
+	public static final String AMP_FUNDINGS_FUNDING_DETAILS_ADJUSTMENT_TYPE = AMP_FUNDINGS + "~" + AMP_FUNDING_DETAILS
+			+ "~" + AMP_ADJUSTMENT_TYPE;
+	public static final String AMP_FUNDINGS_FINANCING_INSTRUMENT = AMP_FUNDINGS + "~" + AMP_FINANCING_INSTRUMENT;
+	public static final String AMP_FUNDINGS_FUNDING_DETAILS_TRANSACTION_TYPE = AMP_FUNDINGS + "~"+ AMP_FUNDING_DETAILS + "~"
+			+ AMP_TRANSACTION_TYPE;
+	public static final String AMP_PRIMARY_SECTORS_SECTOR = AMP_PRIMARY_SECTORS + "~" + AMP_SECTOR;
+
+	public static final String AMP_SECONDARY_SECTORS_SECTOR = AMP_SECONDARY_SECTORS + "~" + AMP_SECTOR;
+	public static final String AMP_TERTIARY_SECTORS_SECTOR = AMP_TERTIARY_SECTORS + "~" + AMP_SECTOR;
+
+	public static final String AMP_FUNDINGS_DONOR_ORGANIZATION_ID = AMP_FUNDINGS +  "~" + DONOR_ORGANIZATION_ID;
+	public static final String AMP_FUNDINGS_FUNDING_DETAILS_CURRENCY = AMP_FUNDINGS + "~"+ AMP_FUNDING_DETAILS + "~" + AMP_CURRENCY;
+	public static final List<String> LIST_OF_VALUES_TO_FETCH = new ArrayList<>(Arrays.asList(AMP_ACTIVITY_STATUS,
+			AMP_A_C_CHAPTER, AMP_FUNDINGS_TYPE_OF_ASSISTANCE, AMP_FUNDINGS_FINANCING_INSTRUMENT,
+			AMP_FUNDINGS_FUNDING_DETAILS_ADJUSTMENT_TYPE, AMP_FUNDINGS_FUNDING_DETAILS_TRANSACTION_TYPE,
+			AMP_PRIMARY_SECTORS_SECTOR, AMP_SECONDARY_SECTORS_SECTOR, AMP_TERTIARY_SECTORS_SECTOR,LOCATIONS_LOCATION ,
+			AMP_FUNDINGS_DONOR_ORGANIZATION_ID, AMP_FUNDINGS_FUNDING_DETAILS_CURRENCY));
+
 	public static final String NULL_STRING ="null";
 }

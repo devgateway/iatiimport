@@ -30,7 +30,8 @@ var Wizard = React.createClass({
 			projectWithUpdates:[],
 			currentVersion: null,
 			statusMessage: "",
-			showDisasterResponse: false
+			showDisasterResponse: false,
+      importExecuted: false
 		};
 	},
 	componentWillReceiveProps: function(nextProps) {
@@ -80,6 +81,7 @@ var Wizard = React.createClass({
 	           common.refreshToken();            
 	    }.bind(this))["catch"](function(err) {
 	            common.resetAuthCookies();
+	            this.goHome();
 	    }.bind(this));
 	        
 	                
@@ -264,8 +266,9 @@ var Wizard = React.createClass({
         window.location = "#";
     },
 	launchImport: function(importOption, disasterResponse) {
-		var self = this;
 		this.showLoadingIcon();
+		//when we launch the import we unblock the previous button
+		this.setState({importExecuted:false});
 		$.ajax({
 	    	url: '/importer/import/execute',
 	        dataType: 'json',
@@ -275,7 +278,6 @@ var Wizard = React.createClass({
 	        },
 	        type: 'POST'
 	     });
-
 		var self = this;
 		self.setIntervalId = setInterval(function(){
     		self.checkImportStatus();
@@ -291,7 +293,16 @@ var Wizard = React.createClass({
 	        if(data.importStatus){
 	          if(data.importStatus.status == "COMPLETED"){
 	    			clearInterval(self.setIntervalId);
-	    			self.setState({results: data.results});
+	    			//once import is completed we disable previous button
+            //If at least one is sucess. If all errors we allow to go back and fix
+              var shouldBlock = false;
+              if(data.results) {
+                shouldBlock = data.results.some(function (r) {
+                  return r.status === constants.OK;
+                });
+              }
+              self.setState({importExecuted:shouldBlock});
+              self.setState({results: data.results});
 		        	self.hideLoadingIcon();
 		            $("#modalResults").modal("show");
 		            self.setState({statusMessage: ""});
@@ -414,7 +425,7 @@ var Wizard = React.createClass({
       </div>
       </div>
       </div>
-      <ImportReport results={this.state.results} {...this.props} />
+      <ImportReport results={this.state.results} {...this.props} importExecuted={this.state.importExecuted}/>
       </div>
       );
   }

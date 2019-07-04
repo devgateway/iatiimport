@@ -2,25 +2,18 @@ package org.devgateway.importtool.main;
 
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 import javax.servlet.SessionCookieConfig;
 
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.web.WebMvcAutoConfiguration;
-//import org.springframework.boot.context.embedded.ServletContextInitializer;
+import org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
-//@ComponentScan()
 @Configuration
 @EnableScheduling
-@EnableWebMvc
 @SpringBootApplication(scanBasePackages ={ "org.devgateway.importtool.main",
 		"org.devgateway.importtool.services", "org.devgateway.importtool.rest," +
 		"org.devgateway.importtool.scheduler" } )
@@ -46,8 +39,7 @@ public class Application extends WebMvcAutoConfiguration {
 			ServletContextInitializer {
 
 		@Override
-		public void onStartup(ServletContext servletContext)
-				throws ServletException {
+		public void onStartup(ServletContext servletContext) {
 			SessionCookieConfig sessionCookieConfig = servletContext
 					.getSessionCookieConfig();
 			sessionCookieConfig.setName("TOMCATSESSIONID");

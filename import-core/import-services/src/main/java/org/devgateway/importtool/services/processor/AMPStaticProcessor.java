@@ -1,83 +1,101 @@
 package org.devgateway.importtool.services.processor;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.endpoint.EPMessages;
 import org.devgateway.importtool.exceptions.CurrencyNotFoundException;
 import org.devgateway.importtool.services.dto.JsonBean;
 import org.devgateway.importtool.services.dto.MappedProject;
-import org.devgateway.importtool.services.processor.helper.*;
+import org.devgateway.importtool.services.processor.destination.TokenCookieHeaderInterceptor;
+import org.devgateway.importtool.services.processor.dto.APIField;
+import org.devgateway.importtool.services.processor.dto.PossibleValue;
+import org.devgateway.importtool.services.processor.helper.ActionResult;
+import org.devgateway.importtool.services.processor.helper.ActionStatus;
+import org.devgateway.importtool.services.processor.helper.Constants;
+import org.devgateway.importtool.services.processor.helper.DocumentMapping;
+import org.devgateway.importtool.services.processor.helper.Field;
+import org.devgateway.importtool.services.processor.helper.FieldMapping;
+import org.devgateway.importtool.services.processor.helper.FieldType;
+import org.devgateway.importtool.services.processor.helper.FieldValue;
+import org.devgateway.importtool.services.processor.helper.FieldValueMapping;
+import org.devgateway.importtool.services.processor.helper.IDestinationProcessor;
+import org.devgateway.importtool.services.processor.helper.InternalDocument;
+import org.devgateway.importtool.services.processor.helper.ValueMappingException;
+import org.devgateway.importtool.services.processor.helper.ValueNotEnabledException;
 import org.devgateway.importtool.services.request.ImportRequest;
+import org.springframework.context.annotation.Scope;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.web.client.*;
+import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
-import org.springframework.util.StringUtils;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+
+import static org.devgateway.importtool.services.processor.destination.AmpStaticProcessorConstants.*;
+import static org.devgateway.importtool.services.processor.helper.Constants.*;
 
 // TODO: Sort methods, move classes to generic helpers for all processors if possible
 // TODO: Clean up code, find opportunities to reuse methods (example update/insert)
 // TODO: Add default values when mappings are missing, reading them from configuration db or files
 // TODO: Better error handling to the end user. Friendlier user messages, specially when referencing a missing dependency
-
+@Component("AMP_PROCESSOR")
+@Scope("session")
 public class AMPStaticProcessor implements IDestinationProcessor {
 	private String descriptiveName = "AMP";
-	static final String BASEURL_PROPERTY = "AMPStaticProcessor.baseURL";
-	static final String BASEURL_DEFAULT_VALUE = "http://localhost:8081";
-	static final String AMP_IATI_ID_FIELD_PROPERTY = "AMPStaticProcessor.ampIatiIdField";
-	static final String AMP_IATI_ID_FIELD_DEFAULT_VALUE = "project_code";
-	private static final String DEFAULT_LANGUAGE_CODE = "en";
-	static final String AMP_IMPLEMENTATION_LEVEL_ID_FIELD_PROPERTY= "AMPStaticProcessor.implementationLevel";
-	static final Integer AMP_IMPLEMENTATION_LEVEL_ID_DEFAULT_VALUE = 70; //Coming form common AMP configuration
+
+
     private Log log = LogFactory.getLog(getClass());
 	// AMP Configuration Details
-	private String DEFAULT_ID_FIELD = "amp-identifier";
-	private String DEFAULT_TITLE_FIELD = "project_title";
 	private String baseURL;
 	private String ampIatiIdField;
 	private Integer ampImplementationLevel;
-	private String fieldsEndpoint = "/rest/activity/fields";
-	private String allFieldsEndpoit = "/rest/activity/field/values";
-	private String translationEndPoints = "/rest/translations/translate?translations=";
-	private String documentsEndpoint = "/rest/activity/projects";
 
 	private List<Field> fieldList = new ArrayList<Field>();
 	private List<ClientHttpRequestInterceptor> interceptors = new ArrayList<ClientHttpRequestInterceptor>();
-	private List<String> destinationFieldsList = new ArrayList<String>(); // fields returned by current AMP installation
-	private Map<String, List<FieldValue>> allFieldValuesForDestinationProcessor; // this holds the list of possible
-	// values that wr retrive from the endpoint at once, instead of one by one
-	private HashMap<String, Map<String, String>> destinationFieldsListLabels = new HashMap<String, Map<String, String>>();
+
+	private Map<String, List<FieldValue>> allFieldValuesForDestinationProcessor;
+	// this holds the list of possible
+	private List<APIField> ampFieldsDefinition;
 	// translations we ask amp to translate for us
 	private Map<String, Map<String, String>> ampTranslations = new HashMap<>();
 
 
-	public List<String> getDestinationFieldsList() {
-		return destinationFieldsList;
-	}
 	private String processorVersion;
-
-	public void setDestinationFieldsList(List<String> destinationFieldsList) {
-		this.destinationFieldsList = destinationFieldsList;
-	}
 
 	//list of projects to be sent to the AMP
 	private List<MappedProject> projectsReadyToBePosted;
 	//List of projects to be updated into the amp. Will be loaded in batches
 	List<JsonBean> projectsToBeUpdated;
 
+	JsonNode jnDestinationDocuments;
 	@Override
 	public String getProcessorVersion() {
 		return processorVersion;
@@ -90,30 +108,6 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	private RestTemplate restTemplate;
 
 	private ActionStatus actionStatus;
-
-	protected static final Map<String, String> tTNameSourceMap = new HashMap<String, String>() {
-		{
-			put("AC", Constants.COMMITMENTS);
-			put("AD", Constants.DISBURSEMENTS);
-			put("AE", Constants.EXPENDITURES);
-			put("PC", Constants.COMMITMENTS);
-			put("PD", Constants.DISBURSEMENTS);
-			put("PE", Constants.EXPENDITURES);
-		}
-	};
-
-	protected static final Map<String, String> aTNameDestinationMap = new HashMap<String, String>() {
-		{
-			put("AC", Constants.ACTUAL);
-			put("AD", Constants.ACTUAL);
-			put("AE", Constants.ACTUAL);
-			put("PC", Constants.PLANNED);
-			put("PD", Constants.PLANNED);
-			put("PE", Constants.PLANNED);
-
-
-		}
-	};
 
 	public ActionStatus getActionStatus() {
 		return actionStatus;
@@ -130,13 +124,17 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	public void setActionStatus(ActionStatus actionStatus) {
 		this.actionStatus = actionStatus;
 	}
+	public AMPStaticProcessor(){
 
-	public AMPStaticProcessor(String authenticationToken) {
+	}
+	@Override
+	public void initialize(String authenticationToken) {
 
 		this.setAuthenticationToken(authenticationToken);
 		this.restTemplate = getRestTemplate();
 
 		baseURL = System.getProperty(BASEURL_PROPERTY);
+
 		if (StringUtils.isEmpty(baseURL)) {
 			this.baseURL = BASEURL_DEFAULT_VALUE;
 		}
@@ -152,39 +150,66 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			ampImplementationLevel = AMP_IMPLEMENTATION_LEVEL_ID_DEFAULT_VALUE;
 		}
 		initializeProjectsLists();
+		initializeDestinationDocuments();
 		instantiateStaticFields();
+		fetchDestinationDocuments();
+	}
+
+	@Override
+	public void reset(){
+		baseURL = null;
+		ampIatiIdField = null;
+		ampImplementationLevel = null;
+		fieldList =  new ArrayList<>();
+		interceptors.clear();
+		allFieldValuesForDestinationProcessor = null;
+		ampTranslations = new HashMap<>();
+		processorVersion = null;
+		projectsReadyToBePosted = new ArrayList<>();
+		projectsToBeUpdated = new ArrayList<>();
+		restTemplate = null;
+		actionStatus = null;
+		jnDestinationDocuments = null;
 	}
 
 	private void initializeProjectsLists() {
 		this.projectsReadyToBePosted = new ArrayList<>();
 		this.projectsToBeUpdated = new ArrayList<>();
 	}
+	private void initializeDestinationDocuments(){
+		jnDestinationDocuments = null;
+	}
 
 	@Override
 	public List<Field> getFields() {
 		return fieldList;
 	}
-	JsonNode jsonNode;
+
+	private void fetchDestinationDocuments()  {
+		String result ;
+		try {
+			result = this.restTemplate.getForObject(baseURL + DOCUMENTS_END_POINT, String.class);
+			ObjectMapper mapper = new ObjectMapper();
+			jnDestinationDocuments = mapper.readTree(result);
+		}
+		catch(Exception ex){
+			log.error("cannot get project list from amp");
+			// FIXME this expception should not be swollen Ill but so far initilizacion errors are not properly reported
+			// FIXME in next refactoring ticket ill try to fix this and report to the client
+		}
+	}
 	@Override
 	// Updated!
 	public List<InternalDocument> getDocuments(Boolean onlyEditable) {
 		actionStatus = new ActionStatus(EPMessages.FETCHING_DESTINATION_PROJECTS.getDescription(), 0L,
 				EPMessages.FETCHING_DESTINATION_PROJECTS.getCode());
-		List<InternalDocument> list = new ArrayList<InternalDocument>();
-		String result = "";
-
+		List<InternalDocument> list = new ArrayList<>();
 		try {
-			if (jsonNode == null) {
-				// we go only once to fetch documents since it make no sense to fetch 3k project
-				// twice. if its faster ill save the list of editable and non editable on init and will only return
-				// the list filtered
-				result = this.restTemplate.getForObject(baseURL + this.getDocumentsEndpoint(), String.class);
-				ObjectMapper mapper = new ObjectMapper();
-
-				jsonNode = mapper.readTree(result);
+			if (jnDestinationDocuments == null) {
+				fetchDestinationDocuments();
 			}
-			if (jsonNode.isArray()) {
-				jsonNode.forEach((JsonNode node) -> {
+			if (jnDestinationDocuments.isArray()) {
+				jnDestinationDocuments.forEach((JsonNode node) -> {
 					InternalDocument document = new InternalDocument();
 
 					Boolean edit = node.get("edit").asBoolean();
@@ -254,27 +279,12 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		return DEFAULT_TITLE_FIELD;
 	}
 
-	private String getFieldsEndpoint() {
-		return fieldsEndpoint;
-	}
-
-	public String getAllFieldsEndpoit() {
-		return allFieldsEndpoit;
-	}
-
 	@Override
 	public void setAuthenticationToken(String authToken) {
 		this.interceptors.clear();
-		this.interceptors.add(new TokenHeaderInterceptor(authToken));
+		this.interceptors.add(new TokenCookieHeaderInterceptor(authToken));
 	}
 
-	public String getDocumentsEndpoint() {
-		return documentsEndpoint;
-	}
-
-	public void setDocumentsEndpoint(String documentsEndpoint) {
-		this.documentsEndpoint = documentsEndpoint;
-	}
 
 	private void updateProject(JsonBean project, InternalDocument source, List<FieldMapping> fieldMappings,
 			List<FieldValueMapping> valueMappings, boolean overrideTitle, ImportRequest importRequest)
@@ -299,15 +309,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				if (locations != null) {
 					project.set(destinationField.getFieldName(), locations);
 				}
-				//TODO THIS IS A WORKAROUND TO BE FIXED BEFORE THE RELEASE
-				/*Properties props = getExtraInfo(source, optValueMappingLocation.get(), false);
-				if (props != null) {
-					@SuppressWarnings("unchecked")
-					LinkedHashMap<String, Integer> hm = (LinkedHashMap<String, Integer>) props.get("extra_info");
-					Integer implementationLocation = hm.get("implementation_level_id");
-					project.set("implementation_location", implementationLocation);
-					project.set("implementation_level", ampImplementationLevel);
-				}*/
+				getLocationFromExtraInfo(project, getExtraInfo(source, optValueMappingLocation.get(), false));
 				break;
 			case RECIPIENT_COUNTRY:
 			case LIST:
@@ -525,6 +527,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		}
 		//once processed we need to remove what is being processed since the user can click on process again
 		initializeProjectsLists();
+		this.initializeProjectsLists();
 		return finalResults;
 	}
 
@@ -634,15 +637,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				if (locations != null) {
 					project.set(destinationField.getFieldName(), locations);
 				}
-				
-				Properties props = getExtraInfo(source, optValueMappingLocation.get(), false);
-				if (props != null) {
-					@SuppressWarnings("unchecked")
-					LinkedHashMap<String, Integer> hm = (LinkedHashMap<String, Integer>) props.get("extra_info");
-					Integer implementationLocation = hm.get("implementation_level_id");
-					project.set("implementation_location", implementationLocation);
-					project.set("implementation_level", ampImplementationLevel);
-				}
+				getLocationFromExtraInfo(project, getExtraInfo(source, optValueMappingLocation.get(), false));
 				break;
 			case RECIPIENT_COUNTRY:
 			case LIST:
@@ -687,6 +682,13 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		}
 
 		return project;
+	}
+
+	private void getLocationFromExtraInfo(JsonBean project, Map<Object, Object> props) {
+		if (props != null) {
+			project.set("implementation_location", props.get("implementation_level_id"));
+			project.set("implementation_level", ampImplementationLevel);
+		}
 	}
 
 	private void processListDestinationProjects(InternalDocument source, List<FieldValueMapping> valueMappings,
@@ -795,6 +797,11 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 					if (StringUtils.isEmpty(provider.trim())) {
 						provider = organization.getValue().get("value");
 					}
+					if(provider == null){
+						break;
+					}
+					//TODO we should search organizations by ref and no by value
+					provider = provider.toUpperCase();
 
 					List<JsonBean> fundingDetails = providerFundingDetails.get(provider);
 					if (fundingDetails == null) {
@@ -811,7 +818,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 					
 					
 					
-					if (destinationFieldsList.contains("fundings~funding_details~disaster_response") && (Constants.DISBURSEMENTS.equals(sourceField.getDisplayName()) || Constants.COMMITMENTS.equals(sourceField.getDisplayName()) )) {
+					if (existFieldInAmp("fundings~funding_details~disaster_response") && (Constants.DISBURSEMENTS.equals(sourceField.getDisplayName()) || Constants.COMMITMENTS.equals(sourceField.getDisplayName()) )) {
 					   fundingDetail.set("disaster_response", importRequest.getDisasterResponse());
 	                }
 					
@@ -860,7 +867,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 					log.debug("Dependent field not loaded: default-aid-type");
 				}
 
-				if (destinationFieldsList.contains("fundings~source_role")) {
+				if (existFieldInAmp("fundings~source_role")) {
 					funding.set("source_role", 1);
 				}
 
@@ -1165,7 +1172,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		return getCodesFromList(source, mapping, true);
 	}
 
-	private Properties getExtraInfo(InternalDocument source, FieldValueMapping mapping, Boolean suffix) {
+	private Map<Object,Object> getExtraInfo(InternalDocument source, FieldValueMapping mapping, Boolean suffix) {
 		Object value = source.getStringMultiFields().get(mapping.getSourceField().getFieldName());
 		Map<Integer, Integer> valueMapIndex = mapping.getValueIndexMapping();
 		List<FieldValue> sourcePossibleValues = mapping.getSourceField().getPossibleValues();
@@ -1264,99 +1271,105 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	}
 
 	private void instantiateStaticFields() {
-
-		Map<String, Properties> fieldProps = getFieldProps();
+		loadFieldProps();
+		//Map<String, Properties> fieldProps = getFieldProps();
 		// Transaction Fields
 		List<Field> trnDependencies = new ArrayList<Field>();
 		loadCodeListValues();
 		loadAmpTranslations();
 		// Fixed fields
 		fieldList.add(new Field("IATI Identifier", "iati-identifier", FieldType.STRING, false));
-		if (destinationFieldsList.contains("project_title")) {
+		APIField projectTitleApi = getFieldProps("project_title");
+		if (projectTitleApi !=null) {
 			Field projectTitle = new Field("Project Title", "project_title",
-					getFieldType(fieldProps.get("project_title")), false);
-			projectTitle.setAttributes(destinationFieldsListLabels.get("project_title"));
-			projectTitle.setMultiLangDisplayName(destinationFieldsListLabels.get("project_title"));
+					getFieldType(projectTitleApi), false);
+			Map<String,String> fieldLabel = getFieldLabel("project_title");
+			projectTitle.setAttributes(fieldLabel);
+			projectTitle.setMultiLangDisplayName(fieldLabel);
 			fieldList.add(projectTitle);
 		}
 
 		// Code Lists
-		if (destinationFieldsList.contains("activity_status")) {
-			Field activityStatus = new Field("Activity Status", "activity_status", FieldType.LIST, true);
-			activityStatus.setPossibleValues(getCodeListValues("activity_status"));
+		if (existFieldInAmp(AMP_ACTIVITY_STATUS)) {
+			Field activityStatus = new Field("Activity Status", AMP_ACTIVITY_STATUS, FieldType.LIST, true);
+			activityStatus.setPossibleValues(getCodeListValues(AMP_ACTIVITY_STATUS));
 			activityStatus.setRequired(true);
-			activityStatus.setMultiLangDisplayName(destinationFieldsListLabels.get("activity_status"));
+			activityStatus.setMultiLangDisplayName(getFieldLabel(AMP_ACTIVITY_STATUS));
 			fieldList.add(activityStatus);
 		}
 
-		if (destinationFieldsList.contains("A C Chapter")) {
-			Field acChapter = new Field("AC Chapter", "A C Chapter", FieldType.LIST, true);
-			acChapter.setPossibleValues(getCodeListValues("A C Chapter"));
+		if (existFieldInAmp(AMP_A_C_CHAPTER)) {
+			Field acChapter = new Field("AC Chapter", AMP_A_C_CHAPTER, FieldType.LIST, true);
+			acChapter.setPossibleValues(getCodeListValues(AMP_A_C_CHAPTER));
 			acChapter.setRequired(false);
-			acChapter.setMultiLangDisplayName(destinationFieldsListLabels.get("A C Chapter"));
+			acChapter.setMultiLangDisplayName(getFieldLabel(AMP_A_C_CHAPTER));
 			fieldList.add(acChapter);
 		}
 
-		if (destinationFieldsList.contains("fundings~type_of_assistance")) {
-			Field typeOfAssistence = new Field("Type of Assistance", "type_of_assistance", FieldType.LIST, true);
-			typeOfAssistence.setPossibleValues(getCodeListValues("fundings~type_of_assistance"));
-			typeOfAssistence.setMultiLangDisplayName(destinationFieldsListLabels.get("fundings~type_of_assistance"));
+		if (existFieldInAmp(AMP_FUNDINGS_TYPE_OF_ASSISTANCE)) {
+			Field typeOfAssistence = new Field("Type of Assistance", AMP_TYPE_OF_ASSISTANCE, FieldType.LIST, true);
+			typeOfAssistence.setPossibleValues(getCodeListValues(AMP_FUNDINGS_TYPE_OF_ASSISTANCE));
+			typeOfAssistence.setMultiLangDisplayName(getFieldLabel(AMP_FUNDINGS_TYPE_OF_ASSISTANCE));
 			fieldList.add(typeOfAssistence);
 			trnDependencies.add(typeOfAssistence);
 		}
 
-		if (destinationFieldsList.contains("fundings~financing_instrument")) {
-			Field financialInstrument = new Field("Aid Modality", "financing_instrument", FieldType.LIST, true);
-			financialInstrument.setPossibleValues(getCodeListValues("fundings~financing_instrument"));
+		if (existFieldInAmp(AMP_FUNDINGS_FINANCING_INSTRUMENT)) {
+			Field financialInstrument = new Field("Aid Modality", AMP_FINANCING_INSTRUMENT, FieldType.LIST, true);
+			financialInstrument.setPossibleValues(getCodeListValues(AMP_FUNDINGS_FINANCING_INSTRUMENT));
 			financialInstrument
-					.setMultiLangDisplayName(destinationFieldsListLabels.get("fundings~financing_instrument"));
+					.setMultiLangDisplayName(getFieldLabel(AMP_FUNDINGS_FINANCING_INSTRUMENT));
+
 			fieldList.add(financialInstrument);
 			trnDependencies.add(financialInstrument);
 		}
 
-		if (destinationFieldsList.contains("fundings~funding_details~adjustment_type")) {
-			Field adjustmentType = new Field("Adjustment Type", "adjustment_type", FieldType.LIST, true);
-			adjustmentType.setPossibleValues(getCodeListValues("fundings~funding_details~adjustment_type"));
-			adjustmentType.setMultiLangDisplayName(
-					destinationFieldsListLabels.get("fundings~funding_details~adjustment_type"));
+		if (existFieldInAmp(AMP_FUNDINGS_FUNDING_DETAILS_ADJUSTMENT_TYPE)) {
+			Field adjustmentType = new Field("Adjustment Type", "adjustment_type", FieldType.LIST,
+					false);
+			adjustmentType.setPossibleValues(getCodeListValues(AMP_FUNDINGS_FUNDING_DETAILS_ADJUSTMENT_TYPE));
+			adjustmentType
+					.setMultiLangDisplayName(getFieldLabel(AMP_FUNDINGS_FUNDING_DETAILS_ADJUSTMENT_TYPE));
 			fieldList.add(adjustmentType);
 		}
 
-		if (destinationFieldsList.contains("fundings~funding_details~transaction_type")) {
-			Field transactionType = new Field("Transaction Type", "transaction_type", FieldType.LIST, false);
-		transactionType.setPossibleValues(getCodeListValues("fundings~funding_details~transaction_type"));
-			transactionType.setMultiLangDisplayName(
-					destinationFieldsListLabels.get("fundings~funding_details~transaction_type"));
+		if (existFieldInAmp(AMP_FUNDINGS_FUNDING_DETAILS_TRANSACTION_TYPE)) {
+			Field transactionType = new Field("Transaction Type", AMP_TRANSACTION_TYPE, FieldType.LIST, false);
+		transactionType.setPossibleValues(getCodeListValues(AMP_FUNDINGS_FUNDING_DETAILS_TRANSACTION_TYPE));
+			transactionType
+					.setMultiLangDisplayName(getFieldLabel(AMP_FUNDINGS_FUNDING_DETAILS_TRANSACTION_TYPE));
 			fieldList.add(transactionType);
 		}
 
-		if (destinationFieldsList.contains("primary_sectors~sector")) {
-			Field primarySector = new Field("Primary Sector", "primary_sectors", FieldType.LIST, true);
-			primarySector.setPossibleValues(getCodeListValues("primary_sectors~sector"));
+		if (existFieldInAmp(AMP_PRIMARY_SECTORS_SECTOR)) {
+			Field primarySector = new Field("Primary Sector", AMP_PRIMARY_SECTORS, FieldType.LIST, true);
+			primarySector.setPossibleValues(getCodeListValues(AMP_PRIMARY_SECTORS_SECTOR));
 			primarySector.setMultiple(true);
-			primarySector.setMultiLangDisplayName(destinationFieldsListLabels.get("primary_sectors"));
+			primarySector
+					.setMultiLangDisplayName(getFieldLabel("primary_sectors"));
 			fieldList.add(primarySector);
 		}
 
-		if (destinationFieldsList.contains("secondary_sectors~sector")) {
-			Field secondarySector = new Field("Secondary Sector", "secondary_sectors", FieldType.LIST, true);
-			secondarySector.setPossibleValues(getCodeListValues("secondary_sectors~sector"));
-			secondarySector.setMultiLangDisplayName(destinationFieldsListLabels.get("secondary_sectors"));
+		if (existFieldInAmp(AMP_SECONDARY_SECTORS_SECTOR)) {
+			Field secondarySector = new Field("Secondary Sector", AMP_SECONDARY_SECTORS, FieldType.LIST, true);
+			secondarySector.setPossibleValues(getCodeListValues(AMP_SECONDARY_SECTORS_SECTOR));
+			secondarySector
+					.setMultiLangDisplayName(getFieldLabel(AMP_SECONDARY_SECTORS));
 			fieldList.add(secondarySector);
 		}
 
-		if (destinationFieldsList.contains("tertiary_sectors~sector")) {
-			Field tertiarySector = new Field("Tertiary Sector", "tertiary_sectors", FieldType.LIST, true);
-			tertiarySector.setPossibleValues(getCodeListValues("tertiary_sectors~sector"));
-			tertiarySector.setMultiLangDisplayName(destinationFieldsListLabels.get("tertiary_sectors"));
+		if (existFieldInAmp(AMP_TERTIARY_SECTORS_SECTOR)) {
+			Field tertiarySector = new Field("Tertiary Sector", AMP_TERTIARY_SECTORS, FieldType.LIST, true);
+			tertiarySector.setPossibleValues(getCodeListValues("AMP_TERTIARY_SECTORS_SECTOR"));
+			tertiarySector.setMultiLangDisplayName(getFieldLabel(AMP_TERTIARY_SECTORS));
 			fieldList.add(tertiarySector);
 		}
 
 		// locations, locations~location, locations~location_percentage
-		if (destinationFieldsList.contains("locations~location")) {
+		if (existFieldInAmp(LOCATIONS_LOCATION)) {
 			Field location = new Field("Location", "locations", FieldType.LOCATION, true);
-			location.setPossibleValues(getCodeListValues("locations~location"));
-			location.setMultiLangDisplayName(destinationFieldsListLabels.get("locations~location"));
+			location.setPossibleValues(getCodeListValues(LOCATIONS_LOCATION));
+			location.setMultiLangDisplayName(getFieldLabel(LOCATIONS_LOCATION));
 			location.setMultiple(true);
 			fieldList.add(location);
 		}
@@ -1377,13 +1390,14 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		multilangfields.put("description", "Description");
 
 		multilangfields.forEach((name, label) -> {
-			if (destinationFieldsList.contains(name)) {
-				FieldType ftDescription = getFieldType(fieldProps.get(name));
+			APIField multiLangField = getFieldProps(name);
+			if (multiLangField !=null) {
+				FieldType ftDescription = getFieldType(multiLangField);
 				if (ftDescription != null) {
 					Field newField = new Field(label, name, ftDescription, true);
-					int fieldLength = getFieldLength(fieldProps.get(name));
+					int fieldLength = getFieldLength(getFieldProps(name));
 					newField.setLength(fieldLength);
-					newField.setMultiLangDisplayName(destinationFieldsListLabels.get(name));
+					newField.setMultiLangDisplayName(getFieldLabel(name));
 					fieldList.add(newField);
 				}
 			}
@@ -1400,13 +1414,13 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		dateFields.put("planned_start_date", "Planned Start Date");
 		dateFields.put("original_completion_date", "Original Completion Date");
 
-		Field actualStartDate = new Field("", "actual_start_date", FieldType.DATE, true);
 		dateFields.forEach((name, label) -> {
-			if (fieldProps.get(name) != null) {
-				FieldType ftDescription = getFieldType(fieldProps.get(name));
+			APIField dateApiField = getFieldProps(name);
+			if (dateApiField != null) {
+				FieldType ftDescription = getFieldType(dateApiField);
 				if (ftDescription != null) {
 					Field newField = new Field(label, name, FieldType.DATE, true);
-					newField.setMultiLangDisplayName(destinationFieldsListLabels.get(name));
+					newField.setMultiLangDisplayName(getFieldLabel(name));
 					fieldList.add(newField);
 				}
 			}
@@ -1425,27 +1439,24 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		organizationsRoles.put("sector_group", "Sector Group");
 
 		organizationsRoles.forEach((name, label) -> {
-			if (destinationFieldsList.contains(name)) {
+			if (existFieldInAmp(name)) {
 				Field org = new Field(label, name, FieldType.ORGANIZATION, true);
-				org.setMultiLangDisplayName(destinationFieldsListLabels.get(name));
-				org.setPossibleValues(getCodeListValues("fundings~donor_organization_id"));
-				if (fieldProps.get(name) != null && fieldProps.get(name).getProperty("percentage_constraint") != null) {
-					org.setPercentage(true);
-				}
+				org.setMultiLangDisplayName(getFieldLabel(name));
+				//TODO REVIEW THIS
+				org.setPossibleValues(getCodeListValues(AMP_FUNDINGS_DONOR_ORGANIZATION_ID));
+
+				org.setPercentage(getOrganisationPercentage(name));
 				fieldList.add(org);
 			}
 		});
 
-		if (destinationFieldsList.contains("fundings~donor_organization_id")) {
+		if (existFieldInAmp(AMP_FUNDINGS_DONOR_ORGANIZATION_ID)) {
 			Field fundingOrganization = new Field("Funding Organization", "donor_organization", FieldType.ORGANIZATION,
 					true);
-			fundingOrganization.setPossibleValues(getCodeListValues("fundings~donor_organization_id"));
+			fundingOrganization.setPossibleValues(getCodeListValues(AMP_FUNDINGS_DONOR_ORGANIZATION_ID));
 			fundingOrganization
-					.setMultiLangDisplayName(destinationFieldsListLabels.get("fundings~donor_organization_id"));
-			if (fieldProps.get("donor_organization") != null
-					&& fieldProps.get("donor_organization").getProperty("percentage_constraint") != null) {
-				fundingOrganization.setPercentage(true);
-			}
+					.setMultiLangDisplayName(getFieldLabel(AMP_FUNDINGS_DONOR_ORGANIZATION_ID));
+			fundingOrganization.setPercentage(getOrganisationPercentage("donor_organization"));
 			fieldList.add(fundingOrganization);
 			trnDependencies.add(fundingOrganization);
 		}
@@ -1499,124 +1510,120 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		}
 		// Currency
 		Field currency = new Field("Currency Code", "currency_code", FieldType.LIST, true);
-		currency.setMultiLangDisplayName(destinationFieldsListLabels.get("fundings~funding_details~currency"));
-		currency.setPossibleValues(getCodeListValues("fundings~funding_details~currency"));
+		currency.setMultiLangDisplayName(getFieldLabel(AMP_FUNDINGS_FUNDING_DETAILS_CURRENCY));
+		currency.setPossibleValues(getCodeListValues(AMP_FUNDINGS_FUNDING_DETAILS_CURRENCY));
 		fieldList.add(currency);
 		
-		 if (destinationFieldsList.contains("fundings~funding_details~disaster_response")) {
+		 if (existFieldInAmp("fundings~funding_details~disaster_response")) {
 		     Field disasterResponse = new Field("Disaster Response", "disaster_response", FieldType.BOOLEAN, false);
 		     fieldList.add(disasterResponse);
           }
 
 	}
+	@SuppressWarnings("unchecked")
+	private Map<String,String> getFieldLabel(String fieldName) {
+		return (Map) getFieldProps(fieldName).getFieldLabel().any();
+	}
+
+	private boolean getOrganisationPercentage(String organisationPath) {
+		boolean percentage = false;
+		APIField donorOrganisation = getFieldProps(organisationPath);
+		if (donorOrganisation != null && donorOrganisation.getPercentageConstraint() != null) {
+			percentage = true;
+		}
+		return percentage;
+	}
 
 	private boolean existFieldInAmp(String fieldName) {
-		return destinationFieldsList.stream().anyMatch(field-> field.equals(fieldName));
+		return getFieldProps(fieldName) != null;
 	}
 
-	private int getFieldLength(Properties properties) {
-		if (properties == null || properties.get("length") == null) {
+	private int getFieldLength(APIField apiField) {
+		if (apiField == null || apiField.getFieldLength() == null) {
 			return 0;
+		} else {
+			return apiField.getFieldLength();
 		}
-		String value = (String) properties.get("length");
-		int fieldLength = Integer.parseInt(value);
-		return fieldLength;
 	}
 
-	private FieldType getFieldType(Properties properties) {
-		if (properties == null || properties.get("field_type") == null) {
+	private FieldType getFieldType(APIField apiField) {
+		if (apiField == null || apiField.getApiType().getFieldType() == null) {
 			return null;
 		}
 		FieldType ft = FieldType.STRING;
-		String fieldType = (String) properties.get("field_type");
-		switch (fieldType) {
-		case "list":
-			ft = FieldType.LIST;
-			break;
-		case "string":
-			if (Boolean.parseBoolean((String) properties.get("translatable"))) {
-				ft = FieldType.MULTILANG_STRING;
+		switch (apiField.getApiType().getFieldType()) {
+			case "list":
+				return FieldType.LIST;
+			case "string":
+				if (apiField.getTranslatable()) {
+					return FieldType.MULTILANG_STRING;
+				} else {
+					return FieldType.STRING;
+				}
+			case "date":
+				return FieldType.DATE;
+		}
+		return FieldType.STRING;
+	}
+
+	private void loadFieldProps() {
+		String result = getRestTemplate().getForObject(baseURL
+				+ FIELDS_ENDPOINT, String.class);
+		ampFieldsDefinition = APIField.getApiFieldListFromString(result);
+	}
+
+	private List<String> getEnabledFieldsPlain(){
+		List<String> enabledFields =  new ArrayList<>();
+		getEnabledFieldsPlain(enabledFields, "", ampFieldsDefinition);
+		return enabledFields;
+	}
+
+	private void getEnabledFieldsPlain(List<String> enabledFields, String parent, List<APIField> children) {
+		for (APIField af : children) {
+			String fieldName = parent + af.getFieldName();
+			if (af.getApiType().getFieldType().equals("long") && af.isIdOnly()) {
+				enabledFields.add(fieldName);
+			}
+			if (af.getChildren() != null && af.getChildren().size() > 0) {
+				getEnabledFieldsPlain(enabledFields, fieldName + "~", af.getChildren());
+			}
+		}
+	}
+	/**
+	 * this method with ~
+	 * @param path
+	 * @return
+	 */
+	private APIField getFieldProps(String path) {
+		if (path == null || path.trim().length() == 0) {
+			return null;
+		} else {
+			return getFieldsDefinition(StringUtils.split(path, "~"));
+		}
+	}
+	private APIField getFieldsDefinition(String... path) {
+		if (path == null || path.length == 0) {
+			return null;
+		} else {
+			return getFieldsDefinition(ampFieldsDefinition, path);
+		}
+	}
+	private APIField getFieldsDefinition(List<APIField> apFieldsDefinitions, String... path) {
+		APIField apiField = apFieldsDefinitions.stream().filter(f -> f.getFieldName().equals(path[0])).findAny().orElse(null);
+		if (path.length == 1 || apiField == null) {
+			return apiField;
+		} else {
+			if (apiField.getChildren() != null) {
+				return getFieldsDefinition(apiField.getChildren(), Arrays.copyOfRange(path, 1, path.length));
 			} else {
-				ft = FieldType.STRING;
-			}
-			break;
-		case "date":
-			ft = FieldType.DATE;
-			break;
-		}
-		return ft;
-	}
-
-	private Map<String, Properties> getFieldProps() {
-		// Map<String, FieldType> map = new HashMap<String, FieldType>();
-		Map<String, Properties> fieldProperties = new HashMap<String, Properties>();
-
-		String result = "";
-		RestTemplate restTemplate = getRestTemplate();
-		result = restTemplate.getForObject(baseURL + this.getFieldsEndpoint(), String.class);
-		try {
-			ObjectMapper mapper = new ObjectMapper();
-			JsonNode jsonNode = mapper.readTree(result);
-
-			if (jsonNode.isArray()) {
-				Iterator<JsonNode> mainNode = jsonNode.elements();
-				while (mainNode.hasNext()) {
-					JsonNode node = mainNode.next();
-					String fieldName = node.get("field_name").asText();
-					String fieldType = node.get("field_type").asText();
-					
-					Map<String, String> fieldLabel = extractMultilanguageText(node.get("field_label"));
-					destinationFieldsList.add(fieldName);
-					destinationFieldsListLabels.put(fieldName, fieldLabel);
-					addChildrenToDestinationFieldList(node, fieldName);
-
-					JsonNode translatable = node.get("translatable");
-					JsonNode percentageConstraint = node.get("percentage_constraint");
-					JsonNode length = node.get("field_length");
-
-					Properties prop = new Properties();
-					prop.setProperty("field_type", fieldType);
-					if(length != null) {
-						prop.setProperty("length", length.asText());
-					}
-					if (translatable != null) {
-						prop.setProperty("translatable", translatable.asText());
-					}
-					if (percentageConstraint != null) {
-						prop.setProperty("percentage_constraint", percentageConstraint.asText());
-					}
-					fieldProperties.put(fieldName, prop);
-
-				}
-			}
-
-		} catch (Exception e) {
-			log.error("Couldn't retrieve field properties from endpoint. Exception: " + e.getMessage());
-		}
-		return fieldProperties;
-	}
-
-	private void addChildrenToDestinationFieldList(JsonNode node, String fieldName) {
-		JsonNode children = node.get("children");
-		if (children != null && children.isArray()) {
-			Iterator<JsonNode> childFields = children.elements();
-			while (childFields.hasNext()) {
-				JsonNode child = childFields.next();
-				String childFieldName = child.get("field_name").asText();
-				Map<String, String> childFieldLabel = extractMultilanguageText(child.get("field_label"));
-				String name = fieldName + "~" + childFieldName;
-				destinationFieldsList.add(name);
-				destinationFieldsListLabels.put(name, childFieldLabel);
-				if (node.get("children") != null) {
-					addChildrenToDestinationFieldList(child, name);
-				}
+				return null;
 			}
 		}
-
 	}
+	
 	private void loadAmpTranslations() {
 
-		String result = restTemplate.postForObject(baseURL + translationEndPoints
+		String result = restTemplate.postForObject(baseURL + TRANSLATIONS_END_POINT
 						+ extractSupportedLocales(), Constants.TRANSACTION_FIELDS, String.class);
 		try {
 			ObjectMapper mapper = new ObjectMapper();
@@ -1645,98 +1652,43 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	}
 
 	private void loadCodeListValues() {
-		// TODO this needs to be extracted to a static variable and abscract field configuration
-		// TODO but proper analysis is needed and its out of the scope of this ticket
-		// TODO also we need to move amp column names to constant and try to abstract configuration
-
-		List<String> allDestinationFieldValues = new ArrayList<>();
-		allDestinationFieldValues.add("activity_status");
-		allDestinationFieldValues.add("A C Chapter");
-		allDestinationFieldValues.add("fundings~type_of_assistance");
-		allDestinationFieldValues.add("fundings~financing_instrument");
-		allDestinationFieldValues.add("fundings~funding_details~adjustment_type");
-		allDestinationFieldValues.add("fundings~funding_details~transaction_type");
-		allDestinationFieldValues.add("primary_sectors~sector");
-		allDestinationFieldValues.add("secondary_sectors~sector");
-		allDestinationFieldValues.add("tertiary_sectors~sector");
-		allDestinationFieldValues.add("locations~location");
-		allDestinationFieldValues.add("fundings~donor_organization_id");
-		allDestinationFieldValues.add("fundings~donor_organization_id");
-		allDestinationFieldValues.add("fundings~funding_details~currency");
-		allDestinationFieldValues.retainAll(destinationFieldsList);
-
-
-
 		allFieldValuesForDestinationProcessor = new HashMap<>();
+		// TODO only get codelist that we need
+		// TODO Refactor to use an object instead of iterating JsonNodes\
+		ParameterizedTypeReference<Map<String, List<PossibleValue>> > responseType =
+				new ParameterizedTypeReference<Map<String, List<PossibleValue>> >() {};
+		List<String> fieldsToFetch = (new ArrayList(Constants.LIST_OF_VALUES_TO_FETCH));
+		fieldsToFetch.retainAll(getEnabledFieldsPlain());
+		HttpEntity l = new HttpEntity(fieldsToFetch);
+		ResponseEntity<Map<String, List<PossibleValue>> >response=
+		restTemplate.exchange(baseURL + ALL_FIELDS_ENDPOINT, HttpMethod.POST,l,responseType);
 
-		String result = restTemplate.postForObject(baseURL + getAllFieldsEndpoit(),
-				allDestinationFieldValues, String.class);
+		response.getBody().forEach((keyName, lPossibleValues)->{
+			allFieldValuesForDestinationProcessor.put(keyName,getPossibleValuesFromNode(lPossibleValues));
+		});
 
-		ObjectMapper mapper = new ObjectMapper();
-		try {
-			JsonNode jsonNode = mapper.readTree(result);
-			Iterator<String> keys = jsonNode.fieldNames();
-			while (keys.hasNext()) {
-				String keyName = keys.next();
-				JsonNode jn = jsonNode.get(keyName);
-				allFieldValuesForDestinationProcessor.put(keyName, getPossibleValuesFromNode(jn.iterator()));
-			}
-		} catch (IOException e) {
-			//
-			log.error("cannot retrieve possible values");
-		}
 	}
 
 	private List<FieldValue> getCodeListValues(String codeListName) {
-		// TODO this if is defensive since we are close to release, if its not found in the map, then we go and fetch
-		// TODO individually. After the release is safe to remove the else and only call from the map
 		List<FieldValue> possibleValues = allFieldValuesForDestinationProcessor.get(codeListName);
-			if(possibleValues == null) {
-			String result = "";
-			possibleValues = new ArrayList<>();
-		//	RestTemplate restTemplate = getRestTemplate();
-			result = restTemplate.getForObject(baseURL + this.getFieldsEndpoint() + "/" + codeListName, String.class);
-
-			try {
-				ObjectMapper mapper = new ObjectMapper();
-				JsonNode jsonNode = mapper.readTree(result);
-				if (jsonNode.isArray()) {
-					Iterator<JsonNode> mainNode = jsonNode.elements();
-					possibleValues.addAll(getPossibleValuesFromNode(mainNode));
-				}
-
-			} catch (Exception e) {
-				log.error("Couldn't retrieve values from Endpoint. Exception: " + e.getMessage() + ", URL:" + codeListName);
-			}
+		if (possibleValues == null) {
+			log.error("Couldn't retrieve code list values for "+ codeListName);
 		}
 		return possibleValues;
 	}
 
-	private List<FieldValue> getPossibleValuesFromNode(Iterator<JsonNode> mainNode) {
-		List<FieldValue> possibleValues = new ArrayList<FieldValue>();
+	private List<FieldValue> getPossibleValuesFromNode(List<PossibleValue> lPossibleValues) {
+		List<FieldValue> possibleValues = new ArrayList<>();
 		int index = 0;
-		while (mainNode.hasNext()) {
-			JsonNode node = mainNode.next();
-			String code = node.get("id").asText();
-			String value = node.get("value").asText();
+		for(PossibleValue p:lPossibleValues){
+
 			FieldValue fv = new FieldValue();
 			fv.setIndex(index++);
-			fv.setCode(code);
-			fv.setValue(value);
+			fv.setCode(p.getId().toString());
+			fv.setValue(p.getValue());
 			//TODO THIS IS A WORKAROUND TO BE FIXED BEFORE THE RELEASE
-			/*if (node.get("extra_info") != null) {
-				fv.getProperties().put("extra_info", node.get("extra_info"));			
-			}*/
-			
-			if (node.get("translated-value") != null) {			        
-			    Iterator <Entry<String,JsonNode>> iter = node.get("translated-value").fields();			    
-                while(iter.hasNext()){
-                    Entry<String,JsonNode>lang = iter.next();                   
-                    fv.getTranslatedValue().put(lang.getKey(),lang.getValue().asText());
-                }
-            }
-			
-			
+			fv.setProperties(p.getExtraInfo());
+			fv.setTranslatedValue(p.getTranslatedValues());
 			possibleValues.add(fv);
 		}
 		return possibleValues;

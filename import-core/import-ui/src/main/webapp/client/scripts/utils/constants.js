@@ -1,6 +1,7 @@
 'use strict';
 
 module.exports = {
+  TOKEN_VERIFICATION_INTERVAL: 120000,
   UPLOAD_FILE: 'UPLOAD_FILE',
   FILTER_DATA: 'FILTER_DATA',
   CHOOSE_PROJECTS: 'CHOOSE_PROJECTS',
@@ -45,5 +46,6 @@ module.exports = {
       POLICY_MARKER: 'policy-marker'      
   },
   YES: 'Yes',
-  NO: 'No'
+  NO: 'No',
+  OK: 'OK'
 };
