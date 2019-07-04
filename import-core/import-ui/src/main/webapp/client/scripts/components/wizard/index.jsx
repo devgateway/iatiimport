@@ -294,7 +294,14 @@ var Wizard = React.createClass({
 	          if(data.importStatus.status == "COMPLETED"){
 	    			clearInterval(self.setIntervalId);
 	    			//once import is completed we disable previous button
-              self.setState({importExecuted:true});
+            //If at least one is sucess. If all errors we allow to go back and fix
+              var shouldBlock = false;
+              if(data.results) {
+                shouldBlock = data.results.some(function (r) {
+                  return r.status === constants.OK;
+                });
+              }
+              self.setState({importExecuted:shouldBlock});
               self.setState({results: data.results});
 		        	self.hideLoadingIcon();
 		            $("#modalResults").modal("show");

@@ -46,5 +46,6 @@ module.exports = {
       POLICY_MARKER: 'policy-marker'      
   },
   YES: 'Yes',
-  NO: 'No'
+  NO: 'No',
+  OK: 'OK'
 };
