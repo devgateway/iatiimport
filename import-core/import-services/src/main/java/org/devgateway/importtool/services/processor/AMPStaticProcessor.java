@@ -1273,7 +1273,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		if (projectTitleApi !=null) {
 			Field projectTitle = new Field("Project Title", "project_title",
 					getFieldType(projectTitleApi), false);
-			Map<String,String> fieldLabel = getFieldLable("project_title");
+			Map<String,String> fieldLabel = getFieldLabel("project_title");
 			projectTitle.setAttributes(fieldLabel);
 			projectTitle.setMultiLangDisplayName(fieldLabel);
 			fieldList.add(projectTitle);
@@ -1284,7 +1284,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			Field activityStatus = new Field("Activity Status", AMP_ACTIVITY_STATUS, FieldType.LIST, true);
 			activityStatus.setPossibleValues(getCodeListValues(AMP_ACTIVITY_STATUS));
 			activityStatus.setRequired(true);
-			activityStatus.setMultiLangDisplayName(getFieldLable(AMP_ACTIVITY_STATUS));
+			activityStatus.setMultiLangDisplayName(getFieldLabel(AMP_ACTIVITY_STATUS));
 			fieldList.add(activityStatus);
 		}
 
@@ -1292,14 +1292,14 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			Field acChapter = new Field("AC Chapter", AMP_A_C_CHAPTER, FieldType.LIST, true);
 			acChapter.setPossibleValues(getCodeListValues(AMP_A_C_CHAPTER));
 			acChapter.setRequired(false);
-			acChapter.setMultiLangDisplayName(getFieldLable(AMP_A_C_CHAPTER));
+			acChapter.setMultiLangDisplayName(getFieldLabel(AMP_A_C_CHAPTER));
 			fieldList.add(acChapter);
 		}
 
 		if (existFieldInAmp(AMP_FUNDINGS_TYPE_OF_ASSISTANCE)) {
 			Field typeOfAssistence = new Field("Type of Assistance", AMP_TYPE_OF_ASSISTANCE, FieldType.LIST, true);
 			typeOfAssistence.setPossibleValues(getCodeListValues(AMP_FUNDINGS_TYPE_OF_ASSISTANCE));
-			typeOfAssistence.setMultiLangDisplayName(getFieldLable(AMP_FUNDINGS_TYPE_OF_ASSISTANCE));
+			typeOfAssistence.setMultiLangDisplayName(getFieldLabel(AMP_FUNDINGS_TYPE_OF_ASSISTANCE));
 			fieldList.add(typeOfAssistence);
 			trnDependencies.add(typeOfAssistence);
 		}
@@ -1308,7 +1308,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			Field financialInstrument = new Field("Aid Modality", AMP_FINANCING_INSTRUMENT, FieldType.LIST, true);
 			financialInstrument.setPossibleValues(getCodeListValues(AMP_FUNDINGS_FINANCING_INSTRUMENT));
 			financialInstrument
-					.setMultiLangDisplayName(getFieldLable(AMP_FUNDINGS_FINANCING_INSTRUMENT));
+					.setMultiLangDisplayName(getFieldLabel(AMP_FUNDINGS_FINANCING_INSTRUMENT));
 
 			fieldList.add(financialInstrument);
 			trnDependencies.add(financialInstrument);
@@ -1319,7 +1319,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 					false);
 			adjustmentType.setPossibleValues(getCodeListValues(AMP_FUNDINGS_FUNDING_DETAILS_ADJUSTMENT_TYPE));
 			adjustmentType
-					.setMultiLangDisplayName(getFieldLable(AMP_FUNDINGS_FUNDING_DETAILS_ADJUSTMENT_TYPE));
+					.setMultiLangDisplayName(getFieldLabel(AMP_FUNDINGS_FUNDING_DETAILS_ADJUSTMENT_TYPE));
 			fieldList.add(adjustmentType);
 		}
 
@@ -1327,7 +1327,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			Field transactionType = new Field("Transaction Type", AMP_TRANSACTION_TYPE, FieldType.LIST, false);
 		transactionType.setPossibleValues(getCodeListValues(AMP_FUNDINGS_FUNDING_DETAILS_TRANSACTION_TYPE));
 			transactionType
-					.setMultiLangDisplayName(getFieldLable(AMP_FUNDINGS_FUNDING_DETAILS_TRANSACTION_TYPE));
+					.setMultiLangDisplayName(getFieldLabel(AMP_FUNDINGS_FUNDING_DETAILS_TRANSACTION_TYPE));
 			fieldList.add(transactionType);
 		}
 
@@ -1336,7 +1336,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			primarySector.setPossibleValues(getCodeListValues(AMP_PRIMARY_SECTORS_SECTOR));
 			primarySector.setMultiple(true);
 			primarySector
-					.setMultiLangDisplayName(getFieldLable(AMP_PRIMARY_SECTORS));
+					.setMultiLangDisplayName(getFieldLabel("primary_sectors"));
 			fieldList.add(primarySector);
 		}
 
@@ -1344,14 +1344,14 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			Field secondarySector = new Field("Secondary Sector", AMP_SECONDARY_SECTORS, FieldType.LIST, true);
 			secondarySector.setPossibleValues(getCodeListValues(AMP_SECONDARY_SECTORS_SECTOR));
 			secondarySector
-					.setMultiLangDisplayName(getFieldLable(AMP_SECONDARY_SECTORS));
+					.setMultiLangDisplayName(getFieldLabel(AMP_SECONDARY_SECTORS));
 			fieldList.add(secondarySector);
 		}
 
 		if (existFieldInAmp(AMP_TERTIARY_SECTORS_SECTOR)) {
 			Field tertiarySector = new Field("Tertiary Sector", AMP_TERTIARY_SECTORS, FieldType.LIST, true);
 			tertiarySector.setPossibleValues(getCodeListValues("AMP_TERTIARY_SECTORS_SECTOR"));
-			tertiarySector.setMultiLangDisplayName(getFieldLable(AMP_TERTIARY_SECTORS));
+			tertiarySector.setMultiLangDisplayName(getFieldLabel(AMP_TERTIARY_SECTORS));
 			fieldList.add(tertiarySector);
 		}
 
@@ -1359,7 +1359,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		if (existFieldInAmp(LOCATIONS_LOCATION)) {
 			Field location = new Field("Location", "locations", FieldType.LOCATION, true);
 			location.setPossibleValues(getCodeListValues(LOCATIONS_LOCATION));
-			location.setMultiLangDisplayName(getFieldLable(LOCATIONS_LOCATION));
+			location.setMultiLangDisplayName(getFieldLabel(LOCATIONS_LOCATION));
 			location.setMultiple(true);
 			fieldList.add(location);
 		}
@@ -1387,7 +1387,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 					Field newField = new Field(label, name, ftDescription, true);
 					int fieldLength = getFieldLength(getFieldProps(name));
 					newField.setLength(fieldLength);
-					newField.setMultiLangDisplayName(getFieldLable(name));
+					newField.setMultiLangDisplayName(getFieldLabel(name));
 					fieldList.add(newField);
 				}
 			}
@@ -1410,7 +1410,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				FieldType ftDescription = getFieldType(dateApiField);
 				if (ftDescription != null) {
 					Field newField = new Field(label, name, FieldType.DATE, true);
-					newField.setMultiLangDisplayName(getFieldLable(name));
+					newField.setMultiLangDisplayName(getFieldLabel(name));
 					fieldList.add(newField);
 				}
 			}
@@ -1431,7 +1431,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		organizationsRoles.forEach((name, label) -> {
 			if (existFieldInAmp(name)) {
 				Field org = new Field(label, name, FieldType.ORGANIZATION, true);
-				org.setMultiLangDisplayName(getFieldLable(name));
+				org.setMultiLangDisplayName(getFieldLabel(name));
 				//TODO REVIEW THIS
 				org.setPossibleValues(getCodeListValues(AMP_FUNDINGS_DONOR_ORGANIZATION_ID));
 
@@ -1445,7 +1445,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 					true);
 			fundingOrganization.setPossibleValues(getCodeListValues(AMP_FUNDINGS_DONOR_ORGANIZATION_ID));
 			fundingOrganization
-					.setMultiLangDisplayName(getFieldLable(AMP_FUNDINGS_DONOR_ORGANIZATION_ID));
+					.setMultiLangDisplayName(getFieldLabel(AMP_FUNDINGS_DONOR_ORGANIZATION_ID));
 			fundingOrganization.setPercentage(getOrganisationPercentage("donor_organization"));
 			fieldList.add(fundingOrganization);
 			trnDependencies.add(fundingOrganization);
@@ -1500,7 +1500,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		}
 		// Currency
 		Field currency = new Field("Currency Code", "currency_code", FieldType.LIST, true);
-		currency.setMultiLangDisplayName(getFieldLable(AMP_FUNDINGS_FUNDING_DETAILS_CURRENCY));
+		currency.setMultiLangDisplayName(getFieldLabel(AMP_FUNDINGS_FUNDING_DETAILS_CURRENCY));
 		currency.setPossibleValues(getCodeListValues(AMP_FUNDINGS_FUNDING_DETAILS_CURRENCY));
 		fieldList.add(currency);
 		
@@ -1511,7 +1511,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 	}
 	@SuppressWarnings("unchecked")
-	private Map<String,String> getFieldLable(String fieldName) {
+	private Map<String,String> getFieldLabel(String fieldName) {
 		return (Map) getFieldProps(fieldName).getFieldLabel().any();
 	}
 
