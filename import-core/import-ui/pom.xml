@@ -12,7 +12,7 @@
 	<parent>
 		<groupId>org.devgateway.importtool</groupId>
 		<artifactId>importtool</artifactId>
-		<version>1.1</version>
+		<version>1.2</version>
 	</parent>
 
 	<properties>
@@ -70,9 +70,13 @@
 			<scope>runtime</scope>
 		</dependency>
         <dependency>
-            <groupId>postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-        </dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.liquibase</groupId>
+			<artifactId>liquibase-core</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-tomcat</artifactId>

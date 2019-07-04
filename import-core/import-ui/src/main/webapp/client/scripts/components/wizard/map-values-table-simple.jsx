@@ -15,6 +15,14 @@ var MappingTableSimple = React.createClass({
   handleAutocompleteToggle: function() {
      
   },
+  getTranslatedValue: function(destinationValue) {
+      var language = this.props.i18nLib.lng() || "en";      
+      var value = destinationValue.value;
+      if (destinationValue.translatedValue && destinationValue.translatedValue[language]) {
+          value = destinationValue.translatedValue[language];
+      }
+      return value;
+  },
   render: function() { 
        var rows = [];
        
@@ -24,8 +32,8 @@ var MappingTableSimple = React.createClass({
 
        var options = [];
        _.map(destinationField.possibleValues, function(destinationValue, i) { 
-    	   options.push({value:destinationValue.code, label:destinationValue.value});      
-       });
+    	   options.push({value:destinationValue.code, label: this.getTranslatedValue(destinationValue)});      
+       }.bind(this));
        
        options = _.sortBy(options, function(item) {
     	   return item.label.trim();

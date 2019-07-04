@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.devgateway.importtool</groupId>
 		<artifactId>importtool</artifactId>
-		<version>1.1</version>
+		<version>1.2</version>
 	</parent>
 	<artifactId>import-rest</artifactId>
 	<dependencies>
@@ -19,12 +19,12 @@
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
-	<build>
+	<!--<build>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
-	</build>
+	</build>-->
 </project>

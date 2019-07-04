@@ -1,6 +1,7 @@
 'use strict';
 
 module.exports = {
+  TOKEN_VERIFICATION_INTERVAL: 120000,
   UPLOAD_FILE: 'UPLOAD_FILE',
   FILTER_DATA: 'FILTER_DATA',
   CHOOSE_PROJECTS: 'CHOOSE_PROJECTS',
@@ -21,6 +22,7 @@ module.exports = {
   IMPORT_TYPE_MANUAL: 'manual',
   IMPORT_TYPE_AUTOMATIC: 'automatic',  
   ROLE_FUNDING: 'Funding',
+  LANGUAGE_PREFERENCE: ['en','fr', 'es'],
   FIELD_NAMES: {
 	  IATI_ID: 'iati-identifier',
 	  TITLE: 'title',
@@ -41,6 +43,9 @@ module.exports = {
       DEFAULT_FLOW_TYPE:'default-flow-type',
       DEFAULT_TIED_STATUS:'default-tied-status',
       SECTOR: 'sector',
-      POLICY_MARKER: 'policy-marker'
-  }
+      POLICY_MARKER: 'policy-marker'      
+  },
+  YES: 'Yes',
+  NO: 'No',
+  OK: 'OK'
 };

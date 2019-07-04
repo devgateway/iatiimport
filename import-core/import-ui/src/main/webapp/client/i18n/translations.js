@@ -180,7 +180,11 @@ module.exports = {
 							'import_option_replace': 'Replace funding information',
 							'import_option_replace_explanation': 'Replaces funding information in the AMP project with funding information from the IATI file. This is done per donor. Data for donors that are not reporting is not affected.',
 							'import_option_replace_prompt': 'You have selected the "Replace funding information" Import option. This option updates existing activities by overwriting the fundings for donors that have data in the IATI file. Do you want to proceed? ',
-							'process_next_version' :'Process Next Version'
+							'process_next_version' :'Process Next Version',
+							'yes': 'Yes',
+							'no': 'No',
+							'disaster_response': 'Disaster Response',
+							'disaster_response_tooltip': 'If the marker is true, it identifies that the funds in the projects go toward disaster response / relief. The option selected here will be a default value and may need to be adjusted afterwards in the AMP.'
 						},
 						'mappings_dropdown' : {
 							'confirm_delete' : 'Are you sure you want to delete  __templateName__ ?'
@@ -480,7 +484,11 @@ module.exports = {
 							'import_option_replace': 'Reemplazar información de financiamiento',
 							'import_option_replace_explanation': 'Reemplaza la información de financiamiento en el proyecto de AMP con información de financiamiento proveniente del archivo IATI. Esto se hace por cada organización donante. No se ven afectados los datos de donantes que no están declarando información.',
 							'import_option_replace_prompt': 'Ha seleccionado la opción de importación: "Reemplazar información de financiamiento". Esta opción actualiza los proyectos existentes reemplazando el financiamento en aquellas organizaciones donantes que possen datos en el archivo de IATI. Desea proceder?',
-							'process_next_version': 'Procesar la siguiente versión'
+							'process_next_version': 'Procesar la siguiente versión',
+							'yes': 'Sí',
+							'no': 'No',
+							'disaster_response': 'Respuesta a desastres',
+							'disaster_response_tooltip': 'Si el marcador es verdadero, identifica que los fondos de los proyectos se destinan para respuesta en caso de desastres / alivio. La opción seleccionada aquí será un valor predeterminado y es posible que deba ajustarse posteriormente en el AMP.'
 						},
 						'mappings_dropdown' : {
 							'confirm_delete' : 'Está seguro de eliminar  __templateName__ ?'
@@ -779,7 +787,11 @@ module.exports = {
 							'import_option_replace': 'Remplacer les informations de financement',
 							'import_option_replace_explanation': "Remplace les informations de financement dans le projet AMP avec des informations de financement provenant du fichier IATI. Ceci est fait par donateur. Les données des donateurs ni figurant pas dans le fichier IATI ne seront pas affectées.",
 							'import_option_replace_prompt': "Vous avez sélectionné l'option d'import Remplacer les informations de financement. Cette option met à jour les activités existantes en écrasant toutes les transactions financières des donateurs qui sont inclus dans le fichier de l'IATI. Voulez-vous continuer?",
-							'process_next_version' :'Traiter la version suivante'
+							'process_next_version' :'Traiter la version suivante',
+							'yes': 'Oui',
+							'no': 'Non',
+							'disaster_response': 'Disaster Response',
+							'disaster_response_tooltip': 'Si le marqueur est vrai, cela indique que les fonds des projets vont au secours en cas de catastrophe. L\'option sélectionnée ici sera une valeur par défaut et, si nécessaire, devra être ajustée ultérieurement dans le MGAE.'
 						},
 						'mappings_dropdown' : {
 							'confirm_delete' : ' Etes - vous sûr(e)de vouloir supprimer __templateName__ ? '
@@ -793,14 +805,14 @@ module.exports = {
 							'view_import': ' Visualiser le Téléchargement ',
 							'delete': ' Supprimer '
 						},
-						'select': 'Select',
+						'select': 'Sélectionnez',
 						'import_report':{
-							'import_process': 'Import Process',
-							'project_id': 'Project Id',
-							'operation': 'Operation',
-							'status': 'Status',
-							'message': 'Message/Project Title',
-							'close': 'Close'
+							'import_process': 'Processus d\'Importation',
+							'project_id': 'ID du Projet',
+							'operation': 'Opération',
+							'status': 'Statut',
+							'message': 'Message/Titre du Projet',
+							'close': 'Fermé'
 						},
 					},
 					'server_messages': {

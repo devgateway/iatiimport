@@ -1,9 +1,11 @@
-package org.devgateway.importtool.services.processor.helper;
+package org.devgateway.importtool.services.dto;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
@@ -54,21 +56,39 @@ public class JsonBean {
 			return null;
 		}
 	}
-
+	public static List<JsonBean> getListOfJsoBeanFromString(String jb) {
+		try {
+			if (jb == null) {
+				return null;
+			}
+			ObjectMapper jsonBeanListMapper = getDefaultMapper();
+			return jsonBeanListMapper.readValue(jb, new TypeReference<List<JsonBean>>() {
+			});
+		} catch (IOException e) {
+			logger.error("Cannot deserialize json bean", e);
+			return null;
+		}
+	}
 	public static JsonBean getJsonBeanFromString(String jb) {
 		try {
 			if (jb == null) {
 				return null;
 			}
-			ObjectMapper mapper11 = new ObjectMapper();
-			mapper11.configure(DeserializationFeature.UNWRAP_ROOT_VALUE,false);
-			mapper11.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false);
+			ObjectMapper mapper11 = getDefaultMapper();
+
 
 			return mapper11.readValue(jb, JsonBean.class);
 		} catch (IOException e) {
 			logger.error("Cannot deserialize json bean", e);
 			return null;
 		}
+	}
+
+	private static ObjectMapper getDefaultMapper() {
+		ObjectMapper mapper11 = new ObjectMapper();
+		mapper11.configure(DeserializationFeature.UNWRAP_ROOT_VALUE,false);
+		mapper11.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false);
+		return mapper11;
 	}
 
 	@Override

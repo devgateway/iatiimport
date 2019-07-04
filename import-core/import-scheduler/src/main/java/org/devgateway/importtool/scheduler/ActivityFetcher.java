@@ -9,12 +9,10 @@ import org.devgateway.importtool.model.Project;
 import org.devgateway.importtool.services.ActivityFetchService;
 import org.devgateway.importtool.endpoint.DataFetchServiceConstants;
 import org.devgateway.importtool.services.processor.IATIProcessor;
-import org.devgateway.importtool.services.processor.helper.IATIProcessorHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StopWatch;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -31,6 +29,7 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.mapping;
+import static org.devgateway.importtool.services.processor.helper.IATIProcessorHelper.getStringFromElement;
 
 @Component
 public class ActivityFetcher {
@@ -67,8 +66,7 @@ public class ActivityFetcher {
                     Element element = (Element) activities.item(i);
                     String lastUpdatedDateTime = element.getAttribute(IATIProcessor.LAST_UPDATED_DATE);
                     projectRepository.updateLastUpdatedDateByProjectIdentifier(ISO8601_DATE_FORMAT_PARSER.parse(
-                            lastUpdatedDateTime),IATIProcessorHelper.getStringFromElement(element,
-                            IATIProcessor.DEFAULT_ID_FIELD));
+                            lastUpdatedDateTime),getStringFromElement(element, IATIProcessor.DEFAULT_ID_FIELD));
                 }
             } catch (XPathExpressionException | ParseException e) {
                 log.error("Cannot fetch activities due to a malformed XPATH", e);
@@ -84,11 +82,7 @@ public class ActivityFetcher {
     }
     @Scheduled(cron = "${ActivityFetcher.fetchActivitiesForSyncedReportingOrgs.cron}")
     public void fetchActivitiesForSyncedReportingOrgs(){
-        StopWatch elapsedTimer = new StopWatch("Activity batch fetcher");
-        elapsedTimer.start();
         List<String> gropingCriteriaList = reportingOrgRepository.getSyncedGroupingCriteria();
         gropingCriteriaList.stream().forEach(reportingOrg ->activityFetchService.fetch(reportingOrg));
-        elapsedTimer.stop();
-        log.info(elapsedTimer.prettyPrint());
     }
 }

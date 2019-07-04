@@ -1,12 +1,7 @@
 package org.devgateway.importtool.services;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -18,21 +13,20 @@ import org.devgateway.importtool.model.Project;
 import org.devgateway.importtool.model.Workflow;
 import org.devgateway.importtool.security.ImportSessionToken;
 import org.devgateway.importtool.services.processor.XMLGenericProcessor;
-import org.devgateway.importtool.services.processor.helper.ActionResult;
-import org.devgateway.importtool.services.processor.helper.Field;
-import org.devgateway.importtool.services.processor.helper.FieldValueMapping;
-import org.devgateway.importtool.services.processor.helper.IDestinationProcessor;
-import org.devgateway.importtool.services.processor.helper.IDocumentMapper;
-import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
+import org.devgateway.importtool.services.processor.helper.*;
+import org.devgateway.importtool.services.processor.helper.FieldType;
 import org.devgateway.importtool.services.request.ImportRequest;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 
+
 @EnableAsync
 @org.springframework.stereotype.Service
 public class ImportService {
+
 	@Autowired
 	private FileRepository fileRepository;
 	@Autowired
@@ -44,6 +38,9 @@ public class ImportService {
 	@Value("${AMPStaticProcessor.processor_version}")
 	private String processorVersion;
 
+	@Autowired
+	private BeanFactory beanFactory;
+
 	private Log log = LogFactory.getLog(getClass());
 	
 	public ImportSummary getSummary(IDocumentMapper documentMapper, ImportSessionToken importSessionToken, ISourceProcessor processor){
@@ -52,6 +49,16 @@ public class ImportService {
 		importSummmary.setProjectCount(projectCount);
 		importSummmary.setFieldMappingCount(documentMapper.getFieldMappingObject().size());
 
+		boolean transactionFieldMapped = documentMapper.getFieldMappingObject().stream().filter(mapping -> {
+		    return FieldType.TRANSACTION.equals(mapping.getSourceField().getType());
+		}).count() > 0;
+		
+		boolean hasTransactionData = documentMapper.getDocumentMappings().stream().filter(docMapping -> {
+		    return docMapping.getSourceDocument().getTransactionFields().size() > 0;
+		}).count() > 0;
+		        
+		importSummmary.setHasTransactions(transactionFieldMapped && hasTransactionData);
+		
 		if (fileRepository != null || importSessionToken != null) {
 			importSummmary.setFileCount(fileRepository.countBySessionId(importSessionToken.getImportTokenSessionId()));
 		}
@@ -100,21 +107,22 @@ public class ImportService {
 	}
 		
 	public void insertLog(ActionResult result, Long id) {
-		Project project = new Project();
-		File file = fileRepository.findById(id);
-		project.setFile(file);
-		project.setTitle(result.getMessage());
-		project.setNotes(result.getOperation());
-		project.setStatus(result.getStatus());
-		project.setProjectIdentifier(result.getSourceProjectIdentifier());
+		fileRepository.findById(id).ifPresent(file->{
+			Project project = new Project();
+			project.setFile(file);
+			project.setTitle(result.getMessage());
+			project.setNotes(result.getOperation());
+			project.setStatus(result.getStatus());
+			project.setProjectIdentifier(result.getSourceProjectIdentifier());
 			project.setGroupingCriteria(result.getSourceGroupingCriteria());
-		project.setLastSyncedOn(new Date());
-		projectRepository.save(project);
+			project.setLastSyncedOn(new Date());
+			projectRepository.save(project);
+		});
 	}
 	
 	public void deleteImport(Long id){
 		projectRepository.deleteByFileId(id);
-		fileRepository.delete(id);
+		fileRepository.deleteById(id);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -145,15 +153,9 @@ public class ImportService {
 				getName().equals(processorName)).findFirst();
 
 		if (optional.isPresent()) {
-			try {
-				Constructor<?> c = Class.forName(optional.get().getDestinationProcessor().getClassName()).getDeclaredConstructor(String.class);
-				c.setAccessible(true);
-				processor = (IDestinationProcessor) c.newInstance(new Object[]{authenticationToken});
-				processor.setProcessorVersion(processorVersion);
-			} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException e) {
-				e.printStackTrace();
-				log.error("Error loading destination processor class: " + optional.get().getDestinationProcessor().getClassName() + " " + e);
-			}
+			processor = beanFactory.getBean(optional.get().getDestinationProcessor().getName() + "_PROCESSOR", IDestinationProcessor.class);
+			processor.setProcessorVersion(processorVersion);
+			processor.initialize(authenticationToken);
 		}
 		return processor;
 	}

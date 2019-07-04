@@ -28,7 +28,8 @@ public class Project implements Identifiable<Long>, Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "project_sequence")
+	@SequenceGenerator(name="project_sequence", sequenceName = "project_seq")
 	@Column(name = "id", unique = true, nullable = false)
 	private Long id;
 

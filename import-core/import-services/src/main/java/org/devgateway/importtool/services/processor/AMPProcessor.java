@@ -22,7 +22,7 @@ import org.devgateway.importtool.services.processor.helper.FieldValueMapping;
 import org.devgateway.importtool.services.processor.helper.IDestinationProcessor;
 import org.devgateway.importtool.services.processor.helper.InternalDocument;
 import org.devgateway.importtool.services.processor.helper.ActionResult;
-import org.devgateway.importtool.services.processor.helper.TokenHeaderInterceptor;
+import org.devgateway.importtool.services.processor.destination.TokenCookieHeaderInterceptor;
 import org.devgateway.importtool.services.request.ImportRequest;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.stereotype.Component;
@@ -61,7 +61,9 @@ public class AMPProcessor implements IDestinationProcessor {
 		this.setDocumentsTestEndpoint("activity_list.json");
 		this.setPossibleValuesEndpoint("_possiblevalues.json");
 	}
+	public void initialize(String authenticationToken){
 
+	}
 	@Override
 	public List<Field> getFields() {
 		List<Field> list = new ArrayList<Field>();
@@ -274,8 +276,13 @@ public class AMPProcessor implements IDestinationProcessor {
 
 	@Override
 	public void setAuthenticationToken(String authToken) {
-		this.interceptors.add(new TokenHeaderInterceptor(authToken));
+		this.interceptors.add(new TokenCookieHeaderInterceptor(authToken));
 		this.authenticationToken = authToken;
+	}
+
+	@Override
+	public void reset() {
+
 	}
 
 	public String getDocumentsEndpoint() {
@@ -295,17 +302,18 @@ public class AMPProcessor implements IDestinationProcessor {
 	}
 
 	@Override
-	public ActionResult insert(InternalDocument source, List<FieldMapping> fieldMapping, List<FieldValueMapping> valueMapping) {
+	public void insert(InternalDocument source, List<FieldMapping> fieldMapping, List<FieldValueMapping> valueMapping,
+                       ImportRequest importRequest) {
 		ActionResult result = new ActionResult("1", "INSERT", "OK", "Project has been inserted");
 		log.debug("Update new document in destination system");
-		return result;
+		//return result;
 	}
 
 	@Override
-	public ActionResult update(InternalDocument source, InternalDocument destination, List<FieldMapping> fieldMapping, List<FieldValueMapping> valueMapping, boolean overrideTitle, ImportRequest importRequest) {
+	public void update(InternalDocument source, InternalDocument destination, List<FieldMapping> fieldMapping, List<FieldValueMapping> valueMapping, boolean overrideTitle, ImportRequest importRequest) {
 		ActionResult result = new ActionResult("1", "UPDATE", "OK", "Project has been updated");
 		log.debug("Update new document in destination system");
-		return result;
+		//return result;
 	}
 
 	@Override
@@ -338,6 +346,16 @@ public class AMPProcessor implements IDestinationProcessor {
 	public List<DocumentMapping>  preImportProcessing(List<DocumentMapping> documentMappings){
 		return documentMappings;
 	}
-	
+
+    @Override
+    public void loadProjectsForUpdate(List<String> listOfAmpIds) {
+
+    }
+
+    @Override
+    public List<ActionResult> processProjectsInBatch(ActionStatus importStatus) {
+        return null;
+    }
+
 
 }

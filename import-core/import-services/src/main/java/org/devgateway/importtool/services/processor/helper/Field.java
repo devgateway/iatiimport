@@ -47,11 +47,18 @@ public class Field {
 	public Field(String displayName, String fieldName, FieldType type, boolean isMappable) {
 		this(displayName,fieldName, type,isMappable,null);
 	}
+
 	public Field(String displayName, String fieldName, FieldType type, boolean isMappable,Map<String,String>
 			description) {
+		this(displayName, fieldName, type, isMappable,description, null);
+	}
+	public Field(String displayName, String fieldName, FieldType type, boolean isMappable, Map<String,String>
+			description, Map<String,String> multiLingualLabel) {
 		this(displayName, fieldName, type);
 		this.isMappable = isMappable;
 		this.description = description;
+		this.multiLangDisplayName = multiLingualLabel;
+
 	}
 
 	public String getFieldName() {

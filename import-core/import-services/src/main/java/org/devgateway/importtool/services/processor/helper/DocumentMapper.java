@@ -1,16 +1,22 @@
 package org.devgateway.importtool.services.processor.helper;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.endpoint.ApiMessage;
 import org.devgateway.importtool.endpoint.EPMessages;
+import org.devgateway.importtool.exceptions.CurrencyNotFoundException;
 import org.devgateway.importtool.exceptions.MissingPrerequisitesException;
 import org.devgateway.importtool.services.request.ImportRequest;
 import org.apache.commons.text.similarity.LevenshteinDistance;
@@ -25,12 +31,13 @@ public class DocumentMapper implements IDocumentMapper {
 	private List<FieldMapping> fieldMappingObject = new ArrayList<FieldMapping>();
 	private List<FieldValueMapping> valueMappingObject = new ArrayList<FieldValueMapping>();
 	private List<DocumentMapping> documentMappings = new ArrayList<DocumentMapping>();
+	private Map<String, Set<String>> valuesInSelectedProjects;
 	private boolean isInitialized = false;
 	private ActionStatus importStatus;
 	private ActionStatus documentMappingStatus;
 	private Log logger = LogFactory.getLog(getClass());
 	private static Integer SIMILARITY_EDIT_DISTANCE = 10;
-		
+
 	public ActionStatus getImportStatus() {
 		return importStatus;
 	}
@@ -83,30 +90,50 @@ public class DocumentMapper implements IDocumentMapper {
 				EPMessages.IMPORT_STATUS_MESSAGE.getCode());
 		importStatus.setStatus(Status.IN_PROGRESS);
 
-		results = new ArrayList<ActionResult>();
-		for (DocumentMapping doc : documentMappings) {
-			if (doc.getSelected()) {
-				importStatus.incrementProcessed();
+		results = new ArrayList<>();
 
-				// if activity was mapped to an existing AMP activity, modify
-				// the operation to UPDATE
-				if (doc.getDestinationDocument() != null) {
-					doc.setOperation(OperationType.UPDATE);
-				}
+		//we only fetch the list of documents that have been selected
+		List<DocumentMapping> filtered = documentMappings.stream().filter(d -> d.getSelected())
+				.collect(Collectors.toList());
+		//for the ones that have destination documents, we go and get the list of ampids
 
-				results.add(processDocumentMapping(doc, importRequest));
-			}
+		List<String> listOfAmpIds = filtered.stream().filter(update->
+			update.getDestinationDocument()!=null
+		).map(doc -> doc.getDestinationDocument().getStringFields().get("internalId")).collect(Collectors.toList());
+		//with this list of amp_ods we got and load projects from amp
+
+		if(listOfAmpIds !=null && listOfAmpIds.size() >0) {
+			this.destinationProcessor.loadProjectsForUpdate(listOfAmpIds);
 		}
-		importStatus.setStatus(Status.COMPLETED);
 
+		filtered.stream().forEach(doc -> {
+			// if activity was mapped to an existing AMP activity, modify
+			// the operation to UPDATE
+			if (doc.getDestinationDocument() != null) {
+				doc.setOperation(OperationType.UPDATE);
+			}
+			try {
+				processDocumentMapping(doc, importRequest);
+			} catch (ValueMappingException | CurrencyNotFoundException e) {
+				//we need to find a better way to processs exceptions
+				results.add(getActionResultFromException(doc, e));
+			}
+		});
+		results.addAll(this.destinationProcessor.processProjectsInBatch(importStatus));
+		importStatus.setStatus(Status.COMPLETED);
 		return results;
 	}
 
-	private ActionResult processDocumentMapping(DocumentMapping doc, ImportRequest importRequest) {
+	private ActionResult getActionResultFromException(DocumentMapping doc, Exception e) {
+		logger.error("Error importing activity ", e);
+		return new ActionResult(doc.getSourceDocument().getIdentifier(), "ERROR", "ERROR",
+				"Value Mapping Exception" + e.getMessage());
+	}
+
+	private void processDocumentMapping(DocumentMapping doc, ImportRequest importRequest)
+			throws CurrencyNotFoundException, ValueMappingException {
 		InternalDocument source = doc.getSourceDocument();
 		InternalDocument destination = doc.getDestinationDocument();
-		ActionResult result = null;
-		
 		//if source project is mapped to an existing project, update the existing project
 		if (destination != null) {
 			doc.setOperation(OperationType.UPDATE);
@@ -115,11 +142,11 @@ public class DocumentMapper implements IDocumentMapper {
 		switch (doc.getOperation()) {
 		case INSERT:
 			// For now, we pass the mapping. Find a better more efficient way.
-			result = this.destinationProcessor.insert(source, this.getFieldMappingObject(),
-					this.getValueMappingObject());
+			 this.destinationProcessor.insert(source, this.getFieldMappingObject(),
+					this.getValueMappingObject(), importRequest);
 			break;
 		case UPDATE:
-			result = this.destinationProcessor.update(source, destination, this.getFieldMappingObject(),
+			 this.destinationProcessor.update(source, destination, this.getFieldMappingObject(),
 					this.getValueMappingObject(), doc.isOverrideTitle(), importRequest);
 			break;
 		case NOOP:
@@ -127,31 +154,28 @@ public class DocumentMapper implements IDocumentMapper {
 		default:
 			break;
 		}
-		result.setSourceProjectIdentifier(source.getIdentifier());
-		result.setSourceGroupingCriteria(source.getGrouping());
-		return result;
 	}
 
 	public void setValueMapping(Field firstFieldSource, String valueSrc, String valueDest) {
 
 	}
 
-	public void initialize(){		
+	public void initialize(){
 		try{
 			if (sourceProcessor == null || destinationProcessor == null) {
 				throw new MissingPrerequisitesException("Missing prerequirements to initialize this mapping");
 			}
-			this.setDocumentMappings(new ArrayList<DocumentMapping>());		
-			//parse file			
-			this.updateStatus(EPMessages.PARSING_IN_PROGRESS, Status.IN_PROGRESS);			
+			this.setDocumentMappings(new ArrayList<DocumentMapping>());
+			//parse file
+			this.updateStatus(EPMessages.PARSING_IN_PROGRESS, Status.IN_PROGRESS);
 			this.sourceProcessor.setActionStatus(this.documentMappingStatus);
 			List<InternalDocument> sourceDocuments = this.sourceProcessor.getDocuments();
-			
+
 			//fetchFetchFromDataStore destination system projects
 			this.updateStatus(EPMessages.FETCHING_DESTINATION_PROJECTS, Status.IN_PROGRESS);
-			this.destinationProcessor.setActionStatus(this.documentMappingStatus);			
-			List<InternalDocument> destinationDocuments = this.destinationProcessor.getDocuments(false);	
-			
+			this.destinationProcessor.setActionStatus(this.documentMappingStatus);
+			List<InternalDocument> destinationDocuments = this.destinationProcessor.getDocuments(false);
+
 			//map projects
 			this.mapProjects(sourceDocuments, destinationDocuments);
 			this.setInitialized(true);
@@ -159,7 +183,7 @@ public class DocumentMapper implements IDocumentMapper {
 			logger.error("Missing prerequirements to initialize this mapping " + mpex);			
 			this.updateStatus(EPMessages.ERROR_EXCTRACTING_PROJECT, Status.FAILED_WITH_ERROR);			
 		}catch (Exception e) {
-			logger.error("Error parsing document " + e);
+			logger.error("Error parsing document ", e);
 			this.updateStatus(EPMessages.ERROR_EXCTRACTING_PROJECT, Status.FAILED_WITH_ERROR);			
 		}		
 	}
@@ -285,5 +309,75 @@ public class DocumentMapper implements IDocumentMapper {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	 /**
+     * Get values used in selected projects     * 
+     * @param documentMapper
+     * @return Map where the key is the field name and the value is a set of all values that are in the selected project for the field
+     */
+    public Map<String, Set<String>> getValuesUsedInSelectedProjects() {
+        valuesInSelectedProjects = new HashMap<>();
+        List<DocumentMapping> selectedActivities = getDocumentMappings().stream().filter(m -> Boolean.TRUE.equals(m.getSelected())).collect(Collectors.toList());
+        
+        for (DocumentMapping docMapping : selectedActivities) {            
+            addSelectedStringMultiFieldValues(docMapping);
+            addSelectedStringFieldValues(docMapping);
+            addSelectedOrganizationFieldValues(docMapping);           
+        }
+        
+        return valuesInSelectedProjects;
+    }
 
+    private void addSelectedStringMultiFieldValues(DocumentMapping docMapping) {
+        for (Entry<String, String[]> entry : docMapping.getSourceDocument().getStringMultiFields().entrySet()) {
+            
+            Set<String> valuesSet = getValuesSet(entry.getKey());            
+            String[] stringValues = (String[]) entry.getValue();
+            if (stringValues != null ) {
+                valuesSet.addAll(Arrays.asList(entry.getValue())); 
+            }    
+            
+            valuesInSelectedProjects.put(entry.getKey(), valuesSet);
+        }   
+    }
+    
+    private void addSelectedStringFieldValues(DocumentMapping docMapping) {
+        for (Entry<String, String> entry : docMapping.getSourceDocument().getStringFields().entrySet()) {
+            
+            Set<String> valuesSet = getValuesSet(entry.getKey());           
+            String stringValue = (String) entry.getValue();
+            if (stringValue != null ) {
+                valuesSet.add(entry.getValue()); 
+            }
+            
+            valuesInSelectedProjects.put(entry.getKey(), valuesSet);
+        }  
+    }
+    
+    private void addSelectedOrganizationFieldValues(DocumentMapping docMapping) {
+        for (Entry<String, Map<String, String>> entry : docMapping.getSourceDocument().getOrganizationFields().entrySet()) {
+            
+            String fieldKey = entry.getKey().substring(0, entry.getKey().lastIndexOf("_"));            
+            Set<String> valuesSet = getValuesSet(fieldKey);              
+            Map<String, String> values =  entry.getValue();
+            if (values != null ) {
+                for (Entry<String, String> org : values.entrySet()) {                         
+                    if ("value".equals(org.getKey())) {                           
+                        valuesSet.add(org.getValue());
+                    }                     
+                }                
+            } 
+            
+            valuesInSelectedProjects.put(fieldKey, valuesSet);
+        }    
+    } 
+    
+   private Set<String> getValuesSet(String fieldName) {
+       Set<String> valuesSet = valuesInSelectedProjects.get(fieldName);               
+       if (valuesSet == null) {
+           valuesSet = new HashSet<>();           
+       } 
+       
+       return valuesSet;
+   }
 }

@@ -13,12 +13,15 @@ import java.util.Date;
 @JsonAutoDetect (fieldVisibility = JsonAutoDetect.Visibility.ANY, isGetterVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.ANY)
 @Entity
 @Table (name = "user_account")
+// FIXME This is not in use remove before closing the feature
+// FIXME Remember to drop the table
 public class User implements Identifiable<Long>, Serializable    {
 
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue (strategy = GenerationType.SEQUENCE)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_sequence")
+	@SequenceGenerator(name="user_sequence", sequenceName = "user_seq")
 	@Column (name = "id", unique = true, nullable = false)
 	private Long id;
 

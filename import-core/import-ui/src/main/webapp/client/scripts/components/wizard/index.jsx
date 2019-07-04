@@ -29,7 +29,9 @@ var Wizard = React.createClass({
 			processedVersions: [],
 			projectWithUpdates:[],
 			currentVersion: null,
-			statusMessage: ""
+			statusMessage: "",
+			showDisasterResponse: false,
+      importExecuted: false
 		};
 	},
 	componentWillReceiveProps: function(nextProps) {
@@ -79,6 +81,7 @@ var Wizard = React.createClass({
 	           common.refreshToken();            
 	    }.bind(this))["catch"](function(err) {
 	            common.resetAuthCookies();
+	            this.goHome();
 	    }.bind(this));
 	        
 	                
@@ -262,19 +265,19 @@ var Wizard = React.createClass({
     goHome: function(){
         window.location = "#";
     },
-	launchImport: function(importOption) {
-		var self = this;
+	launchImport: function(importOption, disasterResponse) {
 		this.showLoadingIcon();
+		//when we launch the import we unblock the previous button
+		this.setState({importExecuted:false});
 		$.ajax({
 	    	url: '/importer/import/execute',
 	        dataType: 'json',
 	        contentType: "application/json; charset=utf-8",
-	        data: JSON.stringify({importOption: importOption}),
+	        data: JSON.stringify({importOption: importOption, disasterResponse: disasterResponse}),
 	        success: function(data) {
 	        },
 	        type: 'POST'
 	     });
-
 		var self = this;
 		self.setIntervalId = setInterval(function(){
     		self.checkImportStatus();
@@ -290,7 +293,16 @@ var Wizard = React.createClass({
 	        if(data.importStatus){
 	          if(data.importStatus.status == "COMPLETED"){
 	    			clearInterval(self.setIntervalId);
-	    			self.setState({results: data.results});
+	    			//once import is completed we disable previous button
+            //If at least one is sucess. If all errors we allow to go back and fix
+              var shouldBlock = false;
+              if(data.results) {
+                shouldBlock = data.results.some(function (r) {
+                  return r.status === constants.OK;
+                });
+              }
+              self.setState({importExecuted:shouldBlock});
+              self.setState({results: data.results});
 		        	self.hideLoadingIcon();
 		            $("#modalResults").modal("show");
 		            self.setState({statusMessage: ""});
@@ -358,6 +370,9 @@ var Wizard = React.createClass({
 	        type: 'GET'
 	     });
   },
+  showDisasterResponse: function(hasDisasterResponseField) {
+     this.setState({showDisasterResponse: hasDisasterResponseField});
+  },
   render: function() {   
     var eventHandlers = {};
     eventHandlers.uploadFile          = this.uploadFile;
@@ -377,6 +392,7 @@ var Wizard = React.createClass({
     eventHandlers.initAutomaticImport = this.initAutomaticImport;
     eventHandlers.processNextVersion = this.processNextVersion;
     eventHandlers.selectDataSource = this.selectDataSource;
+    eventHandlers.showDisasterResponse = this.showDisasterResponse;
 
     var error;
     if(common.hasValidSession() == false){
@@ -409,7 +425,7 @@ var Wizard = React.createClass({
       </div>
       </div>
       </div>
-      <ImportReport results={this.state.results} {...this.props} />
+      <ImportReport results={this.state.results} {...this.props} importExecuted={this.state.importExecuted}/>
       </div>
       );
   }

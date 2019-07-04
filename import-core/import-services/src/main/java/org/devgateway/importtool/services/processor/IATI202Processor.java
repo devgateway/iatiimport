@@ -12,6 +12,8 @@ public class IATI202Processor extends IATI2XProcessor {
 		codelistPath = "IATI202/codelist/";
 		schemaPath = "IATI202/schema/";
 		fieldsTooltipsLocation = "IATI202/tooltips/fields/tooltips";
+		//TODO rename project structures to version/fields/tooltips
+		//TODO version/fields/labels
 		propertiesFile = "IATI202/IATI202Processor.properties";
 		configureDefaults();
 		instantiateStaticFields();
