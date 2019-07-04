@@ -95,6 +95,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	//List of projects to be updated into the amp. Will be loaded in batches
 	List<JsonBean> projectsToBeUpdated;
 
+	JsonNode jnDestinationDocuments;
 	@Override
 	public String getProcessorVersion() {
 		return processorVersion;
@@ -149,6 +150,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			ampImplementationLevel = AMP_IMPLEMENTATION_LEVEL_ID_DEFAULT_VALUE;
 		}
 		initializeProjectsLists();
+		initializeDestinationDocuments();
 		instantiateStaticFields();
 		fetchDestinationDocuments();
 	}
@@ -167,26 +169,28 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		projectsToBeUpdated = new ArrayList<>();
 		restTemplate = null;
 		actionStatus = null;
-		jsonNode = null;
+		jnDestinationDocuments = null;
 	}
 
 	private void initializeProjectsLists() {
 		this.projectsReadyToBePosted = new ArrayList<>();
 		this.projectsToBeUpdated = new ArrayList<>();
-		jsonNode = null;
+	}
+	private void initializeDestinationDocuments(){
+		jnDestinationDocuments = null;
 	}
 
 	@Override
 	public List<Field> getFields() {
 		return fieldList;
 	}
-	JsonNode jsonNode;
+
 	private void fetchDestinationDocuments()  {
 		String result ;
 		try {
 			result = this.restTemplate.getForObject(baseURL + DOCUMENTS_END_POINT, String.class);
 			ObjectMapper mapper = new ObjectMapper();
-			jsonNode = mapper.readTree(result);
+			jnDestinationDocuments = mapper.readTree(result);
 		}
 		catch(Exception ex){
 			log.error("cannot get project list from amp");
@@ -201,11 +205,11 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				EPMessages.FETCHING_DESTINATION_PROJECTS.getCode());
 		List<InternalDocument> list = new ArrayList<>();
 		try {
-			if (jsonNode == null) {
+			if (jnDestinationDocuments == null) {
 				fetchDestinationDocuments();
 			}
-			if (jsonNode.isArray()) {
-				jsonNode.forEach((JsonNode node) -> {
+			if (jnDestinationDocuments.isArray()) {
+				jnDestinationDocuments.forEach((JsonNode node) -> {
 					InternalDocument document = new InternalDocument();
 
 					Boolean edit = node.get("edit").asBoolean();
@@ -523,6 +527,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		}
 		//once processed we need to remove what is being processed since the user can click on process again
 		initializeProjectsLists();
+		this.initializeProjectsLists();
 		return finalResults;
 	}
 
