@@ -1,5 +1,6 @@
 package org.devgateway.importtool.services.processor.helper;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -114,8 +115,8 @@ public class DocumentMapper implements IDocumentMapper {
 			}
 			try {
 				processDocumentMapping(doc, importRequest);
-			} catch (ValueMappingException | CurrencyNotFoundException e) {
-				//we need to find a better way to processs exceptions
+			} catch (ValueMappingException | CurrencyNotFoundException |ParseException | UnsupportedFieldTypeException e) {
+				//we need to find a better way to process exceptions
 				results.add(getActionResultFromException(doc, e));
 			}
 		});
@@ -131,7 +132,7 @@ public class DocumentMapper implements IDocumentMapper {
 	}
 
 	private void processDocumentMapping(DocumentMapping doc, ImportRequest importRequest)
-			throws CurrencyNotFoundException, ValueMappingException {
+			throws CurrencyNotFoundException, ValueMappingException, ParseException, UnsupportedFieldTypeException {
 		InternalDocument source = doc.getSourceDocument();
 		InternalDocument destination = doc.getDestinationDocument();
 		//if source project is mapped to an existing project, update the existing project
@@ -193,15 +194,14 @@ public class DocumentMapper implements IDocumentMapper {
 		for (InternalDocument srcDoc : sourceDocuments) {
 			this.documentMappingStatus.incrementProcessed();
 			String sourceIdField = this.sourceProcessor.getIdField();
-			String destinationIdField = this.destinationProcessor.getIdField();
 			String sourceIdValue = srcDoc.getStringFields().get(sourceIdField);
 			srcDoc.setIdentifier(sourceIdValue);
 			Optional<InternalDocument> optionalDestDoc = destinationDocuments.stream().filter(n -> {
-				return sourceIdValue.equals(n.getStringFields().get(destinationIdField));
+				return sourceIdValue.equals(n.getStringFields().get(Constants.AMP_IATI_ID_FIELD));
 			}).findFirst();
 			if (optionalDestDoc.isPresent()) {
 				InternalDocument destDoc = optionalDestDoc.get();
-				String destinationIdValue = (String) destDoc.getStringFields().get(destinationIdField);
+				String destinationIdValue = (String) destDoc.getStringFields().get(Constants.AMP_IATI_ID_FIELD);
 				destDoc.setIdentifier(destinationIdValue);
 				this.addDocumentMapping(srcDoc, destDoc, OperationType.UPDATE);
 			} else {

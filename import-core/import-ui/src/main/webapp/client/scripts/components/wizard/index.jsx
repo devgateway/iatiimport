@@ -105,7 +105,6 @@ var Wizard = React.createClass({
 		$(this.refs.message.getDOMNode()).html(msg);
 		var box = $(this.refs.messageBox.getDOMNode());
 		box.show();
-		box.fadeOut({duration:10000});
 	},
 	// Steps and transitions
 	uploadFile: function() {
@@ -342,18 +341,21 @@ var Wizard = React.createClass({
 
 		var self = this;
 		return $.ajax({
-	        url: url,
-	        timeout:appConfig.REQUEST_TIMEOUT,
-	        error: function(result) {
+      url: url,
+      timeout:appConfig.REQUEST_TIMEOUT,
+      dataType: 'json',
+      type: 'GET',
+      error: function(error) {
+            var serverResponse = JSON.parse(error.responseText);
 	        	self.setState({
 					info: {
 						status:'FAIL'
 					}
 				});
 	        	self.hideLoadingIcon();
-	        	self.displayError("Error loading state of session.");
+	        	self.displayError(self.props.i18nLib.t('server_messages.' + serverResponse.message));
+        ;
 	        },
-	        dataType: 'json',
 	        success: function(result) {
 	        	self.setState({
 					info: {
@@ -366,8 +368,7 @@ var Wizard = React.createClass({
 					}
 				});
 	        	self.hideLoadingIcon();
-	        },
-	        type: 'GET'
+	        }
 	     });
   },
   showDisasterResponse: function(hasDisasterResponseField) {

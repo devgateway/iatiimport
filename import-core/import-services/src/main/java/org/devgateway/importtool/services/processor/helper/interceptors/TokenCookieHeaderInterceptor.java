@@ -1,8 +1,9 @@
-package org.devgateway.importtool.services.processor.destination;
+package org.devgateway.importtool.services.processor.helper.interceptors;
 
 import java.io.IOException;
 import java.util.List;
 
+import org.devgateway.importtool.services.processor.destination.AmpStaticProcessorConstants;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
@@ -10,7 +11,7 @@ import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.support.HttpRequestWrapper;
 
-public class TokenCookieHeaderInterceptor implements ClientHttpRequestInterceptor {
+public class TokenCookieHeaderInterceptor extends AbstractHttpInterceptor  implements ClientHttpRequestInterceptor {
 
     private String token;
     private String cookie;
@@ -28,8 +29,8 @@ public class TokenCookieHeaderInterceptor implements ClientHttpRequestIntercepto
     public ClientHttpResponse intercept(HttpRequest request, byte[] body,
                                         ClientHttpRequestExecution execution) throws IOException {
 
-        HttpRequestWrapper requestWrapper = new HttpRequestWrapper(request);
-        requestWrapper.getHeaders().add(AmpStaticProcessorConstants.X_AUTH_HEADER, token);
+        HttpRequestWrapper requestWrapper = addHeader(request, AmpStaticProcessorConstants.X_AUTH_HEADER, token);
+
         if (cookie != null) {
             request.getHeaders().add(HttpHeaders.COOKIE, cookie);
         }

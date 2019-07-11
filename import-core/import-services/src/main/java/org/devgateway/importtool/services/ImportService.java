@@ -146,6 +146,7 @@ public class ImportService {
 	}
 	
 	public IDestinationProcessor getDestinationProcessor(String processorName, String authenticationToken) {
+
 		IDestinationProcessor processor = null;
 		List<Workflow> workflows = workflowService.getWorkflows();
 

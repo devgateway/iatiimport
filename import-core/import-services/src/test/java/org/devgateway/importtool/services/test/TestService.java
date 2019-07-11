@@ -1,6 +1,6 @@
 package org.devgateway.importtool.services.test;
 
-import static org.devgateway.importtool.services.processor.helper.Constants.AMP_ACTIVITY_STATUS;
+import static org.devgateway.importtool.services.processor.destination.AmpStaticProcessorConstants.AMP_ACTIVITY_STATUS;
 import static org.hamcrest.CoreMatchers.is;
 
 import java.io.InputStream;

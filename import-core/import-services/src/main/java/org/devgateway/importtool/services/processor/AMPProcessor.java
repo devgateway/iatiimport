@@ -22,7 +22,7 @@ import org.devgateway.importtool.services.processor.helper.FieldValueMapping;
 import org.devgateway.importtool.services.processor.helper.IDestinationProcessor;
 import org.devgateway.importtool.services.processor.helper.InternalDocument;
 import org.devgateway.importtool.services.processor.helper.ActionResult;
-import org.devgateway.importtool.services.processor.destination.TokenCookieHeaderInterceptor;
+import org.devgateway.importtool.services.processor.helper.interceptors.TokenCookieHeaderInterceptor;
 import org.devgateway.importtool.services.request.ImportRequest;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.stereotype.Component;
@@ -239,11 +239,6 @@ public class AMPProcessor implements IDestinationProcessor {
 	}
 
 	@Override
-	public String getIdField() {
-		return DEFAULT_ID_FIELD;
-	}
-
-	@Override
 	public String getTitleField() {
 		return DEFAULT_TITLE_FIELD;
 	}
@@ -253,7 +248,7 @@ public class AMPProcessor implements IDestinationProcessor {
 		return null;
 	}
 
-	@Override
+
 	public void setProcessorVersion(String processorVersion) {
 
 	}
