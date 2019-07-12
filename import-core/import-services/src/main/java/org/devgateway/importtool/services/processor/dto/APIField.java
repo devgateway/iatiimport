@@ -213,4 +213,30 @@ public class APIField {
     public void setSizeLimit(Integer sizeLimit) {
         this.sizeLimit = sizeLimit;
     }
+
+    public static List<APIField> getApiFieldListFromString(String apiFieldList) {
+        try {
+            if (apiFieldList == null) {
+                return null;
+            }
+            ObjectMapper jsonBeanListMapper = getDefaultMapper();
+            return jsonBeanListMapper.readValue(apiFieldList, new TypeReference<List<APIField>>() {
+            });
+        } catch (IOException e) {
+            logger.error("Cannot deserialize json bean", e);
+            return null;
+        }
+    }
+
+    /**
+     * THIS SHOULD BE MOVED TO JSON BEAN ONCE DEVELOP IS MERGED INTO
+     *
+     * @return
+     */
+    private static ObjectMapper getDefaultMapper() {
+        ObjectMapper mapper11 = new ObjectMapper();
+        mapper11.configure(DeserializationFeature.UNWRAP_ROOT_VALUE, false);
+        mapper11.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        return mapper11;
+    }
 }

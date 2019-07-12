@@ -9,12 +9,10 @@ import org.devgateway.importtool.model.Project;
 import org.devgateway.importtool.services.ActivityFetchService;
 import org.devgateway.importtool.endpoint.DataFetchServiceConstants;
 import org.devgateway.importtool.services.processor.IATIProcessor;
-import org.devgateway.importtool.services.processor.helper.IATIProcessorHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StopWatch;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -84,11 +82,7 @@ public class ActivityFetcher {
     }
     @Scheduled(cron = "${ActivityFetcher.fetchActivitiesForSyncedReportingOrgs.cron}")
     public void fetchActivitiesForSyncedReportingOrgs(){
-        StopWatch elapsedTimer = new StopWatch("Activity batch fetcher");
-        elapsedTimer.start();
         List<String> gropingCriteriaList = reportingOrgRepository.getSyncedGroupingCriteria();
         gropingCriteriaList.stream().forEach(reportingOrg ->activityFetchService.fetch(reportingOrg));
-        elapsedTimer.stop();
-        log.info(elapsedTimer.prettyPrint());
     }
 }

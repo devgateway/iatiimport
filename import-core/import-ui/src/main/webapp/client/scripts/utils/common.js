@@ -104,11 +104,11 @@ module.exports = {
 	 var self = this;
 	 self.setIntervalTokenId = setInterval(function(){
 		 self.checkTokenStatus();
-	}, 12000);
+	}, Constants.TOKEN_VERIFICATION_INTERVAL);
  },
  checkTokenStatus: function() {
+    self = this;
 		var currentTime = (new Date()).getTime();
-		var expirationTime = appConfig.DESTINATION_AUTH_TOKEN_EXPIRATION;
 		var secondsToExpire = (appConfig.DESTINATION_AUTH_TOKEN_EXPIRATION - currentTime)/1000;
 		
 		if (secondsToExpire < 0) {
@@ -116,7 +116,8 @@ module.exports = {
 			      this.setAuthCookies(data);			    
 			  $.get(appConfig.TOOL_REST_PATH + '/refresh/' + data.token, function(){});
 		      }.bind(this))['catch'](function(err) {
-		    	  this.resetAuthCookies();
+		        clearInterval(self.setIntervalTokenId);
+		        this.resetAuthCookies();
 		      }.bind(this));
 
 		}

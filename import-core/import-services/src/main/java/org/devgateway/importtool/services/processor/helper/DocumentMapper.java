@@ -21,7 +21,6 @@ import org.devgateway.importtool.exceptions.CurrencyNotFoundException;
 import org.devgateway.importtool.exceptions.MissingPrerequisitesException;
 import org.devgateway.importtool.services.request.ImportRequest;
 import org.apache.commons.text.similarity.LevenshteinDistance;
-import org.springframework.util.StopWatch;
 
 
 public class DocumentMapper implements IDocumentMapper {
@@ -91,26 +90,22 @@ public class DocumentMapper implements IDocumentMapper {
 				documentMappings.stream().filter(m -> m.getSelected() == true).count(),
 				EPMessages.IMPORT_STATUS_MESSAGE.getCode());
 		importStatus.setStatus(Status.IN_PROGRESS);
-		StopWatch documentProcessingStopWatch = new StopWatch("document processing");
+
 		results = new ArrayList<>();
 
 		//we only fetch the list of documents that have been selected
 		List<DocumentMapping> filtered = documentMappings.stream().filter(d -> d.getSelected())
 				.collect(Collectors.toList());
 		//for the ones that have destination documents, we go and get the list of ampids
-		documentProcessingStopWatch.start("Fetch projects by amp id");
 
 		List<String> listOfAmpIds = filtered.stream().filter(update->
 			update.getDestinationDocument()!=null
 		).map(doc -> doc.getDestinationDocument().getStringFields().get("internalId")).collect(Collectors.toList());
-		documentProcessingStopWatch.stop();
 		//with this list of amp_ods we got and load projects from amp
 
 		if(listOfAmpIds !=null && listOfAmpIds.size() >0) {
 			this.destinationProcessor.loadProjectsForUpdate(listOfAmpIds);
 		}
-
-		documentProcessingStopWatch.start("Document processing");
 
 		filtered.stream().forEach(doc -> {
 			// if activity was mapped to an existing AMP activity, modify
@@ -125,15 +120,8 @@ public class DocumentMapper implements IDocumentMapper {
 				results.add(getActionResultFromException(doc, e));
 			}
 		});
-		documentProcessingStopWatch.stop();
-
-		documentProcessingStopWatch.start("Document processing processing");
-
 		results.addAll(this.destinationProcessor.processProjectsInBatch(importStatus));
-		documentProcessingStopWatch.stop();
 		importStatus.setStatus(Status.COMPLETED);
-		//the stop watch will be remove once the ticket is merged into hotfix branch
-		logger.error(documentProcessingStopWatch.prettyPrint());
 		return results;
 	}
 

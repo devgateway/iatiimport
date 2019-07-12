@@ -62,7 +62,7 @@ public class Constants {
 	public static final String ACCOUNTABLE_ORG_DISPLAY_NAME = "Accountable Organization";
 	public static final Set<String> SUPPORTED_LOCALES= new HashSet<>(Arrays.asList("en","fr", "es"));
 
-	public static final Integer AMP_PUSH_BATCH_SIZE = 1;
+	public static final Integer AMP_PUSH_BATCH_SIZE = 3;
 	public static final Integer AMP_PULL_BATCH_SIZE = 100;
 	public static final String AMP_ACTIVITY_ENDPOINT = "rest/activity";
 
@@ -78,13 +78,11 @@ public class Constants {
 
 	public static final String LANG_PACK_TOOLTIPS="TOOLTIPS";
 	public static final String LANG_PACK_LABELS="LABELS";
-	public static final List<String> TRANSACTION_FIELDS = new ArrayList<>(Arrays.asList("Actual Commitments",
-			"Actual Disbursements","Actual Expenditures","Planned Commitments", "Planned Disbursements",
-			"Planned Expenditures"));
-	public static final String RELATED_ORGANIZATION_CODE_LIST_POST_FIX ="organization";
-	
+
+
 	public static final String NULL_STRING ="null";
-	
+	public static final String RELATED_ORGANIZATION_CODE_LIST_POST_FIX ="organization";
+
 	public static final String ISO8601_DATE_AND_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 	public static final String ISO8601_DATE_FORMAT = "yyyy-MM-dd";
 

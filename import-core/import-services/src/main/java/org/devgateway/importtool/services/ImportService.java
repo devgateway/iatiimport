@@ -1,8 +1,6 @@
 package org.devgateway.importtool.services;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 import org.apache.commons.logging.Log;
@@ -14,9 +12,7 @@ import org.devgateway.importtool.model.ImportSummary;
 import org.devgateway.importtool.model.Project;
 import org.devgateway.importtool.model.Workflow;
 import org.devgateway.importtool.security.ImportSessionToken;
-import org.devgateway.importtool.services.processor.config.AmpStaticProcessorConfig;
 import org.devgateway.importtool.services.processor.XMLGenericProcessor;
-import org.devgateway.importtool.services.processor.config.DestinationProcessorConfiguration;
 import org.devgateway.importtool.services.processor.helper.*;
 import org.devgateway.importtool.services.processor.helper.FieldType;
 import org.devgateway.importtool.services.request.ImportRequest;
@@ -25,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
+
 
 @EnableAsync
 @org.springframework.stereotype.Service
@@ -42,7 +39,7 @@ public class ImportService {
 	private String processorVersion;
 
 	@Autowired
-	BeanFactory beanFactory;
+	private BeanFactory beanFactory;
 
 	private Log log = LogFactory.getLog(getClass());
 	
@@ -110,21 +107,22 @@ public class ImportService {
 	}
 		
 	public void insertLog(ActionResult result, Long id) {
-		Project project = new Project();
-		File file = fileRepository.findById(id);
-		project.setFile(file);
-		project.setTitle(result.getMessage());
-		project.setNotes(result.getOperation());
-		project.setStatus(result.getStatus());
-		project.setProjectIdentifier(result.getSourceProjectIdentifier());
-		project.setGroupingCriteria(result.getSourceGroupingCriteria());
-		project.setLastSyncedOn(new Date());
-		projectRepository.save(project);
+		fileRepository.findById(id).ifPresent(file->{
+			Project project = new Project();
+			project.setFile(file);
+			project.setTitle(result.getMessage());
+			project.setNotes(result.getOperation());
+			project.setStatus(result.getStatus());
+			project.setProjectIdentifier(result.getSourceProjectIdentifier());
+			project.setGroupingCriteria(result.getSourceGroupingCriteria());
+			project.setLastSyncedOn(new Date());
+			projectRepository.save(project);
+		});
 	}
 	
 	public void deleteImport(Long id){
 		projectRepository.deleteByFileId(id);
-		fileRepository.delete(id);
+		fileRepository.deleteById(id);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -149,7 +147,6 @@ public class ImportService {
 	
 	public IDestinationProcessor getDestinationProcessor(String processorName, String authenticationToken) {
 
-		DestinationProcessorConfiguration configuration = null;
 		IDestinationProcessor processor = null;
 		List<Workflow> workflows = workflowService.getWorkflows();
 
@@ -157,23 +154,9 @@ public class ImportService {
 				getName().equals(processorName)).findFirst();
 
 		if (optional.isPresent()) {
-			try {
-
-				configuration = beanFactory.getBean(optional.get().getDestinationProcessor().getName(), DestinationProcessorConfiguration.class);
-
-				Constructor<?> c = Class.forName(optional.get().getDestinationProcessor().getClassName()).getDeclaredConstructor(DestinationProcessorConfiguration.class, String.class
-						, String.class);
-				c.setAccessible(true);
-				processor = (IDestinationProcessor) c.newInstance(new Object[]{configuration,  processorVersion, authenticationToken});
-				processor.initialize();
-
-			} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | NoSuchMethodException |
-					SecurityException | IllegalArgumentException | InvocationTargetException e) {
-				//TODO DO NOT swallow this exception, properly handle now that we can notify the importer
-				//TODO what the problem was
-				e.printStackTrace();
-				log.error("Error loading destination processor class: " + optional.get().getDestinationProcessor().getClassName() + " " + e);
-			}
+			processor = beanFactory.getBean(optional.get().getDestinationProcessor().getName() + "_PROCESSOR", IDestinationProcessor.class);
+			processor.setProcessorVersion(processorVersion);
+			processor.initialize(authenticationToken);
 		}
 		return processor;
 	}
