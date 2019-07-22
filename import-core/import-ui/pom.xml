@@ -149,7 +149,6 @@
 						<PULL_REQUEST>${pullRequest}</PULL_REQUEST>
 						<BRANCH>${branch}</BRANCH>
 					</buildArgs>
-					<rm>false</rm>
 					<resources>
 						<resource>
 							<targetPath>/</targetPath>
