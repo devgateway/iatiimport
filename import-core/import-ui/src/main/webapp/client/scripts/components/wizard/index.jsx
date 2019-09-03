@@ -334,7 +334,6 @@ var Wizard = React.createClass({
 		var url = compiledURL({
 			'sourceProcessor': this.getSourceProcessor(sourceProcessor),
 			'destinationProcessor': destinationProcessor,
-			'authenticationToken': Cookies.get("DESTINATION_AUTH_TOKEN"),
 			'username': Cookies.get("DESTINATION_USERNAME"),
 			'host': appConfig.DESTINATION_API_HOST
 		});
@@ -359,7 +358,6 @@ var Wizard = React.createClass({
 	        success: function(result) {
 	        	self.setState({
 					info: {
-						authenticationToken: result.authenticationToken,
 						sourceProcessorName: result.sourceProcessorName,
 						sourceProcessor: sourceProcessor,
 						destinationProcessorName: result.destinationProcessorName,

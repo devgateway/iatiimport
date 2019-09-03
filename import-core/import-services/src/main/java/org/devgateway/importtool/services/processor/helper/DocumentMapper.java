@@ -48,7 +48,7 @@ public class DocumentMapper implements IDocumentMapper {
 	}
 
 	
-	private List<ActionResult> results = new ArrayList<ActionResult>();
+	private List<ActionResult> results = new ArrayList<>();
 		
 	public List<ActionResult> getResults() {
 		return results;

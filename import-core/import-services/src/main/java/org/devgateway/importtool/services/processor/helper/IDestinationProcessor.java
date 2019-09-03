@@ -1,18 +1,13 @@
 package org.devgateway.importtool.services.processor.helper;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 
 import org.devgateway.importtool.exceptions.CurrencyNotFoundException;
-import org.devgateway.importtool.exceptions.MissingPrerequisitesException;
 import org.devgateway.importtool.services.request.ImportRequest;
-import org.springframework.web.client.RestTemplate;
 
 public interface IDestinationProcessor {
 	public String getDescriptiveName();
-
-	public void setAuthenticationToken(String authToken);
 
 	void reset();
 
@@ -38,6 +33,7 @@ public interface IDestinationProcessor {
     void loadProjectsForUpdate(List<String> listOfAmpIds);
 
 	List<ActionResult> processProjectsInBatch(ActionStatus importStatus);
+	
+	void initialize(String ampJSessionId);
 
-	void initialize (String token);
 }
