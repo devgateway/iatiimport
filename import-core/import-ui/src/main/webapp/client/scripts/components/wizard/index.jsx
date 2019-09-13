@@ -54,7 +54,6 @@ var Wizard = React.createClass({
         appActions.refreshDestinationSession.triggerPromise().then(function(data) {
             common.setAuthCookies(data);
             this.initImportSession(sourceProcessor, destinationProcessor); 
-            common.refreshToken();
         }.bind(this))["catch"](function(err) {
             common.resetAuthCookies();
             this.goHome();
@@ -77,8 +76,6 @@ var Wizard = React.createClass({
 	           this.initImportSession(sourceProcessor, destinationProcessor).then(function(){
 	                this.transitionTo('filter', this.props.params);
 	           }.bind(this));
-	            
-	           common.refreshToken();            
 	    }.bind(this))["catch"](function(err) {
 	            common.resetAuthCookies();
 	            this.goHome();
