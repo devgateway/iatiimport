@@ -94,7 +94,24 @@ module.exports = {
       Cookies.set('WORKSPACE', null);
  },
 
+ refreshSession: function() {
+   var self = this;
+   self.setIntervalTokenId = setInterval(function() {
+     self.checkSessionStatus();
+   }, Constants.SESSION_VERIFICATION_INTERVAL);
+ },
+
+ checkSessionStatus: function() {
+   var self = this;
+   appActions.refreshDestinationSession.triggerPromise().then(function(data) {
+      this.setAuthCookies(data);
+      $.get(appConfig.DESTINATION_API_HOST + appConfig.DESTINATION_USER_INFO_ENDPOINT, function(){});
+   }.bind(this))['catch'](function(err) {
+      this.resetAuthCookies();
+   }.bind(this));
+ },
+
  hasValidSession: function() {
-	return Cookies.get('DESTINATION_USERNAME');
+	return (appConfig.DESTINATION_USERNAME && appConfig.DESTINATION_USERNAME.length > 0) === true;
  } 
 };

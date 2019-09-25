@@ -53,7 +53,8 @@ var Wizard = React.createClass({
         var destinationProcessor = this.props.params.dst;    
         appActions.refreshDestinationSession.triggerPromise().then(function(data) {
             common.setAuthCookies(data);
-            this.initImportSession(sourceProcessor, destinationProcessor); 
+            this.initImportSession(sourceProcessor, destinationProcessor);
+            common.refreshSession();
         }.bind(this))["catch"](function(err) {
             common.resetAuthCookies();
             this.goHome();
@@ -70,11 +71,12 @@ var Wizard = React.createClass({
 	 initAutomaticImport: function() {      
 	      var sourceProcessor = this.props.params.src;
 	      var destinationProcessor = this.props.params.dst; 
-	        
+
 	      appActions.refreshDestinationSession.triggerPromise().then(function(data) {
 	           common.setAuthCookies(data);           
 	           this.initImportSession(sourceProcessor, destinationProcessor).then(function(){
 	                this.transitionTo('filter', this.props.params);
+             common.refreshSession();
 	           }.bind(this));
 	    }.bind(this))["catch"](function(err) {
 	            common.resetAuthCookies();
