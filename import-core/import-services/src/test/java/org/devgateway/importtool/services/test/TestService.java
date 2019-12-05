@@ -85,7 +85,6 @@ public class TestService {
 		// Select type of Source -> Destination process
 		ISourceProcessor sourceProcessor = new IATI104Processor();
 		IDestinationProcessor destinationProcessor = new AMPProcessor();
-		destinationProcessor.setAuthenticationToken("27368298-48e3-48ef-9f75-13a58f2f5cb6");
 		ImportRequest importRequest = new ImportRequest();
 		importRequest.setImportOption(ImportOption.OVERWRITE_ALL_FUNDING);
 

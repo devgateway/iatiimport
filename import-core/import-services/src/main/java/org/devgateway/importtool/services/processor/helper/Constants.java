@@ -64,7 +64,7 @@ public class Constants {
 
 	public static final Integer AMP_PUSH_BATCH_SIZE = 3;
 	public static final Integer AMP_PULL_BATCH_SIZE = 100;
-	public static final String AMP_ACTIVITY_ENDPOINT = "rest/activity";
+	public static final String AMP_ACTIVITY_ENDPOINT = "/rest/activity";
 
 	//AMP FIELDS to be moved to its own property field
 	public static final String AMP_INTERNAL_ID = "internal_id";

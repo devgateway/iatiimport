@@ -15,7 +15,6 @@ import org.devgateway.importtool.services.dto.JsonBean;
 import org.devgateway.importtool.services.dto.MappedProject;
 import org.devgateway.importtool.services.dto.SerializationHelper;
 import org.devgateway.importtool.services.processor.destination.AmpStaticProcessorConstants;
-import org.devgateway.importtool.services.processor.helper.interceptors.TokenCookieHeaderInterceptor;
 import org.devgateway.importtool.services.processor.dto.APIField;
 import org.devgateway.importtool.services.processor.dto.PossibleValue;
 import org.devgateway.importtool.services.processor.helper.ActionResult;
@@ -33,6 +32,7 @@ import org.devgateway.importtool.services.processor.helper.InternalDocument;
 import org.devgateway.importtool.services.processor.helper.ProcessorUtils;
 import org.devgateway.importtool.services.processor.helper.UnsupportedFieldTypeException;
 import org.devgateway.importtool.services.processor.helper.ValueMappingException;
+import org.devgateway.importtool.services.processor.helper.interceptors.CookieHeaderInterceptor;
 import org.devgateway.importtool.services.processor.helper.interceptors.UserAgentInterceptor;
 import org.devgateway.importtool.services.request.ImportRequest;
 import org.parboiled.common.ImmutableList;
@@ -68,7 +68,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static org.devgateway.importtool.services.processor.destination.AmpStaticProcessorConstants.*;
-import static org.devgateway.importtool.services.processor.helper.Constants.*;
 
 // TODO: Sort methods, move classes to generic helpers for all processors if possible
 // TODO: Clean up code, find opportunities to reuse methods (example update/insert)
@@ -188,9 +187,10 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 	}
 	@Override
-	public void initialize(String authenticationToken) {
-
-		this.setAuthenticationToken(authenticationToken);
+	public void initialize(String ampJSessionId) {
+		this.interceptors.clear();
+		this.interceptors.add(new CookieHeaderInterceptor(ampJSessionId));
+		this.interceptors.add(new UserAgentInterceptor(this.getAppName(), this.getAppversion()));
 		this.restTemplate = getRestTemplate();
 
 		baseURL = System.getProperty(BASEURL_PROPERTY);
@@ -346,15 +346,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		return DEFAULT_TITLE_FIELD;
 	}
 
-	@Override
-	public void setAuthenticationToken(String authToken) {
-		this.interceptors.clear();
-		this.interceptors.add(new TokenCookieHeaderInterceptor(authToken));
-		this.interceptors.add(new UserAgentInterceptor(this.getAppName(),
-				this.getAppversion()));
-	}
-
-	private void failIfFieldTypeNotSupported(Field destinationField) throws UnsupportedFieldTypeException {	    
+	private void failIfFieldTypeNotSupported(Field destinationField) throws UnsupportedFieldTypeException {
 	    String name = destinationField.getType().equals(FieldType.TRANSACTION) ? "fundings" : destinationField.getFieldName();
 	    String fullName = getEnabledFieldsPlain().stream().filter(field -> field.endsWith(name)).findAny().orElse(null);
 

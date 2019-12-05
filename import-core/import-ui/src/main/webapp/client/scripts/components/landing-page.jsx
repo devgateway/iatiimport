@@ -26,12 +26,11 @@ var LandingPage = React.createClass({
 	     }.bind(this));      
 	},
     componentDidMount: function() {
-      let hasValidSession = common.hasValidSession();
+      var hasValidSession = common.hasValidSession();
       this.setState({hasValidSession:hasValidSession});
       if(hasValidSession){
         this.loadData();
         this.resetSession();
-        common.refreshToken();
       }
 
 	},

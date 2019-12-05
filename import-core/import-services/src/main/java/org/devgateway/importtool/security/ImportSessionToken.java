@@ -4,30 +4,30 @@ import java.util.Date;
 import java.util.UUID;
 
 public class ImportSessionToken {
-	private String authenticationToken;
 	private String userName;
 	private Date creationDate;
 	private String sourceProcessorName;
 	private String destinationProcessorName;
+	private String ampJSessionId;
 	private UUID importTokenSessionId;
 
-	public ImportSessionToken(String authenticationToken, String userName, Date creationDate, String sourceProcessorName, String destinationProcessorName) {
+	public ImportSessionToken(String ampJSessionId, String userName, Date creationDate, String sourceProcessorName, String destinationProcessorName) {
+		this.ampJSessionId = ampJSessionId;
 		this.importTokenSessionId = UUID.randomUUID();
-		this.authenticationToken = authenticationToken;
 		this.userName = userName;
 		this.creationDate = creationDate;
 		this.setSourceProcessorName(sourceProcessorName);
 		this.setDestinationProcessorName(destinationProcessorName);
 	}
-
-	public String getAuthenticationToken() {
-		return authenticationToken;
+	
+	public String getAmpJSessionId() {
+		return ampJSessionId;
 	}
-
-	public void setAuthenticationToken(String authenticationToken) {
-		this.authenticationToken = authenticationToken;
+	
+	public void setAmpJSessionId(String ampJSessionId) {
+		this.ampJSessionId = ampJSessionId;
 	}
-
+	
 	public Date getCreationDate() {
 		return creationDate;
 	}

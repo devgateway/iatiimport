@@ -16,7 +16,7 @@ var DestinationSessionStore = Reflux.createStore({
   handleInitSession: function() {
     var self = this;
     $.ajax({
-        url: appConfig.DESTINATION_API_HOST + appConfig.DESTINATION_AUTH_TOKEN_ENDPOINT,
+        url: appConfig.DESTINATION_API_HOST + appConfig.DESTINATION_USER_INFO_ENDPOINT,
         timeout: appConfig.REQUEST_TIMEOUT,
         error: function() {
         	appActions.initDestinationSession.failed();
@@ -31,7 +31,7 @@ var DestinationSessionStore = Reflux.createStore({
   handleRefreshSession: function() {
     var self = this;
     $.ajax({
-        url: appConfig.DESTINATION_API_HOST + appConfig.DESTINATION_AUTH_TOKEN_ENDPOINT,
+        url: appConfig.DESTINATION_API_HOST + appConfig.DESTINATION_USER_INFO_ENDPOINT,
         timeout: appConfig.REQUEST_TIMEOUT,
         error: function() {
         	appActions.refreshDestinationSession.failed();

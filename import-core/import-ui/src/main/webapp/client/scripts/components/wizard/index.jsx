@@ -53,8 +53,8 @@ var Wizard = React.createClass({
         var destinationProcessor = this.props.params.dst;    
         appActions.refreshDestinationSession.triggerPromise().then(function(data) {
             common.setAuthCookies(data);
-            this.initImportSession(sourceProcessor, destinationProcessor); 
-            common.refreshToken();
+            this.initImportSession(sourceProcessor, destinationProcessor);
+            common.refreshSession();
         }.bind(this))["catch"](function(err) {
             common.resetAuthCookies();
             this.goHome();
@@ -71,14 +71,13 @@ var Wizard = React.createClass({
 	 initAutomaticImport: function() {      
 	      var sourceProcessor = this.props.params.src;
 	      var destinationProcessor = this.props.params.dst; 
-	        
+
 	      appActions.refreshDestinationSession.triggerPromise().then(function(data) {
 	           common.setAuthCookies(data);           
 	           this.initImportSession(sourceProcessor, destinationProcessor).then(function(){
 	                this.transitionTo('filter', this.props.params);
+             common.refreshSession();
 	           }.bind(this));
-	            
-	           common.refreshToken();            
 	    }.bind(this))["catch"](function(err) {
 	            common.resetAuthCookies();
 	            this.goHome();
@@ -334,7 +333,6 @@ var Wizard = React.createClass({
 		var url = compiledURL({
 			'sourceProcessor': this.getSourceProcessor(sourceProcessor),
 			'destinationProcessor': destinationProcessor,
-			'authenticationToken': Cookies.get("DESTINATION_AUTH_TOKEN"),
 			'username': Cookies.get("DESTINATION_USERNAME"),
 			'host': appConfig.DESTINATION_API_HOST
 		});
@@ -359,7 +357,6 @@ var Wizard = React.createClass({
 	        success: function(result) {
 	        	self.setState({
 					info: {
-						authenticationToken: result.authenticationToken,
 						sourceProcessorName: result.sourceProcessorName,
 						sourceProcessor: sourceProcessor,
 						destinationProcessorName: result.destinationProcessorName,

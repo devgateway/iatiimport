@@ -18,7 +18,6 @@ public class AmpStaticProcessorConstants {
     public static final Integer AMP_IMPLEMENTATION_LEVEL_ID_DEFAULT_VALUE = 70; //Coming form common AMP configuration
     public static final String 	DEFAULT_TITLE_FIELD = "project_title";
     public static final String SESSION_COOKIE_NAME = "JSESSIONID";
-    public static final String X_AUTH_HEADER = "X-Auth-Token";
 
     public static final Map<String, String> tTNameSourceMap = new HashMap<String, String>() {
         {
