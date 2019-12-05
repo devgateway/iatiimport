@@ -63,7 +63,7 @@
     "minifyify": "~5.0.0",
     "rimraf": "~2.2.8",
     "time-grunt": "0.2.10",
-    "underscore.string": "~2.3.3",
+    "underscore.string": "~3.3.5",
     "vinyl-fs": "^2.3.1"
   },
   "scripts": {
