@@ -931,7 +931,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 		// create fundings and add transactions to the fundings
 		for (Entry<String, Map<String, String>> entry : organizations.entrySet()) {
-            String providerId = entry.getValue().get("ref")
+            String providerId = entry.getValue().get("ref");
             List<FundingDetail> fundingDetails = providerFundingDetails.get(providerId);
             if(fundingDetails==null) {
                 providerId = entry.getValue().get("value");
