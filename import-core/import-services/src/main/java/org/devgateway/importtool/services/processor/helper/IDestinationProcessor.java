@@ -1,15 +1,13 @@
 package org.devgateway.importtool.services.processor.helper;
 
+import java.text.ParseException;
 import java.util.List;
 
 import org.devgateway.importtool.exceptions.CurrencyNotFoundException;
 import org.devgateway.importtool.services.request.ImportRequest;
-import org.springframework.web.client.RestTemplate;
 
 public interface IDestinationProcessor {
 	public String getDescriptiveName();
-
-	public void setAuthenticationToken(String authToken);
 
 	void reset();
 
@@ -17,28 +15,25 @@ public interface IDestinationProcessor {
 
 	public List<InternalDocument> getDocuments(Boolean summary);
 
-	public String getIdField();
-
 	void insert(InternalDocument source, List<FieldMapping> fieldMapping, List<FieldValueMapping> valueMapping,
-				ImportRequest importRequest) throws ValueMappingException, CurrencyNotFoundException;
+				ImportRequest importRequest) throws ValueMappingException, CurrencyNotFoundException, ParseException, UnsupportedFieldTypeException;
 
 	void update(InternalDocument source, InternalDocument destination, List<FieldMapping> fieldMapping,
 				List<FieldValueMapping> valueMapping, boolean overrideTitle, ImportRequest importRequest)
-			throws ValueMappingException, CurrencyNotFoundException ;
+			throws ValueMappingException, CurrencyNotFoundException, ParseException, UnsupportedFieldTypeException;
 
 	public String getTitleField();
+	 void setProcessorVersion(String processorVersion);
 
 	String getProcessorVersion();
 
-	void setProcessorVersion(String processorVersion);
-
     public void setActionStatus(ActionStatus documentMappingStatus);
 	public List<DocumentMapping> preImportProcessing(List<DocumentMapping> documentMappings);
-	//void setRestTemplate (RestTemplate restTemplate);
-	
+
     void loadProjectsForUpdate(List<String> listOfAmpIds);
 
 	List<ActionResult> processProjectsInBatch(ActionStatus importStatus);
+	
+	void initialize(String ampJSessionId);
 
-	void initialize (String token);
 }

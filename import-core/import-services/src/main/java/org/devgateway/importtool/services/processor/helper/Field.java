@@ -21,6 +21,7 @@ public class Field {
 	private boolean isMappable;
 	private boolean isMultiple;
 	private boolean isPercentage;
+	private boolean isTimeStamp;
 	private List<String> filters = new ArrayList<String>();
 	private List<Field> dependencies = new ArrayList<Field>();
 	private boolean isRequired;
@@ -181,6 +182,14 @@ public class Field {
 
 	public void setPercentage(boolean isPercentage) {
 		this.isPercentage = isPercentage;
+	}
+
+	public boolean isTimeStamp() {
+		return isTimeStamp;
+	}
+
+	public void setTimeStamp(boolean timeStamp) {
+		isTimeStamp = timeStamp;
 	}
 
 	public List<Field> getDependencies() {

@@ -1,5 +1,26 @@
 package org.devgateway.importtool.rest;
 
+import static org.devgateway.importtool.services.processor.destination.AmpStaticProcessorConstants.SESSION_COOKIE_NAME;
+import static org.devgateway.importtool.services.processor.helper.Constants.CURRENT_FILE_ID;
+import static org.devgateway.importtool.services.processor.helper.Constants.DESTINATION_PROCESSOR;
+import static org.devgateway.importtool.services.processor.helper.Constants.DOCUMENT_MAPPER;
+import static org.devgateway.importtool.services.processor.helper.Constants.IATI_STORE_ACTIVITIES;
+import static org.devgateway.importtool.services.processor.helper.Constants.REPORTING_ORG;
+import static org.devgateway.importtool.services.processor.helper.Constants.SESSION_TOKEN;
+import static org.devgateway.importtool.services.processor.helper.Constants.SOURCE_PROCESSOR;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.dao.FileRepository;
@@ -39,24 +60,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.devgateway.importtool.services.processor.helper.Constants.CURRENT_FILE_ID;
-import static org.devgateway.importtool.services.processor.helper.Constants.DESTINATION_PROCESSOR;
-import static org.devgateway.importtool.services.processor.helper.Constants.DOCUMENT_MAPPER;
-import static org.devgateway.importtool.services.processor.helper.Constants.IATI_STORE_ACTIVITIES;
-import static org.devgateway.importtool.services.processor.helper.Constants.SESSION_TOKEN;
-import static org.devgateway.importtool.services.processor.helper.Constants.SOURCE_PROCESSOR;
-import static org.devgateway.importtool.services.processor.helper.Constants.REPORTING_ORG;
-
 
 @RestController
 @RequestMapping(value = "/import")
@@ -81,18 +84,22 @@ class ImportController  {
 	@Value("${IATIProcessor.default_country}")
 	private String defaultCountry;
 
-	@RequestMapping(method = RequestMethod.GET, value = "/new/{sourceProcessorName}/{destinationProcessorName}/{authenticationToken}/{userName}")
-	ResponseEntity<ImportSessionToken> initiateImport(@PathVariable String sourceProcessorName, @PathVariable String destinationProcessorName, @PathVariable String authenticationToken, @PathVariable String userName,
-			HttpServletRequest request) {
+	@RequestMapping(method = RequestMethod.GET, value = "/new/{sourceProcessorName}/{destinationProcessorName}/{userName}")
+	ResponseEntity<ImportSessionToken> initiateImport(@PathVariable String sourceProcessorName,
+													  @PathVariable String destinationProcessorName,
+													  @PathVariable String userName,
+													  HttpServletRequest request) {
 		log.debug("Initialized import");
+		String ampJSessionId = getAmpJSessionIdFromRequest(request);
 		request.getSession().removeAttribute(SOURCE_PROCESSOR);
 		request.getSession().removeAttribute(DESTINATION_PROCESSOR);
 		request.getSession().removeAttribute(SESSION_TOKEN);
 		request.getSession().removeAttribute(DOCUMENT_MAPPER);
 		ISourceProcessor srcProcessor = importService.getSourceProcessor(sourceProcessorName);
-		IDestinationProcessor destProcessor = importService.getDestinationProcessor(destinationProcessorName, authenticationToken);
+		IDestinationProcessor destProcessor = importService.getDestinationProcessor(destinationProcessorName, ampJSessionId);
 		request.getSession().setAttribute(DESTINATION_PROCESSOR, destProcessor);
-		ImportSessionToken importSessionToken = new ImportSessionToken(authenticationToken, userName, new Date(), srcProcessor.getDescriptiveName(), destProcessor.getDescriptiveName());
+		ImportSessionToken importSessionToken = new ImportSessionToken(ampJSessionId, userName, new Date(),
+				srcProcessor.getDescriptiveName(), destProcessor.getDescriptiveName());
 		request.getSession().setAttribute(SESSION_TOKEN, importSessionToken);
 		if(request.getSession().getAttribute(IATI_STORE_ACTIVITIES) != null) {
             FetchResult fr = (FetchResult)
@@ -104,18 +111,16 @@ class ImportController  {
 		request.getSession().setAttribute(SOURCE_PROCESSOR, srcProcessor);
 			return new ResponseEntity<>(importSessionToken, HttpStatus.OK);
 	}
-	
-	@RequestMapping(method = RequestMethod.GET, value = "/refresh/{authenticationToken}")
-	public ResponseEntity<List<File>> refreshToken(@PathVariable String authenticationToken, HttpServletRequest request) {
-		ImportSessionToken authToken = (ImportSessionToken) request.getSession().getAttribute(SESSION_TOKEN);
-		authToken.setAuthenticationToken(authenticationToken);
-		IDestinationProcessor destProcessor = (IDestinationProcessor) request.getSession().getAttribute(DESTINATION_PROCESSOR);
-		destProcessor.setAuthenticationToken(authenticationToken);
-
-		return new ResponseEntity<>( HttpStatus.OK);
-	}
-
-	@RequestMapping(method = RequestMethod.GET, value = "/uploaded")
+    
+    private String getAmpJSessionIdFromRequest(HttpServletRequest request) {
+        Cookie jSessionCookie = Arrays.asList(request.getCookies()).stream()
+				.filter(c -> c.getName().equals(SESSION_COOKIE_NAME))
+				.findAny().orElse(null);
+        
+        return jSessionCookie != null ? jSessionCookie.getValue() : null;
+    }
+    
+    @RequestMapping(method = RequestMethod.GET, value = "/uploaded")
 	public ResponseEntity<List<File>> listFiles(HttpServletRequest request) {
 		List<File> fileList = new ArrayList<File>();
 		ImportSessionToken importSessionToken = (ImportSessionToken) request.getSession().getAttribute(SESSION_TOKEN);
@@ -167,34 +172,30 @@ class ImportController  {
 	}	
 	
 	
-	private void processFile(String fileName, HttpServletRequest request, ISourceProcessor srcProcessor)
-			throws IOException {
-
-		ImportSessionToken authToken = (ImportSessionToken) request.getSession().getAttribute(SESSION_TOKEN);
-		File uploadedFile = importService.logImportSession(fileName ,srcProcessor, authToken);
+	private void processFile(String fileName, HttpServletRequest request, ISourceProcessor srcProcessor) {
+		ImportSessionToken importSessionToken = (ImportSessionToken) request.getSession().getAttribute(SESSION_TOKEN);
+		File uploadedFile = importService.logImportSession(fileName ,srcProcessor, importSessionToken);
 		request.getSession().setAttribute(CURRENT_FILE_ID, uploadedFile.getId());
 	}
 
 	private void logAutomatedImport (HttpServletRequest request, ISourceProcessor srcProcessor) {
-        try {
-            String reportingOrgId = (String)request.getSession().getAttribute(REPORTING_ORG);
-            List<ReportingOrganization> orgs = reportingOrgRepository.findByOrgIdIgnoreCase(reportingOrgId);
-            String orgName = orgs.size() > 0 ? orgs.get(0).getName() : "";
-            
-            ImportSessionToken authToken = (ImportSessionToken) request.getSession().getAttribute(SESSION_TOKEN);
-            File uploadedFile;
-                       
-            uploadedFile = importService.logImportSession(orgName + " - " + srcProcessor.getDescriptiveName()  , srcProcessor, authToken);
-            request.getSession().setAttribute(CURRENT_FILE_ID, uploadedFile.getId());
-        } catch (IOException e) {            
-            e.printStackTrace();
-        }
+		String reportingOrgId = (String)request.getSession().getAttribute(REPORTING_ORG);
+		List<ReportingOrganization> orgs = reportingOrgRepository.findByOrgIdIgnoreCase(reportingOrgId);
+		String orgName = orgs.size() > 0 ? orgs.get(0).getName() : "";
+		
+		ImportSessionToken importSessionToken = (ImportSessionToken) request.getSession().getAttribute(SESSION_TOKEN);
+		File uploadedFile;
+		
+		uploadedFile = importService.logImportSession(orgName + " - " + srcProcessor.getDescriptiveName(),
+				srcProcessor, importSessionToken);
+		request.getSession().setAttribute(CURRENT_FILE_ID, uploadedFile.getId());
     }
 
 	
 	@RequestMapping(method = RequestMethod.POST, value = "/fetch")
-	ResponseEntity<ImportSessionToken> filter(@PathVariable String authenticationToken) {
-		ImportSessionToken authObject = new ImportSessionToken(authenticationToken, "", new Date(), "", null);
+	ResponseEntity<ImportSessionToken> filter(HttpServletRequest request) {
+		String ampJSessionId = getAmpJSessionIdFromRequest(request);
+		ImportSessionToken authObject = new ImportSessionToken(ampJSessionId, "", new Date(), "", null);
 		// TODO: Execute the filters
 		return new ResponseEntity<>(authObject, HttpStatus.OK);
 	}

@@ -43,9 +43,9 @@ var Home = React.createClass({
       
   },
   configureLanguage: function(settings){
-      var currentLanguage = _.find(settings, { 'id': 'language'});
+     var currentLanguage = settings['language'];
 	   if(currentLanguage){
-	        this.switchLanguage(currentLanguage.defaultId);
+	        this.switchLanguage(currentLanguage);
 	   }
   },
   switchLanguage: function(language){      

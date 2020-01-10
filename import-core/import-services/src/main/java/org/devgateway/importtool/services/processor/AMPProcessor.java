@@ -22,7 +22,7 @@ import org.devgateway.importtool.services.processor.helper.FieldValueMapping;
 import org.devgateway.importtool.services.processor.helper.IDestinationProcessor;
 import org.devgateway.importtool.services.processor.helper.InternalDocument;
 import org.devgateway.importtool.services.processor.helper.ActionResult;
-import org.devgateway.importtool.services.processor.destination.TokenCookieHeaderInterceptor;
+import org.devgateway.importtool.services.processor.helper.interceptors.CookieHeaderInterceptor;
 import org.devgateway.importtool.services.request.ImportRequest;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.stereotype.Component;
@@ -46,7 +46,6 @@ public class AMPProcessor implements IDestinationProcessor {
 	private String possibleValuesEndpoint;
 	private String documentsEndpoint;
 	private String documentsTestEndpoint;
-	private String authenticationToken;
 	private Boolean testMode = false;
 	private String descriptiveName = "AMP 2.11";
 
@@ -61,9 +60,12 @@ public class AMPProcessor implements IDestinationProcessor {
 		this.setDocumentsTestEndpoint("activity_list.json");
 		this.setPossibleValuesEndpoint("_possiblevalues.json");
 	}
-	public void initialize(String authenticationToken){
-
+	
+	@Override
+	public void initialize(String ampJSessionId) {
+		this.interceptors.add(new CookieHeaderInterceptor(ampJSessionId));
 	}
+	
 	@Override
 	public List<Field> getFields() {
 		List<Field> list = new ArrayList<Field>();
@@ -182,7 +184,6 @@ public class AMPProcessor implements IDestinationProcessor {
 				result = IOUtils.toString(input, "UTF-8");
 			} else {
 				RestTemplate restTemplate = getRestTemplate();
-				log.debug(this.authenticationToken);
 				result = restTemplate.getForObject(baseURL + this.getDocumentsEndpoint(), String.class);
 			}
 			ObjectMapper mapper = new ObjectMapper();
@@ -239,11 +240,6 @@ public class AMPProcessor implements IDestinationProcessor {
 	}
 
 	@Override
-	public String getIdField() {
-		return DEFAULT_ID_FIELD;
-	}
-
-	@Override
 	public String getTitleField() {
 		return DEFAULT_TITLE_FIELD;
 	}
@@ -253,7 +249,7 @@ public class AMPProcessor implements IDestinationProcessor {
 		return null;
 	}
 
-	@Override
+
 	public void setProcessorVersion(String processorVersion) {
 
 	}
@@ -272,12 +268,6 @@ public class AMPProcessor implements IDestinationProcessor {
 
 	private void setPossibleValuesEndpoint(String possibleValuesEndpoint) {
 		this.possibleValuesEndpoint = possibleValuesEndpoint;
-	}
-
-	@Override
-	public void setAuthenticationToken(String authToken) {
-		this.interceptors.add(new TokenCookieHeaderInterceptor(authToken));
-		this.authenticationToken = authToken;
 	}
 
 	@Override
