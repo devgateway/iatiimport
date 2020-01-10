@@ -31,7 +31,6 @@ var LandingPage = React.createClass({
       if(hasValidSession){
         this.loadData();
         this.resetSession();
-        common.refreshToken();
       }
 
 	},

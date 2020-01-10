@@ -29,18 +29,14 @@ public class DocumentMapperTests {
 				ISourceProcessor sourceProcessor = new IATI104Processor();
 				AMPProcessor destinationProcessor = new AMPProcessor();
 				destinationProcessor.setTestMode(true);
-				destinationProcessor.setAuthenticationToken("27368298-48e3-48ef-9f75-13a58f2f5cb6");
 
 				InputStream is = this.getClass().getResourceAsStream("sample_files/Kosovo_Test_File.xml");
 				sourceProcessor.setInput(is);
-				
 				DocumentMapper documentMapper = new DocumentMapper();
 				documentMapper.setSourceProcessor(sourceProcessor);
 				documentMapper.setDestinationProcessor(destinationProcessor);
 				documentMapper.initialize();
 				Assert.assertEquals("DocumentMapper is initialized", true, documentMapper.isInitialized());
-				
-				
 	}
 	
 	@Test
@@ -49,7 +45,6 @@ public class DocumentMapperTests {
 		        IATI104Processor sourceProcessor = new IATI104Processor();
 		        AMPProcessor destinationProcessor = new AMPProcessor();
 				destinationProcessor.setTestMode(true);
-				destinationProcessor.setAuthenticationToken("27368298-48e3-48ef-9f75-13a58f2f5cb6");
 				ImportRequest importRequest = new ImportRequest();
 				importRequest.setImportOption(ImportOption.OVERWRITE_ALL_FUNDING);
 

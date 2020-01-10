@@ -56,27 +56,13 @@ public class JsonBean {
 			return null;
 		}
 	}
-	public static List<JsonBean> getListOfJsoBeanFromString(String jb) {
-		try {
-			if (jb == null) {
-				return null;
-			}
-			ObjectMapper jsonBeanListMapper = getDefaultMapper();
-			return jsonBeanListMapper.readValue(jb, new TypeReference<List<JsonBean>>() {
-			});
-		} catch (IOException e) {
-			logger.error("Cannot deserialize json bean", e);
-			return null;
-		}
-	}
+
 	public static JsonBean getJsonBeanFromString(String jb) {
 		try {
 			if (jb == null) {
 				return null;
 			}
-			ObjectMapper mapper11 = getDefaultMapper();
-
-
+			ObjectMapper mapper11 = SerializationHelper.getDefaultMapper();
 			return mapper11.readValue(jb, JsonBean.class);
 		} catch (IOException e) {
 			logger.error("Cannot deserialize json bean", e);
@@ -84,12 +70,6 @@ public class JsonBean {
 		}
 	}
 
-	private static ObjectMapper getDefaultMapper() {
-		ObjectMapper mapper11 = new ObjectMapper();
-		mapper11.configure(DeserializationFeature.UNWRAP_ROOT_VALUE,false);
-		mapper11.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false);
-		return mapper11;
-	}
 
 	@Override
 	public String toString() {

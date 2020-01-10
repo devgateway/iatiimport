@@ -16,14 +16,18 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import javax.xml.xpath.XPath;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 
 @Component("IATI1X")
 @Scope("session")
 abstract public class IATI1XProcessor extends IATIProcessor {
-
-	protected static final String ISO_DATE = "yyyy-MM-dd";
 
 	protected Log log = LogFactory.getLog(getClass());
 
@@ -184,7 +188,6 @@ abstract public class IATI1XProcessor extends IATIProcessor {
 		return  nameElement.getChildNodes().item(0).getNodeValue();
 
 	}
-
 
 	protected String extractProvidingOrganization(Element providerNode) {
 		return (providerNode != null

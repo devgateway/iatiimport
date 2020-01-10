@@ -53,8 +53,8 @@ var Wizard = React.createClass({
         var destinationProcessor = this.props.params.dst;    
         appActions.refreshDestinationSession.triggerPromise().then(function(data) {
             common.setAuthCookies(data);
-            this.initImportSession(sourceProcessor, destinationProcessor); 
-            common.refreshToken();
+            this.initImportSession(sourceProcessor, destinationProcessor);
+            common.refreshSession();
         }.bind(this))["catch"](function(err) {
             common.resetAuthCookies();
             this.goHome();
@@ -71,14 +71,13 @@ var Wizard = React.createClass({
 	 initAutomaticImport: function() {      
 	      var sourceProcessor = this.props.params.src;
 	      var destinationProcessor = this.props.params.dst; 
-	        
+
 	      appActions.refreshDestinationSession.triggerPromise().then(function(data) {
 	           common.setAuthCookies(data);           
 	           this.initImportSession(sourceProcessor, destinationProcessor).then(function(){
 	                this.transitionTo('filter', this.props.params);
+             common.refreshSession();
 	           }.bind(this));
-	            
-	           common.refreshToken();            
 	    }.bind(this))["catch"](function(err) {
 	            common.resetAuthCookies();
 	            this.goHome();
@@ -105,7 +104,6 @@ var Wizard = React.createClass({
 		$(this.refs.message.getDOMNode()).html(msg);
 		var box = $(this.refs.messageBox.getDOMNode());
 		box.show();
-		box.fadeOut({duration:10000});
 	},
 	// Steps and transitions
 	uploadFile: function() {
@@ -335,29 +333,30 @@ var Wizard = React.createClass({
 		var url = compiledURL({
 			'sourceProcessor': this.getSourceProcessor(sourceProcessor),
 			'destinationProcessor': destinationProcessor,
-			'authenticationToken': Cookies.get("DESTINATION_AUTH_TOKEN"),
 			'username': Cookies.get("DESTINATION_USERNAME"),
 			'host': appConfig.DESTINATION_API_HOST
 		});
 
 		var self = this;
 		return $.ajax({
-	        url: url,
-	        timeout:appConfig.REQUEST_TIMEOUT,
-	        error: function(result) {
+      url: url,
+      timeout:appConfig.REQUEST_TIMEOUT,
+      dataType: 'json',
+      type: 'GET',
+      error: function(error) {
+            var serverResponse = JSON.parse(error.responseText);
 	        	self.setState({
 					info: {
 						status:'FAIL'
 					}
 				});
 	        	self.hideLoadingIcon();
-	        	self.displayError("Error loading state of session.");
+	        	self.displayError(self.props.i18nLib.t('server_messages.' + serverResponse.message));
+        ;
 	        },
-	        dataType: 'json',
 	        success: function(result) {
 	        	self.setState({
 					info: {
-						authenticationToken: result.authenticationToken,
 						sourceProcessorName: result.sourceProcessorName,
 						sourceProcessor: sourceProcessor,
 						destinationProcessorName: result.destinationProcessorName,
@@ -366,8 +365,7 @@ var Wizard = React.createClass({
 					}
 				});
 	        	self.hideLoadingIcon();
-	        },
-	        type: 'GET'
+	        }
 	     });
   },
   showDisasterResponse: function(hasDisasterResponseField) {

@@ -1,7 +1,10 @@
 package org.devgateway.importtool.services;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -13,8 +16,13 @@ import org.devgateway.importtool.model.Project;
 import org.devgateway.importtool.model.Workflow;
 import org.devgateway.importtool.security.ImportSessionToken;
 import org.devgateway.importtool.services.processor.XMLGenericProcessor;
-import org.devgateway.importtool.services.processor.helper.*;
+import org.devgateway.importtool.services.processor.helper.ActionResult;
+import org.devgateway.importtool.services.processor.helper.Field;
 import org.devgateway.importtool.services.processor.helper.FieldType;
+import org.devgateway.importtool.services.processor.helper.FieldValueMapping;
+import org.devgateway.importtool.services.processor.helper.IDestinationProcessor;
+import org.devgateway.importtool.services.processor.helper.IDocumentMapper;
+import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
 import org.devgateway.importtool.services.request.ImportRequest;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,19 +94,16 @@ public class ImportService {
 	 * 
 	 * @param name - name of file or reporting org for automate imports
 	 * @param srcProcessor - Source processor
-	 * @param authToken - authentication token
 	 * @return
 	 * @throws IOException
 	 */
-	public File logImportSession(String name, ISourceProcessor srcProcessor,
-						   ImportSessionToken authToken) throws
-			IOException{
+	public File logImportSession(String name, ISourceProcessor srcProcessor, ImportSessionToken importSessionToken) {
 
 		File uploadedFile = new File();
 		uploadedFile.setCreatedDate(new Date());
 		uploadedFile.setFileName(name);
-		uploadedFile.setAuthor(authToken.getAuthenticationToken());
-		uploadedFile.setSessionId(authToken.getImportTokenSessionId());
+		uploadedFile.setAuthor(importSessionToken.getUserName());
+		uploadedFile.setSessionId(importSessionToken.getImportTokenSessionId());
 		
 		Boolean isValid = srcProcessor != null ? srcProcessor.isValidInput() : true;
 		uploadedFile.setValid(isValid);		
@@ -145,7 +150,8 @@ public class ImportService {
 		return processor;
 	}
 	
-	public IDestinationProcessor getDestinationProcessor(String processorName, String authenticationToken) {
+	public IDestinationProcessor getDestinationProcessor(String processorName, String ampJSessionId) {
+
 		IDestinationProcessor processor = null;
 		List<Workflow> workflows = workflowService.getWorkflows();
 
@@ -155,7 +161,7 @@ public class ImportService {
 		if (optional.isPresent()) {
 			processor = beanFactory.getBean(optional.get().getDestinationProcessor().getName() + "_PROCESSOR", IDestinationProcessor.class);
 			processor.setProcessorVersion(processorVersion);
-			processor.initialize(authenticationToken);
+			processor.initialize(ampJSessionId);
 		}
 		return processor;
 	}

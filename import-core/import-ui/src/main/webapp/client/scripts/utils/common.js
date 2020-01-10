@@ -79,10 +79,7 @@ module.exports = {
 	 return Cookies.get('IS_ADMIN') === 'true' || Cookies.get('IS_ADMIN') === true;
  },
  setAuthCookies: function(data) {
-	  appConfig.DESTINATION_AUTH_TOKEN = data.token;
       appConfig.DESTINATION_USERNAME = data['user-name'];
-      appConfig.DESTINATION_AUTH_TOKEN_EXPIRATION =  data['token-expiration'] || (new Date()).getTime() + (30*60*1000);
-      Cookies.set('DESTINATION_AUTH_TOKEN', data.token);
       Cookies.set('DESTINATION_USERNAME', data['user-name']);
       // Added true always for now, the API returns wrong value
       Cookies.set('CAN_ADD_ACTIVITY', true || data['add-activity']);
@@ -90,39 +87,31 @@ module.exports = {
       Cookies.set('WORKSPACE', data.team);      
  },
  resetAuthCookies: function() {
-	  appConfig.DESTINATION_AUTH_TOKEN = null;
       appConfig.DESTINATION_USERNAME = null;
-      Cookies.set('DESTINATION_AUTH_TOKEN', null);
       Cookies.set('DESTINATION_USERNAME', null);
       // Added true always for now, the API returns wrong value
       Cookies.set('CAN_ADD_ACTIVITY', null);
       Cookies.set('WORKSPACE', null);
-      appConfig.DESTINATION_AUTH_TOKEN_EXPIRATION = null;
  },
-  //the token expires in 30 minutes, so 2 minutes check is more than enough
- refreshToken: function() {
-	 var self = this;
-	 self.setIntervalTokenId = setInterval(function(){
-		 self.checkTokenStatus();
-	}, Constants.TOKEN_VERIFICATION_INTERVAL);
- },
- checkTokenStatus: function() {
-    self = this;
-		var currentTime = (new Date()).getTime();
-		var secondsToExpire = (appConfig.DESTINATION_AUTH_TOKEN_EXPIRATION - currentTime)/1000;
-		
-		if (secondsToExpire < 0) {
-			appActions.refreshDestinationSession.triggerPromise().then(function(data) {
-			      this.setAuthCookies(data);			    
-			  $.get(appConfig.TOOL_REST_PATH + '/refresh/' + data.token, function(){});
-		      }.bind(this))['catch'](function(err) {
-		        clearInterval(self.setIntervalTokenId);
-		        this.resetAuthCookies();
-		      }.bind(this));
 
-		}
+ refreshSession: function() {
+   var self = this;
+   self.setIntervalTokenId = setInterval(function() {
+     self.checkSessionStatus();
+   }, Constants.SESSION_VERIFICATION_INTERVAL);
  },
+
+ checkSessionStatus: function() {
+   var self = this;
+   appActions.refreshDestinationSession.triggerPromise().then(function(data) {
+      this.setAuthCookies(data);
+      $.get(appConfig.DESTINATION_API_HOST + appConfig.DESTINATION_USER_INFO_ENDPOINT, function(){});
+   }.bind(this))['catch'](function(err) {
+      this.resetAuthCookies();
+   }.bind(this));
+ },
+
  hasValidSession: function() {
-	return Cookies.get('DESTINATION_USERNAME') && appConfig.DESTINATION_AUTH_TOKEN_EXPIRATION > (new Date()).getTime();
+	return (appConfig.DESTINATION_USERNAME && appConfig.DESTINATION_USERNAME.length > 0) === true;
  } 
 };

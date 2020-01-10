@@ -4,7 +4,11 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.model.Language;
-import org.devgateway.importtool.services.processor.helper.*;
+import org.devgateway.importtool.services.processor.helper.Constants;
+import org.devgateway.importtool.services.processor.helper.Field;
+import org.devgateway.importtool.services.processor.helper.FieldType;
+import org.devgateway.importtool.services.processor.helper.FieldValue;
+import org.devgateway.importtool.services.processor.helper.InternalDocument;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
@@ -13,16 +17,22 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import javax.xml.xpath.XPath;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import static org.devgateway.importtool.services.processor.helper.FieldType.TRANSACTION;
 
+
 @Component("IATI2X")
 @Scope("session")
 public class IATI2XProcessor extends IATIProcessor {
-
-
 	private Log log = LogFactory.getLog(getClass());
 
 	private String PROCESSOR_SUPER_VERSION = "2x";
@@ -235,6 +245,7 @@ protected String extractNameElementForCodeListValues(Element nameElement) {
 							}
 						}
 					}
+
 				}
 				document.addMultilangStringField(field.getFieldName(), mlv);
 		};

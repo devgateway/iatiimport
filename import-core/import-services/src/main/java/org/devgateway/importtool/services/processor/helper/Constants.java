@@ -1,11 +1,13 @@
 package org.devgateway.importtool.services.processor.helper;
 
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+//TODO this constant files needs to be split in modules
 public class Constants {
 	public static final String SOURCE_PROCESSOR = "SOURCE_PROCESSOR";
 	public static final String IATI_STORE_ACTIVITIES = "IATI_STORE_ACTIVITIES";
@@ -62,53 +64,27 @@ public class Constants {
 
 	public static final Integer AMP_PUSH_BATCH_SIZE = 3;
 	public static final Integer AMP_PULL_BATCH_SIZE = 100;
-	public static final String AMP_ACTIVITY_ENDPOINT = "rest/activity";
+	public static final String AMP_ACTIVITY_ENDPOINT = "/rest/activity";
 
 	//AMP FIELDS to be moved to its own property field
 	public static final String AMP_INTERNAL_ID = "internal_id";
+	public static final String IS_DRAFT = "is_draft";
+	public static final String CAN_UPGRADE_TO_DRAFT="can-downgrade-to-draft";
+	public static final String AMP_IATI_ID_FIELD= "iati_identifier";
+	public static final String IATI_IDENTIFIER_NOT_CONFIGURED_KEY = "iati_identifier_not_configured";
 
 	public static final String AMP_UPDATE_OPERATION = "UPDATE";
 	public static final String AMP_INSERT_OPERATION = "INSERT";
 
 	public static final String LANG_PACK_TOOLTIPS="TOOLTIPS";
 	public static final String LANG_PACK_LABELS="LABELS";
-	public static final List<String> TRANSACTION_FIELDS = new ArrayList<>(Arrays.asList("Actual Commitments",
-			"Actual Disbursements","Actual Expenditures","Planned Commitments", "Planned Disbursements",
-			"Planned Expenditures"));
-	public static final String AMP_ACTIVITY_STATUS = "activity_status";
-	public static final String AMP_A_C_CHAPTER = "A C Chapter";
-	public static final String AMP_FUNDINGS ="fundings";
-	public static final String AMP_FUNDING_DETAILS ="funding_details";
-	public static final String AMP_TYPE_OF_ASSISTANCE = "type_of_assistance";
-	public static final String AMP_FUNDINGS_TYPE_OF_ASSISTANCE = AMP_FUNDINGS + "~"+ AMP_TYPE_OF_ASSISTANCE;
-	public static final String AMP_FINANCING_INSTRUMENT = "financing_instrument";
-	public static final String AMP_ADJUSTMENT_TYPE = "adjustment_type";
-	public static final String AMP_TRANSACTION_TYPE = "transaction_type";
 
-	public static final String AMP_PRIMARY_SECTORS = "primary_sectors";
-	public static final String AMP_SECTOR = "sector";
-	public static final String AMP_SECONDARY_SECTORS = "secondary_sectors";
-	public static final String AMP_TERTIARY_SECTORS = "tertiary_sectors";
-	public static final String AMP_CURRENCY = "currency";
-	public static final String LOCATIONS_LOCATION = "locations~location";
-	public static final String DONOR_ORGANIZATION_ID = "donor_organization_id";
-	public static final String AMP_FUNDINGS_FUNDING_DETAILS_ADJUSTMENT_TYPE = AMP_FUNDINGS + "~" + AMP_FUNDING_DETAILS
-			+ "~" + AMP_ADJUSTMENT_TYPE;
-	public static final String AMP_FUNDINGS_FINANCING_INSTRUMENT = AMP_FUNDINGS + "~" + AMP_FINANCING_INSTRUMENT;
-	public static final String AMP_FUNDINGS_FUNDING_DETAILS_TRANSACTION_TYPE = AMP_FUNDINGS + "~"+ AMP_FUNDING_DETAILS + "~"
-			+ AMP_TRANSACTION_TYPE;
-	public static final String AMP_PRIMARY_SECTORS_SECTOR = AMP_PRIMARY_SECTORS + "~" + AMP_SECTOR;
-
-	public static final String AMP_SECONDARY_SECTORS_SECTOR = AMP_SECONDARY_SECTORS + "~" + AMP_SECTOR;
-	public static final String AMP_TERTIARY_SECTORS_SECTOR = AMP_TERTIARY_SECTORS + "~" + AMP_SECTOR;
-
-	public static final String AMP_FUNDINGS_DONOR_ORGANIZATION_ID = AMP_FUNDINGS +  "~" + DONOR_ORGANIZATION_ID;
-	public static final String AMP_FUNDINGS_FUNDING_DETAILS_CURRENCY = AMP_FUNDINGS + "~"+ AMP_FUNDING_DETAILS + "~" + AMP_CURRENCY;
-	public static final List<String> LIST_OF_VALUES_TO_FETCH = new ArrayList<>(Arrays.asList(AMP_ACTIVITY_STATUS,
-			AMP_A_C_CHAPTER, AMP_FUNDINGS_TYPE_OF_ASSISTANCE, AMP_FUNDINGS_FINANCING_INSTRUMENT,
-			AMP_FUNDINGS_FUNDING_DETAILS_ADJUSTMENT_TYPE, AMP_FUNDINGS_FUNDING_DETAILS_TRANSACTION_TYPE,
-			AMP_PRIMARY_SECTORS_SECTOR, AMP_SECONDARY_SECTORS_SECTOR, AMP_TERTIARY_SECTORS_SECTOR,LOCATIONS_LOCATION ,
-			AMP_FUNDINGS_DONOR_ORGANIZATION_ID, AMP_FUNDINGS_FUNDING_DETAILS_CURRENCY));
 
 	public static final String NULL_STRING ="null";
+	public static final String RELATED_ORGANIZATION_CODE_LIST_POST_FIX ="organization";
+
+	public static final String ISO8601_DATE_AND_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+	public static final String ISO8601_DATE_FORMAT = "yyyy-MM-dd";
+
+
 }
