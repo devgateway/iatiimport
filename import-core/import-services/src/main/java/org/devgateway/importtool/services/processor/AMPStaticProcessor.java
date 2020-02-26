@@ -1621,7 +1621,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 			if (ampResourceFieldProvider.existsField(RESOURCE_TYPE)) {
 				Field documentCategory = new Field("Document Category", "type", FieldType.LIST, true);
-				documentCategory.setMultiLangDisplayName(getResourceFieldLabel("type"));
+				documentCategory.setMultiLangDisplayName(getAmpTranslations().get("Document Category"));
 				documentCategory.setPossibleValues(getResourceCodeListValues("type"));
 				documentCategory.setMultiple(true);
 				fieldList.add(documentCategory);
