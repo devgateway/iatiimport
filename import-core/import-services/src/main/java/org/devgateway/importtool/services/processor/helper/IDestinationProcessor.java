@@ -4,6 +4,8 @@ import java.text.ParseException;
 import java.util.List;
 
 import org.devgateway.importtool.exceptions.CurrencyNotFoundException;
+import org.devgateway.importtool.services.dto.JsonBean;
+import org.devgateway.importtool.services.dto.MappedProject;
 import org.devgateway.importtool.services.request.ImportRequest;
 
 public interface IDestinationProcessor {
@@ -35,5 +37,14 @@ public interface IDestinationProcessor {
 	List<ActionResult> processProjectsInBatch(ActionStatus importStatus);
 	
 	void initialize(String ampJSessionId);
+
+	default MappedProject getMappedProjectFromSource(InternalDocument source, JsonBean project) {
+		MappedProject mappedProject = new MappedProject();
+		mappedProject.setGroupingCriteria(source.getGrouping());
+		mappedProject.setProjectIdentifier(source.getIdentifier());
+		mappedProject.setProject(project);
+
+		return mappedProject;
+	}
 
 }

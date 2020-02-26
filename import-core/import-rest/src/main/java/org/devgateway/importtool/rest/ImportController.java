@@ -106,7 +106,7 @@ class ImportController  {
                     request.getSession().getAttribute(IATI_STORE_ACTIVITIES);
             srcProcessor.setFromDataStore(true);
             srcProcessor.setInput(fr.getActivities());
-            logAutomatedImport(request, srcProcessor);          
+            logAutomatedImport(request, srcProcessor);
         }
 		request.getSession().setAttribute(SOURCE_PROCESSOR, srcProcessor);
 			return new ResponseEntity<>(importSessionToken, HttpStatus.OK);
@@ -162,7 +162,7 @@ class ImportController  {
 				processFile(file.getOriginalFilename(), request,srcProcessor);
 				return new ResponseEntity<>("{}", HttpStatus.OK);
 			} catch (Exception e) {
-				log.error(e);
+				log.error(e.getMessage(), e);
 				return new ResponseEntity<>(EPMessages.ERROR_UPLOADING_FILE_CHECK_INITIAL_STEPS.toString(),
 						HttpStatus.OK);
 			}

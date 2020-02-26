@@ -14,11 +14,12 @@ public class InternalDocument {
 	private Map<String, Map<String, String>> organizationFields = new HashMap<String, Map<String, String>>();
 	private Map<String, Map<String, String>> transactionFields = new HashMap<String, Map<String, String>>();
 	private Map<String, Map<String, String>> contactFields = new HashMap<String, Map<String, String>>();
-	private Map<String, Date> dateFields = new HashMap<String, Date>();	
-	private Map<String, List<FieldValue>> recepientCountryFields = new HashMap<String, List<FieldValue>>();	
-	private boolean titleDuplicate = false;	
+	private Map<String, Date> dateFields = new HashMap<String, Date>();
+	private Map<String, List<FieldValue>> recepientCountryFields = new HashMap<String, List<FieldValue>>();
 
-	
+	private Map<String, Map<String, String>> documentLinkFields = new HashMap<>();
+
+	private boolean titleDuplicate = false;
 
 	public boolean isTitleDuplicate() {
 		return titleDuplicate;
@@ -66,8 +67,6 @@ public class InternalDocument {
 		getTransactionFields().put(fieldName, transaction);
 	}
 
-	
-	
 	public void addContactFields(String fieldName, Map<String, String> contact) {
 		getContactFields().put(fieldName, contact);
 	}
@@ -78,6 +77,10 @@ public class InternalDocument {
 
 	public void addDateField(String fieldName, Date activityDate) {
 		getDateFields().put(fieldName, activityDate);
+	}
+
+	public void addDocumentLinkField(String fieldName, Map<String, String> documentLink) {
+		getDocumentLinkFields().put(fieldName, documentLink);
 	}
 
 	public String getIdentifier() {
@@ -142,11 +145,16 @@ public class InternalDocument {
 		this.contactFields = contactFields;
 	}
 
-
-	
-
 	public void addRecepientCountryFields(String fieldName, List<FieldValue> value) {
 		this.getRecepientCountryFields().put(fieldName, value);
+	}
+
+	public Map<String, Map<String, String>> getDocumentLinkFields() {
+		return documentLinkFields;
+	}
+
+	public void setDocumentLinkFields(Map<String, Map<String, String>> documentLinkFields) {
+		this.documentLinkFields = documentLinkFields;
 	}
 
 	public String getGrouping() {
