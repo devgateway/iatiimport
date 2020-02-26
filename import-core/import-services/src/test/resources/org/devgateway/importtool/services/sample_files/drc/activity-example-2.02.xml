@@ -1,0 +1,168 @@
+<iati-activities>
+    <iati-activity dataset="ec-devco-cd" last-updated-datetime="2020-02-20T10:43:04" xml:lang="en"
+                   default-currency="EUR" humanitarian="0" hierarchy="2" generated-datetime="2020-02-20T10:43:07"
+                   version="2.02">
+        <iati-identifier>XI-IATI-EC_DEVCO-2002/020-810</iati-identifier>
+        <reporting-org ref="XI-IATI-EC_DEVCO" type="15">
+            <narrative xml:lang="en">European Commission - Development and Cooperation-EuropeAid</narrative>
+        </reporting-org>
+        <title>
+            <narrative xml:lang="en">APPUI STRUCTUREL AU FONCTIONNEMENT DE LA ZONE DE SANTE DE KATANA, SUD-KIVU, R.D.
+                CONGO
+            </narrative>
+        </title>
+        <description type="1">
+            <narrative>Am&#xE9;lioration durable du bien-tre et de la capacit&#xE9; d&apos;autonomie de la population de
+                la zone de sant&#xE9; Fomulac-Katana
+            </narrative>
+        </description>
+        <participating-org ref="XI-IATI-EC_DEVCO" role="1" type="15" activity-id="XI-IATI-EC_DEVCO-2002/020-810">
+            <narrative xml:lang="en">European Commission - Directorate-General for International Cooperation and
+                Development (DEVCO)
+            </narrative>
+        </participating-org>
+        <participating-org ref="XT-IATI-EC_DEVCO" role="3" type="15" activity-id="XI-IATI-EC_DEVCO-2002/020-810">
+            <narrative xml:lang="en">European Commission - Directorate-General for International Cooperation and
+                Development (DEVCO)
+            </narrative>
+        </participating-org>
+        <participating-org ref="N/A" role="4" type="15" activity-id="XI-IATI-EC_DEVCO-2002/020-810">
+            <narrative xml:lang="en">EC_DEVCO</narrative>
+        </participating-org>
+        <activity-status code="3"></activity-status>
+        <activity-date iso-date="2003-02-19" type="1">
+            <narrative xml:lang="en">Planned Start: 19-FEB-03</narrative>
+        </activity-date>
+        <activity-date iso-date="2003-02-19" type="2">
+            <narrative xml:lang="en">Actual Start: 19-FEB-03</narrative>
+        </activity-date>
+        <activity-date iso-date="2008-03-31" type="3">
+            <narrative xml:lang="en">Planned End: 31-MAR-08</narrative>
+        </activity-date>
+        <activity-date iso-date="2006-09-30" type="4">
+            <narrative xml:lang="en">Actual End: 30-SEP-06</narrative>
+        </activity-date>
+        <activity-scope code="1"></activity-scope>
+        <recipient-country code="CD">
+            <narrative xml:lang="en">Democratic Republic of the Congo</narrative>
+        </recipient-country>
+        <location>
+            <description>
+                <narrative xml:lang="en">Democratic Republic of the Congo</narrative>
+            </description>
+            <point srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
+                <pos>-4.3297 15.315</pos>
+            </point>
+        </location>
+        <sector vocabulary="1" code="12220" percentage="100">
+            <narrative xml:lang="en">Basic health care</narrative>
+        </sector>
+        <policy-marker code="1" significance="0" vocabulary="1">
+            <narrative xml:lang="en">Gender Equality</narrative>
+        </policy-marker>
+        <policy-marker code="2" significance="0" vocabulary="1">
+            <narrative xml:lang="en">Aid to Environment</narrative>
+        </policy-marker>
+        <policy-marker code="3" significance="0" vocabulary="1">
+            <narrative xml:lang="en">Participatory Development/Good Governance</narrative>
+        </policy-marker>
+        <policy-marker code="4" significance="0" vocabulary="1">
+            <narrative xml:lang="en">Trade Development</narrative>
+        </policy-marker>
+        <policy-marker code="5" significance="0" vocabulary="1">
+            <narrative xml:lang="en">Aid Targeting the Objectives of the Convention on Biological Diversity</narrative>
+        </policy-marker>
+        <policy-marker code="6" significance="0" vocabulary="1">
+            <narrative xml:lang="en">Aid Targeting the Objectives of the Framework Convention on Climate Change -
+                Mitigation
+            </narrative>
+        </policy-marker>
+        <policy-marker code="7" significance="0" vocabulary="1">
+            <narrative xml:lang="en">Aid Targeting the Objectives of the Framework Convention on Climate Change -
+                Adaptation
+            </narrative>
+        </policy-marker>
+        <policy-marker code="8" significance="0" vocabulary="1">
+            <narrative xml:lang="en">Aid Targeting the Objectives of the Convention to Combat Desertification
+            </narrative>
+        </policy-marker>
+        <policy-marker code="9" significance="0" vocabulary="1">
+            <narrative xml:lang="en">Reproductive, Maternal, Newborn and Child Health (RMNCH)</narrative>
+        </policy-marker>
+        <policy-marker code="10" significance="0" vocabulary="1">
+            <narrative xml:lang="en">Disaster Risk Reduction (DRR)</narrative>
+        </policy-marker>
+        <policy-marker code="11" significance="0" vocabulary="1">
+            <narrative xml:lang="en">Disability</narrative>
+        </policy-marker>
+        <policy-marker code="12" significance="0" vocabulary="1">
+            <narrative xml:lang="en">Nutrition</narrative>
+        </policy-marker>
+        <collaboration-type code="1"></collaboration-type>
+        <default-flow-type code="50"></default-flow-type>
+        <default-finance-type code="110"></default-finance-type>
+        <default-aid-type code="NGO"></default-aid-type>
+        <budget type="1" status="2">
+            <period-start iso-date="2003-02-19"></period-start>
+            <period-end iso-date="2006-09-30"></period-end>
+            <value currency="EUR" value-date="2020-02-20">0</value>
+        </budget>
+        <capital-spend percentage="0"></capital-spend>
+        <transaction ref="XI-IATI-EC_DEVCO-2002/020-810/1ER PAIEMENT INTERM&#xC9;DIAIRE" humanitarian="0">
+            <transaction-type code="3"></transaction-type>
+            <transaction-date iso-date="2005-05-03"></transaction-date>
+            <value currency="EUR" value-date="2020-02-20">81173</value>
+            <provider-org ref="XI-IATI-EC_DEVCO" provider-activity-id="XI-IATI-EC_DEVCO-2002/020-810"
+                          type="15"></provider-org>
+            <receiver-org>
+                <narrative>Louvain Cooperation Au Developpement Asbl*Ld</narrative>
+            </receiver-org>
+            <disbursement-channel code="2"></disbursement-channel>
+            <flow-type code="50"></flow-type>
+            <finance-type code="110"></finance-type>
+            <aid-type code="NGO"></aid-type>
+        </transaction>
+        <transaction ref="XI-IATI-EC_DEVCO-2002/020-810/PAIEMENT 3&#xC8;ME TRANCHE" humanitarian="0">
+            <transaction-type code="3"></transaction-type>
+            <transaction-date iso-date="2005-12-27"></transaction-date>
+            <value currency="EUR" value-date="2020-02-20">81172</value>
+            <provider-org ref="XI-IATI-EC_DEVCO" provider-activity-id="XI-IATI-EC_DEVCO-2002/020-810"
+                          type="15"></provider-org>
+            <receiver-org>
+                <narrative>Louvain Cooperation Au Developpement Asbl*Ld</narrative>
+            </receiver-org>
+            <disbursement-channel code="2"></disbursement-channel>
+            <flow-type code="50"></flow-type>
+            <finance-type code="110"></finance-type>
+            <aid-type code="NGO"></aid-type>
+        </transaction>
+        <transaction ref="XI-IATI-EC_DEVCO-2002/020-810/(20810)PAIEMENT FINAL" humanitarian="0">
+            <transaction-type code="3"></transaction-type>
+            <transaction-date iso-date="2007-05-11"></transaction-date>
+            <value currency="EUR" value-date="2020-02-20">25146</value>
+            <provider-org ref="XI-IATI-EC_DEVCO" provider-activity-id="XI-IATI-EC_DEVCO-2002/020-810"
+                          type="15"></provider-org>
+            <receiver-org>
+                <narrative>Louvain Cooperation Au Developpement Asbl*Ld</narrative>
+            </receiver-org>
+            <disbursement-channel code="2"></disbursement-channel>
+            <flow-type code="50"></flow-type>
+            <finance-type code="110"></finance-type>
+            <aid-type code="NGO"></aid-type>
+        </transaction>
+        <document-link
+                url="https://webgate.ec.europa.eu/europeaid/online-services/index.cfm?do=publi.welcome&amp;nbPubliList=15&amp;orderby=upd&amp;orderbyad=Desc&amp;searchtype=RS&amp;aofr=113172"
+                format="application/pdf">
+            <title>
+                <narrative>Actions dans les pays en d&#xE9;veloppement (PVD) &#xE0; cofinancer avec les ONG europ&#xE9;ennes
+                    de d&#xE9;veloppement - Operations in developing countries (PVD) cofinanced with European
+                    Development NGOs (B7-6000)
+                </narrative>
+            </title>
+            <category code="A10"></category>
+            <language code="FR"></language>
+        </document-link>
+        <related-activity ref="XI-IATI-EC_DEVCO-2002/1092/0" type="1"></related-activity>
+        <conditions attached="0"></conditions>
+    </iati-activity>
+</iati-activities>
