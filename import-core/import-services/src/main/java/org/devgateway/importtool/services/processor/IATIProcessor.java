@@ -891,7 +891,7 @@ public abstract class IATIProcessor implements ISourceProcessor {
         }
     }
 
-    protected void processDocumentLinkElementType(InternalDocument document, Element element) throws ParseException {
+    protected void processDocumentLinkElementType(InternalDocument document, Element element) {
         Consumer<Field> documentLinkConsumer = field -> {
             NodeList nodes = element.getElementsByTagName("document-link");
             List<String> documentCategories = new ArrayList<>();
@@ -910,6 +910,25 @@ public abstract class IATIProcessor implements ISourceProcessor {
                 documentFields.put("title", title);
                 documentFields.put("category", category);
                 documentFields.put("url", url);
+
+                Calendar calendar = Calendar.getInstance();
+
+                NodeList documentDateElements = documentLinkElement.getElementsByTagName("document-date");
+                if (documentDateElements.getLength() > 0) {
+                    String documentDate = documentDateElements
+                            .item(0)
+                            .getAttributes()
+                            .getNamedItem(ISO_ATTRIBUTE)
+                            .getNodeValue();
+                    try {
+                        calendar.setTime(DateUtils.parseDate(Boolean.FALSE, documentDate));
+                    } catch (ParseException e) {
+                        log.error(e.getMessage(), e);
+                    }
+                } else {
+                    calendar.setTime(new Date());
+                }
+                documentFields.put("year", Integer.toString(calendar.get(Calendar.YEAR)));
 
                 documentCategories.add(category);
 

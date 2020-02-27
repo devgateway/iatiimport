@@ -58,6 +58,7 @@ public class AmpResourceProcessor {
         documentEntity.set("team", teamId);
         documentEntity.set("resource_type", RESOURCE_WEB_LINK_TYPE);
         documentEntity.set("private", true);
+        documentEntity.set("year_of_publication", value.get("year"));
 
         if (documentCategoryId != null) {
             documentEntity.set("type", documentCategoryId);
