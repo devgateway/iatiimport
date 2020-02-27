@@ -1,5 +1,6 @@
 package org.devgateway.importtool.services.processor.destination;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.services.dto.JsonBean;
@@ -40,6 +41,10 @@ public class AmpResourceProcessor {
 
     private void init() {
         JsonBean layout = restTemplate.getForObject(baseURL + SECURITY_LAYOUT_ENDPOINT, JsonBean.class);
+        String workspaceId = layout.getString("workspaceId");
+        if (StringUtils.isBlank(workspaceId)) {
+            throw new RuntimeException("There is no workspace attached to the user session");
+        }
         teamId =  Long.parseLong(layout.getString("workspaceId"));
         userEmail = layout.getString("email");
     }
