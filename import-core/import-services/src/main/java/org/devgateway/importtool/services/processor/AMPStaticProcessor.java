@@ -1624,6 +1624,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				documentCategory.setMultiLangDisplayName(getAmpTranslations().get("Document Category"));
 				documentCategory.setPossibleValues(getResourceCodeListValues("type"));
 				documentCategory.setMultiple(true);
+				documentCategory.setDependencies(ImmutableList.of(documentLink));
 				fieldList.add(documentCategory);
 			}
 		}
