@@ -558,7 +558,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	@Override
 	public void insert(InternalDocument source, List<FieldMapping> fieldMapping,
 			List<FieldValueMapping> valueMapping, ImportRequest importRequest) throws ValueMappingException,
-			CurrencyNotFoundException, ParseException, UnsupportedFieldTypeException {
+			CurrencyNotFoundException, ParseException, UnsupportedFieldTypeException, AmpResourceNotCreatedException {
 		JsonBean project = transformProject(source, fieldMapping, valueMapping, importRequest);
 		projectsReadyToBePosted.add(getMappedProjectFromSource(source, project));
 }
@@ -664,7 +664,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 	private JsonBean transformProject(InternalDocument source, List<FieldMapping> fieldMappings,
 			List<FieldValueMapping> valueMappings, ImportRequest importRequest) throws ValueMappingException,
-			CurrencyNotFoundException, ParseException, UnsupportedFieldTypeException {
+			CurrencyNotFoundException, ParseException, UnsupportedFieldTypeException, AmpResourceNotCreatedException {
 
 		Boolean hasTransactions = false;
 		Boolean hasDocumentLinks = false;
@@ -842,7 +842,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
     }
 
     private List<JsonBean> getActivityDocuments(InternalDocument source, List<FieldMapping> fieldMappings,
-												List<FieldValueMapping> valueMappings) throws ValueMappingException {
+												List<FieldValueMapping> valueMappings) throws ValueMappingException, AmpResourceNotCreatedException {
 		List<JsonBean> documentLinks = new ArrayList<>();
 		for (Entry<String, Map<String, String>> entry : source.getDocumentLinkFields().entrySet()) {
 			Integer documentCategoryId = getIdFromList(entry.getValue().get("category"), "category", fieldMappings,
@@ -852,11 +852,9 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			Resource resource = ampResourceProcessor.createResource(entry.getValue(), documentCategoryId);
 
 			JsonBean document = new JsonBean();
-			if (resource != null) {
-				document.set("uuid", resource.getUuid());
-				document.set("document_type", resource.getDocumentType());
-				documentLinks.add(document);
-			}
+			document.set("uuid", resource.getUuid());
+			document.set("document_type", resource.getDocumentType());
+			documentLinks.add(document);
 		}
 
 		return documentLinks;

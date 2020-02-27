@@ -5,6 +5,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.services.dto.JsonBean;
 import org.devgateway.importtool.services.dto.Resource;
+import org.devgateway.importtool.services.processor.helper.AmpResourceNotCreatedException;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -49,7 +50,9 @@ public class AmpResourceProcessor {
         userEmail = layout.getString("email");
     }
 
-    public Resource createResource(Map<String, String> value, Integer documentCategoryId) {
+    public Resource createResource(Map<String, String> value, Integer documentCategoryId)
+            throws AmpResourceNotCreatedException {
+
         JsonBean documentEntity = new JsonBean();
 
         documentEntity.set("title", value.get("title"));
@@ -72,16 +75,15 @@ public class AmpResourceProcessor {
 
             if (response.getBody().getString("error") == null) {
                 String uuid = response.getBody().getString("uuid");
-                log.info("A resource was created in amp: " + uuid);
+                log.info("A resource was created in AMP: " + uuid);
 
                 return new Resource(uuid);
             } else {
-                log.error("Failed to create resource in AMP: " + response.getBody().getString("error"));
+                throw new AmpResourceNotCreatedException("Failed to create resource in AMP: "
+                        + response.getBody().getString("error"));
             }
         } catch (RestClientException ex) {
-            log.error("Failed to create resource in AMP", ex);
+            throw new AmpResourceNotCreatedException("Failed to create resource in AMP: ", ex);
         }
-
-        return null;
     }
 }

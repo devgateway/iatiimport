@@ -18,7 +18,7 @@ public interface IDestinationProcessor {
 	public List<InternalDocument> getDocuments(Boolean summary);
 
 	void insert(InternalDocument source, List<FieldMapping> fieldMapping, List<FieldValueMapping> valueMapping,
-				ImportRequest importRequest) throws ValueMappingException, CurrencyNotFoundException, ParseException, UnsupportedFieldTypeException;
+				ImportRequest importRequest) throws ValueMappingException, CurrencyNotFoundException, ParseException, UnsupportedFieldTypeException, AmpResourceNotCreatedException;
 
 	void update(InternalDocument source, InternalDocument destination, List<FieldMapping> fieldMapping,
 				List<FieldValueMapping> valueMapping, boolean overrideTitle, ImportRequest importRequest)
