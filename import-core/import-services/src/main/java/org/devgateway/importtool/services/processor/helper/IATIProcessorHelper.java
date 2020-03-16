@@ -25,6 +25,9 @@ public class IATIProcessorHelper {
         mappingNameFile.put("default-tied-status", "TiedStatus");
         mappingNameFile.put("policy-marker", "PolicyMarker");
         mappingNameFile.put("sector", "Sector");
+        mappingNameFile.put("document-category", "DocumentCategory");
+        mappingNameFile.put("sdg-goals", "UNSDG-Goals");
+        mappingNameFile.put("sdg-targets", "UNSDG-Targets");
     }
     public static String getStringFromElement(Element element, String field){
         return getStringFromElement(element, field, null);

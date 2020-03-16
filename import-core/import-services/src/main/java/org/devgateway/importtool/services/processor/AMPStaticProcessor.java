@@ -376,11 +376,11 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 					return n.getSourceField().getFieldName().equals(mapping.getSourceField().getFieldName());
 				}).findFirst();
 
-				List<JsonBean> locations = getCodesFromList(source, optValueMappingLocation.get(), false);
+				List<JsonBean> locations = getCodesFromList(source, optValueMappingLocation.get());
 				if (locations != null) {
 					project.set(destinationField.getFieldName(), locations);
 				}
-				getLocationFromExtraInfo(project, getExtraInfo(source, optValueMappingLocation.get(), false));
+				getLocationFromExtraInfo(project, getExtraInfo(source, optValueMappingLocation.get()));
 				break;
 			case RECIPIENT_COUNTRY:
 			case LIST:
@@ -723,11 +723,11 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 					return n.getSourceField().getFieldName().equals(mapping.getSourceField().getFieldName());
 				}).findFirst();
 
-				List<JsonBean> locations = getCodesFromList(source, optValueMappingLocation.get(), false);
+				List<JsonBean> locations = getCodesFromList(source, optValueMappingLocation.get());
 				if (locations != null) {
 					project.set(destinationField.getFieldName(), locations);
 				}
-				getLocationFromExtraInfo(project, getExtraInfo(source, optValueMappingLocation.get(), false));
+				getLocationFromExtraInfo(project, getExtraInfo(source, optValueMappingLocation.get()));
 				break;
 			case RECIPIENT_COUNTRY:
 			case LIST:
@@ -786,21 +786,12 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 												Field destinationField) throws ValueMappingException {
 		if (!destinationField.getFieldName().equals("type_of_assistance")
 				&& !destinationField.getFieldName().equals("financing_instrument")) {
-			// TODO this needs to come from Field destinationObject as a property
-			// TODO after the release please refactor this method in order to avoid asking here
-			// TODO if we should add id for the prefix
-			// TODO also column names should be moved to constants
-			Boolean prefix = true;
-			if (destinationField.getFieldName().equals("primary_sectors")
-					|| destinationField.getFieldName().equals("secondary_sectors")
-					|| destinationField.getFieldName().equals("tertiary_sectors")) {
-				prefix = false;
-			}
+
 			Optional<FieldValueMapping> optValueMapping = valueMappings.stream().filter(n -> {
 				return n.getSourceField().getFieldName().equals(mapping.getSourceField().getFieldName());
 			}).findFirst();
 			if (optValueMapping.isPresent() && sourceField.isMultiple()) {
-				List<JsonBean> values = getCodesFromList(source, optValueMapping.get(), prefix);
+				List<JsonBean> values = getCodesFromList(source, optValueMapping.get());
 				if (values != null) {
 					project.set(destinationField.getFieldName(), values);
 				}
@@ -1241,11 +1232,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		return langString;
 	}
 
-	private List<JsonBean> getCodesFromList(InternalDocument source, FieldValueMapping mapping) throws ValueMappingException {
-		return getCodesFromList(source, mapping, true);
-	}
-
-	private Map<Object,Object> getExtraInfo(InternalDocument source, FieldValueMapping mapping, Boolean suffix) {
+	private Map<Object,Object> getExtraInfo(InternalDocument source, FieldValueMapping mapping) {
 		Object value = source.getStringMultiFields().get(mapping.getSourceField().getFieldName());
 		Map<Integer, Integer> valueMapIndex = mapping.getValueIndexMapping();
 		List<FieldValue> sourcePossibleValues = mapping.getSourceField().getPossibleValues();
@@ -1268,8 +1255,11 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		return null;
 	}
 
-	private List<JsonBean> getCodesFromList(InternalDocument source, FieldValueMapping mapping, Boolean suffix) throws ValueMappingException {
-		Object value = source.getStringMultiFields().get(mapping.getSourceField().getFieldName());
+	private List<JsonBean> getCodesFromList(InternalDocument source, FieldValueMapping mapping) throws ValueMappingException {
+		Field destField = mapping.getDestinationField();
+		String sourceFieldName = mapping.getSourceField().getFieldName();
+		String destFieldName = destField.getChildName() != null ? destField.getChildName() : sourceFieldName;
+		Object value = source.getStringMultiFields().get(sourceFieldName);
 		Map<Integer, Integer> valueMapIndex = mapping.getValueIndexMapping();
 		List<FieldValue> sourcePossibleValues = mapping.getSourceField().getPossibleValues();
 		String[] stringValues = (String[]) value;
@@ -1305,13 +1295,13 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		Integer divider = uniqueValues.size();
 		for (Entry<Integer, Integer> entry : uniqueValues.entrySet()) {
 			JsonBean bean = new JsonBean();
-			if (suffix) {
-				bean.set(mapping.getSourceField().getFieldName() + "_id", entry.getKey());
+			if (FIELDS_WITHOUT_PREFIX.contains(destField.getFieldName())) {
+				bean.set(destFieldName, entry.getKey());
 			} else {
-				bean.set(mapping.getSourceField().getFieldName(), entry.getKey());
+				bean.set(destFieldName + "_id", entry.getKey());
 			}
 			if (mapping.getSourceField().isPercentage() && entry.getValue() > 0) {
-				bean.set(mapping.getSourceField().getFieldName() + "_percentage", (double) 100 / (double) divider);
+				bean.set(destFieldName + "_percentage", (double) 100 / (double) divider);
 			}
 			beanList.add(bean);
 		}
@@ -1415,25 +1405,25 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			Field primarySector = new Field("Primary Sector", AMP_PRIMARY_SECTORS, FieldType.LIST, true);
 			primarySector.setPossibleValues(getCodeListValues(AMP_PRIMARY_SECTORS_SECTOR));
 			primarySector.setMultiple(true);
-			primarySector
-					.setMultiLangDisplayName(getFieldLabel("primary_sectors"));
+			primarySector.setMultiLangDisplayName(getFieldLabel("primary_sectors"));
 			fieldList.add(primarySector);
 		}
 
 		if (existFieldInAmp(AMP_SECONDARY_SECTORS_SECTOR)) {
 			Field secondarySector = new Field("Secondary Sector", AMP_SECONDARY_SECTORS, FieldType.LIST, true);
 			secondarySector.setPossibleValues(getCodeListValues(AMP_SECONDARY_SECTORS_SECTOR));
-			secondarySector
-					.setMultiLangDisplayName(getFieldLabel(AMP_SECONDARY_SECTORS));
+			secondarySector.setMultiLangDisplayName(getFieldLabel(AMP_SECONDARY_SECTORS));
 			fieldList.add(secondarySector);
 		}
 
 		if (existFieldInAmp(AMP_TERTIARY_SECTORS_SECTOR)) {
 			Field tertiarySector = new Field("Tertiary Sector", AMP_TERTIARY_SECTORS, FieldType.LIST, true);
-			tertiarySector.setPossibleValues(getCodeListValues("AMP_TERTIARY_SECTORS_SECTOR"));
+			tertiarySector.setPossibleValues(getCodeListValues(AMP_TERTIARY_SECTORS_SECTOR));
 			tertiarySector.setMultiLangDisplayName(getFieldLabel(AMP_TERTIARY_SECTORS));
 			fieldList.add(tertiarySector);
 		}
+
+		addProgramFields();
 
 		// locations, locations~location, locations~location_percentage
 		if (existFieldInAmp(LOCATIONS_LOCATION)) {
@@ -1594,6 +1584,44 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		     Field disasterResponse = new Field("Disaster Response", "disaster_response", FieldType.BOOLEAN, false);
 		     fieldList.add(disasterResponse);
           }
+	}
+
+	private void addProgramFields() {
+		if (existFieldInAmp(AMP_NATIONAL_PLAN_OBJECTIVE)) {
+			Field npo = new Field("National Plan Objective", AMP_NPO_PROGRAM, FieldType.LIST, true);
+			npo.setPossibleValues(getCodeListValues(AMP_NPO_PROGRAM));
+			npo.setChildName(AMP_PROGRAM);
+			npo.setMultiple(true);
+			npo.setMultiLangDisplayName(getFieldLabel(AMP_NATIONAL_PLAN_OBJECTIVE));
+			fieldList.add(npo);
+		}
+
+		if (existFieldInAmp(AMP_PRIMARY_PROGRAMS_PROGRAM)) {
+			Field primaryProgram = new Field("Primary Programs", AMP_PRIMARY_PROGRAMS, FieldType.LIST, true);
+			primaryProgram.setPossibleValues(getCodeListValues(AMP_PRIMARY_PROGRAMS_PROGRAM));
+			primaryProgram.setMultiLangDisplayName(getFieldLabel(AMP_PRIMARY_PROGRAMS));
+			primaryProgram.setMultiple(true);
+			primaryProgram.setChildName(AMP_PROGRAM);
+			fieldList.add(primaryProgram);
+		}
+
+		if (existFieldInAmp(AMP_SECONDARY_PROGRAMS_PROGRAM)) {
+			Field secondaryProgram = new Field("Secondary Programs", AMP_SECONDARY_PROGRAMS, FieldType.LIST, true);
+			secondaryProgram.setPossibleValues(getCodeListValues(AMP_SECONDARY_PROGRAMS_PROGRAM));
+			secondaryProgram.setMultiLangDisplayName(getFieldLabel(AMP_SECONDARY_PROGRAMS));
+			secondaryProgram.setChildName(AMP_PROGRAM);
+			secondaryProgram.setMultiple(true);
+			fieldList.add(secondaryProgram);
+		}
+
+		if (existFieldInAmp(AMP_TERTIARY_PROGRAMS_PROGRAM)) {
+			Field tertiaryProgram = new Field("Tertiary Programs", AMP_TERTIARY_PROGRAMS, FieldType.LIST, true);
+			tertiaryProgram.setPossibleValues(getCodeListValues(AMP_TERTIARY_PROGRAMS_PROGRAM));
+			tertiaryProgram.setMultiLangDisplayName(getFieldLabel(AMP_TERTIARY_PROGRAMS));
+			tertiaryProgram.setChildName(AMP_PROGRAM);
+			tertiaryProgram.setMultiple(true);
+			fieldList.add(tertiaryProgram);
+		}
 	}
 
 	@SuppressWarnings("unchecked")
