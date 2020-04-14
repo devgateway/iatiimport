@@ -1,4 +1,4 @@
-package org.devgateway.importtool.services.test;
+package org.devgateway.importtool.services.processor;
 
 import org.junit.Assert;
 
@@ -6,9 +6,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.devgateway.importtool.endpoint.ApiMessage;
 import org.devgateway.importtool.endpoint.EPMessages;
-import org.devgateway.importtool.services.processor.IATI104Processor;
 import org.devgateway.importtool.services.processor.helper.ActionStatus;
 import org.devgateway.importtool.services.processor.helper.Field;
 import org.devgateway.importtool.services.processor.helper.ISourceProcessor;

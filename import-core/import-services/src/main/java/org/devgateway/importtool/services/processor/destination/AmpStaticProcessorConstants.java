@@ -70,6 +70,10 @@ public class AmpStaticProcessorConstants {
     public static final String LOCATIONS_LOCATION = "locations~location";
     public static final String DONOR_ORGANIZATION_ID = "donor_organization_id";
 
+    public static final String ACTIVITY_DOCUMENTS = "activity_documents";
+
+    public static final String RESOURCE_TYPE = "type";
+
     public static final String AMP_FUNDINGS_FINANCING_INSTRUMENT = AMP_FUNDINGS + "~" + AMP_FINANCING_INSTRUMENT;
 
     public static final String AMP_PRIMARY_SECTORS_SECTOR = AMP_PRIMARY_SECTORS + "~" + AMP_SECTOR;
@@ -88,18 +92,8 @@ public class AmpStaticProcessorConstants {
     public static final String AMP_FUNDINGS_DISBURSEMENTS_ADJUSTMENT_TYPE = AMP_FUNDINGS_DISBURSEMENTS + "~" + AMP_ADJUSTMENT_TYPE;
     public static final String AMP_FUNDINGS_EXPENDITURES_ADJUSTMENT_TYPE = AMP_FUNDINGS_EXPENDITURES + "~" + AMP_ADJUSTMENT_TYPE;
 
-    public static final List<String> LIST_OF_VALUES_TO_FETCH = new ArrayList<>(Arrays.asList(AMP_ACTIVITY_STATUS,
-            AMP_A_C_CHAPTER, AMP_FUNDINGS_TYPE_OF_ASSISTANCE, AMP_FUNDINGS_FINANCING_INSTRUMENT,
-            AMP_PRIMARY_SECTORS_SECTOR, AMP_SECONDARY_SECTORS_SECTOR, AMP_TERTIARY_SECTORS_SECTOR,LOCATIONS_LOCATION ,
-            AMP_FUNDINGS_DONOR_ORGANIZATION_ID, AMP_FUNDINGS_COMMITMENTS_ADJUSTMENT_TYPE,
-            AMP_FUNDINGS_DISBURSEMENTS_ADJUSTMENT_TYPE, AMP_FUNDINGS_EXPENDITURES_ADJUSTMENT_TYPE,
-            AMP_FUNDINGS_COMMITMENTS_CURRENCY, AMP_FUNDINGS_DISBURSEMENTS_CURRENCY, AMP_FUNDINGS_CEXPENDITURES_CURRENCY));
-
     //end points
-    public static final String FIELDS_ENDPOINT = "/rest/activity/fields";
-    public static final String ALL_FIELDS_ENDPOINT = "/rest/activity/field/values";
-    public static final String TRANSLATIONS_END_POINT = "/rest/translations/translate?translations=";
-    public static final String DOCUMENTS_END_POINT = "/rest/activity/projects";
-
+    public static final String TRANSLATIONS_ENDPOINT = "/rest/translations/translate?translations=";
+    public static final String PROJECTS_ENDPOINT = "/rest/activity/projects";
 
 }

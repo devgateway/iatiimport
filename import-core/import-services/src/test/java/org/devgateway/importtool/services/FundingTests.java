@@ -1,4 +1,4 @@
-package org.devgateway.importtool.services.test;
+package org.devgateway.importtool.services;
 
 import static org.junit.Assert.assertEquals;
 

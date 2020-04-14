@@ -327,6 +327,20 @@ public abstract class IATIProcessor implements ISourceProcessor {
         providerOrg.setSubType("Provider");
         getFields().add(providerOrg);
         getFilterFieldList().add(providerOrg);
+
+        Field documentLink = new Field("Document Link", "document-link",
+                FieldType.DOCUMENT_LINK, true, getTooltipForField("document-link"),
+                getLabelsForField("document-link"));
+        getFields().add(documentLink);
+        getFilterFieldList().add(documentLink);
+
+        Field documentCategory = new Field("Document Category", "category",
+                FieldType.LIST, true, getTooltipForField("document-category"),
+                getLabelsForField("document-category"));
+        documentCategory.setPossibleValues(getCodeListValues("document-category"));
+        documentCategory.setMultiple(true);
+        getFields().add(documentCategory);
+        getFilterFieldList().add(documentCategory);
     }
 
     private List<FieldValue> getCodeListValues(String codeListName) {
@@ -676,6 +690,7 @@ public abstract class IATIProcessor implements ISourceProcessor {
             processMultiLangElementType(xPath, document, iatiActivity, defaultLanguageCode);
             processTransactionElementType(document, iatiActivity, activityParticipatingOrgrNode);
             processDateElementType(document, iatiActivity);
+            processDocumentLinkElementType(document, iatiActivity);
 
             list.add(document);
         }
@@ -876,6 +891,56 @@ public abstract class IATIProcessor implements ISourceProcessor {
         }
     }
 
+    protected void processDocumentLinkElementType(InternalDocument document, Element element) {
+        Consumer<Field> documentLinkConsumer = field -> {
+            NodeList nodes = element.getElementsByTagName("document-link");
+            List<String> documentCategories = new ArrayList<>();
+            for (int j = 0; j < nodes.getLength(); ++j) {
+                Element documentLinkElement = (Element) nodes.item(j);
+
+                String url = documentLinkElement.getAttribute("url");
+
+                Element titleElement = (Element) documentLinkElement.getElementsByTagName("title").item(0);
+                String title = extractNameElementForCodeListValues(titleElement);
+
+                Element categoryElement = (Element) documentLinkElement.getElementsByTagName("category").item(0);
+                String category = categoryElement.getAttribute("code");
+
+                Map<String, String> documentFields = new HashMap<>();
+                documentFields.put("title", title);
+                documentFields.put("category", category);
+                documentFields.put("url", url);
+
+                Calendar calendar = Calendar.getInstance();
+
+                NodeList documentDateElements = documentLinkElement.getElementsByTagName("document-date");
+                if (documentDateElements.getLength() > 0) {
+                    String documentDate = documentDateElements
+                            .item(0)
+                            .getAttributes()
+                            .getNamedItem(ISO_ATTRIBUTE)
+                            .getNodeValue();
+                    try {
+                        calendar.setTime(DateUtils.parseDate(Boolean.FALSE, documentDate));
+                    } catch (ParseException e) {
+                        log.error(e.getMessage(), e);
+                    }
+                } else {
+                    calendar.setTime(new Date());
+                }
+                documentFields.put("year", Integer.toString(calendar.get(Calendar.YEAR)));
+
+                documentCategories.add(category);
+
+                document.addDocumentLinkField(field.getUniqueFieldName() + "_" + j, documentFields);
+            }
+            if (!documentCategories.isEmpty()) {
+                String[] codeValues = documentCategories.stream().toArray(String[]::new);
+                document.addStringMultiField("type", codeValues);
+            }
+        };
+        processForEachFilteredByType(documentLinkConsumer, FieldType.DOCUMENT_LINK);
+    }
 
     protected void processTransactionElementType(InternalDocument document, Element iatiActivity,
                                                  Element activityProviderNode)  {
