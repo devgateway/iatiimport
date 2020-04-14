@@ -41,11 +41,11 @@ var ChooseFields = React.createClass({
 			sourceFieldsData: data
 		});
 	},
-	updateDestinationFields: function(data) {	   
+	updateDestinationFields: function(data) {
 		this.setState({
 			destinationFieldsData: data
-		});	 
-		 
+		});
+
 	   var disasterResponse =   _.find(data, function(field){ return field.uniqueFieldName == 'disaster_response';});
 	   this.props.eventHandlers.showDisasterResponse(disasterResponse ? true : false);
 	},
@@ -143,7 +143,7 @@ var ChooseFields = React.createClass({
 		var mappableFields = _.where(this.state.sourceFieldsData, {mappable: true});
 		return (mappableFields.length == this.state.mappingFieldsData.length);
 	},
-	handleNext: function() {	    
+	handleNext: function() {
 		this.props.eventHandlers.chooseFields(this.state.mappingFieldsData, constants.DIRECTION_NEXT);
 	},
 	handlePrevious: function() {
@@ -170,6 +170,14 @@ var ChooseFields = React.createClass({
 		});
 		this.forceUpdate();
 	},
+  containsAll: function (list1, list2) {
+    for (var i = 0; i < list1.length; i++) {
+      if ($.inArray(list1[i], list2) === -1) {
+        return false;
+      }
+    }
+    return true;
+  },
 	handleToggle: function(item, event) {
 		var mapping = [];
 		if(event.target.checked) {
@@ -241,11 +249,41 @@ var ChooseFields = React.createClass({
 			this.displayError();
 		}.bind(this));
 	},
-	isMappingComplete: function(){
-		var notMapped = _.filter(this.state.mappingFieldsData, function(m) {
-			return _.isUndefined(m.destinationField) || _.isNull(m.destinationField)
-	    });
-		return (this.state.mappingFieldsData.length > 0 && notMapped.length == 0)
+	isMappingComplete: function() {
+    var notMapped = _.filter(this.state.mappingFieldsData, function (m) {
+      return _.isUndefined(m.destinationField) || _.isNull(m.destinationField)
+    });
+
+    var requiredDestFields = _.map(_.filter(this.state.destinationFieldsData, function (item) {
+      return item.required;
+    }), function (item) {
+      return item.uniqueFieldName;
+    });
+
+    var selectedDestFields = _.map(this.state.mappingFieldsData, function (item) {
+      if (item.destinationField) {
+        return item.destinationField.uniqueFieldName;
+      }
+    });
+
+    var destDependentFields = [...new Set(_.map(_.filter(this.state.destinationFieldsData, function (item) {
+      return selectedDestFields && selectedDestFields.includes(item.uniqueFieldName) && item.dependencies;
+    }), function (item) {
+      return _.map(item.dependencies, function (i) {
+        return i.uniqueFieldName;
+      })
+    }).flat())];
+
+    var requiredFieldsAreNotMissing = requiredDestFields && requiredDestFields.length > 0
+      && selectedDestFields && selectedDestFields.length > 0
+      && this.containsAll(requiredDestFields, selectedDestFields);
+
+    var dependentFieldsAreNotMissing = destDependentFields && destDependentFields.length > 0
+      && selectedDestFields && selectedDestFields.length > 0
+      && this.containsAll(destDependentFields, selectedDestFields);
+
+    return (this.state.mappingFieldsData.length > 0 && notMapped.length == 0)
+      && requiredFieldsAreNotMissing && dependentFieldsAreNotMissing;
 	},
     render: function() {
     	var rows = {};
@@ -264,7 +302,7 @@ var ChooseFields = React.createClass({
                             _.map(item.dependencies, function(item, key)
                           {
                             return common.getDisplayValue(item, language) ;
-                          }).join(",");
+                          }).join(", ");
                             dependenciesMessage.push(<div ><strong>{common.getDisplayValue(item, language)}</strong>{this.props.i18nLib.t('wizard.map_fields.msg_field_has_dependencies',{field:common.getDisplayValue(item, language), dependencies:dependencies})}</div>);
                         }
                     }.bind(this));
