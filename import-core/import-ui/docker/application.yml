@@ -1,7 +1,0 @@
-spring:
-  profiles: default
-  dataSource:
-    driverClassName : org.postgresql.Driver
-    url: jdbc:postgresql://db:5432/postgres
-    username : postgres
-    password :

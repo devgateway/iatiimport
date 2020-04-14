@@ -242,6 +242,15 @@ public abstract class IATIProcessor implements ISourceProcessor {
         getFields().add(sector);
         getFilterFieldList().add(sector);
 
+        Field sdg = new Field("SDG", "tag", FieldType.LIST, true,
+                getTooltipForField("tag"), getLabelsForField("tag"));
+        sdg.setPossibleValues(getCodeListValues("sdg-goals"));
+        sdg.getPossibleValues().addAll(getCodeListValues("sdg-targets"));
+        sdg.setMultiple(true);
+        sdg.setPercentage(true);
+        getFields().add(sdg);
+        getFilterFieldList().add(sdg);
+
         Field location = new Field("Location", "location", FieldType.LOCATION, true,
                 getTooltipForField("location"), getLabelsForField("location"));
         location.setPossibleValues(new ArrayList<FieldValue>());
