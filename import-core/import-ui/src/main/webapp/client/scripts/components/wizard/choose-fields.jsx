@@ -274,16 +274,15 @@ var ChooseFields = React.createClass({
       })
     }).flat())];
 
-    var requiredFieldsAreNotMissing = requiredDestFields && requiredDestFields.length > 0
-      && selectedDestFields && selectedDestFields.length > 0
-      && this.containsAll(requiredDestFields, selectedDestFields);
-
-    var dependentFieldsAreNotMissing = destDependentFields && destDependentFields.length > 0
-      && selectedDestFields && selectedDestFields.length > 0
-      && this.containsAll(destDependentFields, selectedDestFields);
-
+    var requiredFieldsAreMissing = requiredDestFields && requiredDestFields.length > 0;
+    var dependentFieldsAreMissing = destDependentFields && destDependentFields.length > 0;
+    if (selectedDestFields && selectedDestFields.length > 0) {
+      requiredFieldsAreMissing = requiredFieldsAreMissing && !this.containsAll(requiredDestFields, selectedDestFields);
+      dependentFieldsAreMissing = dependentFieldsAreMissing && !this.containsAll(destDependentFields, selectedDestFields);
+    }
+    console.log(dependentFieldsAreMissing)
     return (this.state.mappingFieldsData.length > 0 && notMapped.length == 0)
-      && requiredFieldsAreNotMissing && dependentFieldsAreNotMissing;
+      && !requiredFieldsAreMissing && !dependentFieldsAreMissing;
 	},
     render: function() {
     	var rows = {};
