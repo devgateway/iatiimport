@@ -1,42 +1,29 @@
 package org.devgateway.importtool.services.processor;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.devgateway.importtool.services.processor.helper.ActionStatus;
-import org.devgateway.importtool.services.processor.helper.DocumentMapping;
-import org.devgateway.importtool.services.processor.helper.Field;
-import org.devgateway.importtool.services.processor.helper.FieldMapping;
-import org.devgateway.importtool.services.processor.helper.FieldType;
-import org.devgateway.importtool.services.processor.helper.FieldValue;
-import org.devgateway.importtool.services.processor.helper.FieldValueMapping;
-import org.devgateway.importtool.services.processor.helper.IDestinationProcessor;
-import org.devgateway.importtool.services.processor.helper.InternalDocument;
-import org.devgateway.importtool.services.processor.helper.ActionResult;
+import org.devgateway.importtool.services.dto.JsonBean;
+import org.devgateway.importtool.services.dto.MappedProject;
+import org.devgateway.importtool.services.processor.helper.*;
 import org.devgateway.importtool.services.processor.helper.interceptors.CookieHeaderInterceptor;
 import org.devgateway.importtool.services.request.ImportRequest;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
+import java.util.Map.Entry;
 
-@Component("AMP210")
-public class AMPProcessor implements IDestinationProcessor {
+@Component("AMP34")
+public class AMP34TestDestinationProcessor implements IDestinationProcessor {
 
 	private Log log = LogFactory.getLog(getClass());
 
-	private String DEFAULT_ID_FIELD = "amp-identifier";
 	private String DEFAULT_TITLE_FIELD = "title";
 	private String baseURL;
 
@@ -47,12 +34,14 @@ public class AMPProcessor implements IDestinationProcessor {
 	private String documentsEndpoint;
 	private String documentsTestEndpoint;
 	private Boolean testMode = false;
-	private String descriptiveName = "AMP 2.11";
+	private String descriptiveName = "AMP 3.4";
 
-	private List<ClientHttpRequestInterceptor> interceptors = new ArrayList<ClientHttpRequestInterceptor>();
+	private List<MappedProject> projectsReadyToBePosted = new ArrayList<>();
+
+	private List<ClientHttpRequestInterceptor> interceptors = new ArrayList<>();
 	private RestTemplate template;
 
-	public AMPProcessor() {
+	public AMP34TestDestinationProcessor() {
 		this.baseURL = "http://localhost:8081";
 		this.setFieldsEndpoint("/rest/activity/fields");
 		this.setFieldsTestEndpoint("destination_fields.json");
@@ -68,7 +57,7 @@ public class AMPProcessor implements IDestinationProcessor {
 	
 	@Override
 	public List<Field> getFields() {
-		List<Field> list = new ArrayList<Field>();
+		List<Field> list = new ArrayList<>();
 		String result = "";
 
 		if (testMode) {
@@ -294,9 +283,13 @@ public class AMPProcessor implements IDestinationProcessor {
 	@Override
 	public void insert(InternalDocument source, List<FieldMapping> fieldMapping, List<FieldValueMapping> valueMapping,
                        ImportRequest importRequest) {
-		ActionResult result = new ActionResult("1", "INSERT", "OK", "Project has been inserted");
-		log.debug("Update new document in destination system");
-		//return result;
+		JsonBean project = transformProject(source, fieldMapping, valueMapping, importRequest);
+		projectsReadyToBePosted.add(getMappedProjectFromSource(source, project));
+	}
+
+	private JsonBean transformProject(InternalDocument source, List<FieldMapping> fieldMapping,
+									  List<FieldValueMapping> valueMapping, ImportRequest importRequest) {
+		return new JsonBean();
 	}
 
 	@Override
@@ -344,8 +337,14 @@ public class AMPProcessor implements IDestinationProcessor {
 
     @Override
     public List<ActionResult> processProjectsInBatch(ActionStatus importStatus) {
-        return null;
+		List<ActionResult> finalResults = new ArrayList<>();
+
+		for (MappedProject project : projectsReadyToBePosted) {
+			ActionResult result = new ActionResult("1", "INSERT", "OK", "Project has been inserted: " + project.getProjectIdentifier());
+			finalResults.add(result);
+		}
+
+		projectsReadyToBePosted = new ArrayList<>();
+		return finalResults;
     }
-
-
 }

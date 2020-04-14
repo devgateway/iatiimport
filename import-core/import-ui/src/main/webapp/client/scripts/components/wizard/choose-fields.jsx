@@ -41,11 +41,11 @@ var ChooseFields = React.createClass({
 			sourceFieldsData: data
 		});
 	},
-	updateDestinationFields: function(data) {	   
+	updateDestinationFields: function(data) {
 		this.setState({
 			destinationFieldsData: data
-		});	 
-		 
+		});
+
 	   var disasterResponse =   _.find(data, function(field){ return field.uniqueFieldName == 'disaster_response';});
 	   this.props.eventHandlers.showDisasterResponse(disasterResponse ? true : false);
 	},
@@ -143,7 +143,7 @@ var ChooseFields = React.createClass({
 		var mappableFields = _.where(this.state.sourceFieldsData, {mappable: true});
 		return (mappableFields.length == this.state.mappingFieldsData.length);
 	},
-	handleNext: function() {	    
+	handleNext: function() {
 		this.props.eventHandlers.chooseFields(this.state.mappingFieldsData, constants.DIRECTION_NEXT);
 	},
 	handlePrevious: function() {
@@ -339,6 +339,7 @@ var ChooseFields = React.createClass({
                         {rows[constants.FIELD_TYPE.DATE]}
                         {rows[constants.FIELD_TYPE.ORGANIZATION]}
                         {rows[constants.FIELD_TYPE.TRANSACTION]}
+                        {rows[constants.FIELD_TYPE.DOCUMENT_LINK]}
                         </tbody>
                     </table>
                 </div>

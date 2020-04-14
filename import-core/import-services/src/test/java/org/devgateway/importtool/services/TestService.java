@@ -1,4 +1,4 @@
-package org.devgateway.importtool.services.test;
+package org.devgateway.importtool.services;
 
 import static org.devgateway.importtool.services.processor.destination.AmpStaticProcessorConstants.AMP_ACTIVITY_STATUS;
 import static org.hamcrest.CoreMatchers.is;
@@ -10,7 +10,6 @@ import java.util.Optional;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.devgateway.importtool.services.ServiceConfiguration;
 import org.devgateway.importtool.services.processor.AMPProcessor;
 import org.devgateway.importtool.services.processor.IATI104Processor;
 import org.devgateway.importtool.services.processor.IATI201Processor;

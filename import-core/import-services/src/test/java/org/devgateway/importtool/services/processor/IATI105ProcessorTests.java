@@ -1,4 +1,4 @@
-package org.devgateway.importtool.services.test;
+package org.devgateway.importtool.services.processor;
 
 import org.junit.Assert;
 
@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.devgateway.importtool.services.processor.IATI201Processor;
 import org.devgateway.importtool.services.processor.helper.Field;
 import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
 import org.devgateway.importtool.services.processor.helper.Status;
@@ -22,9 +21,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = IATI201ProcessorTests.TestIATI201ProcessorConfiguration.class)
+@ContextConfiguration(classes = IATI105ProcessorTests.TestIATI105ProcessorConfiguration.class)
 @Transactional
-public class IATI201ProcessorTests {
+public class IATI105ProcessorTests {
 		
 	@Before
 	public void setUp() throws Exception {
@@ -32,12 +31,12 @@ public class IATI201ProcessorTests {
 
 	@Configuration
 	@EnableAutoConfiguration
-	static class TestIATI201ProcessorConfiguration {
+	static class TestIATI105ProcessorConfiguration {
 	}
 	
 	@Test	
 	public void testIATIFileIsParsedCorrectly() throws Exception {
-		ISourceProcessor transformer = new IATI201Processor();
+		ISourceProcessor transformer = new IATI105Processor();
 		InputStream is = this.getClass().getResourceAsStream("sample_files/activity-standard-example-minimal.xml");
 		transformer.setActionStatus(this.getStatus());
 		transformer.setInput(is);
@@ -61,7 +60,7 @@ public class IATI201ProcessorTests {
 	
 	@Test
 	public void testLanguagesAreParsed(){
-		ISourceProcessor transformer = new IATI201Processor();
+		ISourceProcessor transformer = new IATI105Processor();
 		InputStream is = this.getClass().getResourceAsStream("sample_files/activity-standard-example-minimal.xml");
 		transformer.setInput(is);
 		List<String> expectedLanguages = new ArrayList<String>();
