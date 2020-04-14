@@ -16,7 +16,6 @@ WORKDIR /opt/importer
 RUN apk add --no-cache bash gawk sed grep bc coreutils
 
 ADD wait-for-it.sh .
-ADD application.yml .
 
 EXPOSE 8081
 
