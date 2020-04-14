@@ -168,13 +168,6 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			this.baseURL = BASEURL_DEFAULT_VALUE;
 		}
 
-		String ampImplementationLevelProperty = System.getProperty(AMP_IMPLEMENTATION_LEVEL_ID_FIELD_PROPERTY);
-		if (ampImplementationLevelProperty != null) {
-			ampImplementationLevel = Integer.parseInt(ampImplementationLevelProperty);
-		} else {
-			ampImplementationLevel = AMP_IMPLEMENTATION_LEVEL_ID_DEFAULT_VALUE;
-		}
-
 		ampActivityFieldProvider = new AmpActivityFieldProvider(baseURL, restTemplate);
 		ampResourceFieldProvider = new AmpResourceFieldProvider(baseURL, restTemplate);
 		ampActivityFieldValueProvider = new AmpActivityFieldValueProvider(baseURL, restTemplate);
@@ -1447,6 +1440,13 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			location.setMultiLangDisplayName(getFieldLabel(LOCATIONS_LOCATION));
 			location.setMultiple(true);
 			fieldList.add(location);
+		}
+
+		if (ampActivityFieldProvider.existsField(AMP_IMPLEMENTATION_LEVEL)) {
+			Field implementationLevel = new Field("Implementation Level", AMP_IMPLEMENTATION_LEVEL, FieldType.LIST, true);
+			implementationLevel.setPossibleValues(getCodeListValues(AMP_IMPLEMENTATION_LEVEL));
+			implementationLevel.setMultiLangDisplayName(getFieldLabel(AMP_IMPLEMENTATION_LEVEL));
+			fieldList.add(implementationLevel);
 		}
 
 		// Multi-language strings

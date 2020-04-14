@@ -12,7 +12,6 @@ public class AmpStaticProcessorConstants {
     public static final String AMP_IATI_ID_FIELD_DEFAULT_VALUE = "project_code";
     public static final String DEFAULT_LANGUAGE_CODE = "en";
     public static final String AMP_IMPLEMENTATION_LEVEL_ID_FIELD_PROPERTY = "AMPStaticProcessor.implementationLevel";
-    public static final Integer AMP_IMPLEMENTATION_LEVEL_ID_DEFAULT_VALUE = 70; //Coming form common AMP configuration
     public static final String 	DEFAULT_TITLE_FIELD = "project_title";
     public static final String SESSION_COOKIE_NAME = "JSESSIONID";
 
@@ -54,6 +53,7 @@ public class AmpStaticProcessorConstants {
     public static final String AMP_FINANCING_INSTRUMENT = "financing_instrument";
     public static final String AMP_ADJUSTMENT_TYPE = "adjustment_type";
     public static final String AMP_TRANSACTION_TYPE = "transaction_type";
+    public static final String AMP_IMPLEMENTATION_LEVEL = "implementation_level";
 
     public static final String AMP_PRIMARY_SECTORS = "primary_sectors";
     public static final String AMP_SECTOR = "sector";
