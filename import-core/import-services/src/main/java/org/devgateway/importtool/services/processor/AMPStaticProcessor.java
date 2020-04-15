@@ -36,6 +36,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import static org.devgateway.importtool.services.processor.destination.AmpActivityFieldValueProvider.FIELDS_WITHOUT_PREFIX;
 import static org.devgateway.importtool.services.processor.destination.AmpStaticProcessorConstants.*;
 
 // TODO: Sort methods, move classes to generic helpers for all processors if possible
@@ -1619,7 +1620,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	}
 
 	private void addProgramFields() {
-		if (existFieldInAmp(AMP_NATIONAL_PLAN_OBJECTIVE)) {
+		if (ampActivityFieldProvider.existsField(AMP_NATIONAL_PLAN_OBJECTIVE)) {
 			Field npo = new Field("National Plan Objective", AMP_NPO_PROGRAM, FieldType.LIST, true);
 			npo.setPossibleValues(getCodeListValues(AMP_NPO_PROGRAM));
 			npo.setChildName(AMP_PROGRAM);
@@ -1628,7 +1629,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			fieldList.add(npo);
 		}
 
-		if (existFieldInAmp(AMP_PRIMARY_PROGRAMS_PROGRAM)) {
+		if (ampActivityFieldProvider.existsField(AMP_PRIMARY_PROGRAMS_PROGRAM)) {
 			Field primaryProgram = new Field("Primary Programs", AMP_PRIMARY_PROGRAMS, FieldType.LIST, true);
 			primaryProgram.setPossibleValues(getCodeListValues(AMP_PRIMARY_PROGRAMS_PROGRAM));
 			primaryProgram.setMultiLangDisplayName(getFieldLabel(AMP_PRIMARY_PROGRAMS));
@@ -1637,7 +1638,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			fieldList.add(primaryProgram);
 		}
 
-		if (existFieldInAmp(AMP_SECONDARY_PROGRAMS_PROGRAM)) {
+		if (ampActivityFieldProvider.existsField(AMP_SECONDARY_PROGRAMS_PROGRAM)) {
 			Field secondaryProgram = new Field("Secondary Programs", AMP_SECONDARY_PROGRAMS, FieldType.LIST, true);
 			secondaryProgram.setPossibleValues(getCodeListValues(AMP_SECONDARY_PROGRAMS_PROGRAM));
 			secondaryProgram.setMultiLangDisplayName(getFieldLabel(AMP_SECONDARY_PROGRAMS));
@@ -1646,7 +1647,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			fieldList.add(secondaryProgram);
 		}
 
-		if (existFieldInAmp(AMP_TERTIARY_PROGRAMS_PROGRAM)) {
+		if (ampActivityFieldProvider.existsField(AMP_TERTIARY_PROGRAMS_PROGRAM)) {
 			Field tertiaryProgram = new Field("Tertiary Programs", AMP_TERTIARY_PROGRAMS, FieldType.LIST, true);
 			tertiaryProgram.setPossibleValues(getCodeListValues(AMP_TERTIARY_PROGRAMS_PROGRAM));
 			tertiaryProgram.setMultiLangDisplayName(getFieldLabel(AMP_TERTIARY_PROGRAMS));
