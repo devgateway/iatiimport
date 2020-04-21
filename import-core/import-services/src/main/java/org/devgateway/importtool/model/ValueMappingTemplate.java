@@ -15,7 +15,7 @@ public class ValueMappingTemplate implements Identifiable<Long>, Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "value_mapping_sequence")
-	@SequenceGenerator(name="value_mapping_sequence", sequenceName = "value_mapping_seq")
+	@SequenceGenerator(name="value_mapping_sequence", sequenceName = "value_mapping_seq", allocationSize = 1)
 	@Column(name = "id", unique = true, nullable = false)
 	private Long id;
 

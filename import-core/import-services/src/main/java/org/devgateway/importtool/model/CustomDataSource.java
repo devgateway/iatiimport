@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 public class CustomDataSource {
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "custom_datasource_sequence")
-	@SequenceGenerator(name="custom_datasource_sequence", sequenceName = "custom_datasource_seq")
+	@SequenceGenerator(name="custom_datasource_sequence", sequenceName = "custom_datasource_seq", allocationSize = 1)
 	@Column(name = "id", unique = true, nullable = false)
 	private Long id;	
 	@Column(name = "url", length = 512)
