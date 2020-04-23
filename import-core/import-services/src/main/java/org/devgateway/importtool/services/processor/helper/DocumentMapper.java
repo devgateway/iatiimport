@@ -19,6 +19,7 @@ import org.devgateway.importtool.endpoint.ApiMessage;
 import org.devgateway.importtool.endpoint.EPMessages;
 import org.devgateway.importtool.exceptions.CurrencyNotFoundException;
 import org.devgateway.importtool.exceptions.MissingPrerequisitesException;
+import org.devgateway.importtool.services.ProjectTranslator;
 import org.devgateway.importtool.services.request.ImportRequest;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 
@@ -38,6 +39,7 @@ public class DocumentMapper implements IDocumentMapper {
 	private ActionStatus documentMappingStatus;
 	private Log logger = LogFactory.getLog(getClass());
 	private static Integer SIMILARITY_EDIT_DISTANCE = 10;
+	private ProjectTranslator projectTranslator;
 
 	public ActionStatus getImportStatus() {
 		return importStatus;
@@ -161,6 +163,11 @@ public class DocumentMapper implements IDocumentMapper {
 
 	}
 
+	@Override
+	public void setProjectTranslator(ProjectTranslator projectTranslator) {
+		this.projectTranslator = projectTranslator;
+	}
+
 	public void initialize(){
 		try{
 			if (sourceProcessor == null || destinationProcessor == null) {
@@ -171,6 +178,19 @@ public class DocumentMapper implements IDocumentMapper {
 			this.updateStatus(EPMessages.PARSING_IN_PROGRESS, Status.IN_PROGRESS);
 			this.sourceProcessor.setActionStatus(this.documentMappingStatus);
 			List<InternalDocument> sourceDocuments = this.sourceProcessor.getDocuments();
+
+			if (projectTranslator != null && projectTranslator.isEnabled()) {
+				if (!sourceProcessor.isFromDataStore()) {
+					try {
+						this.updateStatus(EPMessages.TRANSLATING, Status.IN_PROGRESS);
+						projectTranslator.translate(sourceDocuments);
+					} catch (RuntimeException e) {
+						logger.error("Translation failed", e);
+					}
+				}
+
+				projectTranslator.loadTranslations(sourceDocuments);
+			}
 
 			//fetchFetchFromDataStore destination system projects
 			this.updateStatus(EPMessages.FETCHING_DESTINATION_PROJECTS, Status.IN_PROGRESS);
