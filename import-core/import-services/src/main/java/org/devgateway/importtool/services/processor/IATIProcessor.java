@@ -341,7 +341,6 @@ public abstract class IATIProcessor implements ISourceProcessor {
                 FieldType.DOCUMENT_LINK, true, getTooltipForField("document-link"),
                 getLabelsForField("document-link"));
         getFields().add(documentLink);
-        getFilterFieldList().add(documentLink);
 
         Field documentCategory = new Field("Document Category", "category",
                 FieldType.LIST, true, getTooltipForField("document-category"),
