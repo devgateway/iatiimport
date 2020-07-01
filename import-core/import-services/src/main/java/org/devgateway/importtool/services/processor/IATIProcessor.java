@@ -191,6 +191,7 @@ public abstract class IATIProcessor implements ISourceProcessor {
         Field activityScope = new Field("Activity Scope", "activity-scope", FieldType.LIST,
                 true, getTooltipForField("activity-scope"), getLabelsForField("activity-scope"));
         activityScope.setPossibleValues(getCodeListValues("activity-scope"));
+        activityScope.setFilterRequired(true);
         getFields().add(activityScope);
         getFilterFieldList().add(activityScope);
 
