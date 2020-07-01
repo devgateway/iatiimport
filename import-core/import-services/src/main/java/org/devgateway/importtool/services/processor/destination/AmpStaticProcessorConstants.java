@@ -54,6 +54,7 @@ public class AmpStaticProcessorConstants {
     public static final String AMP_ADJUSTMENT_TYPE = "adjustment_type";
     public static final String AMP_TRANSACTION_TYPE = "transaction_type";
     public static final String AMP_IMPLEMENTATION_LEVEL = "implementation_level";
+    public static final String AMP_IMPLEMENTATION_LOCATION = "implementation_location";
 
     public static final String AMP_PRIMARY_SECTORS = "primary_sectors";
     public static final String AMP_SECTOR = "sector";

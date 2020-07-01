@@ -1761,6 +1761,29 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		if (possibleValues == null) {
 			log.error("Couldn't retrieve activity code list values for " + codeListName);
 		}
+
+		if (codeListName.equals(LOCATIONS_LOCATION)) {
+			return transformImplementationLocationName(possibleValues);
+		}
+
+		return possibleValues;
+	}
+
+	private List<FieldValue> transformImplementationLocationName(List<FieldValue> possibleValues) {
+		List<FieldValue> implLocPossibleValues = ampActivityFieldValueProvider.
+				getPossibleValues(AMP_IMPLEMENTATION_LOCATION);
+
+		possibleValues.stream().forEach(pv -> {
+			final String implLocName = pv.getProperties().get("implementation_location_name").toString();
+			FieldValue implPV = implLocPossibleValues.stream()
+					.filter(impl -> impl.getValue().equals(implLocName))
+					.findFirst().get();
+			pv.getTranslatedValue().entrySet().stream()
+					.forEach(val -> val.setValue(
+							String.format("%s (%s)", val.getValue(), implPV.getTranslatedValue().get(val.getKey()))));
+			pv.setValue(String.format("%s (%s)", pv.getValue(), implPV.getTranslatedValue().get(DEFAULT_LANGUAGE_CODE)));
+		});
+
 		return possibleValues;
 	}
 
