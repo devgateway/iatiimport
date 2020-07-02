@@ -118,6 +118,7 @@ public class DocumentMapper implements IDocumentMapper {
 			} catch (Exception e) {
 				//we need to find a better way to process exceptions
 				results.add(getActionResultFromException(doc, e));
+				logger.error(e.getMessage(), e);
 			}
 		});
 		results.addAll(this.destinationProcessor.processProjectsInBatch(importStatus));
