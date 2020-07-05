@@ -340,6 +340,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		project.set(Constants.AMP_IATI_ID_FIELD, source.getIdentifier());
 
 		Boolean hasTransactions = false;
+		Boolean hasLocations = false;
 		for (FieldMapping mapping : fieldMappings) {
 			Field sourceField = mapping.getSourceField();
 			Field destinationField = mapping.getDestinationField();
@@ -355,7 +356,8 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				if (locations != null) {
 					project.set(destinationField.getFieldName(), locations);
 				}
-				getLocationFromExtraInfo(project, getExtraInfo(source, optValueMappingLocation.get()));
+				updateImplementationLocation(project, getExtraInfo(source, optValueMappingLocation.get()));
+				hasLocations = true;
 				break;
 			case RECIPIENT_COUNTRY:
 			case LIST:
@@ -416,7 +418,10 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				project.set("fundings", fundings);
 				project.set("donor_organization", getDonorOrgs(fundings));
 			}
+		}
 
+		if (hasLocations) {
+			updateEmptyImplementationLevel(project);
 		}
 	}
 
@@ -662,6 +667,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 		Boolean hasTransactions = false;
 		Boolean hasDocumentLinks = false;
+		Boolean hasLocations = false;
 
 		JsonBean project = new JsonBean();
 		project.set(Constants.AMP_IATI_ID_FIELD, source.getIdentifier());
@@ -702,7 +708,8 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				if (locations != null) {
 					project.set(destinationField.getFieldName(), locations);
 				}
-				getLocationFromExtraInfo(project, getExtraInfo(source, optValueMappingLocation.get()));
+				updateImplementationLocation(project, getExtraInfo(source, optValueMappingLocation.get()));
+				hasLocations = true;
 				break;
 			case RECIPIENT_COUNTRY:
 			case LIST:
@@ -757,15 +764,30 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			}
 		}
 
+		if (hasLocations) {
+			updateEmptyImplementationLevel(project);
+		}
+
 		log.debug(project.toString());
 
 		return project;
 	}
 
-	private void getLocationFromExtraInfo(JsonBean project, Map<Object, Object> props) {
+	/**
+	 * Set the implementation level if is missing based on implementation location info.
+	 *
+	 * @param project
+	 */
+	private void updateEmptyImplementationLevel(JsonBean project) {
+		if (StringUtils.isBlank(project.getString("implementation_level"))) {
+			Integer implLocationId = (Integer) project.get("implementation_location");
+			project.set("implementation_level", getImplementationLevelFromImplementationLocation(implLocationId));
+		}
+	}
+
+	private void updateImplementationLocation(JsonBean project, Map<Object, Object> props) {
 		if (props != null) {
 			project.set("implementation_location", props.get("implementation_level_id"));
-			project.set("implementation_level", ampImplementationLevel);
 		}
 	}
 
@@ -1785,6 +1807,33 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		});
 
 		return possibleValues;
+	}
+
+	/**
+	 * Get the implementation level id from implementation location extra info
+	 *
+	 * @param implementationLocationId
+	 * @return
+	 */
+	private Integer getImplementationLevelFromImplementationLocation(Integer implementationLocationId) {
+		List<FieldValue> implLocPossibleValues = ampActivityFieldValueProvider.
+				getPossibleValues(AMP_IMPLEMENTATION_LOCATION);
+
+		FieldValue implLocFieldValue = implLocPossibleValues.stream()
+				.filter(fv -> fv.getCode().equals(implementationLocationId.toString()))
+				.findFirst().orElseGet(null);
+
+		if (implLocFieldValue != null && implLocFieldValue.getProperties() != null) {
+			List<Integer> levels = (List<Integer>) implLocFieldValue.getProperties().get("implementation-levels");
+			if (!levels.isEmpty()) {
+				return levels.get(0);
+			}
+			log.warn("No implementation level found in implementation location extra info " + implLocFieldValue.getValue());
+		}
+
+		log.warn("No implementation location found with id " + implementationLocationId);
+
+		return null;
 	}
 
 	private List<FieldValue> getResourceCodeListValues(String codeListName) {
