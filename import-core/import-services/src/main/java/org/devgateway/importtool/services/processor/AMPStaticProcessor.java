@@ -333,14 +333,16 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 	private void updateProject(JsonBean project, InternalDocument source, List<FieldMapping> fieldMappings,
 			List<FieldValueMapping> valueMappings, boolean overrideTitle, ImportRequest importRequest)
-			throws ValueMappingException, CurrencyNotFoundException, UnsupportedFieldTypeException, ParseException {
+			throws ValueMappingException, CurrencyNotFoundException, UnsupportedFieldTypeException, ParseException, AmpResourceNotCreatedException {
 		if (overrideTitle) {
 			project.set("project_title", getMultilangString(source, "project_title", "title"));
 		}
 		project.set(Constants.AMP_IATI_ID_FIELD, source.getIdentifier());
 
 		Boolean hasTransactions = false;
+		Boolean hasDocumentLinks = false;
 		Boolean hasLocations = false;
+
 		for (FieldMapping mapping : fieldMappings) {
 			Field sourceField = mapping.getSourceField();
 			Field destinationField = mapping.getDestinationField();
@@ -388,7 +390,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 				project.set(destinationField.getFieldName(), getString(source, mapping));
 				break;
 			case DOCUMENT_LINK:
-				project.set(destinationField.getFieldName(), new ArrayList<>());
+				hasDocumentLinks = true;
 				break;
 			case TRANSACTION:
 				hasTransactions = true;
@@ -417,6 +419,14 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 			if (fundings != null) {
 				project.set("fundings", fundings);
 				project.set("donor_organization", getDonorOrgs(fundings));
+			}
+		}
+
+		// Process documentLinks
+		if (hasDocumentLinks) {
+			List<JsonBean> documentLinks = getActivityDocuments(source, fieldMappings, valueMappings);
+			if (!documentLinks.isEmpty()) {
+				project.set("activity_documents", documentLinks);
 			}
 		}
 
@@ -548,7 +558,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	@Override
 	public void update(InternalDocument source, InternalDocument destination, List<FieldMapping> fieldMapping,
 			List<FieldValueMapping> valueMapping, boolean overrideTitle, ImportRequest importRequest)
-			throws  ValueMappingException, CurrencyNotFoundException, ParseException, UnsupportedFieldTypeException {
+			throws ValueMappingException, CurrencyNotFoundException, ParseException, UnsupportedFieldTypeException, AmpResourceNotCreatedException {
 		JsonBean project = getProject(destination.getStringFields().get("internalId"));
 		updateProject(project, source, fieldMapping, valueMapping, overrideTitle, importRequest);
 		projectsReadyToBePosted.add(getMappedProjectFromSource(source, project));
@@ -781,7 +791,9 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 	private void updateEmptyImplementationLevel(JsonBean project) {
 		if (StringUtils.isBlank(project.getString("implementation_level"))) {
 			Integer implLocationId = (Integer) project.get("implementation_location");
-			project.set("implementation_level", getImplementationLevelFromImplementationLocation(implLocationId));
+			if (implLocationId != null) {
+				project.set("implementation_level", getImplementationLevelFromImplementationLocation(implLocationId));
+			}
 		}
 	}
 
