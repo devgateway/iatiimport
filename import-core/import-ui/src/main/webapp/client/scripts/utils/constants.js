@@ -43,7 +43,9 @@ module.exports = {
       DEFAULT_FLOW_TYPE:'default-flow-type',
       DEFAULT_TIED_STATUS:'default-tied-status',
       SECTOR: 'sector',
-      POLICY_MARKER: 'policy-marker'
+      TAG: 'tag',
+      POLICY_MARKER: 'policy-marker',
+      CATEGORY: 'category',
   },
   YES: 'Yes',
   NO: 'No',
