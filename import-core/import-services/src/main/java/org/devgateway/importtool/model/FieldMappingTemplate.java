@@ -15,7 +15,7 @@ public class FieldMappingTemplate implements Identifiable<Long>, Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mapping_template_sequence")
-	@SequenceGenerator(name="mapping_template_sequence", sequenceName = "mapping_template_seq")
+	@SequenceGenerator(name="mapping_template_sequence", sequenceName = "mapping_template_seq", allocationSize = 1)
 	@Column(name = "id", unique = true, nullable = false)
 	private Long id;
 

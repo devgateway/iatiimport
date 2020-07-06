@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 public class DataSource {	
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "datasource_sequence")
-	@SequenceGenerator(name="datasource_sequence", sequenceName = "datasource_seq")
+	@SequenceGenerator(name="datasource_sequence", sequenceName = "datasource_seq", allocationSize = 1)
 	@Column(name = "id", unique = true, nullable = false)
 	private Long id;
 	
