@@ -114,9 +114,9 @@ module.exports = {
  hasValidSession: function() {
 	return (appConfig.DESTINATION_USERNAME && appConfig.DESTINATION_USERNAME.length > 0) === true;
  } ,
-  getTitle: function (document) {
+  getTitle: function (document, lng) {
     let multilangFields = document.multilangFields;
-    let language = this.props.i18nLib.lng() || 'en';
+    let language = lng || 'en';
     let title = document.multilangFields.title[language];
 
     if (title == null || title.length == 0) {
@@ -128,17 +128,24 @@ module.exports = {
     }
     return title;
   },
-  shouldTranslateTitle: function(document){
-    if (this.props.i18nLib.lng() !== 'en' && document.multilangFields && document.multilangFields.title[this.props.i18nLib.lng()]) {
+  shouldTranslateTitle: function(document, lng){
+    if (lng !== 'en' && document.multilangFields && document.multilangFields.title[lng]) {
       return false;
     }
 
     return true;
   },
-  getTranslation: function(document, value) {
-    if (this.props.i18nLib.lng() !== 'en') {
-      for (trn of document.translations) {
-        if (trn.srcLang === 'en' && trn.dstLang === this.props.i18nLib.lng() && trn.srcText === value) {
+  shouldTranslate: function(document, field, lng){
+    if (lng !== 'en' && document.multilangFields && document.multilangFields[field][lng]) {
+      return false;
+    }
+
+    return true;
+  },
+  getTranslation: function(document, value, lng) {
+    if (lng !== 'en') {
+      for (let trn of document.translations) {
+        if (trn.srcLang === 'en' && trn.dstLang === lng && trn.srcText === value) {
           return trn.dstText;
         }
       }

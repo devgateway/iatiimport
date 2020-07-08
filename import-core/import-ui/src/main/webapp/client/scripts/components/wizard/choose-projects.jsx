@@ -14,7 +14,7 @@ var _ = require('lodash/dist/lodash.underscore');
 var constants = require('./../../utils/constants');
 var sourceFieldsStore = require('./../../stores/SourceFieldsStore');
 var Tooltip = require('./tooltip');
-var common = require('./../../../utils/common');
+var common = require('./../../utils/common');
 var OPERATION_INSERT = 'INSERT';
 var OPERATION_UPDATE = 'UPDATE';
 
@@ -247,10 +247,10 @@ var ChooseProjects = React.createClass({
         if (this.state.projectData) {
            $.map(this.state.projectData, function (item, i) {
                 if (item.operation == OPERATION_INSERT) {
-                    let sourceDocumentTitle = common.getTitle(item.sourceDocument);
+                    let sourceDocumentTitle = common.getTitle(item.sourceDocument, this.props.i18nLib.lng());
                     let sourceTranslatedDocumentTitle = null;
-                    if (common.shouldTranslateTitle(item.sourceDocument)) {
-                      sourceTranslatedDocumentTitle = this.getTranslation(item.sourceDocument, sourceDocumentTitle);
+                    if (common.shouldTranslateTitle(item.sourceDocument, this.props.i18nLib.lng())) {
+                      sourceTranslatedDocumentTitle = common.getTranslation(item.sourceDocument, sourceDocumentTitle, this.props.i18nLib.lng());
                     }
                     newProjects.push(<tr key={i} className={this.projectHasBeenUpdated(item.sourceDocument.identifier) ? "updated-project" : ""}>
                         <td>
@@ -263,8 +263,8 @@ var ChooseProjects = React.createClass({
                         {item.sourceDocument.identifier}
                         </td>
                         <td>
-                          {sourceTranslatedDocumentTitle && sourceTranslatedDocumentTitle.length > 0 && <Tooltip i18nLib={this.props.i18nLib} tooltip={sourceTranslatedDocumentTitle}/>}
                           {sourceDocumentTitle}
+                          {sourceTranslatedDocumentTitle && sourceTranslatedDocumentTitle.length > 0 && <Tooltip i18nLib={this.props.i18nLib} tooltip={sourceTranslatedDocumentTitle} classes="glyphicon-info-sign-translation"/>}
                         </td>
                             <td className="no-left-padding">
                             {item.destinationDocument &&
@@ -292,12 +292,11 @@ var ChooseProjects = React.createClass({
                     if (this.projectHasBeenUpdated(item.sourceDocument.identifier)) {
                         classes += " updated-project";
                     }
-                    let sourceDocumentTitle = common.getTitle(item.sourceDocument);
+                    let sourceDocumentTitle = common.getTitle(item.sourceDocument, this.props.i18nLib.lng());
                     let sourceTranslatedDocumentTitle = null;
-                    if (common.shouldTranslateTitle(item.sourceDocument)) {
-                      sourceTranslatedDocumentTitle = this.getTranslation(item.sourceDocument, sourceDocumentTitle);
+                    if (common.shouldTranslateTitle(item.sourceDocument, this.props.i18nLib.lng())) {
+                      sourceTranslatedDocumentTitle = common.getTranslation(item.sourceDocument, sourceDocumentTitle, this.props.i18nLib.lng());
                     }
-
                     existingProjects.push(<tr key={i} className = {classes} >
                         <td>
                           <input aria-label="Source" className="source" type="checkbox" checked={item.selected} onChange={this.handleToggle.bind(this, item)} />
@@ -309,8 +308,8 @@ var ChooseProjects = React.createClass({
                         {item.sourceDocument.identifier}
                         </td>
                         <td>{item.destinationDocument.allowEdit ? "" : " * " }
-                            {sourceTranslatedDocumentTitle && sourceTranslatedDocumentTitle.length > 0 && <Tooltip i18nLib={this.props.i18nLib} tooltip={sourceTranslatedDocumentTitle}/>}
                             {sourceDocumentTitle}
+                            {sourceTranslatedDocumentTitle && sourceTranslatedDocumentTitle.length > 0 && <Tooltip i18nLib={this.props.i18nLib} tooltip={sourceTranslatedDocumentTitle} classes="glyphicon-info-sign-translation" />}
                         </td>
                         <td>
                             {item.destinationDocument &&
