@@ -247,8 +247,8 @@ var ChooseProjects = React.createClass({
         if (this.state.projectData) {
            $.map(this.state.projectData, function (item, i) {
                 if (item.operation == OPERATION_INSERT) {
-                    let sourceDocumentTitle = common.getTitle(item.sourceDocument, this.props.i18nLib.lng());
-                    let sourceTranslatedDocumentTitle = null;
+                    var sourceDocumentTitle = common.getTitle(item.sourceDocument, this.props.i18nLib.lng());
+                    var sourceTranslatedDocumentTitle = null;
                     if (common.shouldTranslateTitle(item.sourceDocument, this.props.i18nLib.lng())) {
                       sourceTranslatedDocumentTitle = common.getTranslation(item.sourceDocument, sourceDocumentTitle, this.props.i18nLib.lng());
                     }
@@ -292,8 +292,8 @@ var ChooseProjects = React.createClass({
                     if (this.projectHasBeenUpdated(item.sourceDocument.identifier)) {
                         classes += " updated-project";
                     }
-                    let sourceDocumentTitle = common.getTitle(item.sourceDocument, this.props.i18nLib.lng());
-                    let sourceTranslatedDocumentTitle = null;
+                    var sourceDocumentTitle = common.getTitle(item.sourceDocument, this.props.i18nLib.lng());
+                    var sourceTranslatedDocumentTitle = null;
                     if (common.shouldTranslateTitle(item.sourceDocument, this.props.i18nLib.lng())) {
                       sourceTranslatedDocumentTitle = common.getTranslation(item.sourceDocument, sourceDocumentTitle, this.props.i18nLib.lng());
                     }

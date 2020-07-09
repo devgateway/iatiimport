@@ -22,8 +22,8 @@ var FieldView = React.createClass({
 
 var Identification = React.createClass({
     render: function () {
-        let sourceDocumentDescription = common.getMultilangString(this.props.project.multilangFields, constants.FIELD_NAMES.DESCRIPTION, this.props.i18nLib);
-        let sourceTranslatedDocumentDescription = null;
+        var sourceDocumentDescription = common.getMultilangString(this.props.project.multilangFields, constants.FIELD_NAMES.DESCRIPTION, this.props.i18nLib);
+        var sourceTranslatedDocumentDescription = null;
         if (common.shouldTranslate(this.props.project, constants.FIELD_NAMES.DESCRIPTION, this.props.i18nLib.lng())) {
           sourceTranslatedDocumentDescription = common.getTranslation(this.props.project, sourceDocumentDescription, this.props.i18nLib.lng());
         }

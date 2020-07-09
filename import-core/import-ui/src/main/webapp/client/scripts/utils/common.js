@@ -115,12 +115,12 @@ module.exports = {
 	return (appConfig.DESTINATION_USERNAME && appConfig.DESTINATION_USERNAME.length > 0) === true;
  } ,
   getTitle: function (document, lng) {
-    let multilangFields = document.multilangFields;
-    let language = lng || 'en';
-    let title = document.multilangFields.title[language];
+    var multilangFields = document.multilangFields;
+    var language = lng || 'en';
+    var title = document.multilangFields.title[language];
 
     if (title == null || title.length == 0) {
-      for (let key in multilangFields.title) {
+      for (var key in multilangFields.title) {
         if (multilangFields.title.hasOwnProperty(key)) {
           title = multilangFields.title[key];
         }
@@ -144,9 +144,10 @@ module.exports = {
   },
   getTranslation: function(document, value, lng) {
     if (lng !== 'en') {
-      for (let trn of document.translations) {
-        if (trn.srcLang === 'en' && trn.dstLang === lng && trn.srcText === value) {
-          return trn.dstText;
+      for (var trn in document.translations) {
+        var translation = document.translations[trn];
+        if (translation.srcLang === 'en' && translation.dstLang === lng && translation.srcText === value) {
+          return translation.dstText;
         }
       }
     }
