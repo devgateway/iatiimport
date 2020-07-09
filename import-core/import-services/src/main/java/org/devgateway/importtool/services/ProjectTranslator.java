@@ -1,16 +1,5 @@
 package org.devgateway.importtool.services;
 
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.toSet;
-
-import java.io.ByteArrayInputStream;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
-
 import org.apache.commons.lang3.StringUtils;
 import org.devgateway.importtool.dao.MachineTranslationRepository;
 import org.devgateway.importtool.model.MachineTranslation;
@@ -21,6 +10,17 @@ import org.devgateway.importtool.services.processor.helper.Processor;
 import org.devgateway.importtool.services.processor.helper.Translation;
 import org.parboiled.common.ImmutableList;
 import org.springframework.stereotype.Component;
+
+import java.io.ByteArrayInputStream;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toSet;
 
 /**
  * @author Octavian Ciubotaru
@@ -160,18 +160,21 @@ public class ProjectTranslator {
 
         Set<String> texts = extractTexts(docs, srcLang, dstLang);
 
-        Map<String, String> textsToNormalized = texts.stream()
-                .collect(toMap(Function.identity(), StringUtils::normalizeSpace));
+        if (texts.size() > 0) {
+            Map<String, String> textsToNormalized = texts.stream()
+                    .collect(toMap(Function.identity(), StringUtils::normalizeSpace));
 
-        Map<String, String> translations =
-                machineTranslationRepository.find(srcLang, dstLang, textsToNormalized.values()).stream()
-                        .collect(toMap(MachineTranslation::getSrcText, MachineTranslation::getDstText));
 
-        for (InternalDocument doc : docs) {
-            doc.setTranslations(extractTextsFromDoc(doc, srcLang, dstLang, true).stream()
-                    .map(t -> new Translation(srcLang, dstLang, t, translations.get(textsToNormalized.get(t))))
-                    .filter(t -> t.getDstText() != null)
-                    .collect(toList()));
+            Map<String, String> translations =
+                    machineTranslationRepository.find(srcLang, dstLang, textsToNormalized.values()).stream()
+                            .collect(toMap(MachineTranslation::getSrcText, MachineTranslation::getDstText));
+
+            for (InternalDocument doc : docs) {
+                doc.setTranslations(extractTextsFromDoc(doc, srcLang, dstLang, true).stream()
+                        .map(t -> new Translation(srcLang, dstLang, t, translations.get(textsToNormalized.get(t))))
+                        .filter(t -> t.getDstText() != null)
+                        .collect(toList()));
+            }
         }
     }
 }
