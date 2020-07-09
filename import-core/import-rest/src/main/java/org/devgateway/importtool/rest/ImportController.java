@@ -37,6 +37,7 @@ import org.devgateway.importtool.rest.dto.FetchOrganizationDetails;
 import org.devgateway.importtool.security.ImportSessionToken;
 import org.devgateway.importtool.services.ActivityFetchService;
 import org.devgateway.importtool.services.ImportService;
+import org.devgateway.importtool.services.ProjectTranslator;
 import org.devgateway.importtool.services.processor.IATIProcessor;
 import org.devgateway.importtool.services.processor.helper.DocumentMapper;
 import org.devgateway.importtool.services.processor.helper.IDestinationProcessor;
@@ -75,7 +76,10 @@ class ImportController  {
 
 	@Autowired
 	private ImportService importService;
-	
+
+	@Autowired
+	private ProjectTranslator projectTranslator;
+
 	@Autowired
 	private ActivityFetchService activityFetchService;
 	
@@ -204,11 +208,7 @@ class ImportController  {
 	 ResponseEntity<String> processedProjects(HttpServletRequest request) {
 		ISourceProcessor srcProcessor = (ISourceProcessor) request.getSession().getAttribute(SOURCE_PROCESSOR);
 		IDestinationProcessor destProcessor = (IDestinationProcessor) request.getSession().getAttribute(DESTINATION_PROCESSOR);
-		IDocumentMapper documentMapper = (IDocumentMapper) request.getSession().getAttribute(DOCUMENT_MAPPER);
-		if (documentMapper == null) {
-			documentMapper = new DocumentMapper();
-			request.getSession().setAttribute(DOCUMENT_MAPPER, documentMapper);
-		}		
+		IDocumentMapper documentMapper = getSessionDocumentMapper(request);
 		documentMapper.setSourceProcessor(srcProcessor);
 		documentMapper.setDestinationProcessor(destProcessor);
 		importService.initialize(documentMapper);		
@@ -217,7 +217,7 @@ class ImportController  {
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/projects")
 	ResponseEntity<DocumentMappingResponse> getProjects(HttpServletRequest request) {		
-		IDocumentMapper documentMapper = (IDocumentMapper) request.getSession().getAttribute(DOCUMENT_MAPPER);	
+		IDocumentMapper documentMapper = (IDocumentMapper) request.getSession().getAttribute(DOCUMENT_MAPPER);
 		DocumentMappingResponse documentMappingResponse = new DocumentMappingResponse();
 		documentMappingResponse.setDocumentMappingStatus(documentMapper.getDocumentMappingStatus());
 		documentMappingResponse.setDocumentMappings(documentMapper.getDocumentMappings());
@@ -227,16 +227,21 @@ class ImportController  {
 	@RequestMapping(method = RequestMethod.POST, value = "/execute")
 	void execute(@RequestBody ImportRequest importRequest, HttpServletRequest request) {
 		log.info(importRequest.getImportOption());
-		IDocumentMapper documentMapper = (IDocumentMapper) request.getSession().getAttribute(DOCUMENT_MAPPER);
-		if (documentMapper == null) {
-			documentMapper = new DocumentMapper();
-			request.getSession().setAttribute(DOCUMENT_MAPPER, documentMapper);
-		}		
+		IDocumentMapper documentMapper = getSessionDocumentMapper(request);
 		Long fileId = (Long)request.getSession().getAttribute(CURRENT_FILE_ID);
 		importService.execute(documentMapper, fileId, importRequest);		
 	}
 
-	
+	private IDocumentMapper getSessionDocumentMapper(HttpServletRequest request) {
+		IDocumentMapper documentMapper = (IDocumentMapper) request.getSession().getAttribute(DOCUMENT_MAPPER);
+		if (documentMapper == null) {
+			documentMapper = new DocumentMapper();
+			documentMapper.setProjectTranslator(projectTranslator);
+			request.getSession().setAttribute(DOCUMENT_MAPPER, documentMapper);
+		}
+		return documentMapper;
+	}
+
 	@RequestMapping(method = RequestMethod.GET, value = "/execute/status")
 	ResponseEntity<ImportExecuteResponse> getExecuteStatus(HttpServletRequest request) {
 		IDocumentMapper documentMapper = (IDocumentMapper) request.getSession().getAttribute(DOCUMENT_MAPPER);

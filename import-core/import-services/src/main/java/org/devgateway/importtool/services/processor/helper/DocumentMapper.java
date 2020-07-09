@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -13,12 +14,16 @@ import java.util.Set;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import javax.transaction.Transactional;
+
+import org.apache.commons.lang3.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.endpoint.ApiMessage;
 import org.devgateway.importtool.endpoint.EPMessages;
 import org.devgateway.importtool.exceptions.CurrencyNotFoundException;
 import org.devgateway.importtool.exceptions.MissingPrerequisitesException;
+import org.devgateway.importtool.services.ProjectTranslator;
 import org.devgateway.importtool.services.request.ImportRequest;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 
@@ -38,6 +43,7 @@ public class DocumentMapper implements IDocumentMapper {
 	private ActionStatus documentMappingStatus;
 	private Log logger = LogFactory.getLog(getClass());
 	private static Integer SIMILARITY_EDIT_DISTANCE = 10;
+	private ProjectTranslator projectTranslator;
 
 	public ActionStatus getImportStatus() {
 		return importStatus;
@@ -161,6 +167,11 @@ public class DocumentMapper implements IDocumentMapper {
 
 	}
 
+	@Override
+	public void setProjectTranslator(ProjectTranslator projectTranslator) {
+		this.projectTranslator = projectTranslator;
+	}
+
 	public void initialize(){
 		try{
 			if (sourceProcessor == null || destinationProcessor == null) {
@@ -171,6 +182,19 @@ public class DocumentMapper implements IDocumentMapper {
 			this.updateStatus(EPMessages.PARSING_IN_PROGRESS, Status.IN_PROGRESS);
 			this.sourceProcessor.setActionStatus(this.documentMappingStatus);
 			List<InternalDocument> sourceDocuments = this.sourceProcessor.getDocuments();
+
+			if (projectTranslator != null && projectTranslator.isEnabled()) {
+				if (!sourceProcessor.isFromDataStore()) {
+					try {
+						this.updateStatus(EPMessages.TRANSLATING, Status.IN_PROGRESS);
+						projectTranslator.translate(sourceDocuments);
+					} catch (RuntimeException e) {
+						logger.error("Translation failed", e);
+					}
+				}
+
+				projectTranslator.loadTranslations(sourceDocuments);
+			}
 
 			//fetchFetchFromDataStore destination system projects
 			this.updateStatus(EPMessages.FETCHING_DESTINATION_PROJECTS, Status.IN_PROGRESS);
@@ -190,6 +214,7 @@ public class DocumentMapper implements IDocumentMapper {
 	}
 	
 	private void mapProjects(List<InternalDocument> sourceDocuments, List<InternalDocument> destinationDocuments) {
+		StopWatch stopWatch = StopWatch.createStarted();
 		this.updateStatus(EPMessages.MAPPING_STATUS_MESSAGE, Status.IN_PROGRESS);
 		for (InternalDocument srcDoc : sourceDocuments) {
 			this.documentMappingStatus.incrementProcessed();
@@ -211,13 +236,15 @@ public class DocumentMapper implements IDocumentMapper {
 
 		}
 		this.documentMappingStatus.setStatus(Status.COMPLETED);
+		stopWatch.stop();
+		logger.info("mapped in: " + stopWatch);
 	}
     
     private List<InternalDocument> findProjectsWithSimilarTitle(InternalDocument srcDoc, List<InternalDocument> destinationDocuments) {
-		Map<String, String> srcTitles = srcDoc.getMultilangFields().get("title");
+		Map<String, String> srcTitles = getMultilangValueWithMachineTranslations(srcDoc, "title");
 		List<InternalDocument> similarProjects = new ArrayList<>();
 		for (InternalDocument destDoc : destinationDocuments) {
-			Map<String, String> destTitles = destDoc.getMultilangFields().get("title");
+			Map<String, String> destTitles = getMultilangValueWithMachineTranslations(destDoc, "title");
 			Iterator<Entry<String, String>> it = srcTitles.entrySet().iterator();
 			boolean foundSimilar = false;
 			while (it.hasNext() && foundSimilar == false) {
@@ -236,6 +263,23 @@ public class DocumentMapper implements IDocumentMapper {
 
 		return similarProjects;
     }
+
+	/**
+	 * Returns multilang value for specific field. If there are any machine translations, these translations will be
+	 * included in the value.
+	 */
+    private Map<String, String> getMultilangValueWithMachineTranslations(InternalDocument doc, String fieldName) {
+		LinkedHashMap<String, String> map = new LinkedHashMap<>(doc.getMultilangFields().get(fieldName));
+		for (Translation translation : doc.getTranslations()) {
+			String value = map.get(translation.getSrcLang());
+			if (value != null
+					&& !map.containsKey(translation.getDstLang())
+					&& value.equals(translation.getSrcText())) {
+				map.put(translation.getDstLang(), translation.getDstText());
+			}
+		}
+		return map;
+	}
     
     private void updateStatus(ApiMessage message, Status status){
     	if(this.documentMappingStatus == null){

@@ -84,6 +84,11 @@ public abstract class IATIProcessor implements ISourceProcessor {
     }
 
     @Override
+    public boolean isFromDataStore() {
+        return fromDatastore;
+    }
+
+    @Override
     public void setInput(Document input) {
         this.doc = input;
     }
