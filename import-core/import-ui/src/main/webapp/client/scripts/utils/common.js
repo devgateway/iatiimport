@@ -12,17 +12,17 @@ module.exports = {
 	  var language = i18nLib.lng();
 	  var fieldData = multilangFields[field];
 	  var result = fieldData[language] ? fieldData[language] : null;
-	  
+
 	  if (result === null){
 		  for (var i = 0; i < Constants.LANGUAGE_PREFERENCE.length; i++) {
 				 var langKey = Constants.LANGUAGE_PREFERENCE[i];
 				 result = fieldData[langKey];
 				 if (result) {
 					 return result;
-				 }				  
+				 }
 			 }
-	  }	  
- 
+	  }
+
 	 return result;
   },
   getDisplayValue: function(item, language) {
@@ -34,46 +34,46 @@ module.exports = {
   },
   getFieldDisplayName: function(fieldData, fieldName) {
 	  var displayName = '';
-	  var field = _.find(fieldData, function(sourceField) { 
+	  var field = _.find(fieldData, function(sourceField) {
 		  return sourceField.uniqueFieldName === fieldName;
 	  });
-	  
+
 	  if (field) {
-		  displayName = field.displayName; 
+		  displayName = field.displayName;
 	  }
-	  
+
 	  return displayName;
  },
  getValueName: function(fieldData, fieldName, code) {
 	  var name = '';
-	  var field = _.find(fieldData, function(sourceField) { 
+	  var field = _.find(fieldData, function(sourceField) {
 		  return sourceField.uniqueFieldName === fieldName;
 	  });
-	  
+
 	  if (field && field.possibleValues && field.possibleValues.length > 0) {
-		  var foundItem = _.find(field.possibleValues, function(value) { 
+		  var foundItem = _.find(field.possibleValues, function(value) {
 			  return value.code === code;
 		  });
 		  if (foundItem) {
 			  name = foundItem.value;
-		  }		 		  
+		  }
 	  }
-	  
-	  return name; 
+
+	  return name;
  },
  formatNumber: function(num){
-	    if (num) {	    	
+	    if (num) {
 	    	var n = parseFloat(num).toFixed(2).toString(), p = n.indexOf('.');
 	 	    return n.replace(/\d(?=(?:\d{3})+(?:\.|$))/g, function($0, i){
 	 	        return p<0 || i<p ? ($0+',') : $0;
-	 	    });	 	
+	 	    });
 	 	}
  },
  formatDate: function(date) {
 	 if (date) {
 		 return moment(date).format('YYYY-MM-DD');
 	 }
-	 
+
  },
  isAdmin: function() {
 	 return Cookies.get('IS_ADMIN') === 'true' || Cookies.get('IS_ADMIN') === true;
@@ -84,7 +84,7 @@ module.exports = {
       // Added true always for now, the API returns wrong value
       Cookies.set('CAN_ADD_ACTIVITY', true || data['add-activity']);
       Cookies.set('IS_ADMIN', data['is-admin']);
-      Cookies.set('WORKSPACE', data.team);      
+      Cookies.set('WORKSPACE', data.team);
  },
  resetAuthCookies: function() {
       appConfig.DESTINATION_USERNAME = null;
@@ -113,5 +113,43 @@ module.exports = {
 
  hasValidSession: function() {
 	return (appConfig.DESTINATION_USERNAME && appConfig.DESTINATION_USERNAME.length > 0) === true;
- } 
+ } ,
+  getTitle: function (document, lng) {
+    let multilangFields = document.multilangFields;
+    let language = lng || 'en';
+    let title = document.multilangFields.title[language];
+
+    if (title == null || title.length == 0) {
+      for (let key in multilangFields.title) {
+        if (multilangFields.title.hasOwnProperty(key)) {
+          title = multilangFields.title[key];
+        }
+      }
+    }
+    return title;
+  },
+  shouldTranslateTitle: function(document, lng){
+    if (lng !== 'en' && document.multilangFields && document.multilangFields.title[lng]) {
+      return false;
+    }
+
+    return true;
+  },
+  shouldTranslate: function(document, field, lng){
+    if (lng !== 'en' && document.multilangFields && document.multilangFields[field][lng]) {
+      return false;
+    }
+
+    return true;
+  },
+  getTranslation: function(document, value, lng) {
+    if (lng !== 'en') {
+      for (let trn of document.translations) {
+        if (trn.srcLang === 'en' && trn.dstLang === lng && trn.srcText === value) {
+          return trn.dstText;
+        }
+      }
+    }
+    return null;
+  }
 };

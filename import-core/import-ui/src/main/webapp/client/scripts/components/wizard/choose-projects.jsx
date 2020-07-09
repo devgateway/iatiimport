@@ -14,6 +14,7 @@ var _ = require('lodash/dist/lodash.underscore');
 var constants = require('./../../utils/constants');
 var sourceFieldsStore = require('./../../stores/SourceFieldsStore');
 var Tooltip = require('./tooltip');
+var common = require('./../../utils/common');
 var OPERATION_INSERT = 'INSERT';
 var OPERATION_UPDATE = 'UPDATE';
 
@@ -33,9 +34,6 @@ var ChooseProjects = React.createClass({
     },
     initializeFailed:false,
     componentWillMount: function () {
-     this.getTitle = this.getTitle.bind(this);
-     this.shouldTranslateTitle = this.shouldTranslateTitle.bind(this);
-     this.getTranslation = this.getTranslation.bind(this);
      this.showSimilarProjectsDialog = this.showSimilarProjectsDialog.bind(this);
      this.mapProject = this.mapProject.bind(this);
      this.resetMapping = this.resetMapping.bind(this);
@@ -211,37 +209,6 @@ var ChooseProjects = React.createClass({
 	        type: 'GET'
 	     });
 	},
-  getTitle: function (document) {
-    let multilangFields = document.multilangFields;
-    let language = this.props.i18nLib.lng() || 'en';
-    let title = document.multilangFields.title[language];
-
-    if (title == null || title.length == 0) {
-      for (let key in multilangFields.title) {
-        if (multilangFields.title.hasOwnProperty(key)) {
-          title = multilangFields.title[key];
-        }
-      }
-    }
-    return title;
-  },
-  shouldTranslateTitle: function(document){
-    if (this.props.i18nLib.lng() !== 'en' && document.multilangFields && document.multilangFields.title[this.props.i18nLib.lng()]) {
-      return false;
-    }
-
-    return true;
-  },
-  getTranslation: function(document, value) {
-    if (this.props.i18nLib.lng() !== 'en') {
-      for (trn of document.translations) {
-        if (trn.srcLang === 'en' && trn.dstLang === this.props.i18nLib.lng() && trn.srcText === value) {
-          return trn.dstText;
-        }
-      }
-    }
-    return null;
-  },
 	showSimilarProjectsDialog: function(event) {
 	   var projectMapping = _.find(this.state.projectData, function(item) { return item.id === event.target.dataset.id;});
 	   this.setState({showSimilarProjects: !this.state.showSimilarProjects, projectMapping: projectMapping});
@@ -280,10 +247,10 @@ var ChooseProjects = React.createClass({
         if (this.state.projectData) {
            $.map(this.state.projectData, function (item, i) {
                 if (item.operation == OPERATION_INSERT) {
-                    let sourceDocumentTitle = this.getTitle(item.sourceDocument);
+                    let sourceDocumentTitle = common.getTitle(item.sourceDocument, this.props.i18nLib.lng());
                     let sourceTranslatedDocumentTitle = null;
-                    if (this.shouldTranslateTitle(item.sourceDocument)) {
-                      sourceTranslatedDocumentTitle = this.getTranslation(item.sourceDocument, sourceDocumentTitle);
+                    if (common.shouldTranslateTitle(item.sourceDocument, this.props.i18nLib.lng())) {
+                      sourceTranslatedDocumentTitle = common.getTranslation(item.sourceDocument, sourceDocumentTitle, this.props.i18nLib.lng());
                     }
                     newProjects.push(<tr key={i} className={this.projectHasBeenUpdated(item.sourceDocument.identifier) ? "updated-project" : ""}>
                         <td>
@@ -296,8 +263,8 @@ var ChooseProjects = React.createClass({
                         {item.sourceDocument.identifier}
                         </td>
                         <td>
-                          {sourceTranslatedDocumentTitle && sourceTranslatedDocumentTitle.length > 0 && <Tooltip i18nLib={this.props.i18nLib} tooltip={sourceTranslatedDocumentTitle}/>}
                           {sourceDocumentTitle}
+                          {sourceTranslatedDocumentTitle && sourceTranslatedDocumentTitle.length > 0 && <Tooltip i18nLib={this.props.i18nLib} tooltip={sourceTranslatedDocumentTitle} classes="glyphicon-info-sign-translation"/>}
                         </td>
                             <td className="no-left-padding">
                             {item.destinationDocument &&
@@ -306,7 +273,7 @@ var ChooseProjects = React.createClass({
                             </td>
                         <td className="no-right-padding">
                             {(this.state.destinationProjects && this.state.destinationProjects.length > 0) &&
-                                <AutoComplete context={constants.CHOOSE_PROJECTS} options={this.state.destinationProjects} display="title" language={language} placeholder="" refId="destSearch" onSelect={this.handleAutocompleteToggle.bind(this, item)} value={item.destinationDocument ? this.getTitle(item.destinationDocument.multilangFields) : ''}/>
+                                <AutoComplete context={constants.CHOOSE_PROJECTS} options={this.state.destinationProjects} display="title" language={language} placeholder="" refId="destSearch" onSelect={this.handleAutocompleteToggle.bind(this, item)} value={item.destinationDocument ? common.getTitle(item.destinationDocument.multilangFields) : ''}/>
                             }
                        </td>
 
@@ -325,12 +292,11 @@ var ChooseProjects = React.createClass({
                     if (this.projectHasBeenUpdated(item.sourceDocument.identifier)) {
                         classes += " updated-project";
                     }
-                    let sourceDocumentTitle = this.getTitle(item.sourceDocument);
+                    let sourceDocumentTitle = common.getTitle(item.sourceDocument, this.props.i18nLib.lng());
                     let sourceTranslatedDocumentTitle = null;
-                    if (this.shouldTranslateTitle(item.sourceDocument)) {
-                      sourceTranslatedDocumentTitle = this.getTranslation(item.sourceDocument, sourceDocumentTitle);
+                    if (common.shouldTranslateTitle(item.sourceDocument, this.props.i18nLib.lng())) {
+                      sourceTranslatedDocumentTitle = common.getTranslation(item.sourceDocument, sourceDocumentTitle, this.props.i18nLib.lng());
                     }
-
                     existingProjects.push(<tr key={i} className = {classes} >
                         <td>
                           <input aria-label="Source" className="source" type="checkbox" checked={item.selected} onChange={this.handleToggle.bind(this, item)} />
@@ -342,8 +308,8 @@ var ChooseProjects = React.createClass({
                         {item.sourceDocument.identifier}
                         </td>
                         <td>{item.destinationDocument.allowEdit ? "" : " * " }
-                            {sourceTranslatedDocumentTitle && sourceTranslatedDocumentTitle.length > 0 && <Tooltip i18nLib={this.props.i18nLib} tooltip={sourceTranslatedDocumentTitle}/>}
                             {sourceDocumentTitle}
+                            {sourceTranslatedDocumentTitle && sourceTranslatedDocumentTitle.length > 0 && <Tooltip i18nLib={this.props.i18nLib} tooltip={sourceTranslatedDocumentTitle} classes="glyphicon-info-sign-translation" />}
                         </td>
                         <td>
                             {item.destinationDocument &&
@@ -351,7 +317,7 @@ var ChooseProjects = React.createClass({
                              }
                         </td>
                         <td>
-                            {this.getTitle(item.destinationDocument)}
+                            {common.getTitle(item.destinationDocument)}
                         </td>
                         <td>
                           <input aria-label="override-title" className="override-title"  type="checkbox" checked={item.overrideTitle} onChange={this.handleOverrideTitle.bind(this, item)} />
@@ -370,7 +336,7 @@ var ChooseProjects = React.createClass({
                     <div className="panel panel-success">
                       <div className="panel-heading">{this.props.i18nLib.t('wizard.choose_projects.new_projects')} <i>({newProjects.length } {this.props.i18nLib.t('wizard.choose_projects.choose_projects')})</i></div>
                         <div className="panel-body">
-                         <SimilarProjectsDialog projectMapping={this.state.projectMapping} getTitle={this.getTitle} mapProject={this.mapProject} {...this.props} />
+                         <SimilarProjectsDialog projectMapping={this.state.projectMapping} getTitle={common.getTitle} mapProject={this.mapProject} {...this.props} />
                          {this.state.showSourceProjectPreview && this.state.projectMapping && this.state.sourceFieldsData.length > 0  &&
                             <ProjectPreview closeProjectPreview={this.closeProjectPreview.bind(this)} project={this.state.projectMapping.sourceDocument} i18nLib = {this.props.i18nLib} sourceFieldsData = {this.state.sourceFieldsData} />
                          }
