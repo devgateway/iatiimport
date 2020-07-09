@@ -42,7 +42,7 @@ var Identification = React.createClass({
                 </div>
 
                 <FieldView {...this.props} fieldName={constants.FIELD_NAMES.DEFAULT_AID_TYPE}/>
-                <FieldView {...this.props} fieldName={constants.FIELD_NAMES.ACTIVITY_SCOPE}/>import_tool
+                <FieldView {...this.props} fieldName={constants.FIELD_NAMES.ACTIVITY_SCOPE}/>
                 <FieldView {...this.props} fieldName={constants.FIELD_NAMES.DEFAULT_FINANCE_TYPE}/>
                 <FieldView {...this.props} fieldName={constants.FIELD_NAMES.DEFAULT_FLOW_TYPE}/>
                 <FieldView {...this.props} fieldName={constants.FIELD_NAMES.DEFAULT_TIED_STATUS}/>
