@@ -14,7 +14,8 @@ var Header = React.createClass({
         return (<div className="preview_header">
                 <span className="preview_title">
                       {documentTitle}
-                      {translatedDocumentTitle && translatedDocumentTitle.length > 0 && <Tooltip i18nLib={this.props.i18nLib} tooltip={translatedDocumentTitle} classes="glyphicon-info-sign-translation"/>}
+                      {translatedDocumentTitle && translatedDocumentTitle.length > 0
+                      && <div><Tooltip i18nLib={this.props.i18nLib} tooltip={translatedDocumentTitle} dataPlacement="right" classes="glyphicon-info-sign-translation"/></div>}
                 </span>
                     <div className="preview_status_container">
                        <div className="inline">

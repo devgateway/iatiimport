@@ -536,8 +536,16 @@ div.tooltip{
   word-wrap: break-word;
 }
 
-.field_description .tooltip-inner {
-  width: 600px;
-  max-width: 100%;
-  min-width: fit-content;
+.projectPreview .tooltip-inner {
+  max-width: 90%;
+  min-width: 50px;
+}
+
+.projectPreview .tooltip.in {
+  width: unset !important;
+}
+
+.projectPreview .glyphicon-info-sign-translation {
+  margin-left: 0px;
+  padding-right: 10px;
 }
