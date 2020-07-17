@@ -4,9 +4,11 @@ import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletContext;
 import javax.servlet.SessionCookieConfig;
 
+import org.devgateway.importtool.services.ProjectTranslationSettings;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,6 +21,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication(scanBasePackages ={ "org.devgateway.importtool.main",
 		"org.devgateway.importtool.services", "org.devgateway.importtool.rest," +
 		"org.devgateway.importtool.scheduler","org.devgateway.importtool.rest.error" } )
+@EnableConfigurationProperties(ProjectTranslationSettings.class)
 public class Application extends WebMvcAutoConfiguration {
 	public static void main(String[] args) {
         System.setProperty("server.tomcat.max-threads","200");
