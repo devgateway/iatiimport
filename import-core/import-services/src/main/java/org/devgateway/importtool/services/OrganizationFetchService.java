@@ -34,16 +34,15 @@ public class OrganizationFetchService {
             Integer offSet = 0;
             reportingOrgRepository.deleteAll();
             IatiOrganizationsOutput response;
-            //Integer PAGE_SIZE = 200;
-            //do {
+            Integer PAGE_SIZE = 50;
+            do {
                 //Uncomment the following line to fetchFetchFromDataStore the organizations 200 at a time
                 //at the moment of testing it was faster to fetchFetchFromDataStore them all together
-                String finalUrl = DataFetchServiceConstants.IATI_ORGANIZATIONS_DEFAULT_URL;  // + "&limit=" +
-                // PAGE_SIZE + "&offset=" + offSet;
+                String finalUrl = DataFetchServiceConstants.IATI_ORGANIZATIONS_DEFAULT_URL + "&limit=" + PAGE_SIZE + "&offset=" + offSet;
                 response = restTemplate.getForObject(finalUrl, IatiOrganizationsOutput.class);
-                //offSet += PAGE_SIZE;
+                offSet += PAGE_SIZE;
                 response.getResult().stream().forEach(r ->  reportingOrgRepository.save(getOrgFromJson(r)));
-            //} while (response.getResult().size() == PAGE_SIZE);
+            } while (response.getResult().size() == PAGE_SIZE);
         } catch (RestClientException ex) {
             log.error("Cannot get organizations from datastore", ex);
             throw new RuntimeException(ex);
