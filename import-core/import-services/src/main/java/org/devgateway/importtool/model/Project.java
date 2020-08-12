@@ -29,7 +29,7 @@ public class Project implements Identifiable<Long>, Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "project_sequence")
-	@SequenceGenerator(name="project_sequence", sequenceName = "project_seq")
+	@SequenceGenerator(name="project_sequence", sequenceName = "project_seq", allocationSize = 1)
 	@Column(name = "id", unique = true, nullable = false)
 	private Long id;
 

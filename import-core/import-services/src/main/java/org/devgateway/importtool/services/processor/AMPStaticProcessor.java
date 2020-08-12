@@ -163,11 +163,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 		this.interceptors.add(new UserAgentInterceptor(this.getAppName(), this.getAppversion()));
 		this.restTemplate = getRestTemplate();
 
-		baseURL = System.getProperty(BASEURL_PROPERTY);
-
-		if (StringUtils.isEmpty(baseURL)) {
-			this.baseURL = BASEURL_DEFAULT_VALUE;
-		}
+		baseURL = BASEURL;
 
 		ampActivityFieldProvider = new AmpActivityFieldProvider(baseURL, restTemplate);
 		ampResourceFieldProvider = new AmpResourceFieldProvider(baseURL, restTemplate);

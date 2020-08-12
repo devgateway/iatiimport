@@ -1,5 +1,24 @@
 package org.devgateway.importtool.services;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.endpoint.DataFetchServiceConstants;
@@ -16,28 +35,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSSerializer;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 @org.springframework.stereotype.Service
 public class ActivityFetchService {
@@ -46,6 +43,9 @@ public class ActivityFetchService {
 	private DataSourceService dataSourceService;
     @Value("${IATIProcessor.default_country}")
     private String defaultCountry;
+
+    @Autowired
+    private ProjectTranslator projectTranslator;
 
 	private Log log = LogFactory.getLog(getClass());
 	private Integer FILE_EXPIRATION_TIME = 24;
@@ -77,9 +77,9 @@ public class ActivityFetchService {
 
 			if (shouldUseFile) {
 				InputStream fileInputStream = new FileInputStream(f);
-				doc = this.createXMLDocument(fileInputStream);
+				doc = XMLUtils.createXMLDocument(fileInputStream);
 			} else {
-				doc = this.createXMLDocument(fetch(reportingOrg, parameters));
+				doc = XMLUtils.createXMLDocument(fetch(reportingOrg, parameters));
 			}
 			FetchResult o = this.buildResult(doc);
 			result.setActivities(o.getActivities());
@@ -88,7 +88,7 @@ public class ActivityFetchService {
 		} catch (RuntimeException ex) {
 			//we should probably not save it until is valid. leaving it here
 			//for simplicity
-			Files.delete(Paths.get(fileName));
+			Files.deleteIfExists(Paths.get(fileName));
 			result.setStatus(Status.FAILED_WITH_ERROR);
 			throw ex;
 		}
@@ -107,7 +107,7 @@ public class ActivityFetchService {
 	}
 
 	public Document fetchFetchFromDataStore(String reportingOrg, List<Param> parameters ) {
-		return this.createXMLDocument(fetchFetchFromDataStoreAsString(reportingOrg, parameters));
+		return XMLUtils.createXMLDocument(fetchFetchFromDataStoreAsString(reportingOrg, parameters));
 	}
 
 	public String fetchFetchFromDataStoreAsString(String reportingOrg, List<Param> parameters ) {
@@ -151,11 +151,20 @@ public class ActivityFetchService {
 	 * @param reportingOrg
 	 * @return
 	 */
-	public String fetch(String reportingOrg, List<Param> params) {
+	private String fetch(String reportingOrg, List<Param> params) {
 		String fileName = ReportingOrganizationHelper.getFileName(reportingOrg);
 		String responseText = fetchFetchFromDataStoreAsString(reportingOrg, params);
+
+		if (projectTranslator.isEnabled()) {
+			try {
+				projectTranslator.translate(responseText);
+			} catch (Exception e) {
+				log.error("Failed to translate.", e);
+			}
+		}
+
 		try {
-			Files.write(Paths.get(fileName), responseText.getBytes("UTF-8"));
+			Files.write(Paths.get(fileName), responseText.getBytes(StandardCharsets.UTF_8));
 		} catch (IOException e) {
 		    //if the file could not be sent, we return all the same the string so it can be processed online
 			log.error("cannot save file ", e);
@@ -163,32 +172,7 @@ public class ActivityFetchService {
 		return responseText;
 	}
 
-	private Document createXMLDocument(String responseText) {
-		InputStream inputStream = new ByteArrayInputStream(responseText.getBytes());
-		return createXMLDocument(inputStream);
 
-	}
-
-	private Document createXMLDocument(InputStream inputStream ) {
-		Document doc = null;
-		if (inputStream != null) {
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-			factory.setValidating(false);
-			factory.setIgnoringElementContentWhitespace(true);
-			try {
-				DocumentBuilder builder = factory.newDocumentBuilder();
-
-				doc = builder.parse(inputStream);
-			} catch (ParserConfigurationException | SAXException | IOException e) {
-				//TODO properly handle errors
-				log.error("Error parsing fetched data : " , e);
-				throw new RuntimeException("Error parsing data");
-			}	
-		}	
-		
-		return doc;
-	}
-	
 	private FetchResult buildResult(Document doc) {
 		FetchResult result = new FetchResult();
 		if (doc != null) {

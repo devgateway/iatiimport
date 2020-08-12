@@ -47,6 +47,8 @@ public interface ISourceProcessor {
 
 	void setFromDataStore(boolean fromDatastore);
 
+	boolean isFromDataStore();
+
 	 List<String> buildTooltipsFields() throws IOException, SAXException,
 			 ParserConfigurationException,XPathExpressionException;
 }

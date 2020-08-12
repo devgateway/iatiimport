@@ -510,6 +510,12 @@ tbody.scrollablebody td, thead.scrollablebody th {
 	margin-right:10px;
 }
 
+.glyphicon-info-sign-translation {
+  color: #337ab7;
+  font-size: 15px;
+  margin-left:10px;
+}
+
 .glyphicon-eye-open-custom {
 	font-size: 16px;
 	margin:5px;
@@ -541,4 +547,18 @@ tbody.scrollablebody td, thead.scrollablebody th {
 }
 div.tooltip{
   word-wrap: break-word;
+}
+
+.projectPreview .tooltip-inner {
+  max-width: 90%;
+  min-width: 50px;
+}
+
+.projectPreview .tooltip.in {
+  width: unset !important;
+}
+
+.projectPreview .glyphicon-info-sign-translation {
+  margin-left: 0px;
+  padding-right: 10px;
 }
