@@ -203,6 +203,11 @@ public class XMLGenericProcessor implements ISourceProcessor {
 	}
 
 	@Override
+	public boolean isFromDataStore() {
+		return false;
+	}
+
+	@Override
 	public List<String> buildTooltipsFields() throws IOException, SAXException, ParserConfigurationException,
             XPathExpressionException {
 		return null;

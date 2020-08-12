@@ -22,7 +22,7 @@ import javax.persistence.*;
 public class ReportingOrganization {
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "reporting_org_sequence")
-	@SequenceGenerator(name="reporting_org_sequence", sequenceName = "reporting_org_seq")
+	@SequenceGenerator(name="reporting_org_sequence", sequenceName = "reporting_org_seq", allocationSize = 1)
 	@Column(name = "id", unique = true, nullable = false)
 	private Long id;
 

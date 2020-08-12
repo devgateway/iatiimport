@@ -217,6 +217,7 @@ module.exports = {
 					  105: 'Error uploading file.',
 					  106: 'Importing __processed__ of __total__ projects',
 					  107: 'Mapping __processed__ of __total__',
+            108: 'Translating titles',
             'iati_identifier_not_configured':'Import Process cannot start, since the API field, iati_identifier,  ' +
               'is not configured to store the \'iati-identifier\'. Please contact the administrator for further ' +
               ' assistance.'
@@ -529,6 +530,7 @@ module.exports = {
 					  105: 'Error al cargar el archivo.',
 					  106: 'Importando __processed__ proyecto de __total__',
 					  107: 'Mapping __processed__ of __total__',
+            108: 'Translating titles',
             'iati_identifier_not_configured':'El proceso de importación no puede comenzar debido a que el ' +
               'campo \'iati_identifier\' no esta configurado para poder alojar el identificador de IATI. Por favor ' +
               'contacte al administrador del sistema para asistencia adicional.'
