@@ -913,11 +913,16 @@ public abstract class IATIProcessor implements ISourceProcessor {
                 String title = extractNameElementForCodeListValues(titleElement);
 
                 Element categoryElement = (Element) documentLinkElement.getElementsByTagName("category").item(0);
-                String category = categoryElement.getAttribute("code");
 
+                String category = null;
+                if (categoryElement != null) {
+                    category = categoryElement.getAttribute("code");
+                }
                 Map<String, String> documentFields = new HashMap<>();
                 documentFields.put("title", title);
-                documentFields.put("category", category);
+                if (category != null) {
+                    documentFields.put("category", category);
+                }
                 documentFields.put("url", url);
 
                 Calendar calendar = Calendar.getInstance();

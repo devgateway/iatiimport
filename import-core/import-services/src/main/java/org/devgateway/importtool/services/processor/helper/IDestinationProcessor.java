@@ -22,7 +22,8 @@ public interface IDestinationProcessor {
 
 	void update(InternalDocument source, InternalDocument destination, List<FieldMapping> fieldMapping,
 				List<FieldValueMapping> valueMapping, boolean overrideTitle, ImportRequest importRequest)
-			throws ValueMappingException, CurrencyNotFoundException, ParseException, UnsupportedFieldTypeException;
+			throws ValueMappingException, CurrencyNotFoundException, ParseException, UnsupportedFieldTypeException,
+			AmpResourceNotCreatedException;
 
 	public String getTitleField();
 	 void setProcessorVersion(String processorVersion);
