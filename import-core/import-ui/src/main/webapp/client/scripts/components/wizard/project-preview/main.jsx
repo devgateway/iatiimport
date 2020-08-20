@@ -22,7 +22,7 @@ var ProjectPreview = React.createClass({
     },
     render: function () {
         return (
-          <div className="modal fade in" id="projectPreview" tabindex="-1" role="dialog" aria-hidden="true" style={{display: 'block'}} >
+          <div className="modal fade in" id="projectPreview" tabIndex="-1" role="dialog" aria-hidden="true" style={{display: 'block'}} >
 			   <div ref="projectPreviewDialog" className="modal-dialog projectPreview">
 			    <div className="modal-content">
 			      <div className="modal-header">
