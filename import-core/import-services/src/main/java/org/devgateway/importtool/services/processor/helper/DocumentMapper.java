@@ -121,7 +121,7 @@ public class DocumentMapper implements IDocumentMapper {
 			}
 			try {
 				processDocumentMapping(doc, importRequest);
-			} catch (ValueMappingException | CurrencyNotFoundException |ParseException | UnsupportedFieldTypeException e) {
+			} catch (ValueMappingException | CurrencyNotFoundException |ParseException | AmpResourceNotCreatedException| UnsupportedFieldTypeException e) {
 				//we need to find a better way to process exceptions
 				results.add(getActionResultFromException(doc, e));
 				logger.error(e.getMessage(), e);
