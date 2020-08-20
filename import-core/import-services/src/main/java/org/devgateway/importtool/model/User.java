@@ -21,7 +21,7 @@ public class User implements Identifiable<Long>, Serializable    {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_sequence")
-	@SequenceGenerator(name="user_sequence", sequenceName = "user_seq")
+	@SequenceGenerator(name="user_sequence", sequenceName = "user_seq", allocationSize = 1)
 	@Column (name = "id", unique = true, nullable = false)
 	private Long id;
 

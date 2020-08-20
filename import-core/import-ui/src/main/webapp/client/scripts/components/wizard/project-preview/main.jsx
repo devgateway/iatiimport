@@ -7,7 +7,9 @@ var ParticipatingOrgs = require('./participating-orgs');
 var Transactions = require('./transactions');
 var Planning = require('./planning');
 var Sectors = require('./sectors');
+var Programs = require('./programs');
 var Locations = require('./locations');
+var Documents = require('./documents');
 var RecipientCountries = require('./recipient-countries');
 var PolicyMarkers = require('./policy-markers');
 
@@ -40,8 +42,10 @@ var ProjectPreview = React.createClass({
 			               <ParticipatingOrgs {...this.props}/>
 			               <RecipientCountries {...this.props}/>
 			               <Sectors {...this.props}/>
+			               <Programs {...this.props}/>
 			               <PolicyMarkers {...this.props}/>
 			               <Locations {...this.props}/>
+			               <Documents {...this.props}/>
 			               <Transactions {...this.props}/>
 			              </div>
 			           </div>

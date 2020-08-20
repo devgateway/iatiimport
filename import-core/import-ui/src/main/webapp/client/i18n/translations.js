@@ -29,7 +29,7 @@ module.exports = {
 									'fr' : 'French ',
 									'es': 'Spanish',
 									'workflow_list' : 'Workflow List',
-									'data_source' : 'Data Source Manager'									
+									'data_source' : 'Data Source Manager'
 								}
 							}
 						}
@@ -94,7 +94,7 @@ module.exports = {
                             'source_project_tooltip': 'The title of the project extracted from IATI data store or IATI file',
                             'destination_project_tooltip': 'The title of the project in the destination system that will be updated',
                             'similar_titles_tooltip': 'Click on the blue bubble to see projects with a similar title in the destination system. This also allows you to map one of the similar projects to the source project.',
-                            'override_title_tooltip': 'Selecting this will replace the title of the project in the destination with a the title from the source project'                            
+                            'override_title_tooltip': 'Selecting this will replace the title of the project in the destination with a the title from the source project'
 						},
 						'similar_projects_dlg': {
 							'title': 'Projects with similar title',
@@ -123,6 +123,7 @@ module.exports = {
 							'transaction' : 'Transaction Fields',
 							'organization' : 'Organization Fields',
 							'location': 'Location Fields',
+              'document_link' : 'Document Fields',
 							'msg_error_retrieving_destination_fields' : ' Error retrieving destination fields.',
 							'msg_error_retrieving_source_fields' : ' Error retrieving source fields.',
 							'msg_error_retrieving_mappings' : ' Error retrieving field mappings.',
@@ -206,7 +207,7 @@ module.exports = {
 							'status': 'Status',
 							'message': 'Message/Project Title',
 							'close': 'Close'
-						}						
+						}
 					},
 				  'server_messages': {
 					  101: 'Extracting project __processed__ of __total__',
@@ -216,6 +217,7 @@ module.exports = {
 					  105: 'Error uploading file.',
 					  106: 'Importing __processed__ of __total__ projects',
 					  107: 'Mapping __processed__ of __total__',
+            108: 'Translating titles',
             'iati_identifier_not_configured':'Import Process cannot start, since the API field, iati_identifier,  ' +
               'is not configured to store the \'iati-identifier\'. Please contact the administrator for further ' +
               ' assistance.'
@@ -275,15 +277,15 @@ module.exports = {
 						'imported': '(IMPORTED)',
 						'all_versions_imported': 'All versions have been imported',
 						'org_has_no_data': 'This organization does not have any IATI files for this country.',
-						'processed': '(PROCESSED)'						
+						'processed': '(PROCESSED)'
 					},
 					'project_preview':{
 						'title': 'Project Preview',
 						 'close': 'Close Preview',
 						 'identification': 'Identification',
 						 'funding_information': 'Funding Information',
-						 'total_commitments':'Total Commitments', 
-						 'total_disbursements': 'Total Disbursements', 
+						 'total_commitments':'Total Commitments',
+						 'total_disbursements': 'Total Disbursements',
 						 'total_expenditure':'Total Expenditure',
 						 'participating_orgs': 'Participating Organizations',
 					     'org': 'Organization',
@@ -302,11 +304,16 @@ module.exports = {
 					     'sectors': 'Sectors',
 					     'locations': 'Locations',
 					     'recipient': 'Recipient Country',
-					     'policy_markers': 'Policy Markers'
+					     'policy_markers': 'Policy Markers',
+               'documents': 'Documents',
+               'documents_title': 'Title',
+               'documents_category': 'Category',
+               'documents_year': 'Year',
+               'sdg': 'Sustainable Development Goals (SDG)'
 					}
 				}
-			},			
-			
+			},
+
 			'es' : {
 				translation : {
 					'header' : {
@@ -400,7 +407,7 @@ module.exports = {
                             'source_project_tooltip': 'Título del proyecto extraido del repositorio de IATI o de un archivo IATI',
                             'destination_project_tooltip': 'Título del proyecto que será actualizado en el sistema de destino',
                             'similar_titles_tooltip': 'Haga clic en el ícono azul para ver los proyectos con títulos similares en el sistema de destino. Esto también le permite asignar uno de los proyectos similares con el proyecto de origen',
-                            'override_title_tooltip': 'Al seleccionar esta opción el título del proyecto será reemplazado con el título proveniente del archivo' 
+                            'override_title_tooltip': 'Al seleccionar esta opción el título del proyecto será reemplazado con el título proveniente del archivo'
 						},
 						'similar_projects_dlg': {
 							'title': 'Proyectos con títulos similares',
@@ -523,6 +530,7 @@ module.exports = {
 					  105: 'Error al cargar el archivo.',
 					  106: 'Importando __processed__ proyecto de __total__',
 					  107: 'Mapping __processed__ of __total__',
+            108: 'Translating titles',
             'iati_identifier_not_configured':'El proceso de importación no puede comenzar debido a que el ' +
               'campo \'iati_identifier\' no esta configurado para poder alojar el identificador de IATI. Por favor ' +
               'contacte al administrador del sistema para asistencia adicional.'
@@ -587,8 +595,8 @@ module.exports = {
 						'close': 'Cerrar vista previa',
 						'identification': 'Identificación',
 						'funding_information': 'Información de financiamiento',
-						'total_commitments':'Compromisos totales', 
-						'total_disbursements': 'Desembolsos totales', 
+						'total_commitments':'Compromisos totales',
+						'total_disbursements': 'Desembolsos totales',
 						'total_expenditure':'Gastos totales',
 						'participating_orgs': 'Organizaciones participantes',
 						'org': 'Organización',
@@ -607,7 +615,12 @@ module.exports = {
 						'sectors': 'Sectores',
 						'locations': 'Ubicación',
 						'recipient': 'País receptor',
-						'policy_markers': 'Marcadores de políticas'				     
+						'policy_markers': 'Marcadores de políticas',
+            'documents': 'Documentos',
+            'documents_title': 'Título',
+            'documents_category': 'Categoría',
+            'documents_year': 'Año',
+            'sdg': 'Metas de Desarrollo Sostenible (MDS)'
 					}
 				}
 			},
@@ -707,7 +720,7 @@ module.exports = {
                             'source_project_tooltip': 'Le titre du projet extrait de la banque de données ou du fichier IATI.',
                             'destination_project_tooltip': 'Le titre du projet dans le système de destination qui sera mis à jour',
                             'similar_titles_tooltip': 'Cliquez sur la bulle bleue pour afficher les projets qui ont un titre similaire dans le système de destination. Cela vous permet de sélectionner le(s) projet(s) similaire(s) à celui(ceux) d\'origine.',
-                            'override_title_tooltip': 'Si vous sélectionnez cette option, le titre du projet de destination sera remplacé par celui contenu dans le fichier' 
+                            'override_title_tooltip': 'Si vous sélectionnez cette option, le titre du projet de destination sera remplacé par celui contenu dans le fichier'
 						},
 						'similar_projects_dlg': {
 							'title': 'Projets ayant un titre similaire',
@@ -893,8 +906,8 @@ module.exports = {
 							'close': 'Fermer l\'aperçu',
 							'identification': 'Identification',
 							'funding_information': 'Information de Financement',
-							'total_commitments':'Total des Engagements', 
-							'total_disbursements': 'Total des Décaissements', 
+							'total_commitments':'Total des Engagements',
+							'total_disbursements': 'Total des Décaissements',
 							'total_expenditure':'Total des Dépenses',
 							'participating_orgs': 'Organisations Associées',
 							'org': 'Organisation',
@@ -913,10 +926,15 @@ module.exports = {
 							'sectors': 'Secteurs',
 							'locations': 'Localisations',
 							'recipient': 'Pays Bénéficaire',
-							'policy_markers': 'Marqueurs'				     
+							'policy_markers': 'Marqueurs',
+              'documents': 'Documents',
+              'documents_title': 'Titre',
+              'documents_category': 'Catégorie',
+              'documents_year': 'An',
+              'sdg': 'Objectifs de Développement Durable (ODD)'
 						}
 				}
 			}
-			
+
 		}
 };

@@ -57,9 +57,11 @@ var MapValues = React.createClass({
     });
   },
   handleNext: function() {
+    this.props.eventHandlers.showLoadingIcon();
     this.props.eventHandlers.mapValues(this.state.mappings, constants.DIRECTION_NEXT);
   },
   handlePrevious: function() {
+      this.props.eventHandlers.showLoadingIcon();
 	    this.props.eventHandlers.mapValues(this.state.mappings, constants.DIRECTION_PREVIOUS);
   },
   updateValueMappings: function(sourceFieldData, selectedDestinationValue) {

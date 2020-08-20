@@ -376,6 +376,7 @@ var ChooseFields = React.createClass({
                         {rows[constants.FIELD_TYPE.DATE]}
                         {rows[constants.FIELD_TYPE.ORGANIZATION]}
                         {rows[constants.FIELD_TYPE.TRANSACTION]}
+                        {rows[constants.FIELD_TYPE.DOCUMENT_LINK]}
                         </tbody>
                     </table>
                 </div>

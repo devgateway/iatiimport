@@ -21,6 +21,7 @@ stage('Build') {
                 sh returnStatus: true, script: "tar -cf ../iati-node-cache.tar --remove-files" +
                         " import-core/import-ui/src/main/webapp/node" +
                         " import-core/import-ui/src/main/webapp/node_modules"
+                sh returnStatus: true, script: "rm import-core/import-ui/src/main/webapp/package-lock.json"
                 sh returnStatus: true, script: "cd import-core && mvn clean"
             }
         }

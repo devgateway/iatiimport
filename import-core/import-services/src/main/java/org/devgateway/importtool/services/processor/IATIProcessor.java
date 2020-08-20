@@ -84,6 +84,11 @@ public abstract class IATIProcessor implements ISourceProcessor {
     }
 
     @Override
+    public boolean isFromDataStore() {
+        return fromDatastore;
+    }
+
+    @Override
     public void setInput(Document input) {
         this.doc = input;
     }
@@ -191,6 +196,7 @@ public abstract class IATIProcessor implements ISourceProcessor {
         Field activityScope = new Field("Activity Scope", "activity-scope", FieldType.LIST,
                 true, getTooltipForField("activity-scope"), getLabelsForField("activity-scope"));
         activityScope.setPossibleValues(getCodeListValues("activity-scope"));
+        activityScope.setFilterRequired(true);
         getFields().add(activityScope);
         getFilterFieldList().add(activityScope);
 
@@ -241,6 +247,15 @@ public abstract class IATIProcessor implements ISourceProcessor {
         sector.setPercentage(true);
         getFields().add(sector);
         getFilterFieldList().add(sector);
+
+        Field sdg = new Field("SDG", "tag", FieldType.LIST, true,
+                getTooltipForField("tag"), getLabelsForField("tag"));
+        sdg.setPossibleValues(getCodeListValues("sdg-goals"));
+        sdg.getPossibleValues().addAll(getCodeListValues("sdg-targets"));
+        sdg.setMultiple(true);
+        sdg.setPercentage(true);
+        getFields().add(sdg);
+        getFilterFieldList().add(sdg);
 
         Field location = new Field("Location", "location", FieldType.LOCATION, true,
                 getTooltipForField("location"), getLabelsForField("location"));
@@ -327,6 +342,19 @@ public abstract class IATIProcessor implements ISourceProcessor {
         providerOrg.setSubType("Provider");
         getFields().add(providerOrg);
         getFilterFieldList().add(providerOrg);
+
+        Field documentLink = new Field("Document Link", "document-link",
+                FieldType.DOCUMENT_LINK, true, getTooltipForField("document-link"),
+                getLabelsForField("document-link"));
+        getFields().add(documentLink);
+
+        Field documentCategory = new Field("Document Category", "category",
+                FieldType.LIST, true, getTooltipForField("document-category"),
+                getLabelsForField("document-category"));
+        documentCategory.setPossibleValues(getCodeListValues("document-category"));
+        documentCategory.setMultiple(true);
+        getFields().add(documentCategory);
+        getFilterFieldList().add(documentCategory);
     }
 
     private List<FieldValue> getCodeListValues(String codeListName) {
@@ -676,6 +704,7 @@ public abstract class IATIProcessor implements ISourceProcessor {
             processMultiLangElementType(xPath, document, iatiActivity, defaultLanguageCode);
             processTransactionElementType(document, iatiActivity, activityParticipatingOrgrNode);
             processDateElementType(document, iatiActivity);
+            processDocumentLinkElementType(document, iatiActivity);
 
             list.add(document);
         }
@@ -876,6 +905,61 @@ public abstract class IATIProcessor implements ISourceProcessor {
         }
     }
 
+    protected void processDocumentLinkElementType(InternalDocument document, Element element) {
+        Consumer<Field> documentLinkConsumer = field -> {
+            NodeList nodes = element.getElementsByTagName("document-link");
+            List<String> documentCategories = new ArrayList<>();
+            for (int j = 0; j < nodes.getLength(); ++j) {
+                Element documentLinkElement = (Element) nodes.item(j);
+
+                String url = documentLinkElement.getAttribute("url");
+
+                Element titleElement = (Element) documentLinkElement.getElementsByTagName("title").item(0);
+                String title = extractNameElementForCodeListValues(titleElement);
+
+                Element categoryElement = (Element) documentLinkElement.getElementsByTagName("category").item(0);
+
+                String category = null;
+                if (categoryElement != null) {
+                    category = categoryElement.getAttribute("code");
+                }
+                Map<String, String> documentFields = new HashMap<>();
+                documentFields.put("title", title);
+                if (category != null) {
+                    documentFields.put("category", category);
+                }
+                documentFields.put("url", url);
+
+                Calendar calendar = Calendar.getInstance();
+
+                NodeList documentDateElements = documentLinkElement.getElementsByTagName("document-date");
+                if (documentDateElements.getLength() > 0) {
+                    String documentDate = documentDateElements
+                            .item(0)
+                            .getAttributes()
+                            .getNamedItem(ISO_ATTRIBUTE)
+                            .getNodeValue();
+                    try {
+                        calendar.setTime(DateUtils.parseDate(Boolean.FALSE, documentDate));
+                    } catch (ParseException e) {
+                        log.error(e.getMessage(), e);
+                    }
+                } else {
+                    calendar.setTime(new Date());
+                }
+                documentFields.put("year", Integer.toString(calendar.get(Calendar.YEAR)));
+
+                documentCategories.add(category);
+
+                document.addDocumentLinkField(field.getUniqueFieldName() + "_" + j, documentFields);
+            }
+            if (!documentCategories.isEmpty()) {
+                String[] codeValues = documentCategories.stream().toArray(String[]::new);
+                document.addStringMultiField("type", codeValues);
+            }
+        };
+        processForEachFilteredByType(documentLinkConsumer, FieldType.DOCUMENT_LINK);
+    }
 
     protected void processTransactionElementType(InternalDocument document, Element iatiActivity,
                                                  Element activityProviderNode)  {

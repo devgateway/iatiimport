@@ -29,7 +29,7 @@ var SimilarProjectsDialog = React.createClass({
                            {item.identifier}
                           </td>
                            <td>
-                           {this.props.getTitle(item.multilangFields)}
+                           {this.props.getTitle(item, this.props.i18nLib.lng())}
                           </td>
                          </tr>)
               }.bind(this));
