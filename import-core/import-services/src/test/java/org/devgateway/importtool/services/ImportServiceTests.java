@@ -1,4 +1,4 @@
-package org.devgateway.importtool.services.test;
+package org.devgateway.importtool.services;
 
 import org.junit.Before;
 

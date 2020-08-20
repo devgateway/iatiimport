@@ -27,6 +27,8 @@ public class Field {
 	private boolean isRequired;
 	private boolean isExclusive;
 	private int length;
+
+	private String childName;
 	
 	private boolean filterRequired;
 	// These types are silly but needed for now.
@@ -251,5 +253,13 @@ public class Field {
 
 	public String getXpathFilterCondition(Boolean isFormDataStore){
 		return "";
+	}
+
+	public String getChildName() {
+		return childName;
+	}
+
+	public void setChildName(String childName) {
+		this.childName = childName;
 	}
 }

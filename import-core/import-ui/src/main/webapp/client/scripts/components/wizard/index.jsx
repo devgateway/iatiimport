@@ -46,11 +46,11 @@ var Wizard = React.createClass({
 	    }
 	},
 	resetSession: function() {
-	      $.get('/importer/import/wipeall', function(){}); 
+	      $.get('/importer/import/wipeall', function(){});
 	},
 	initManualImport: function() {
 	    var sourceProcessor = this.props.params.src;
-        var destinationProcessor = this.props.params.dst;    
+        var destinationProcessor = this.props.params.dst;
         appActions.refreshDestinationSession.triggerPromise().then(function(data) {
             common.setAuthCookies(data);
             this.initImportSession(sourceProcessor, destinationProcessor);
@@ -59,21 +59,21 @@ var Wizard = React.createClass({
             common.resetAuthCookies();
             this.goHome();
         }.bind(this));
-           
+
 	},
 	getSourceProcessor: function(src) {
 	      if (src === constants.IMPORT_TYPE_AUTOMATIC && this.state.currentVersion) {
 	          return "IATI" + this.state.currentVersion.replace(".", "")
 	      }
-	        
+
 	      return src;
-	 },  
-	 initAutomaticImport: function() {      
+	 },
+	 initAutomaticImport: function() {
 	      var sourceProcessor = this.props.params.src;
-	      var destinationProcessor = this.props.params.dst; 
+	      var destinationProcessor = this.props.params.dst;
 
 	      appActions.refreshDestinationSession.triggerPromise().then(function(data) {
-	           common.setAuthCookies(data);           
+	           common.setAuthCookies(data);
 	           this.initImportSession(sourceProcessor, destinationProcessor).then(function(){
 	                this.transitionTo('filter', this.props.params);
              common.refreshSession();
@@ -82,9 +82,9 @@ var Wizard = React.createClass({
 	            common.resetAuthCookies();
 	            this.goHome();
 	    }.bind(this));
-	        
-	                
-	        
+
+
+
 	},
     updateCurrentStep : function(step){
 	  var completedSteps = this.state.completedSteps;
@@ -109,18 +109,18 @@ var Wizard = React.createClass({
 	uploadFile: function() {
 		this.transitionTo('filter', this.props.params);
 	},
-     
+
 	selectDataSource: function() {
-	    this.setState({completedSteps: [], versions:[], processedVersions: [], projectWithUpdates:[], currentVersion: null});        
+	    this.setState({completedSteps: [], versions:[], processedVersions: [], projectWithUpdates:[], currentVersion: null});
 	    this.transitionTo('selectdatasource', this.props.params);
 	},
-	
+
 	filterData: function(languageData, filterData, direction) {
 		var languagesUpdated = false;
 		var filtersUpdated = false;
 		var nextStep = 'projects';
 		var previousStep = this.props.params.src !== constants.IMPORT_TYPE_AUTOMATIC ? 'upload' : 'selectversion';
-		    
+
 		formActions.updateLanguages.triggerPromise(languageData).then(function() {
 			languagesUpdated = true;
 			if(languagesUpdated && filtersUpdated){
@@ -244,14 +244,14 @@ var Wizard = React.createClass({
 	processNextVersion: function() {
 	    var processedVersions = this.state.processedVersions;
 	    var currentIndex = this.state.versions.indexOf(this.state.currentVersion);
-	   
+
 	    var nextIndex = currentIndex + 1;
 	    if (nextIndex <= this.state.versions.length - 1){
-	        var nextVersion = this.state.versions[nextIndex]; 
+	        var nextVersion = this.state.versions[nextIndex];
 	        processedVersions.push(nextVersion);
 	        this.setState({currentVersion: nextVersion, processedVersions: processedVersions})
-	    }	
-	    
+	    }
+
 	    this.transitionTo('selectversion', this.props.params);
 	},
 	navigateBack: function(){
@@ -371,7 +371,7 @@ var Wizard = React.createClass({
   showDisasterResponse: function(hasDisasterResponseField) {
      this.setState({showDisasterResponse: hasDisasterResponseField});
   },
-  render: function() {   
+  render: function() {
     var eventHandlers = {};
     eventHandlers.uploadFile          = this.uploadFile;
     eventHandlers.filterData          = this.filterData;
@@ -403,12 +403,12 @@ var Wizard = React.createClass({
 
     return (
       <div>
-      <div className="wizard-container" > 
+      <div className="wizard-container" >
      <h2>{this.props.i18nLib.t('wizard.import_process')}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       {this.state.info.sourceProcessorName && this.state.info.destinationProcessorName &&
-          
-          <small>{this.state.info.sourceProcessorName} {window.i18nLib.t('header.nav.menu.submenu.to')} {this.state.info.destinationProcessorName} </small> 
-      }      
+
+          <small>{this.state.info.sourceProcessorName} {window.i18nLib.t('header.nav.menu.submenu.to')} {this.state.info.destinationProcessorName} </small>
+      }
       </h2>
       <div className="row">
       <WizardSteps {...this.props} currentStep = {this.state.currentStep} completedSteps= {this.state.completedSteps} />
@@ -418,7 +418,9 @@ var Wizard = React.createClass({
        <span className="sr-only">Error:</span>
          <span ref="message"></span>
        </div>
-      <div className="loading-icon" ref="loadingIcon"></div>
+      <div className="loading-icon" ref="loadingIcon">
+        <div className="loading-icon-background"></div>
+      </div>
       <RouteHandler eventHandlers={eventHandlers} {...this.props}  {...this.state}/>
       </div>
       </div>

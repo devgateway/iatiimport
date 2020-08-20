@@ -24,7 +24,7 @@ var FilterData = React.createClass({
 		this.listenTo(languageStore, this.updateLanguages);
 		this.listenTo(filterStore, this.updateFilters);
 		this.loadData();
-	},    
+	},
 	updateFilters: function(data) {
 		this.setState({
 			filterData: data
@@ -35,47 +35,47 @@ var FilterData = React.createClass({
 			languageData: data
 		});
 	},
-	loadData: function(){      
+	loadData: function(){
 		this.clearFlags();
 		this.errorMsg = "";
 		this.props.eventHandlers.showLoadingIcon();
-		appActions.loadLanguageData.triggerPromise().then(function(data) {                            
-			this.updateLanguages(data); 
+		appActions.loadLanguageData.triggerPromise().then(function(data) {
+			this.updateLanguages(data);
 			this.languageDataLoaded = true;
 			this.hideLoadingIcon();
-		}.bind(this))["catch"](function(err) {       
+		}.bind(this))["catch"](function(err) {
 			this.languageDataLoaded = true;
-			this.hideLoadingIcon(); 
+			this.hideLoadingIcon();
 			this.errorMsg += this.props.i18nLib.t('wizard.filter_data.msg_error_retrieving_languages');
-			this.displayError();        
+			this.displayError();
 		}.bind(this));
 
-		appActions.loadFilterData.triggerPromise().then(function(data) {                              
+		appActions.loadFilterData.triggerPromise().then(function(data) {
 			this.updateFilters(data);
-			this.filterDataLoaded = true; 
-			this.hideLoadingIcon(); 
+			this.filterDataLoaded = true;
+			this.hideLoadingIcon();
 		}.bind(this))["catch"](function(err) {
-			this.filterDataLoaded = true; 
-			this.hideLoadingIcon(); 
+			this.filterDataLoaded = true;
+			this.hideLoadingIcon();
 			this.errorMsg += this.props.i18nLib.t('wizard.filter_data.msg_error_retrieving_filters');
-			this.displayError();                          
+			this.displayError();
 		}.bind(this));
 	},
-	clearFlags: function(){     
+	clearFlags: function(){
 		this.languageDataLoaded = false;
-		this.filterDataLoaded = false;        
-	}, 
+		this.filterDataLoaded = false;
+	},
 	hideLoadingIcon: function(){
 		if(this.languageDataLoaded && this.filterDataLoaded){
 			this.props.eventHandlers.hideLoadingIcon();
 		}
-	}, 
+	},
 	displayError: function(){
 		if(this.languageDataLoaded && this.filterDataLoaded){
-			this.props.eventHandlers.displayError(this.errorMsg); 
+			this.props.eventHandlers.displayError(this.errorMsg);
 		}
 	},
-	handleToggle: function(field, value, event) {        
+	handleToggle: function(field, value, event) {
 		var currentField = _.find(this.state.filterData, { 'fieldName': field.fieldName });
 		var filterValue = value.code ? value.code : value.value;
 		var filterExists = _.some(currentField.filters, function(a) { return a == filterValue});
@@ -88,8 +88,8 @@ var FilterData = React.createClass({
 
 		this.setState( { filterData: this.state.filterData });
 	},
-	handleToggleRadio: function(field, value, event) {        
-		var currentField = _.find(this.state.filterData, { 'fieldName': field.fieldName });		
+	handleToggleRadio: function(field, value, event) {
+		var currentField = _.find(this.state.filterData, { 'fieldName': field.fieldName });
 		if(event.target.checked) {
 			currentField.filters = [];
 			currentField.filters.push(value.code);
@@ -104,7 +104,7 @@ var FilterData = React.createClass({
 		var languages = this.state.languageData;
 		var currentLanguage = _.find(languages, { 'code': language.code });
 		currentLanguage.selected = event.target.checked;
-		this.setState({languageData:languages});		
+		this.setState({languageData:languages});
 	},
 	handleNext: function() {
 		this.props.eventHandlers.filterData(this.state.languageData,this.state.filterData,constants.DIRECTION_NEXT);
@@ -113,7 +113,7 @@ var FilterData = React.createClass({
 		this.props.eventHandlers.filterData(this.state.languageData,this.state.filterData,constants.DIRECTION_PREVIOUS);
 	},
 	selectAll: function(field, event) {
-		if(event.target.checked) {			
+		if(event.target.checked) {
 			field.filters = [];
 			_.each(field.possibleValues, function(item) {
 			    var filterValue = item.code ? item.code : item.value;
@@ -143,7 +143,7 @@ var FilterData = React.createClass({
 
       if (this.state.filterData) {
             $.map(this.state.filterData, function(filter, i) {
-                var filterValues = [];                
+                var filterValues = [];
                 $.map(filter.possibleValues, function(values, i) {
                     var checkedValue = _.some(filter.filters, function(v){ return v === values.code || v === values.value});
                     if(filter.exclusive){
@@ -155,7 +155,7 @@ var FilterData = React.createClass({
                             <input aria-label="Field1" className="form-control" readOnly type="text" value={values.value}/>
                             </div>
                         )
-                    }else{                      
+                    }else{
                        filterValues.push(
                             <div className="input-group">
                             <span className="input-group-addon">
@@ -164,12 +164,12 @@ var FilterData = React.createClass({
                             <input aria-label="Field1" className="form-control" readOnly type="text" value={(values.code ? values.code + ' : ' : '' ) +  values.value}/>
                             </div>
                         )
-                    }                    
+                    }
                 }.bind(this));
 
                 if(filterValues.length > 0 ) {
                     var groupSelector = "";
-                    if(!filter.exclusive){
+                    if(!filter.exclusive && !filter.filterRequired){
                        groupSelector = <input type="checkbox" className="group-select" onChange={this.selectAll.bind(this, filter)} />;
                     }
                     filters.push(
@@ -199,7 +199,7 @@ var FilterData = React.createClass({
         return (
             <div className="panel panel-default">
                 <div className="panel-heading"><strong>{this.props.i18nLib.t('wizard.filter_data.filter_information')}</strong></div>
-                <div className="panel-body">                   
+                <div className="panel-body">
                     {this.props.i18nLib.t('wizard.filter_data.select_filters')}
                     <br /><br />
                     {filters}
@@ -209,19 +209,19 @@ var FilterData = React.createClass({
                         <div className="panel-body">
                             {languages}
                         </div>
-                      </div>  
+                      </div>
                     }
-                   
+
                 </div>
                 <div className="buttons">
-                    <div className="row">                          
+                    <div className="row">
                           <div className="col-md-6"><button className="btn btn-success navbar-btn btn-custom btn-previous" type="button" onClick={this.handlePrevious}>{this.props.i18nLib.t('wizard.filter_data.previous')}</button></div>
                           <div className="col-md-6"><button disabled = { this.isValid() ? "" : "disabled"} className="btn btn-success navbar-btn btn-custom btn-next" type="button" onClick={this.handleNext}>{this.props.i18nLib.t('wizard.filter_data.next')}</button></div>
-                     </div>                   
+                     </div>
                 </div>
                 </div>
-            ); 
-    } 
+            );
+    }
 });
 
 module.exports = FilterData;

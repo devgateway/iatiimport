@@ -123,6 +123,7 @@ module.exports = {
 							'transaction' : 'Transaction Fields',
 							'organization' : 'Organization Fields',
 							'location': 'Location Fields',
+              'document_link' : 'Document Fields',
 							'msg_error_retrieving_destination_fields' : ' Error retrieving destination fields.',
 							'msg_error_retrieving_source_fields' : ' Error retrieving source fields.',
 							'msg_error_retrieving_mappings' : ' Error retrieving field mappings.',
@@ -303,7 +304,12 @@ module.exports = {
 					     'sectors': 'Sectors',
 					     'locations': 'Locations',
 					     'recipient': 'Recipient Country',
-					     'policy_markers': 'Policy Markers'
+					     'policy_markers': 'Policy Markers',
+               'documents': 'Documents',
+               'documents_title': 'Title',
+               'documents_category': 'Category',
+               'documents_year': 'Year',
+               'sdg': 'Sustainable Development Goals (SDG)'
 					}
 				}
 			},
@@ -609,7 +615,12 @@ module.exports = {
 						'sectors': 'Sectores',
 						'locations': 'Ubicación',
 						'recipient': 'País receptor',
-						'policy_markers': 'Marcadores de políticas'
+						'policy_markers': 'Marcadores de políticas',
+            'documents': 'Documentos',
+            'documents_title': 'Título',
+            'documents_category': 'Categoría',
+            'documents_year': 'Año',
+            'sdg': 'Metas de Desarrollo Sostenible (MDS)'
 					}
 				}
 			},
@@ -915,7 +926,12 @@ module.exports = {
 							'sectors': 'Secteurs',
 							'locations': 'Localisations',
 							'recipient': 'Pays Bénéficaire',
-							'policy_markers': 'Marqueurs'
+							'policy_markers': 'Marqueurs',
+              'documents': 'Documents',
+              'documents_title': 'Titre',
+              'documents_category': 'Catégorie',
+              'documents_year': 'An',
+              'sdg': 'Objectifs de Développement Durable (ODD)'
 						}
 				}
 			}

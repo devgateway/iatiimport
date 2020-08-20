@@ -121,7 +121,7 @@ public class DocumentMapper implements IDocumentMapper {
 			}
 			try {
 				processDocumentMapping(doc, importRequest);
-			} catch (Exception e) {
+			} catch (ValueMappingException | CurrencyNotFoundException |ParseException | AmpResourceNotCreatedException| UnsupportedFieldTypeException e) {
 				//we need to find a better way to process exceptions
 				results.add(getActionResultFromException(doc, e));
 				logger.error(e.getMessage(), e);
@@ -139,7 +139,7 @@ public class DocumentMapper implements IDocumentMapper {
 	}
 
 	private void processDocumentMapping(DocumentMapping doc, ImportRequest importRequest)
-			throws CurrencyNotFoundException, ValueMappingException, ParseException, UnsupportedFieldTypeException {
+			throws CurrencyNotFoundException, ValueMappingException, ParseException, UnsupportedFieldTypeException, AmpResourceNotCreatedException {
 		InternalDocument source = doc.getSourceDocument();
 		InternalDocument destination = doc.getDestinationDocument();
 		//if source project is mapped to an existing project, update the existing project
@@ -357,7 +357,6 @@ public class DocumentMapper implements IDocumentMapper {
 	
 	 /**
      * Get values used in selected projects     * 
-     * @param documentMapper
      * @return Map where the key is the field name and the value is a set of all values that are in the selected project for the field
      */
     public Map<String, Set<String>> getValuesUsedInSelectedProjects() {

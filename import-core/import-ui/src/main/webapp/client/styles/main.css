@@ -369,8 +369,21 @@ tbody.scrollablebody td, thead.scrollablebody th {
     left: 45%;
     z-index: 100;
     display:none;
+    opacity: 0.7;
     background-color: #000;
-    opacity: 0.6;
+}
+
+.loading-icon-background {
+  height: 100%;
+  width:100%;
+  border-radius: 10px;
+  color: #FFF;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 101;
+  opacity: 0.3;
+  background-color: #FFF;
 }
 
 .message-box{
