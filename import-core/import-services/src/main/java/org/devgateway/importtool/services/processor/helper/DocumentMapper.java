@@ -121,9 +121,10 @@ public class DocumentMapper implements IDocumentMapper {
 			}
 			try {
 				processDocumentMapping(doc, importRequest);
-			} catch (ValueMappingException | CurrencyNotFoundException | ParseException | UnsupportedFieldTypeException | AmpResourceNotCreatedException e) {
+			} catch (ValueMappingException | CurrencyNotFoundException |ParseException | UnsupportedFieldTypeException e) {
 				//we need to find a better way to process exceptions
 				results.add(getActionResultFromException(doc, e));
+				logger.error(e.getMessage(), e);
 			}
 		});
 		results.addAll(this.destinationProcessor.processProjectsInBatch(importStatus));

@@ -960,12 +960,12 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 		// create fundings and add transactions to the fundings
 		for (Entry<String, Map<String, String>> entry : organizations.entrySet()) {
-            String providerId = entry.getValue().get("ref");
-            List<FundingDetail> fundingDetails = providerFundingDetails.get(providerId);
-            if(fundingDetails==null) {
-                providerId = entry.getValue().get("value");
-                fundingDetails = providerFundingDetails.get(providerId);
-            }
+            String providerId = Optional.ofNullable(entry.getValue().get("ref")).orElse("").toUpperCase();
+			List<FundingDetail> fundingDetails = providerFundingDetails.get(providerId);
+			if (fundingDetails == null) {
+				providerId = Optional.ofNullable(entry.getValue().get("value")).orElse("").toUpperCase();
+				fundingDetails = providerFundingDetails.get(providerId);
+			}
 			if (fundingDetails != null) {
 				JsonBean funding = new JsonBean();
 				Integer donorId = getIdFromList(entry.getValue().get("value"), "participating-org", fieldMappings,
@@ -986,7 +986,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 
 					}
 				} catch (ValueMappingException e) {
-					log.debug("Dependent field not loaded: default-finance-type");
+					log.warn("Dependent field not loaded: default-finance-type");
 				}
 
 				try {
@@ -999,7 +999,7 @@ public class AMPStaticProcessor implements IDestinationProcessor {
 						}
 					}
 				} catch (ValueMappingException e) {
-					log.debug("Dependent field not loaded: default-aid-type");
+					log.warn("Dependent field not loaded: default-aid-type");
 				}
 
 				if (ampActivityFieldProvider.existsField("fundings~source_role")) {
