@@ -8,4 +8,5 @@ public class EPMessages {
  public static final ApiMessage ERROR_UPLOADING_FILE = new ApiMessage(105, "Error uploading file."); 
  public static final ApiMessage IMPORT_STATUS_MESSAGE = new ApiMessage(106, "Importing %s of %s projects");
  public static final ApiMessage MAPPING_STATUS_MESSAGE = new ApiMessage(107, "Mapping %s of %s");
+ public static final ApiMessage TRANSLATING = new ApiMessage(108, "Translating");
 }

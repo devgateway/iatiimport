@@ -1,5 +1,6 @@
 package org.devgateway.importtool.services.processor.helper;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +17,12 @@ public class InternalDocument {
 	private Map<String, Map<String, String>> contactFields = new HashMap<String, Map<String, String>>();
 	private Map<String, Date> dateFields = new HashMap<String, Date>();	
 	private Map<String, List<FieldValue>> recepientCountryFields = new HashMap<String, List<FieldValue>>();	
-	private boolean titleDuplicate = false;	
+	private boolean titleDuplicate = false;
+
+	/**
+	 * Some of the fields may have translations in other language.
+	 */
+	private List<Translation> translations = new ArrayList<>();
 
 	
 
@@ -155,5 +161,13 @@ public class InternalDocument {
 
 	public void setGrouping(String grouping) {
 		this.grouping = grouping;
+	}
+
+	public List<Translation> getTranslations() {
+		return translations;
+	}
+
+	public void setTranslations(List<Translation> translations) {
+		this.translations = translations;
 	}
 }

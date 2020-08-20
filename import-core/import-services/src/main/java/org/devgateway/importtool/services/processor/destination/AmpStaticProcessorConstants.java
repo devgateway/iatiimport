@@ -7,10 +7,15 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class AmpStaticProcessorConstants {
     public static final String BASEURL_PROPERTY = "AMPStaticProcessor.baseURL";
     public static final String BASEURL_DEFAULT_VALUE = "http://localhost:8081";
+
+    public static final String BASEURL = Optional.ofNullable(System.getProperty(BASEURL_PROPERTY))
+            .orElse(BASEURL_DEFAULT_VALUE);
+
     public static final String AMP_IATI_ID_FIELD_PROPERTY = "AMPStaticProcessor.ampIatiIdField";
     public static final String AMP_IATI_ID_FIELD_DEFAULT_VALUE = "project_code";
     public static final String DEFAULT_LANGUAGE_CODE = "en";

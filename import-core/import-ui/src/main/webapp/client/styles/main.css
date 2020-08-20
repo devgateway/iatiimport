@@ -92,7 +92,7 @@ thead.scrollablebody {
 tbody.scrollablebody td, thead.scrollablebody th {
     width: 19.2%;
     float: left;
-}      
+}
 
 
 
@@ -276,7 +276,7 @@ tbody.scrollablebody td, thead.scrollablebody th {
 .wizard-steps > li > a.active,
 .wizard-steps > li > a:focus {
   color: #FFF;
-  background-color: #337AB7;  
+  background-color: #337AB7;
   text-decoration: none;
 }
 
@@ -369,8 +369,8 @@ tbody.scrollablebody td, thead.scrollablebody th {
     left: 45%;
     z-index: 100;
     display:none;
-    background-color: #000; 
-    opacity: 0.6;   
+    background-color: #000;
+    opacity: 0.6;
 }
 
 .message-box{
@@ -389,18 +389,18 @@ tbody.scrollablebody td, thead.scrollablebody th {
   cursor: pointer;
 }
 .template-dropdown-item-link{
-  
+
 }
 .template-dropdown-item-delete{
   color:#ff0000;
 }
 
-.wordwrap { 
-   white-space: pre-wrap;     
-   white-space: -moz-pre-wrap;    
-   white-space: -pre-wrap;        
-   white-space: -o-pre-wrap;      
-   word-wrap: break-word;      
+.wordwrap {
+   white-space: pre-wrap;
+   white-space: -moz-pre-wrap;
+   white-space: -pre-wrap;
+   white-space: -o-pre-wrap;
+   word-wrap: break-word;
 }
 
 .not-active {
@@ -414,10 +414,10 @@ tbody.scrollablebody td, thead.scrollablebody th {
 
 .group-title{
 	font-weight: bold;
-	
+
 }
 .group-header{
-	border-bottom:3px solid #ddd;	
+	border-bottom:3px solid #ddd;
 }
 .fake-link{
 	color:#337ab7;
@@ -438,7 +438,7 @@ tbody.scrollablebody td, thead.scrollablebody th {
 
 
 .workflow-selector li:before {
-	content:"\00BB \0020";	
+	content:"\00BB \0020";
 }
 
 .wizard-container{
@@ -466,11 +466,11 @@ tbody.scrollablebody td, thead.scrollablebody th {
 }
 
 .no-left-padding {
-	padding-left:0px !important;	
+	padding-left:0px !important;
 }
 
 .no-right-padding {
-	padding-right:0px !important;	
+	padding-right:0px !important;
 }
 
 .glyphicon-remove-custom{
@@ -495,6 +495,12 @@ tbody.scrollablebody td, thead.scrollablebody th {
 .glyphicon-info-sign-custom2{
 	font-size: 14px;
 	margin-right:10px;
+}
+
+.glyphicon-info-sign-translation {
+  color: #337ab7;
+  font-size: 15px;
+  margin-left:10px;
 }
 
 .glyphicon-eye-open-custom {
@@ -528,4 +534,18 @@ tbody.scrollablebody td, thead.scrollablebody th {
 }
 div.tooltip{
   word-wrap: break-word;
+}
+
+.projectPreview .tooltip-inner {
+  max-width: 90%;
+  min-width: 50px;
+}
+
+.projectPreview .tooltip.in {
+  width: unset !important;
+}
+
+.projectPreview .glyphicon-info-sign-translation {
+  margin-left: 0px;
+  padding-right: 10px;
 }
