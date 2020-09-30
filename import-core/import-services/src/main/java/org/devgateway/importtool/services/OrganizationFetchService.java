@@ -43,6 +43,7 @@ public class OrganizationFetchService {
                 offSet += PAGE_SIZE;
                 response.getResult().stream().forEach(r ->  reportingOrgRepository.save(getOrgFromJson(r)));
             } while (response.getResult().size() == PAGE_SIZE);
+            log.debug("Organizations fetched");
         } catch (RestClientException ex) {
             log.error("Cannot get organizations from datastore", ex);
             throw new RuntimeException(ex);

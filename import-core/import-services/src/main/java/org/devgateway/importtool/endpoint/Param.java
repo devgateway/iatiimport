@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static org.devgateway.importtool.endpoint.DataFetchServiceConstants.PARAM_AND_VALUE;
+
 public class Param {
     private String paramName;
     private List<String> paramValue;
@@ -16,7 +18,7 @@ public class Param {
     }
 
     public Param(String paramName, String paramValue) {
-        this(paramName, paramValue, "=");
+        this(paramName, paramValue, PARAM_AND_VALUE);
     }
 
     public Param(String paramName, String paramValue, String parameterOperator) {
@@ -41,13 +43,14 @@ public class Param {
     public void setParamName(String paramName) {
         this.paramName = paramName;
     }
+
     public String getParamValueEncoded() {
         StringBuffer p = new StringBuffer();
         Optional.ofNullable(paramValue).orElse(Collections.emptyList()).stream().forEach(param -> {
             p.append(param);
-            p.append("|" );
+            p.append(" ");
         });
-        if(p.length()>0){
+        if (p.length() > 0) {
             p.setLength(p.length() - 1);
         }
         return p.toString();
