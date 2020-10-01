@@ -23,7 +23,7 @@ var SaveMappingsDialog = React.createClass({
      var mapped = _.filter(this.props.mappingFieldsData, function(m) {
             return m.destinationField;
      });
-     
+
      formActions.saveFieldMappingsTemplate({fieldMapping: mapped, name:this.state.name, id: mappingId }).then(function(data) {
         if(data.error){
            this.displayError(this.props.i18nLib.t('wizard.save_field_mappings_dlg.'+ data.error));
@@ -52,12 +52,12 @@ var SaveMappingsDialog = React.createClass({
 	     box.fadeOut({duration:10000});
     },
     isValidName: function() {
-     return this.state.name &&  this.state.name.trim().length > 0;  
+     return this.state.name &&  this.state.name.trim().length > 0;
     },
     render: function () {
 
       return (
-            <div className="modal fade" id="saveMapFields" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2" aria-hidden="true" >
+            <div className="modal fade" id="saveMapFields" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel2" aria-hidden="true" >
   			  <div ref="saveMappingDialog" className="modal-dialog">
   			    <div className="modal-content">
   			      <div className="modal-header">
@@ -74,7 +74,7 @@ var SaveMappingsDialog = React.createClass({
   			      </div>
   			      <div className="modal-footer">
                     <button type="button" className="btn btn-default btn-warning" data-dismiss="modal">{this.props.i18nLib.t('wizard.save_field_mappings_dlg.close')}</button>
-                    <button type="button" disabled = {this.isValidName() ? "" : "disabled"}  className="btn btn-primary " onClick={this.saveMappings} >{this.props.i18nLib.t('wizard.save_field_mappings_dlg.save_mapping')}</button>                
+                    <button type="button" disabled = {this.isValidName() ? "" : "disabled"}  className="btn btn-primary " onClick={this.saveMappings} >{this.props.i18nLib.t('wizard.save_field_mappings_dlg.save_mapping')}</button>
   			      </div>
   			    </div>
   			  </div>

@@ -16,12 +16,12 @@ var taskConfig = function(grunt) {
         {
           context: ['/importer','/system'],
           host: 'localhost',
-          port: 8080
+          port: 8081
         },
         {
           context: ['/aim', '/TEMPLATE', '/repository', '/rest', '/index.do', '/showDesktop.do', '/wicket', '/ckeditor_4.4.6', '/showLayout.do'],
           host: 'localhost',
-          port: 8081
+          port: 8080
         }
 
       ],

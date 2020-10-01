@@ -1,5 +1,7 @@
 package org.devgateway.importtool.rest.error;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.exceptions.MissingPrerequisitesException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -18,6 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 //TODO so we can return the lang pack with all translations, server side.
 public class GlobalExceptionHandler {
 
+    private Log log = LogFactory.getLog(getClass());
+
     private final MediaType jsonMediaType = MediaType.parseMediaType("application/json");
 
     @ExceptionHandler(MissingPrerequisitesException.class)
@@ -34,6 +38,7 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<Object> handleGenericRunTimeException(
             RuntimeException ex) {
         String error = ex.getMessage();
+        log.error(ex.getMessage(), ex);
         return buildResponseEntity(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, error, ex));
     }
 

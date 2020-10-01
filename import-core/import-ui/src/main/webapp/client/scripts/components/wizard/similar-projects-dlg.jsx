@@ -36,7 +36,7 @@ var SimilarProjectsDialog = React.createClass({
        }
 
        return (
-          <div className="modal fade" id="similarProjects" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2" aria-hidden="true" >
+          <div className="modal fade" id="similarProjects" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel2" aria-hidden="true" >
 			   <div ref="similarProjectsDialog" className="modal-dialog">
 			    <div className="modal-content">
 			      <div className="modal-header">
