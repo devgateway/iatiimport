@@ -42,7 +42,7 @@ public abstract class IATIProcessor implements ISourceProcessor {
     private Log log = LogFactory.getLog(getClass());
     public static final String DEFAULT_ID_FIELD = "iati-identifier";
     public static final String LAST_UPDATED_DATE = "last-updated-datetime";
-    public static final String DEFAULT_PATH_API = "/results/iati-activities/iati-activity";
+    public static final String DEFAULT_PATH_API = "/iati-activities/iati-activity";
     public static String DEFAULT_GROUPING_FIELD = "reporting-org";
     protected String PROCESSOR_VERSION = "";
     protected String PROCESSOR_SUPER_VERSION;
@@ -174,14 +174,15 @@ public abstract class IATIProcessor implements ISourceProcessor {
             log.error("IOException Parsing Source File: " + e);
         }
     }
+
     protected void instantiateStaticFields() {
 
         // Text fields
         getFields().add(new Field("IATI Identifier", "iati-identifier", FieldType.STRING,
-                false, getTooltipForField("iati-identifier"),getLabelsForField("iati-identifier")));
+                false, getTooltipForField("iati-identifier"), getLabelsForField("iati-identifier")));
 
         getFields().add(new Field("Title", "title", FieldType.MULTILANG_STRING, false,
-                getTooltipForField("title"),getLabelsForField("title")));
+                getTooltipForField("title"), getLabelsForField("title")));
 
         getFields().add(new Field("Description", "description", FieldType.MULTILANG_STRING,
                 true, getTooltipForField("description"), getLabelsForField("description")));
@@ -266,7 +267,7 @@ public abstract class IATIProcessor implements ISourceProcessor {
 
         // Dates
         Field activityDateStartPlanned = new Field("Activity Date Start Planned", "activity-date"
-                , FieldType.DATE, true,getTooltipForField("activity-date_start-planned"), getLabelsForField("activity" +
+                , FieldType.DATE, true, getTooltipForField("activity-date_start-planned"), getLabelsForField("activity" +
                 "-date_start-planned"));
         activityDateStartPlanned.setSubType("start-planned");
         getFields().add(activityDateStartPlanned);
@@ -395,8 +396,11 @@ public abstract class IATIProcessor implements ISourceProcessor {
         }
         return possibleValues;
     }
-    protected abstract NodeList getNodeListForCodeListValues(Document doc, String  standardFieldName);
-    protected abstract String extractNameElementForCodeListValues(Element nameElement) ;
+
+    protected abstract NodeList getNodeListForCodeListValues(Document doc, String standardFieldName);
+
+    protected abstract String extractNameElementForCodeListValues(Element nameElement);
+
     protected void configureDefaults() {
         InputStream propsStream = this.getClass().getResourceAsStream(this.getPropertiesFile());
         Properties properties = new Properties();
@@ -412,7 +416,8 @@ public abstract class IATIProcessor implements ISourceProcessor {
     protected NodeList getActivities() throws XPathExpressionException {
         XPath xPath = XPathFactory.newInstance().newXPath();
 
-        String xpathExtractActivities = (fromDatastore ? "/result" : "") + "/iati-activities/iati-activity[";
+        String xpathExtractActivities = fromDatastore ? "/iati-activities" + this.getExtraQueryVersion()
+                + "/iati-activity[" : "/iati-activities/iati-activity[";
         final StringBuilder query = new StringBuilder(xpathExtractActivities);
         Field countryField = this.getFields().stream().filter(f -> {
             return f.getType().equals(FieldType.RECIPIENT_COUNTRY);
@@ -454,20 +459,11 @@ public abstract class IATIProcessor implements ISourceProcessor {
             }
 
         });
-        if (fromDatastore) {
-            if (!(xpathExtractActivities.equals(query.toString()))) {
-                query.append(" and " + getExtraQueryVersion());
-            } else {
-                query.append(getExtraQueryVersion());
-            }
+        if (!(xpathExtractActivities.equals(query.toString()))) {
+            query.append("]");
+
         } else {
-            if (!(xpathExtractActivities.equals(query.toString()))) {
-                query.append("]");
-
-            } else {
-                query.setLength(query.length() - 1);
-            }
-
+            query.setLength(query.length() - 1);
         }
 
         NodeList activities = (NodeList) xPath.compile(query.toString()).evaluate(this.getDoc(), XPathConstants.NODESET);
@@ -509,7 +505,7 @@ public abstract class IATIProcessor implements ISourceProcessor {
     }
 
     public String getExtraQueryVersion() {
-        return "@*[name()='iati-extra:version']='" + PROCESSOR_VERSION + "']";
+        return "[@*[name()='version']='" + PROCESSOR_VERSION + "']";
     }
 
     protected Document getDocument(String fileName) throws ParserConfigurationException, SAXException, IOException {
@@ -667,6 +663,7 @@ public abstract class IATIProcessor implements ISourceProcessor {
         }
         return list;
     }
+
     protected List<InternalDocument> extractDocuments(Document doc) throws Exception {
         // Extract global values
         XPath xPath = XPathFactory.newInstance().newXPath();
@@ -710,8 +707,9 @@ public abstract class IATIProcessor implements ISourceProcessor {
         }
         return list;
     }
+
     protected abstract void processMultiLangElementType(XPath xPath, InternalDocument document, Element element,
-                                               String defaultLanguageCode) ;
+                                                        String defaultLanguageCode);
 
     protected void processStringElementType(InternalDocument document, Element element) {
         processForEachFilteredByType(field -> {
@@ -897,11 +895,11 @@ public abstract class IATIProcessor implements ISourceProcessor {
             Element e = (Element) nodes.item(j);
             Field field = getField(e, FieldType.DATE);
             String localDate = e.getAttribute(ISO_ATTRIBUTE);
-                String format = ISO_DATE;
-                SimpleDateFormat sdf = new SimpleDateFormat(format);
-                if (localDate != null && !localDate.isEmpty()) {
-                    document.addDateField(field.getUniqueFieldName(), sdf.parse(localDate));
-                }
+            String format = ISO_DATE;
+            SimpleDateFormat sdf = new SimpleDateFormat(format);
+            if (localDate != null && !localDate.isEmpty()) {
+                document.addDateField(field.getUniqueFieldName(), sdf.parse(localDate));
+            }
         }
     }
 
@@ -962,15 +960,15 @@ public abstract class IATIProcessor implements ISourceProcessor {
     }
 
     protected void processTransactionElementType(InternalDocument document, Element iatiActivity,
-                                                 Element activityProviderNode)  {
+                                                 Element activityProviderNode) {
         NodeList nodes;
         nodes = iatiActivity.getElementsByTagName("transaction");
         for (int j = 0; j < nodes.getLength(); ++j) {
-            String reference ;
+            String reference;
             Element transactionElement = (Element) nodes.item(j);
             Field field = getField(transactionElement, TRANSACTION);
 
-            if(field == null) {
+            if (field == null) {
                 continue;
             }
             // Reference
@@ -979,7 +977,7 @@ public abstract class IATIProcessor implements ISourceProcessor {
             String localValue = transactionElement.getElementsByTagName("value").item(0).getChildNodes().item(0).getNodeValue();
             // Date
             String localDate = "";
-            if(transactionElement.getElementsByTagName("transaction-date").item(0) != null) {
+            if (transactionElement.getElementsByTagName("transaction-date").item(0) != null) {
                 NodeList transactionDate = transactionElement.getElementsByTagName("transaction-date").item(0).getChildNodes();
                 if (transactionDate.getLength() == 0) {
                     localDate = ((Element) transactionDate).getAttribute(ISO_ATTRIBUTE);
@@ -987,8 +985,7 @@ public abstract class IATIProcessor implements ISourceProcessor {
                     localDate = transactionDate.item(0).getNodeValue();
 
                 }
-                if (localDate != null && !isValidDate(localDate))
-                {
+                if (localDate != null && !isValidDate(localDate)) {
                     localDate = transactionElement.getElementsByTagName("transaction-date").item(0).getAttributes().getNamedItem(ISO_ATTRIBUTE).getNodeValue();
                 }
             }
@@ -1001,7 +998,7 @@ public abstract class IATIProcessor implements ISourceProcessor {
             // if no provider tag, check if we have participating-org with role 1 (funding
             // if not use reporting org )
             if (providerNode == null) {
-                if (activityProviderNode != null ) {
+                if (activityProviderNode != null) {
                     providerNode = activityProviderNode;
                 } else {
                     //this should be moved to iati since its per activity
@@ -1060,7 +1057,9 @@ public abstract class IATIProcessor implements ISourceProcessor {
             }
         }
     }
+
     protected abstract String extractProvidingOrganization(Element providerNode);
+
     protected abstract String extractReceivingOrganization(Element e);
 
     protected Boolean includedByFilter(List<String> filters, String codeValue) {
@@ -1074,12 +1073,15 @@ public abstract class IATIProcessor implements ISourceProcessor {
         }
         return false;
     }
+
     protected abstract String getStringOrgValue(Element fieldElement);
-    protected abstract String getDateSubtype(Field field) ;
+
+    protected abstract String getDateSubtype(Field field);
 
     /**
      * Search for name in the element, if not available return description. Otherwise return null
      * Each processor shall implemente where to look for name and description since it will depend on the iati version
+     *
      * @param fieldElement
      * @return
      */
@@ -1101,14 +1103,15 @@ public abstract class IATIProcessor implements ISourceProcessor {
                                 && (filteredField.getSubType().equals(code)
                                 || code.equals(filteredField.getSubTypeCode())));
             case DATE:
-                  return filteredField ->
-                       (filteredField.getType().equals(fieldType) &&
-                               getDateSubtype(filteredField).equals(e.getAttribute("type")));
-                default:
+                return filteredField ->
+                        (filteredField.getType().equals(fieldType) &&
+                                getDateSubtype(filteredField).equals(e.getAttribute("type")));
+            default:
                 return null;
         }
     }
-    protected Field getField(Element element, FieldType fieldType){
+
+    protected Field getField(Element element, FieldType fieldType) {
         return getFields().stream()
                 .filter(getFieldsPredicate(element, fieldType))
                 .reduce((a, b) -> {
