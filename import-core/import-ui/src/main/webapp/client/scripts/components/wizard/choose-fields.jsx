@@ -266,16 +266,16 @@ var ChooseFields = React.createClass({
       }
     });
 
-    var destDependentFields = [...new Set(_.map(_.filter(this.state.destinationFieldsData, function (item) {
+    var destDependentFields = Array.from(new Set(_.map(_.filter(this.state.destinationFieldsData, function (item) {
       return selectedDestFields && selectedDestFields.includes(item.uniqueFieldName) && item.dependencies;
     }), function (item) {
       return _.map(item.dependencies, function (i) {
         return i.uniqueFieldName;
       })
-    }).flat())];
+    }).flat()));
 
-    let requiredFieldsAreMissing = requiredDestFields && requiredDestFields.length > 0;
-    let dependentFieldsAreMissing = destDependentFields && destDependentFields.length > 0;
+    var requiredFieldsAreMissing = requiredDestFields && requiredDestFields.length > 0;
+    var dependentFieldsAreMissing = destDependentFields && destDependentFields.length > 0;
     if (selectedDestFields && selectedDestFields.length > 0) {
       requiredFieldsAreMissing = requiredFieldsAreMissing && !this.containsAll(requiredDestFields, selectedDestFields);
       dependentFieldsAreMissing = dependentFieldsAreMissing && !this.containsAll(destDependentFields, selectedDestFields);
