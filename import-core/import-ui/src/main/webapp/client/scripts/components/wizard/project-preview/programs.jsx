@@ -5,7 +5,6 @@ var _ = require('lodash/dist/lodash.underscore');
 var Programs = React.createClass({
     render: function () {
        var sdgTagCodes = (this.props.project.stringMultiFields && this.props.project.stringMultiFields['tag']) ? this.props.project.stringMultiFields['tag'] : [];
-      debugger;
        return (<div className="section_group_class" >
              <div className="section_title_class"><span>{this.props.i18nLib.t('project_preview.sdg')}</span><span></span></div>
                <table className="box_table">

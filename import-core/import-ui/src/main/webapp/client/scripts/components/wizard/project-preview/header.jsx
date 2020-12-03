@@ -15,7 +15,13 @@ var Header = React.createClass({
                 <span className="preview_title">
                       {documentTitle}
                       {translatedDocumentTitle && translatedDocumentTitle.length > 0
-                      && <div><Tooltip i18nLib={this.props.i18nLib} tooltip={translatedDocumentTitle} dataPlacement="right" classes="glyphicon-info-sign-translation"/></div>}
+                      && <div><Tooltip
+                        i18nLib={this.props.i18nLib}
+                        tooltip={translatedDocumentTitle}
+                        dataPlacement="right"
+                        image="/images/france-flag-round-icon-16.png"
+                        classes="translation-tooltip"
+                        /></div>}
                 </span>
                     <div className="preview_status_container">
                        <div className="inline">

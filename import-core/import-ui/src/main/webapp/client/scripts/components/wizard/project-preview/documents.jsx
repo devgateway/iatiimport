@@ -5,7 +5,6 @@ var _ = require('lodash/dist/lodash.underscore');
 var Documents = React.createClass({
     render: function () {
        var documents = this.props.project.documentLinkFields ? Object.values(this.props.project.documentLinkFields) : [];
-       debugger;
        return (<div className="section_group_class" >
              <div className="section_title_class"><span>{this.props.i18nLib.t('project_preview.documents')}</span><span></span></div>
              <table className="box_table">
