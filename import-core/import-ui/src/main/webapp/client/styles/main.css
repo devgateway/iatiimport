@@ -358,6 +358,16 @@ tbody.scrollablebody td, thead.scrollablebody th {
   clear:both;
 }
 
+.france-flag {
+  display: inline-block;
+  background: url(../images/france-flag-round-icon-16.png) no-repeat;
+  width: 25px;
+  margin-left: 5px;
+}
+.france-flag:before{
+  content:"\2002";
+}
+
 .loading-icon {
     background: url('../images/ajax-loader.gif') no-repeat center center;
     min-height: 100px;

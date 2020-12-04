@@ -39,9 +39,9 @@ var Identification = React.createClass({
                   && <div>
                     <Tooltip
                       i18nLib={this.props.i18nLib} tooltip={sourceTranslatedDocumentDescription}
-                      dataPlacement="right"
-                      image="/images/france-flag-round-icon-16.png"
-                      classes="translation-tooltip" />
+                      dataPlacement={constants.TOOLTIP_DESC}
+                      image={true}
+                      classes="france-flag tooltip-desc"/>
                   </div>}
                 </p>
                 </div>

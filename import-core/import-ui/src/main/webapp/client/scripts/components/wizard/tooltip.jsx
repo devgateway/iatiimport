@@ -1,4 +1,5 @@
 var React = require('react');
+var constants = require("../../utils/constants");
 var DEFAULT_LANGUAGE_CODE = 'en';
 var Tooltip = React.createClass({
   getInitialState: function () {
@@ -8,7 +9,7 @@ var Tooltip = React.createClass({
     $(this.refs.tooltip.getDOMNode()).tooltip();
   },
   getClasses: function () {
-    var classes=''
+    var classes = ''
 
     if (!this.props.image) {
       classes = 'glyphicon glyphicon-info-sign ';
@@ -24,7 +25,11 @@ var Tooltip = React.createClass({
   getDataPlacement: function () {
     var dataPlacement = "bottom";
     if (this.props.dataPlacement) {
-      dataPlacement = this.props.classes;
+      if (this.props.dataPlacement === constants.TOOLTIP_DESC || this.props.dataPlacement === constants.TOOLTIP_HEADER) {
+        dataPlacement = this.props.dataPlacement;
+      } else {
+        dataPlacement = this.props.classes;
+      }
     }
 
     return dataPlacement;
@@ -40,10 +45,8 @@ var Tooltip = React.createClass({
   },
   render: function () {
     return (
-      <span ref="tooltip" className={this.props.image?'':this.getClasses()} data-toggle="tooltip" data-placement={this.getDataPlacement()}
-            title={this.getTooltip()}>
-       {this.props.image && <img src={this.props.image} className={!this.props.image?'':this.getClasses()}/>}
-       </span>);
+      <span ref="tooltip" className={this.getClasses()} data-toggle="tooltip" data-placement={this.getDataPlacement()}
+            title={this.getTooltip()}></span>);
   }
 });
 module.exports = Tooltip;

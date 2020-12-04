@@ -267,8 +267,8 @@ var ChooseProjects = React.createClass({
                           {sourceTranslatedDocumentTitle && sourceTranslatedDocumentTitle.length > 0 &&
                           <Tooltip i18nLib={this.props.i18nLib}
                                    tooltip={sourceTranslatedDocumentTitle}
-                                   image="/images/france-flag-round-icon-16.png"
-                                   classes="translation-tooltip"
+                                   image={true}
+                                   classes="france-flag"
                           />}
                         </td>
                             <td className="no-left-padding">
