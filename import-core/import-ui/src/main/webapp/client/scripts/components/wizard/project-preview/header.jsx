@@ -19,7 +19,7 @@ var Header = React.createClass({
                         i18nLib={this.props.i18nLib}
                         tooltip={translatedDocumentTitle}
                         dataPlacement="right"
-                        image="/images/france-flag-round-icon-16.png"
+                        image="france-flag-round-icon-16.png"
                         classes="translation-tooltip"
                         /></div>}
                 </span>

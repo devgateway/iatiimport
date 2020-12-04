@@ -42,7 +42,7 @@ var Tooltip = React.createClass({
     return (
       <span ref="tooltip" className={this.props.image?'':this.getClasses()} data-toggle="tooltip" data-placement={this.getDataPlacement()}
             title={this.getTooltip()}>
-       {this.props.image && <img src={this.props.image} className={!this.props.image?'':this.getClasses()}/>}
+       {this.props.image && <img src={'../../../images/' + this.props.image} className={!this.props.image?'':this.getClasses()}/>}
        </span>);
   }
 });
