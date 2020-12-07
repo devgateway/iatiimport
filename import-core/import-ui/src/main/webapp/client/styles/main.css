@@ -358,6 +358,16 @@ tbody.scrollablebody td, thead.scrollablebody th {
   clear:both;
 }
 
+.france-flag {
+  display: inline-block;
+  background: url(../images/france-flag-round-icon-16.png) no-repeat;
+  width: 25px;
+  margin-left: 5px;
+}
+.france-flag:before{
+  content:"\2002";
+}
+
 .loading-icon {
     background: url('../images/ajax-loader.gif') no-repeat center center;
     min-height: 100px;
@@ -489,7 +499,6 @@ tbody.scrollablebody td, thead.scrollablebody th {
 .glyphicon-remove-custom{
 	margin-top:5px !important;
 }
-
 .glyphicon-custom {
 	margin-left: 20px;
 	font-size: 18px;
@@ -510,12 +519,9 @@ tbody.scrollablebody td, thead.scrollablebody th {
 	margin-right:10px;
 }
 
-.glyphicon-info-sign-translation {
-  color: #337ab7;
-  font-size: 15px;
-  margin-left:10px;
+.translation-tooltip{
+  margin-left: 5px;
 }
-
 .glyphicon-eye-open-custom {
 	font-size: 16px;
 	margin:5px;
@@ -556,9 +562,4 @@ div.tooltip{
 
 .projectPreview .tooltip.in {
   width: unset !important;
-}
-
-.projectPreview .glyphicon-info-sign-translation {
-  margin-left: 0px;
-  padding-right: 10px;
 }

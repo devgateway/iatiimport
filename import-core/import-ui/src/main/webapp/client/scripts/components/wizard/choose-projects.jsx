@@ -264,7 +264,12 @@ var ChooseProjects = React.createClass({
                         </td>
                         <td>
                           {sourceDocumentTitle}
-                          {sourceTranslatedDocumentTitle && sourceTranslatedDocumentTitle.length > 0 && <Tooltip i18nLib={this.props.i18nLib} tooltip={sourceTranslatedDocumentTitle} classes="glyphicon-info-sign-translation"/>}
+                          {sourceTranslatedDocumentTitle && sourceTranslatedDocumentTitle.length > 0 &&
+                          <Tooltip i18nLib={this.props.i18nLib}
+                                   tooltip={sourceTranslatedDocumentTitle}
+                                   image={true}
+                                   classes="france-flag"
+                          />}
                         </td>
                             <td className="no-left-padding">
                             {item.destinationDocument &&
@@ -309,7 +314,12 @@ var ChooseProjects = React.createClass({
                         </td>
                         <td>{item.destinationDocument.allowEdit ? "" : " * " }
                             {sourceDocumentTitle}
-                            {sourceTranslatedDocumentTitle && sourceTranslatedDocumentTitle.length > 0 && <Tooltip i18nLib={this.props.i18nLib} tooltip={sourceTranslatedDocumentTitle} classes="glyphicon-info-sign-translation" />}
+                            {sourceTranslatedDocumentTitle && sourceTranslatedDocumentTitle.length > 0 &&
+                            <Tooltip i18nLib={this.props.i18nLib}
+                                     tooltip={sourceTranslatedDocumentTitle}
+                                     image={true}
+                                     classes="france-flag"
+                            />}
                         </td>
                         <td>
                             {item.destinationDocument &&

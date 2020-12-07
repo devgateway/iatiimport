@@ -36,7 +36,13 @@ var Identification = React.createClass({
                 <p className="field_description">
                   {sourceDocumentDescription}
                   {sourceTranslatedDocumentDescription && sourceTranslatedDocumentDescription.length > 0
-                  && <div><Tooltip i18nLib={this.props.i18nLib} tooltip={sourceTranslatedDocumentDescription} dataPlacement="right" classes="glyphicon-info-sign-translation" /></div>}
+                  && <div>
+                    <Tooltip
+                      i18nLib={this.props.i18nLib} tooltip={sourceTranslatedDocumentDescription}
+                      dataPlacement={constants.TOOLTIP_DESC}
+                      image={true}
+                      classes="france-flag tooltip-desc"/>
+                  </div>}
                 </p>
                 </div>
                 </div>
