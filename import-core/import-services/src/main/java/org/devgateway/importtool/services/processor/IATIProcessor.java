@@ -520,7 +520,7 @@ public abstract class IATIProcessor implements ISourceProcessor {
         factory.setValidating(false);
         factory.setIgnoringElementContentWhitespace(true);
         DocumentBuilder builder = factory.newDocumentBuilder();
-        return builder. parse(is);
+        return builder.parse(is);
     }
 
     public List<String> buildTooltipsFields() {
