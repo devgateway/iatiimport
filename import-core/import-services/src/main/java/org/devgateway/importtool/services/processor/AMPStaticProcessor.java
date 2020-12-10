@@ -1231,7 +1231,10 @@ public class AMPStaticProcessor implements IDestinationProcessor {
             } else {
                 return n.getValue().equals(fieldValue);
             }
-        }).findFirst().get();
+        }).findFirst().orElse(null);
+		if (fvs == null) {
+			return null;
+		} ;
         Integer sourceValueIndex = fvs.getIndex();
         Integer destinationValueIndex = vm.getValueIndexMapping().get(sourceValueIndex);
         FieldValue fvd = vm.getDestinationField().getPossibleValues().stream().filter(n -> {
