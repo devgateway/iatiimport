@@ -278,7 +278,7 @@ var ChooseProjects = React.createClass({
                             </td>
                         <td className="no-right-padding">
                             {(this.state.destinationProjects && this.state.destinationProjects.length > 0) &&
-                                <AutoComplete context={constants.CHOOSE_PROJECTS} options={this.state.destinationProjects} display="title" language={language} placeholder="" refId="destSearch" onSelect={this.handleAutocompleteToggle.bind(this, item)} value={item.destinationDocument ? common.getTitle(item.destinationDocument.multilangFields) : ''}/>
+                                <AutoComplete context={constants.CHOOSE_PROJECTS} options={this.state.destinationProjects} display="title" language={language} placeholder="" refId="destSearch" onSelect={this.handleAutocompleteToggle.bind(this, item)} value={item.destinationDocument ? common.getTitle(item.destinationDocument) : ''}/>
                             }
                        </td>
 
