@@ -29,25 +29,55 @@ public class DataService {
         
         if (documentMapper.getFieldMappingObject() != null && documentMapper.getFieldMappingObject().size() > 0 && (documentMapper.getValueMappingObject() == null || documentMapper.getValueMappingObject().size() == 0)) {
             if (documentMapper.getValueMappingObject() == null) {
-                documentMapper.setValueMappingObject(new ArrayList<FieldValueMapping>());
+                documentMapper.setValueMappingObject(new ArrayList<>());
             }
             documentMapper.getFieldMappingObject().stream().forEach(fieldMapping -> {
                 addFieldValueMapping(documentMapper, fieldMapping, valuesInSelectedSourceProjects);
             });
-
-        } else if (documentMapper.getValueMappingObject().size() != documentMapper.getFieldMappingObject().size()) {
+        } else {
             documentMapper.getFieldMappingObject().stream().forEach(fieldMapping -> {
-                Boolean alreadyInserted = documentMapper.getValueMappingObject().stream().anyMatch(n -> { return n.getSourceField().getUniqueFieldName().equals(fieldMapping.getSourceField().getUniqueFieldName());});
-                if(!alreadyInserted) {
+                documentMapper.getValueMappingObject()
+                        .removeIf(fv -> !fieldValueMappingMatchWithFieldMapping(fv, fieldMapping));
+
+                Boolean alreadyInserted = documentMapper.getValueMappingObject().stream()
+                        .anyMatch(n -> isFieldValueOfFieldMapping(n, fieldMapping));
+
+                if (!alreadyInserted) {
                     addFieldValueMapping(documentMapper, fieldMapping, valuesInSelectedSourceProjects);
                 }
             });
-
         }
         
         return documentMapper.getValueMappingObject();
     }
-    
+
+    /**
+     * Detect if the field value's source field and destination field matches with the field mapping's field
+     *
+     * @param fv
+     * @param fieldMapping
+     * @return
+     */
+    private boolean fieldValueMappingMatchWithFieldMapping(FieldValueMapping fv, FieldMapping fieldMapping) {
+        if (fv.getSourceField().getUniqueFieldName().equals(fieldMapping.getSourceField().getUniqueFieldName())) {
+            return fv.getDestinationField().getUniqueFieldName().equals(fieldMapping.getDestinationField().getUniqueFieldName());
+        }
+
+        return true;
+    }
+
+    /**
+     * Detect if the value mapping's fields are the same of field mapping's fields
+     *
+     * @param fv
+     * @param fieldMapping
+     * @return
+     */
+    private boolean isFieldValueOfFieldMapping(FieldValueMapping fv, FieldMapping fieldMapping) {
+        return fv.getSourceField().getUniqueFieldName().equals(fieldMapping.getSourceField().getUniqueFieldName())
+                && fv.getDestinationField().getUniqueFieldName().equals(fieldMapping.getDestinationField().getUniqueFieldName());
+    }
+
     private void addFieldValueMapping(IDocumentMapper documentMapper, FieldMapping fieldMapping, Map<String, Set<String>> valuesInSelectedSourceProjects) {
         FieldValueMapping fvm = new FieldValueMapping();
         fvm.setSourceField(fieldMapping.getSourceField());
@@ -84,7 +114,7 @@ public class DataService {
         
         documentMapper.getValueMappingObject().add(fvm);
     }
-    
+
     public List<FieldMapping> setFieldMapping(IDocumentMapper documentMapper, List<FieldMapping> fieldMapping){
         documentMapper.setFieldMappingObject(fieldMapping);     
         //update field value mappings
