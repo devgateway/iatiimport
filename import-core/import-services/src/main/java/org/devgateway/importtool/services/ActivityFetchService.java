@@ -1,24 +1,5 @@
 package org.devgateway.importtool.services;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
@@ -36,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -43,6 +25,27 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSSerializer;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.mapping;
@@ -106,9 +109,10 @@ public class ActivityFetchService {
         } catch (RuntimeException ex) {
             //we should probably not save it until is valid. leaving it here
             //for simplicity
-            //Files.delete(Paths.get(fileName));
-            //result.setStatus(Status.FAILED_WITH_ERROR);
-            //throw ex;
+            Files.deleteIfExists(Paths.get(fileName));
+            result.setStatus(Status.FAILED_WITH_ERROR);
+            result.setMessage("Error fetching activities from the datastore: " + ex.getMessage());
+            throw ex;
         }
     }
 
@@ -175,8 +179,12 @@ public class ActivityFetchService {
 
 
         String url = getUrlForReportingOrg(reportingOrg) + getParameters(queryParameters, defaultParameters);
-        log.debug(url);
-        return restTemplate.getForObject(url, String.class);
+        try {
+            return restTemplate.getForObject(url, String.class);
+        } catch (RestClientException ex) {
+            log.error("Cannot get activities from datastore", ex);
+            throw new RuntimeException(ex.getLocalizedMessage(), ex);
+        }
     }
 
     private String getParameters(List<Param> queryParam, List<Param> parameters) {

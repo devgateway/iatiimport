@@ -1,26 +1,5 @@
 package org.devgateway.importtool.rest;
 
-import static org.devgateway.importtool.services.processor.destination.AmpStaticProcessorConstants.SESSION_COOKIE_NAME;
-import static org.devgateway.importtool.services.processor.helper.Constants.CURRENT_FILE_ID;
-import static org.devgateway.importtool.services.processor.helper.Constants.DESTINATION_PROCESSOR;
-import static org.devgateway.importtool.services.processor.helper.Constants.DOCUMENT_MAPPER;
-import static org.devgateway.importtool.services.processor.helper.Constants.IATI_STORE_ACTIVITIES;
-import static org.devgateway.importtool.services.processor.helper.Constants.REPORTING_ORG;
-import static org.devgateway.importtool.services.processor.helper.Constants.SESSION_TOKEN;
-import static org.devgateway.importtool.services.processor.helper.Constants.SOURCE_PROCESSOR;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.devgateway.importtool.dao.FileRepository;
@@ -39,11 +18,7 @@ import org.devgateway.importtool.services.ActivityFetchService;
 import org.devgateway.importtool.services.ImportService;
 import org.devgateway.importtool.services.ProjectTranslator;
 import org.devgateway.importtool.services.processor.IATIProcessor;
-import org.devgateway.importtool.services.processor.helper.DocumentMapper;
-import org.devgateway.importtool.services.processor.helper.IDestinationProcessor;
-import org.devgateway.importtool.services.processor.helper.IDocumentMapper;
-import org.devgateway.importtool.services.processor.helper.ISourceProcessor;
-import org.devgateway.importtool.services.processor.helper.Status;
+import org.devgateway.importtool.services.processor.helper.*;
 import org.devgateway.importtool.services.request.ImportRequest;
 import org.devgateway.importtool.services.response.DocumentMappingResponse;
 import org.devgateway.importtool.services.response.ImportExecuteResponse;
@@ -53,13 +28,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.*;
+
+import static org.devgateway.importtool.services.processor.destination.AmpStaticProcessorConstants.SESSION_COOKIE_NAME;
+import static org.devgateway.importtool.services.processor.helper.Constants.*;
 
 
 @RestController
@@ -281,22 +260,22 @@ class ImportController  {
 			if (activitiesFromDataStore.getStatus().equals(Status.FAILED_WITH_ERROR)
 					|| activitiesFromDataStore.getStatus().equals(Status.COMPLETED)) { //activities  have
 				if (activitiesFromDataStore.getStatus().equals(Status.COMPLETED)) {
-					if (activitiesFromDataStore.getStatus().equals(Status.COMPLETED)) {
-						activitiesFromDataStore.getVersions().retainAll(IATIProcessor.IMPLEMENTED_VERSIONS);
-						organizationDetails.setVersions(activitiesFromDataStore.getVersions());
-						organizationDetails.setProjectWithUpdates(projectRepository.findProjectUpdated());
-						request.getSession().setAttribute(IATI_STORE_ACTIVITIES, activitiesFromDataStore);
-						organizationDetails.setStatus(Status.COMPLETED);
-					} else {
-						organizationDetails.setStatus(Status.FAILED_WITH_ERROR);
-					}
+					activitiesFromDataStore.getVersions().retainAll(IATIProcessor.IMPLEMENTED_VERSIONS);
+					organizationDetails.setVersions(activitiesFromDataStore.getVersions());
+					organizationDetails.setProjectWithUpdates(projectRepository.findProjectUpdated());
+					request.getSession().setAttribute(IATI_STORE_ACTIVITIES, activitiesFromDataStore);
+					organizationDetails.setStatus(Status.COMPLETED);
 				} else {
-					organizationDetails.setStatus(Status.IN_PROGRESS);
+					organizationDetails.setStatus(Status.FAILED_WITH_ERROR);
+					organizationDetails.setMessage(activitiesFromDataStore.getMessage());
 				}
+			} else {
+				organizationDetails.setStatus(Status.IN_PROGRESS);
 			}
-		}else{
-			 organizationDetails.setStatus(Status.FAILED_WITH_ERROR);
+		} else {
+			organizationDetails.setStatus(Status.FAILED_WITH_ERROR);
 		}
+
 		return new ResponseEntity<>(organizationDetails, HttpStatus.OK);
 
 	}
