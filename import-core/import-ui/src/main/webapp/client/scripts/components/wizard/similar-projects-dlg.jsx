@@ -1,29 +1,33 @@
 var React = require('react');
 var _ = require('lodash/dist/lodash.underscore');
 var SimilarProjectsDialog = React.createClass({
-    getInitialState: function() {
-       return {selectedProject: null};
-    },
     onProjectSelectionChange: function(event) {
-       var selectedProject = _.find(this.props.projectMapping.projectsWithSimilarTitles, function(item) { return item.identifier === event.target.dataset.id;});
-       this.setState({selectedProject: selectedProject});
+       var selectedProject = _.find(this.props.projectMapping.projectsWithSimilarTitles, function(item) { return item.stringFields.internalId === event.target.dataset.id;});
+       this.props.updateSimilarProjectSelected(selectedProject);
     },
     mapSelectedProject: function() {
-      if (this.state.selectedProject) {
-         this.props.mapProject(this.props.projectMapping, this.state.selectedProject);
-         $('#similarProjects').modal('hide');
-      }
+       this.props.mapSelectedProject();
+       $('#similarProjects').modal('hide');
     },
     onClose: function() {
       $('#similarProjects').modal('hide');
     },
+    isMapSelectedProjectButtonDisabled: function() {
+      if (this.props.similarProjectSelected || (this.props.projectMapping && this.props.projectMapping.destinationDocument)) {
+        return false;
+      }
+      return true;
+    },
     render: function () {
        var rows = [];
        if (this.props.projectMapping && this.props.projectMapping.projectsWithSimilarTitles){
-          $.map(this.props.projectMapping.projectsWithSimilarTitles, function (item, i) {
+           let project = this.props.similarProjectSelected ? this.props.similarProjectSelected : this.props.projectMapping.destinationDocument;
+           let selectedProjectInternalId = project ? project.stringFields.internalId : "";
+           $.map(this.props.projectMapping.projectsWithSimilarTitles, function (item, i) {
+            let internalId = item.stringFields.internalId;
             rows.push(<tr>
                        <td>
-                        <input type="checkbox" checked={this.state.selectedProject ? (this.state.selectedProject.identifier === item.identifier) : false} data-id={item.identifier} onChange={this.onProjectSelectionChange} />
+                        <input type="checkbox" checked={selectedProjectInternalId === internalId} data-id={internalId} onChange={this.onProjectSelectionChange} />
                           </td>
                           <td>
                            {item.identifier}
@@ -34,6 +38,8 @@ var SimilarProjectsDialog = React.createClass({
                          </tr>)
               }.bind(this));
        }
+
+       let mapSelectedDisabled = this.isMapSelectedProjectButtonDisabled();
 
        return (
           <div className="modal fade" id="similarProjects" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel2" aria-hidden="true" >
@@ -64,7 +70,7 @@ var SimilarProjectsDialog = React.createClass({
 			      </table>
 			      <div className="modal-footer">
 			        <button type="button" className="btn btn-default btn-warning" data-dismiss="modal" onClick={this.onClose}>{this.props.i18nLib.t('wizard.similar_projects_dlg.close')}</button>
-			        <button type="button" className="btn btn-primary" onClick={this.mapSelectedProject}>{this.props.i18nLib.t('wizard.similar_projects_dlg.select_project')}</button>
+			        <button type="button" disabled={mapSelectedDisabled} className="btn btn-primary" onClick={this.mapSelectedProject}>{this.props.i18nLib.t('wizard.similar_projects_dlg.select_project')}</button>
 			      </div>
 			    </div>
 			  </div>
