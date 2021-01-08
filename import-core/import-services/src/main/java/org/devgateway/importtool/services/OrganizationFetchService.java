@@ -45,7 +45,7 @@ public class OrganizationFetchService {
             } while (response.getResult().size() == PAGE_SIZE);
             log.debug("Organizations fetched");
         } catch (RestClientException ex) {
-            log.error("Cannot get organizations from datastore", ex);
+            log.error("Cannot get organizations from the datastore", ex);
             throw new RuntimeException(ex);
         }
     }
