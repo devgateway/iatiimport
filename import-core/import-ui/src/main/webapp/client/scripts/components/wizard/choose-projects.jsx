@@ -29,13 +29,15 @@ var ChooseProjects = React.createClass({
            showSimilarProjects: false,
            projectMapping: null,
            showSourceProjectPreview: false,
-           sourceFieldsData:[]
+           sourceFieldsData:[],
+           similarProjectSelected: ""
           };
     },
     initializeFailed:false,
     componentWillMount: function () {
      this.showSimilarProjectsDialog = this.showSimilarProjectsDialog.bind(this);
-     this.mapProject = this.mapProject.bind(this);
+     this.mapSelectedProject = this.mapSelectedProject.bind(this);
+     this.updateSimilarProjectSelected = this.updateSimilarProjectSelected.bind(this);
      this.resetMapping = this.resetMapping.bind(this);
      this.props.eventHandlers.updateCurrentStep(constants.CHOOSE_PROJECTS);
      this.listenTo(projectStore, this.updateProject);
@@ -113,11 +115,18 @@ var ChooseProjects = React.createClass({
         item.destinationDocument = datum;
         this.forceUpdate();
     },
-    mapProject: function(mapping, project) {
+  mapSelectedProject: function() {
        var projectData = this.state.projectData;
-       var projectMapping = _.find(projectData, function(m) { return m.id === mapping.id});
-       projectMapping.destinationDocument = project;
+       var pm = this.state.projectMapping;
+       var projectMapping = _.find(projectData, function(m) { return m.id === pm.id});
+       projectMapping.destinationDocument = this.state.similarProjectSelected;
        this.setState({projectData: projectData});
+    },
+    resetSimilarProjectSelected: function() {
+      this.updateSimilarProjectSelected(null);
+    },
+    updateSimilarProjectSelected: function(project) {
+      this.setState({similarProjectSelected: project});
     },
     checkAll: function(operation){
         var projects = _.where(this.state.projectData, {operation: operation});
@@ -211,6 +220,7 @@ var ChooseProjects = React.createClass({
 	},
 	showSimilarProjectsDialog: function(event) {
 	   var projectMapping = _.find(this.state.projectData, function(item) { return item.id === event.target.dataset.id;});
+     this.resetSimilarProjectSelected();
 	   this.setState({showSimilarProjects: !this.state.showSimilarProjects, projectMapping: projectMapping});
 	},
 	resetMapping: function(event) {
@@ -346,7 +356,7 @@ var ChooseProjects = React.createClass({
                     <div className="panel panel-success">
                       <div className="panel-heading">{this.props.i18nLib.t('wizard.choose_projects.new_projects')} <i>({newProjects.length } {this.props.i18nLib.t('wizard.choose_projects.choose_projects')})</i></div>
                         <div className="panel-body">
-                         <SimilarProjectsDialog projectMapping={this.state.projectMapping} getTitle={common.getTitle} mapProject={this.mapProject} {...this.props} />
+                         <SimilarProjectsDialog projectMapping={this.state.projectMapping} getTitle={common.getTitle} mapSelectedProject={this.mapSelectedProject} updateSimilarProjectSelected={this.updateSimilarProjectSelected} similarProjectSelected={this.state.similarProjectSelected} {...this.props} />
                          {this.state.showSourceProjectPreview && this.state.projectMapping && this.state.sourceFieldsData.length > 0  &&
                             <ProjectPreview closeProjectPreview={this.closeProjectPreview.bind(this)} project={this.state.projectMapping.sourceDocument} i18nLib = {this.props.i18nLib} sourceFieldsData = {this.state.sourceFieldsData} />
                          }
