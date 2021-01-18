@@ -672,6 +672,7 @@ public abstract class IATIProcessor implements ISourceProcessor {
         XPath xPath = XPathFactory.newInstance().newXPath();
         NodeList nodeList = getActivities();
         List<InternalDocument> list = new ArrayList<>();
+        actionStatus.setProcessed(0);
         actionStatus.setTotal(Long.valueOf(nodeList.getLength()));
         this.clearUsedValues();
         for (int i = 0; i < nodeList.getLength(); i++) {
