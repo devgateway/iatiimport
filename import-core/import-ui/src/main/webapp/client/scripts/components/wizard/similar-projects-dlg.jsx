@@ -21,10 +21,10 @@ var SimilarProjectsDialog = React.createClass({
     render: function () {
        var rows = [];
        if (this.props.projectMapping && this.props.projectMapping.projectsWithSimilarTitles){
-           let project = this.props.similarProjectSelected ? this.props.similarProjectSelected : this.props.projectMapping.destinationDocument;
-           let selectedProjectInternalId = project ? project.stringFields.internalId : "";
+           var project = this.props.similarProjectSelected ? this.props.similarProjectSelected : this.props.projectMapping.destinationDocument;
+           var selectedProjectInternalId = project ? project.stringFields.internalId : "";
            $.map(this.props.projectMapping.projectsWithSimilarTitles, function (item, i) {
-            let internalId = item.stringFields.internalId;
+             var internalId = item.stringFields.internalId;
             rows.push(<tr>
                        <td>
                         <input type="checkbox" checked={selectedProjectInternalId === internalId} data-id={internalId} onChange={this.onProjectSelectionChange} />
@@ -39,7 +39,7 @@ var SimilarProjectsDialog = React.createClass({
               }.bind(this));
        }
 
-       let mapSelectedDisabled = this.isMapSelectedProjectButtonDisabled();
+       var mapSelectedDisabled = this.isMapSelectedProjectButtonDisabled();
 
        return (
           <div className="modal fade" id="similarProjects" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel2" aria-hidden="true" >
