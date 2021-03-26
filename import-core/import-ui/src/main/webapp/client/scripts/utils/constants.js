@@ -1,6 +1,8 @@
 'use strict';
 
 module.exports = {
+  TOOLTIP_DESC: 'tooltip-desc',
+  TOOLTIP_HEADER: 'tooltip-header',
   SESSION_VERIFICATION_INTERVAL: 10000,
   UPLOAD_FILE: 'UPLOAD_FILE',
   FILTER_DATA: 'FILTER_DATA',

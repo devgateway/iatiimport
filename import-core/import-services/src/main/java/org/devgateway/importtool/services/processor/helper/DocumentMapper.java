@@ -217,6 +217,8 @@ public class DocumentMapper implements IDocumentMapper {
 	private void mapProjects(List<InternalDocument> sourceDocuments, List<InternalDocument> destinationDocuments) {
 		StopWatch stopWatch = StopWatch.createStarted();
 		this.updateStatus(EPMessages.MAPPING_STATUS_MESSAGE, Status.IN_PROGRESS);
+		this.documentMappingStatus.setProcessed(0);
+		this.documentMappingStatus.setTotal(sourceDocuments.size());
 		for (InternalDocument srcDoc : sourceDocuments) {
 			this.documentMappingStatus.incrementProcessed();
 			String sourceIdField = this.sourceProcessor.getIdField();

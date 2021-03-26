@@ -13,11 +13,13 @@ import org.devgateway.importtool.services.dto.JsonBean;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({"field_name", "apiType", "field_label", "required", "importable", "dependencies", "id_only",
-        "multiple_values", "percentage_constraint", "unique_constraint", "tree_collection", "translatable", "regex_pattern",
+        "multiple_values", "percentage_constraint", "unique_constraint", "tree_collection", "translatable",
+        "regex_pattern",
         "regex_constraint", "field_length", "size_limit"})
 /**
  * Class coming from AMP authored by Octavian Ciubotaru
@@ -33,7 +35,7 @@ public class APIField {
     private APIType apiType;
 
     @JsonProperty(JsonConstants.FIELD_LABEL)
-    private JsonBean fieldLabel;
+    private LinkedHashMap<String, JsonBean> fieldLabel;
 
     @JsonProperty(JsonConstants.REQUIRED)
     private String required;
@@ -95,10 +97,10 @@ public class APIField {
     }
 
     public JsonBean getFieldLabel() {
-        return fieldLabel;
+        return fieldLabel.get("default");
     }
 
-    public void setFieldLabel(JsonBean fieldLabel) {
+    public void setFieldLabel(LinkedHashMap<String, JsonBean> fieldLabel) {
         this.fieldLabel = fieldLabel;
     }
 

@@ -367,28 +367,30 @@ public abstract class IATIProcessor implements ISourceProcessor {
         List<FieldValue> possibleValues = new ArrayList<>();
         try {
             Document doc = getDocument(this.getCodelistPath() + standardFieldName + ".xml");
-            NodeList nodeList = getNodeListForCodeListValues(doc, standardFieldName);
-            int index = 0;
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                Node node = nodeList.item(i);
-                if (node.getNodeType() == Node.ELEMENT_NODE) {
-                    Element element = (Element) node;
-                    Element codeElement = (Element) element.getElementsByTagName("code").item(0);
-                    String code = codeElement.getChildNodes().item(0).getNodeValue();
-                    Element nameElement = (Element) element.getElementsByTagName("name").item(0);
+            if (doc != null) {
+                NodeList nodeList = getNodeListForCodeListValues(doc, standardFieldName);
+                int index = 0;
+                for (int i = 0; i < nodeList.getLength(); i++) {
+                    Node node = nodeList.item(i);
+                    if (node.getNodeType() == Node.ELEMENT_NODE) {
+                        Element element = (Element) node;
+                        Element codeElement = (Element) element.getElementsByTagName("code").item(0);
+                        String code = codeElement.getChildNodes().item(0).getNodeValue();
+                        Element nameElement = (Element) element.getElementsByTagName("name").item(0);
 
-                    String name = extractNameElementForCodeListValues(nameElement);
+                        String name = extractNameElementForCodeListValues(nameElement);
 
-                    FieldValue fv = new FieldValue();
-                    fv.setIndex(index++);
-                    fv.setCode(code);
-                    if (concatenate) {
-                        fv.setValue(code + " - " + name);
-                    } else {
-                        fv.setValue(name);
+                        FieldValue fv = new FieldValue();
+                        fv.setIndex(index++);
+                        fv.setCode(code);
+                        if (concatenate) {
+                            fv.setValue(code + " - " + name);
+                        } else {
+                            fv.setValue(name);
+                        }
+
+                        possibleValues.add(fv);
                     }
-
-                    possibleValues.add(fv);
                 }
             }
         } catch (ParserConfigurationException | SAXException | IOException e) {
@@ -512,6 +514,7 @@ public abstract class IATIProcessor implements ISourceProcessor {
         InputStream is = this.getClass().getResourceAsStream(fileName);
         if (is == null) {
             log.error("this field name is null:" + fileName);
+            return null;
         }
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setValidating(false);
@@ -669,6 +672,7 @@ public abstract class IATIProcessor implements ISourceProcessor {
         XPath xPath = XPathFactory.newInstance().newXPath();
         NodeList nodeList = getActivities();
         List<InternalDocument> list = new ArrayList<>();
+        actionStatus.setProcessed(0);
         actionStatus.setTotal(Long.valueOf(nodeList.getLength()));
         this.clearUsedValues();
         for (int i = 0; i < nodeList.getLength(); i++) {

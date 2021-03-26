@@ -11,6 +11,8 @@ public class FetchOrganizationDetails {
     private Set<String> versions;
     private List<Project> projectWithUpdates;
 
+    private String message;
+
     public FetchOrganizationDetails(){
         status = Status.NOT_STARTED;
     }
@@ -38,5 +40,13 @@ public class FetchOrganizationDetails {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

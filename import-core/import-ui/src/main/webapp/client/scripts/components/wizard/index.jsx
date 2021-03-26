@@ -234,7 +234,12 @@ var Wizard = React.createClass({
             self.transitionTo('selectversion', self.props.params);
           } else if (data.status === 'FAILED_WITH_ERROR') {
             $(self.refs.loadingIcon.getDOMNode()).hide();
-            self.displayError("Server Error");
+            if (data.message && data.message.length > 0) {
+              self.displayError(data.message);
+            } else {
+              self.displayError("Server Error");
+            }
+
             clearInterval(id);
           }
         }
