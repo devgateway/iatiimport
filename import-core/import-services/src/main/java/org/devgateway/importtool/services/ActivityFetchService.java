@@ -182,7 +182,7 @@ public class ActivityFetchService {
         try {
             return restTemplate.getForObject(url, String.class);
         } catch (RestClientException ex) {
-            log.error("Cannot get activities from datastore", ex);
+            log.error("Cannot get activities from datastore from the following url:" + url, ex);
             throw new RuntimeException(ex.getLocalizedMessage(), ex);
         }
     }
@@ -192,7 +192,8 @@ public class ActivityFetchService {
         if (queryParam != null && queryParam.size() > 0) {
             params.append("?q=");
             if (queryParam.size() > 0) {
-                queryParam.stream().forEach(param -> {
+                queryParam.stream().filter(parameter -> !parameter.getParamValueEncoded().
+                        trim().isEmpty()).collect(Collectors.toList()).stream().forEach(param -> {
                     params.append(param.getParamName().replace(PARAMETER_REPLACE_VALUE, param.getParamValueEncoded()));
                     params.append(param.getParameterOperator());
                 });
@@ -298,8 +299,12 @@ public class ActivityFetchService {
                 for (int i = 0; i < activities.getLength(); i++) {
                     Element element = (Element) activities.item(i);
                     String lastUpdatedDateTime = element.getAttribute(IATIProcessor.LAST_UPDATED_DATE);
-                    projectRepository.updateLastUpdatedDateByProjectIdentifier(ISO8601_DATE_FORMAT_PARSER.parse(
-                            lastUpdatedDateTime),getStringFromElement(element, IATIProcessor.DEFAULT_ID_FIELD));
+                    if (lastUpdatedDateTime == null || lastUpdatedDateTime.isEmpty()) {
+                        continue;
+                    } else {
+                        projectRepository.updateLastUpdatedDateByProjectIdentifier(ISO8601_DATE_FORMAT_PARSER.parse(
+                                lastUpdatedDateTime), getStringFromElement(element, IATIProcessor.DEFAULT_ID_FIELD));
+                    }
                 }
             } catch (XPathExpressionException | ParseException e) {
                 log.error("Cannot fetch activities due to a malformed XPATH", e);
