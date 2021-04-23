@@ -18,7 +18,7 @@ public interface ProjectRepository extends PagingAndSortingRepository<Project, L
 	List<Project> findProjectLastSyncedDate();
 	@Modifying
 	@Query("update Project p set p.lastUpdatedOn = ?1  where p.projectIdentifier = ?2 and p.lastSyncedOn = (select " +
-			"p1.lastSyncedOn from Project p1 where p1.projectIdentifier = p.projectIdentifier)")
+			"max(p1.lastSyncedOn) from Project p1 where p1.projectIdentifier = p.projectIdentifier)")
 	@Transactional
 	void updateLastUpdatedDateByProjectIdentifier(Date lastUpdatedOn, String projectIdentifier);
 	List<Project> findProjectUpdated();
