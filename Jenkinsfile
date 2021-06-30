@@ -21,7 +21,7 @@ stage('Build') {
                 sh returnStatus: true, script: "tar -cf ../iati-node-cache.tar --remove-files" +
                         " import-core/import-ui/src/main/webapp/node" +
                         " import-core/import-ui/src/main/webapp/node_modules"
-                sh returnStatus: true, script: "rm import-core/import-ui/src/main/webapp/package-lock.json"
+                sh returnStatus: true, script: "rm -f import-core/import-ui/src/main/webapp/package-lock.json"
                 sh returnStatus: true, script: "cd import-core && mvn clean"
             }
         }
@@ -48,6 +48,6 @@ stage('Deploy') {
         def country = deployParams['COUNTRY']
         def iatiField = deployParams['IATI_ID_FIELD']
         def processorVersion = deployParams['PROCESSOR_VERSION']
-        sh "ssh sulfur 'cd /opt/docker/iati-importer && ./up.sh $tag $host $country $iatiField $processorVersion'"
+        sh "ssh sulfur.migrated 'cd /opt/docker/iati-importer && ./up.sh $tag $host $country $iatiField $processorVersion'"
     }
 }
