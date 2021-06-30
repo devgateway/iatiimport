@@ -143,7 +143,7 @@
 				<version>1.2.0</version>
 				<configuration>
 					<dockerDirectory>${project.basedir}/docker</dockerDirectory>
-					<imageName>phosphorus:5000/iati-importer-ui:${iatiImporterTag}</imageName>
+					<imageName>phosphorus.migrated:5000/iati-importer-ui:${iatiImporterTag}</imageName>
 					<buildArgs>
 						<IMPORTER_JAR>${project.build.finalName}.jar</IMPORTER_JAR>
 						<PULL_REQUEST>${pullRequest}</PULL_REQUEST>

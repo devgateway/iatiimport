@@ -48,6 +48,6 @@ stage('Deploy') {
         def country = deployParams['COUNTRY']
         def iatiField = deployParams['IATI_ID_FIELD']
         def processorVersion = deployParams['PROCESSOR_VERSION']
-        sh "ssh sulfur 'cd /opt/docker/iati-importer && ./up.sh $tag $host $country $iatiField $processorVersion'"
+        sh "ssh sulfur.migrated 'cd /opt/docker/iati-importer && ./up.sh $tag $host $country $iatiField $processorVersion'"
     }
 }
