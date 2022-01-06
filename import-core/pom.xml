@@ -213,11 +213,6 @@
 				<artifactId>httpclient</artifactId>
 				<version>4.5.2</version>
 			</dependency>
-			<dependency>
-				<groupId>log4j</groupId>
-				<artifactId>log4j</artifactId>
-				<version>1.2.17</version>
-			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -225,11 +220,11 @@
 		<repository>
 			<id>spring-snapshot</id>
 			<name>Spring Maven Snapshot Repository</name>
-			<url>http://repo.springsource.org/libs-snapshot</url>
+			<url>https://repo.spring.io/release</url>
 		</repository>
 		<repository>
 			<id>JBoss repository</id>
-			<url>http://repository.jboss.org/nexus/content/groups/public/</url>
+			<url>https://repository.jboss.org/nexus/content/groups/public/</url>
 		</repository>
 	</repositories>
 </project>
