@@ -6,8 +6,6 @@ import-core/import-ui/src/main/resources/static/scripts/lt-ie9.js
 import-core/import-ui/src/main/resources/static/scripts/main.js
 import-core/import-ui/src/main/resources/static/styles/global.css
 import-core/import-ui/src/main/resources/static/styles/main.css
-import-core/import-ui/src/main/webapp/package-lock.json
 modernizr.js
-package-lock.json
 index.html
 .idea
