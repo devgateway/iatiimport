@@ -24,7 +24,7 @@
 		<sd.rest>2.0.0.RC1</sd.rest>
 		<m2eclipse.wtp.contextRoot>/</m2eclipse.wtp.contextRoot>
 		<spring-social.version>1.1.0.M4</spring-social.version>
-		<liquibase.version>3.6.3</liquibase.version>
+		<liquibase.version>4.8.0</liquibase.version>
 	</properties>
 	<packaging>pom</packaging>
 	<contributors>
