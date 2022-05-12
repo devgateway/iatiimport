@@ -1,21 +1,23 @@
-FROM openjdk:8-jre-alpine
+FROM maven:3.8.4-jdk-8 as build
+ARG BUILD_SOURCE
+WORKDIR /tmp/build
+COPY . .
+RUN --mount=type=cache,target=/root/.m2 --mount=type=cache,target=/root/.npm \
+    mvn -B clean package -DskipTests -DqaBuild -DbuildSource=$BUILD_SOURCE \
+    && mv import-ui/target/import-ui.jar /tmp/import-ui.jar \
+    && rm -r *.*
+
+FROM openjdk:8-jre
 
 LABEL maintainer="ociubotaru@developmentgateway.org"
 
 ARG PULL_REQUEST
 ARG BRANCH
-ARG IMPORTER_JAR
-ARG AMP_URL
-ARG PROCESSOR_VERSION
-ARG COUNTRY
 
 RUN mkdir -p /opt/importer
 WORKDIR /opt/importer
 
-# install bash to be able to run wait-for-it.sh
-RUN apk add --no-cache bash gawk sed grep bc coreutils
-
-ADD wait-for-it.sh .
+COPY wait-for-it.sh .
 
 EXPOSE 8081
 
@@ -34,4 +36,4 @@ ENTRYPOINT ./wait-for-it.sh db:5432 -t 0 -- \
 LABEL "pull-request"=$PULL_REQUEST
 LABEL "branch"=$BRANCH
 
-ADD $IMPORTER_JAR importer.jar
+COPY --from=build /tmp/import-ui.jar importer.jar
