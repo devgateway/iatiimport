@@ -25,3 +25,5 @@ spring:
       ddl-auto : update
     show-sql: false
 
+#logging.level:
+#  org.apache.http.wire: DEBUG

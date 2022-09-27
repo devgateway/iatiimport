@@ -15,10 +15,15 @@ import org.devgateway.importtool.services.processor.helper.ReportingOrganization
 import org.devgateway.importtool.services.processor.helper.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpRequest;
+import org.springframework.http.client.ClientHttpRequestExecution;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -58,8 +63,7 @@ public class ActivityFetchService {
     //this is not ISO Format however iati site says it should be
     private static final String ISO8601_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
     private static final SimpleDateFormat ISO8601_DATE_FORMAT_PARSER = new SimpleDateFormat(ISO8601_DATE_FORMAT);
-    @Autowired
-    private DataSourceService dataSourceService;
+
     @Value("${IATIProcessor.default_country}")
     private String defaultCountry;
 
@@ -67,6 +71,9 @@ public class ActivityFetchService {
     private ProjectRepository projectRepository;
     @Autowired
     private ProjectTranslator projectTranslator;
+
+    @Autowired
+    private IATIDatastoreProperties iatiDatastoreProperties;
 
     private Log log = LogFactory.getLog(getClass());
     private Integer FILE_EXPIRATION_TIME = 24;
@@ -142,43 +149,39 @@ public class ActivityFetchService {
         return doc;
     }
 
+    private class IATIAuthInterceptor implements ClientHttpRequestInterceptor {
 
-    /**
-     * If we have a custom datasource for the reporting org, fetch it, if not return the default one
-     *
-     * @param reportingOrg
-     * @return
-     */
-    private String getUrlForReportingOrg(String reportingOrg) {
-
-        String customUrl = dataSourceService.getDataSourceURL(reportingOrg);
-        customUrl = customUrl != null ? customUrl : DataFetchServiceConstants.IATI_DATASTORE_DEFAULT_URL;
-        return customUrl;
+        @Override
+        public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution)
+                throws IOException {
+            request.getHeaders().add("Ocp-Apim-Subscription-Key", iatiDatastoreProperties.getApiKey());
+            return execution.execute(request, body);
+        }
     }
 
-    public Document fetchFetchFromDataStore(String reportingOrg, List<Param> parameters) {
-        return XMLUtils.createXMLDocument(fetchFetchFromDataStoreAsString(reportingOrg, parameters));
+    public Document fetchFetchFromDataStore(List<Param> parameters) {
+        return XMLUtils.createXMLDocument(fetchFetchFromDataStoreAsString(parameters));
     }
 
-    public String fetchFetchFromDataStoreAsString(String reportingOrg, List<Param> queryParameters) {
+    public String fetchFetchFromDataStoreAsString(List<Param> queryParameters) {
         CloseableHttpClient httpClient = HttpClients.custom()
                 .setSSLHostnameVerifier(new NoopHostnameVerifier())
                 .build();
         HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
         requestFactory.setHttpClient(httpClient);
         RestTemplate restTemplate = new RestTemplate(requestFactory);
+        restTemplate.getInterceptors().add(new IATIAuthInterceptor());
         if (queryParameters == null) {
             queryParameters = new ArrayList<>();
         }
         //SET DEFAULT PARAMS
         List<Param> defaultParameters = new ArrayList<>();
-        defaultParameters.add(new Param("wt", "xslt", "="));
-        defaultParameters.add(new Param("tr", "activity-xml.xsl", "="));
+        defaultParameters.add(new Param("wt", "iati", "="));
         defaultParameters.add(new Param("rows", "5000000", "="));
 
-
-
-        String url = getUrlForReportingOrg(reportingOrg) + getParameters(queryParameters, defaultParameters);
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(iatiDatastoreProperties.getUrl());
+        uriBuilder.pathSegment("activity", "iati");
+        String url = uriBuilder.toUriString() + getParameters(queryParameters, defaultParameters);
         try {
             return restTemplate.getForObject(url, String.class);
         } catch (RestClientException ex) {
@@ -223,7 +226,7 @@ public class ActivityFetchService {
      */
     private String fetch(String reportingOrg, List<Param> params) {
         String fileName = ReportingOrganizationHelper.getFileName(reportingOrg);
-        String responseText = fetchFetchFromDataStoreAsString(reportingOrg, params);
+        String responseText = fetchFetchFromDataStoreAsString(params);
 
         if (projectTranslator.isEnabled()) {
             try {
@@ -291,7 +294,7 @@ public class ActivityFetchService {
         getIatiIdentifiers().forEach((String reportingOrg, List<String> iatiIdentifiers) -> {
             List<Param> params = DataFetchServiceConstants.getCommonParams(reportingOrg, defaultCountry);
             params.add(new Param(DataFetchServiceConstants.IATI_IDENTIFIER_PARAMETER, iatiIdentifiers,PARAM_AND_VALUE));
-            Document doc = this.fetchFetchFromDataStore(reportingOrg, params);
+            Document doc = this.fetchFetchFromDataStore(params);
             NodeList activities;
             try {
                 activities = (NodeList) xPath.compile(query.toString()).evaluate(doc, XPathConstants.NODESET);

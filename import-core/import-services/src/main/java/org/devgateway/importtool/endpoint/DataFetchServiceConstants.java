@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DataFetchServiceConstants {
-    public static final String IATI_DATASTORE_DEFAULT_URL = "https://iati.cloud/search/activity";
     public static final String IATI_ORGANIZATIONS_DEFAULT_URL = "https://iatiregistry.org/api/action/organization_list?" +
             "all_fields=true&include_extras=true";
     public static final String PARAMETER_REPLACE_VALUE = "$";

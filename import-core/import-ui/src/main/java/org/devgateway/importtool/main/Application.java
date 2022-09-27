@@ -4,6 +4,7 @@ import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletContext;
 import javax.servlet.SessionCookieConfig;
 
+import org.devgateway.importtool.services.IATIDatastoreProperties;
 import org.devgateway.importtool.services.ProjectTranslationSettings;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -21,7 +22,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication(scanBasePackages ={ "org.devgateway.importtool.main",
 		"org.devgateway.importtool.services", "org.devgateway.importtool.rest," +
 		"org.devgateway.importtool.scheduler","org.devgateway.importtool.rest.error" } )
-@EnableConfigurationProperties(ProjectTranslationSettings.class)
+@EnableConfigurationProperties({ProjectTranslationSettings.class, IATIDatastoreProperties.class})
 public class Application extends WebMvcAutoConfiguration {
 	public static void main(String[] args) {
         System.setProperty("server.tomcat.max-threads","200");
