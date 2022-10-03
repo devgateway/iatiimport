@@ -3,7 +3,8 @@ package org.devgateway.importtool.services;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.N
+otEmpty;
 
 @Validated
 @ConfigurationProperties("iati.datastore")
