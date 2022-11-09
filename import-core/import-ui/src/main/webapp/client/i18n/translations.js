@@ -13,7 +13,6 @@ module.exports = {
 								'reports' : ' Reports ',
 								'close' : ' Close ',
 								'language_selector' : ' Language',
-								'admin': 'Admin',
 								'submenu' : {
 									'iati101': 'IATI 1.01 to AMP',
 									'iati103' : 'IATI 1.03 to AMP',
@@ -28,8 +27,7 @@ module.exports = {
 									'en' : 'English ',
 									'fr' : 'French ',
 									'es': 'Spanish',
-									'workflow_list' : 'Workflow List',
-									'data_source' : 'Data Source Manager'
+									'workflow_list' : 'Workflow List'
 								}
 							}
 						}
@@ -327,7 +325,6 @@ module.exports = {
 								'reports' : ' Reportes ',
 								'close' : ' Cerrar ',
 								'language_selector' : ' Idioma',
-								'admin': 'Admin',
 								'submenu' : {
 									'iati101': 'IATI 1.01 hacia AMP',
 									'iati103' : 'IATI 1.03 hacia AMP',
@@ -342,8 +339,7 @@ module.exports = {
 									'en' : 'Inglés ',
 									'fr' : 'Francés ',
 									'es':'Spanish ',
-									'workflow_list' : 'Lista de Flujos de Trabajo',
-									'data_source' : 'Gestión de fuente de datos'
+									'workflow_list' : 'Lista de Flujos de Trabajo'
 								}
 							}
 						}
@@ -637,7 +633,6 @@ module.exports = {
 								'reports' : ' Rapports ',
 								'close' : ' Fermer ',
 								'language_selector' : ' Langue',
-								'admin': 'Admin',
 								'submenu' : {
 									'iati101': 'IATI 1.01 vers AMP',
 									'iati103' : 'IATI 1.03 vers AMP',
@@ -652,8 +647,7 @@ module.exports = {
 									'en' : 'English ',
 									'fr' : 'Français ',
 									'es': 'Spanish',
-									'workflow_list' : 'Flux de téléchargement',
-									'data_source' : 'Gestionnaire des sources de données'
+									'workflow_list' : 'Flux de téléchargement'
 
 								}
 							}

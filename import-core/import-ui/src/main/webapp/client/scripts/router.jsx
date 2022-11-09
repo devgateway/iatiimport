@@ -19,11 +19,9 @@ var MapValues = require('./components/wizard/map-values');
 var MapValuesTab = require('./components/wizard/map-values-table');
 var Import = require('./components/wizard/review-import');
 var Reports = require('./components/reports/index');
-var Admin = require('./components/admin/index');
 var ImportList = require('./components/reports/import-list');
 var ImportLog = require('./components/reports/import-log');
 var WorkflowList = require('./components/reports/workflow-list');
-var DataSource = require('./components/admin/data-source');
 var ErrorPage = require('./components/error-page')
 var appActions = require('./actions');
 var common = require('./utils/common');
@@ -32,47 +30,44 @@ var Cookies = require('js-cookie');
 
 var routes = (
 	<Route name="layout" path="/" handler={Home}>
-		<DefaultRoute handler={LandingPage} />	
+		<DefaultRoute handler={LandingPage} />
         <Route name="error" path="error" handler={ErrorPage} />
 		<Route name="manual" path="manual" handler={ManualProcess} />
-		<Route path="wizard/:src/:dst" handler={Wizard}>	
-			<Route name="upload" handler={UploadFile}/>        
+		<Route path="wizard/:src/:dst" handler={Wizard}>
+			<Route name="upload" handler={UploadFile}/>
             <Route name="selectdatasource" path="selectdatasource" handler={SelectDataSource}/>
-            <Route name="selectversion" path="selectversion" handler={SelectVersion}/>        
+            <Route name="selectversion" path="selectversion" handler={SelectVersion}/>
 			<Route name="filter" path="filter" handler={FilterData}/>
 			<Route name="projects" path="projects" handler={ChooseProjects}/>
 			<Route name="fields" path="fields" handler={ChooseFields}/>
-			<Route name="mapvalues" path="values" handler={MapValues}>			  
-			</Route>			
-			<Route name="import" path="import" handler={Import}/>		  
+			<Route name="mapvalues" path="values" handler={MapValues}>
+			</Route>
+			<Route name="import" path="import" handler={Import}/>
 		</Route>
 		<Route path="reports" handler = {Reports}>
 		   <Route name="previousimports" path="previousimports" handler={ImportList}/>" +
 		   <Route name="workflowlist" path="workflowlist" handler={WorkflowList}/>
 		   <Route name="importlog" path="importlog/:id" handler={ImportLog}/>
         </Route>
-        <Route path="admin" handler = {Admin}>        
-          <Route name="datasource" path="datasource" handler={DataSource}/>
-        </Route>			
 	</Route>
 );
 
 
 exports.start = function() {
-   appActions.initDestinationSession.triggerPromise().then(function(data) {        
-        common.setAuthCookies(data);        
+   appActions.initDestinationSession.triggerPromise().then(function(data) {
+        common.setAuthCookies(data);
         Router.run(routes, function (Handler) {
             React.render(<Handler />, document.getElementById('app-wrapper'));
         });
-        
-                
+
+
       }.bind(this))["catch"](function(err) {
           common.resetAuthCookies();
           Router.run(routes, function (Handler) {
               React.render(<Handler />, document.getElementById('app-wrapper'));
           });
-          
+
       }.bind(this));
 
-  
+
 }

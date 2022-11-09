@@ -9,3 +9,5 @@ import-core/import-ui/src/main/resources/static/styles/main.css
 modernizr.js
 index.html
 .idea
+*.iml
+*/*.iml

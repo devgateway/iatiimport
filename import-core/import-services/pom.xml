@@ -79,5 +79,10 @@
 			<artifactId>log4j-over-slf4j</artifactId>
 			<version>1.7.32</version>
 		</dependency>
+		<dependency>
+			<groupId>org.hibernate.validator</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>6.2.4.Final</version>
+		</dependency>
 	</dependencies>
 </project>
