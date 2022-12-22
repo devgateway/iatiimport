@@ -6,22 +6,24 @@ def tag = BRANCH_NAME.replaceAll(/[^a-zA-Z0-9_-]/, "-").toLowerCase()
 def branch = env.CHANGE_ID == null ? BRANCH_NAME : null
 def pr = env.CHANGE_ID
 
-def dockerRepository = 'registry.developmentgateway.org'
+def dockerRepository = '798366298150.dkr.ecr.us-east-1.amazonaws.com'
 
 stage('Build') {
     node {
-        withEnv(['DOCKER_BUILDKIT=1']) {
-            try {
-                checkout scm
+        docker.withRegistry("https://798366298150.dkr.ecr.us-east-1.amazonaws.com", "ecr:us-east-1:aws-ecr-credentials-id") {
+            withEnv(['DOCKER_BUILDKIT=1']) {
+                try {
+                    checkout scm
 
-                def image = docker.build("${dockerRepository}/iati-importer-ui:${tag}",
-                        "--build-arg BUILD_SOURCE=${tag} " +
-                        "--build-arg PULL_REQUEST=${pr} " +
-                        "--build-arg BRANCH=${branch} " +
-                        "./import-core")
-                image.push()
-            } finally {
-                sh "docker rmi ${dockerRepository}/iati-importer-ui:${tag}"
+                    def image = docker.build("${dockerRepository}/amp/iati-importer:${tag}",
+                            "--build-arg BUILD_SOURCE=${tag} " +
+                            "--build-arg PULL_REQUEST=${pr} " +
+                            "--build-arg BRANCH=${branch} " +
+                            "./import-core")
+                    image.push()
+                } finally {
+                    sh "docker rmi ${dockerRepository}/amp/iati-importer:${tag}"
+                }
             }
         }
     }
