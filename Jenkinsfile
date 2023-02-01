@@ -49,6 +49,6 @@ stage('Deploy') {
         def country = deployParams['COUNTRY']
         def iatiField = deployParams['IATI_ID_FIELD']
         def processorVersion = deployParams['PROCESSOR_VERSION']
-        sh "ssh boad.aws.devgateway.org 'iati-up $tag $host $country $iatiField $processorVersion'"
+        sh "ssh ${env.AMP_STAGING_HOSTNAME} 'iati-up $tag $host $country $iatiField $processorVersion'"
     }
 }
